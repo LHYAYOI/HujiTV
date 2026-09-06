@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>スコアランキング</title>
+
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+    <main>
+        <h1>スコアランキング</h1>
+
+        <p id="status">ランキングを読み込んでいます...</p>
+
+        <table id="ranking-table" hidden>
+            <thead>
+                <tr>
+                    <th>順位</th>
+                    <th>プレイヤー</th>
+                    <th>スコア</th>
+                </tr>
+            </thead>
+
+            <tbody id="ranking-body">
+            </tbody>
+        </table>
+    </main>
+
+    <script src="./js/ranking.js"></script>
+
+</body>
+
+</html>
