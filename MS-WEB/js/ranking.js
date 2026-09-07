@@ -1,4 +1,4 @@
-const SUPABASE_URL = "https://mlzzduyeeptfmmaflgkj.supabase.co";
+ï»¿const SUPABASE_URL = "https://mlzzduyeeptfmmaflgkj.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Hev5d_eUSXb0Kjd-wX-Stg_aYnB7Oq9";
 
 async function loadRanking() {
@@ -8,7 +8,7 @@ async function loadRanking() {
 
     try {
         const response = await fetch(
-            `${SUPABASE_URL}/rest/v1/scores?select=player_name,score&order=score.desc&limit=10`,
+            `${SUPABASE_URL}/rest/v1/scores?select=playerName,score&order=score.desc&limit=10`,
             {
                 headers:
                 {
@@ -18,8 +18,10 @@ async function loadRanking() {
         );
 
         if (!response.ok) {
+            const errorText = await response.text();
+
             throw new Error(
-                `ƒ‰ƒ“ƒLƒ“ƒOæ“¾¸”s: ${response.status} ${response.statusText}`
+                `ãƒ©ãƒ³ã‚­ãƒ³ã‚°å–å¾—å¤±æ•—: ${response.status} ${response.statusText}\n${errorText}`
             );
         }
 
@@ -34,7 +36,7 @@ async function loadRanking() {
             rankCell.textContent = index + 1;
 
             const nameCell = document.createElement("td");
-            nameCell.textContent = scoreData.player_name;
+            nameCell.textContent = scoreData.playerName;
 
             const scoreCell = document.createElement("td");
             scoreCell.textContent = scoreData.score;
@@ -52,8 +54,7 @@ async function loadRanking() {
     catch (error) {
         console.error(error);
 
-        status.textContent =
-            "ƒ‰ƒ“ƒLƒ“ƒO‚Ìæ“¾‚É¸”s‚µ‚Ü‚µ‚½B";
+        status.textContent = "ãƒ©ãƒ³ã‚­ãƒ³ã‚°ã®å–å¾—ã«å¤±æ•—ã—ã¾ã—ãŸã€‚";
     }
 }
 
