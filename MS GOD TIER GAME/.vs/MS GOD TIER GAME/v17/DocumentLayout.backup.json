@@ -3,11 +3,7 @@
   "WorkspaceRootPath": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|d:\\github\\hujitv\\ms god tier game\\assets\\hamada\\scripts\\camera\\newmonobehaviourscript.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:assets\\hamada\\scripts\\camera\\newmonobehaviourscript.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\camera\\camerashake.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|d:\\github\\hujitv\\ms god tier game\\assets\\hamada\\scripts\\camera\\camerashake.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\camera\\camerashake.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -15,16 +11,8 @@
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\camera\\cameramanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\common\\animationeventrelay.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\common\\animationeventrelay.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\common\\easing.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\common\\easing.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\CameraManager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Hamada\\Scripts\\CameraManager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|d:\\github\\hujitv\\ms god tier game\\assets\\hamada\\scripts\\camera\\cinemachinerotationshake.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\camera\\cinemachinerotationshake.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -34,80 +22,46 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "NewMonoBehaviourScript.cs",
-              "DocumentMoniker": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\NewMonoBehaviourScript.cs",
-              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Camera\\NewMonoBehaviourScript.cs",
-              "ToolTip": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\NewMonoBehaviourScript.cs",
-              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Camera\\NewMonoBehaviourScript.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAADwvw8AAAAuAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "CinemachineRotationShake.cs",
+              "DocumentMoniker": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CinemachineRotationShake.cs",
+              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Camera\\CinemachineRotationShake.cs",
+              "ToolTip": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CinemachineRotationShake.cs",
+              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Camera\\CinemachineRotationShake.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAABIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-10T09:50:18.423Z",
+              "WhenOpened": "2026-09-10T11:29:26.566Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "CameraManager.cs",
               "DocumentMoniker": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
               "ToolTip": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
               "RelativeToolTip": "Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAEQAAAAVAAAAAAAAAA==",
+              "ViewState": "AgIAAFQAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-10T08:04:26.13Z"
+              "WhenOpened": "2026-09-10T08:04:26.13Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "CameraShake.cs",
               "DocumentMoniker": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CameraShake.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Camera\\CameraShake.cs",
               "ToolTip": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CameraShake.cs",
               "RelativeToolTip": "Assets\\Hamada\\Scripts\\Camera\\CameraShake.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAASAAAAAAAAAA==",
+              "ViewState": "AgIAADQAAAAAAAAAAAAAAEEAAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-10T08:01:20.077Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "AnimationEventRelay.cs",
-              "DocumentMoniker": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\AnimationEventRelay.cs",
-              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Common\\AnimationEventRelay.cs",
-              "ToolTip": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\AnimationEventRelay.cs",
-              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Common\\AnimationEventRelay.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-10T07:42:40.249Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Easing.cs",
-              "DocumentMoniker": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\Easing.cs",
-              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Common\\Easing.cs",
-              "ToolTip": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\Easing.cs",
-              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Common\\Easing.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-10T07:23:35.125Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "CameraManager.cs",
-              "DocumentMoniker": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\CameraManager.cs",
-              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\CameraManager.cs",
-              "ToolTip": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\CameraManager.cs",
-              "RelativeToolTip": "Assets\\Hamada\\Scripts\\CameraManager.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-10T06:57:58.835Z"
+              "WhenOpened": "2026-09-10T08:01:20.077Z",
+              "EditorCaption": ""
             }
           ]
         }
