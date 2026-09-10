@@ -12,6 +12,10 @@ public class CameraShake : MonoBehaviour
 
     void Update()
     {
+        if(Input.GetKeyDown(KeyCode.P))
+        {
+            Debug.Log("ShakeCamera");
+        }
     }
 
     IEnumerator ShakeRoutine(float duration,float intensity)
