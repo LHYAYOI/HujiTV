@@ -10,4 +10,7 @@ public enum BOOK_MESSAGE_TYPE : byte
 
     BUTTON_PRESSED = 1,
     ORIENTATION = 2,
+
+    PAGE_CHANGED = 3,
+    CAST_REQUEST = 4,
 }
