@@ -12,6 +12,7 @@ public abstract class SceneTransition : MonoBehaviour
     public enum TRANSITION_TYPE  // ‘JˆÚ‚ÌŽí—Þ
     {
         FADE,
+        IRIS,
     }
 
     public abstract TRANSITION_TYPE Type { get; }    // ‘JˆÚ‚ÌŽí—Þ‚ðŽæ“¾

@@ -112,6 +112,7 @@ public class SceneController : MonoBehaviour
             SCENE_TYPE.RESULT => "Result",
             SCENE_TYPE.TUTORIAL => "Tutorial",
 
+            _ => "Title",
         };
     }
 }

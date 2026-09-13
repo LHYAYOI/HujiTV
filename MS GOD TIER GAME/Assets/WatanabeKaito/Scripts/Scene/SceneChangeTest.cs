@@ -7,7 +7,7 @@ public class SceneChangeTest : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            SceneController.Instance.ChangeScene(SceneController.SCENE_TYPE.GAME, SceneTransition.TRANSITION_TYPE.FADE);
+            SceneController.Instance.ChangeScene(SceneController.SCENE_TYPE.GAME, SceneTransition.TRANSITION_TYPE.IRIS);
         }
     }
 }
