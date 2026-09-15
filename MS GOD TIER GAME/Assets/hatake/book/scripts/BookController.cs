@@ -71,13 +71,17 @@ public sealed class BookController : MonoBehaviour
         bool advanceFlag = spreadIndex > m_spreadIndex;
         bool turnFlag = m_currentTexture != null && spreadIndex != m_spreadIndex;
         RenderTexture targetTexture = m_currentTexture == m_textureA ? m_textureB : m_textureA;
+
         m_captureCamera.targetTexture = targetTexture;
         m_leftPageView.ShowPage(leftPage);
         m_rightPageView.ShowPage(rightPage);
+
         Canvas.ForceUpdateCanvases();
+
         m_captureCamera.enabled = true;
         yield return new WaitForEndOfFrame();
-        m_captureCamera.enabled = false;
+
+        // m_captureCamera.enabled = false;
 
         if (m_modelView != null)
         {

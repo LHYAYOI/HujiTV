@@ -7,9 +7,9 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MI_Grudge_000
+  m_Name: MI_Grudge
   m_Shader: {fileID: 4800000, guid: f54e158132925fb489c0e969073037be, type: 3}
-  m_Parent: {fileID: 2100000, guid: d0a19b65f9292b6418686a62aed9665e, type: 2}
+  m_Parent: {fileID: 2100000, guid: a7070c9ed3cbf2345a5d467408ba5447, type: 2}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - U_BASE_ON
@@ -19,14 +19,7 @@ Material:
   - U_MOSH_ON
   - U_PIXEL_ON
   - U_SHARPEN_ON
-  m_InvalidKeywords:
-  - _UBASICENABLED_ON
-  - _UCHROMATICABERRATIONENABLED_ON
-  - _UDATAMOSHENABLED_ON
-  - _UDISPLACEMENTENABLED_ON
-  - _UGLITCHENABLED_ON
-  - _UPIXELATIONENABLED_ON
-  - _USHARPENENABLED_ON
+  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -38,15 +31,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs: []
     m_Ints: []
-    m_Floats:
-    - _uBasicEnabled: 1
-    - _uChromaticAberrationEnabled: 1
-    - _uDataMoshEnabled: 1
-    - _uDisplacementEnabled: 1
-    - _uGlitchEnabled: 1
-    - _uPixelationEnabled: 1
-    - _uSharpenEnabled: 1
-    m_Colors:
-    - _Color: {r: 1.1486983, g: 1.1486983, b: 1.1486983, a: 1}
+    m_Floats: []
+    m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1

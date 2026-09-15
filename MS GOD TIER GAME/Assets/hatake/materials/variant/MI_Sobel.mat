@@ -7,16 +7,14 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MI_Sobel_000
+  m_Name: MI_Sobel
   m_Shader: {fileID: 4800000, guid: 611338efe17f0d04cbf6d2305b195241, type: 3}
   m_Parent: {fileID: 2100000, guid: 45dfd9b74773eaf42b3885aa8a791102, type: 2}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - U_EDGEDETECTION_ON
   - U_MIRROR_ON
-  m_InvalidKeywords:
-  - _UEDGEDETECTIONENABLED_ON
-  - _UMIRRORTILEENABLED_ON
+  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -29,13 +27,8 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _uEdgeDetectionEnabled: 1
-    - _uEdgeThickness: 0.78
     - _uMainTextureEnabled: 0
-    - _uMirrorTileEnabled: 1
-    - _uMirrorTileX: 0
-    - _uMirrorTileY: 0
     m_Colors:
-    - _uEdgeColor: {r: 0, g: 15.599884, b: 17.982025, a: 1}
+    - _uEdgeColor: {r: 0, g: 16, b: 13.414505, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
