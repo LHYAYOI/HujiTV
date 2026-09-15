@@ -1,4 +1,8 @@
+
 using UnityEngine;
+
+/// <summary>
+/// BookDataDebugは、BookDataの内容をデバッグ表示するためのコンポーネント
 
 public sealed class BookDataDebug : MonoBehaviour
 {
@@ -10,7 +14,7 @@ public sealed class BookDataDebug : MonoBehaviour
         if (m_bookData == null)
         {
             Debug.LogWarning(
-                "Book Dataを設定してください。",
+                "Book Dataを設定して",
                 this);
             return;
         }

@@ -13,7 +13,7 @@ public static class BookModelSetup
     {
         if (EditorApplication.isPlayingOrWillChangePlaymode)
         {
-            Debug.LogError("停止してから実行してください。");
+            Debug.LogError("実行中は使えません");
             return;
         }
 
@@ -22,14 +22,14 @@ public static class BookModelSetup
 
         if (controller == null)
         {
-            Debug.LogError("HierarchyのBookController付きBookManagerを選択してください。");
+            Debug.LogError("HierarchyのBookController付きBookManagerを選択した状態でのみ実行可");
             return;
         }
         SerializedObject controllerObject = new SerializedObject(controller);
 
         if (controllerObject.FindProperty("m_modelView").objectReferenceValue != null)
         {
-            Debug.LogError("このBookControllerはすでに3Dモデルに接続されています。");
+            Debug.LogError("このBookControllerはすでに3Dモデルに接続されています");
             return;
         }
 
@@ -67,13 +67,13 @@ public static class BookModelSetup
 
         if (modelAsset == null || clip == null || atlas == null || shader == null)
         {
-            Debug.LogError("book_anim.unitypackageと接続用Shaderをインポートしてください。");
+            Debug.LogError("book_anim.unitypackageと接続用Shaderをインポートされていません");
             return;
         }
 
         if (clip.legacy)
         {
-            Debug.LogError("page_anim.fbxのRigをGenericにしてください。");
+            Debug.LogError("page_anim.fbxのRigをGenericにしてください");
             return;
         }
 
@@ -83,7 +83,7 @@ public static class BookModelSetup
         if (textureA == textureB || textureA.width != 800 || textureA.height != 450 ||
             textureB.width != 800 || textureB.height != 450)
         {
-            Debug.LogError("A/Bには別々の800x450 Render Textureを指定してください。");
+            Debug.LogError("A/Bには別々の800x450 Render Textureを指定してください");
             return;
         }
 
@@ -221,8 +221,8 @@ public static class BookModelSetup
 
     private static string CreateOutputFolder()
     {
-        string folder = AssetDatabase.GenerateUniqueAssetPath("Assets/Book3DGenerated");
-        string guid = AssetDatabase.CreateFolder("Assets", folder.Substring("Assets/".Length));
+        string folder = AssetDatabase.GenerateUniqueAssetPath("Assets/hatake/book/model");
+        string guid = AssetDatabase.CreateFolder("Assets/hatake/book/model", folder.Substring("Assets/hatake/book/model".Length));
         return AssetDatabase.GUIDToAssetPath(guid);
     }
 

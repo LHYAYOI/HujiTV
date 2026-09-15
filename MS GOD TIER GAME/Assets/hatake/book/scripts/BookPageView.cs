@@ -2,9 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+// <summary>
+// BookPageViewは、BookPageDataの内容をUI上に表示するためのコンポーネント
+
 [RequireComponent(typeof(RectTransform))]
 [RequireComponent(typeof(RectMask2D))]
 [RequireComponent(typeof(Image))]
+
 public sealed class BookPageView : MonoBehaviour
 {
     private readonly List<GameObject> m_imageObjects =
@@ -61,12 +65,12 @@ public sealed class BookPageView : MonoBehaviour
             RectTransform imageTransform =
                 imageObject.GetComponent<RectTransform>();
 
-            // 画像の基準点を左上に統一。
+            // 画像の基準点を左上に統一
             imageTransform.anchorMin = new Vector2(0f, 1f);
             imageTransform.anchorMax = new Vector2(0f, 1f);
             imageTransform.pivot = new Vector2(0f, 1f);
 
-            // 保存データのYは下向き、UI座標のYは上向き。
+            // 保存データのYは下向き、UI座標のYは上向き
             imageTransform.anchoredPosition = new Vector2(
                 imageData.Position.x,
                 -imageData.Position.y);
@@ -92,7 +96,7 @@ public sealed class BookPageView : MonoBehaviour
                 continue;
             }
 
-            // Destroyの実行前に表示を止めます。
+            // Destroyの実行前に表示を止めます
             imageObject.SetActive(false);
             Destroy(imageObject);
         }

@@ -2,17 +2,20 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// BookImageDataは、BookPageData内で表示する画像の情報を管理するクラスです
+
 [Serializable]
 public sealed class BookImageData
 {
     [SerializeField]
     private Sprite m_sprite;
 
-    [Tooltip("画像に適用するUI用Material。未設定なら標準表示。")]
+    [Tooltip("画像に適用するUI用Material。未設定なら標準表示")]
     [SerializeField]
     private Material m_material;
 
-    [Tooltip("ページ左上からの位置。Xは右向き、Yは下向き。")]
+    [Tooltip("ページ左上からの位置。Xは右向き、Yは下向き")]
     [SerializeField]
     private Vector2 m_position = Vector2.zero;
 
@@ -55,6 +58,6 @@ public sealed class BookPageData : ScriptableObject
     public Color BackgroundColor => m_backgroundColor;
     public IReadOnlyList<BookImageData> Images => m_images;
 
-    // 全ページ共通の基準サイズ
+    [Tooltip("ページの基準サイズ。UI表示や3Dモデル表示で使用します")]
     public static Vector2 PageSize => new Vector2(310f, 360f);
 }

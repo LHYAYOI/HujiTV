@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+/// <summary>
+/// BookDataは、1冊の本の情報を管理するScriptableObjectです
+
 [CreateAssetMenu(
     fileName = "Book_New",
     menuName = "Book/Book Data")]
@@ -13,7 +17,7 @@ public sealed class BookData : ScriptableObject
 
     [Header("ページ順")]
 
-    [Tooltip("先頭から、左・右・左・右の順に登録します。")]
+    [Tooltip("先頭から、左・右・左・右の順に登録します")]
     [SerializeField]
     private List<BookPageData> m_pages =
         new List<BookPageData>();
@@ -21,7 +25,7 @@ public sealed class BookData : ScriptableObject
     public string BookTitle => m_bookTitle;
     public int PageCount => m_pages.Count;
 
-    // ページ数が奇数の場合、最後の右ページは空白
+    [Tooltip("ページ数が奇数の場合、最後の右ページは空白")]
     public int SpreadCount => (PageCount + 1) / 2;
 
     /// <summary>

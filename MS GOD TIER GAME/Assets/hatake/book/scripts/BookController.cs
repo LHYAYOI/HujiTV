@@ -2,6 +2,9 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// BookControllerは、BookDataの見開きを撮影し、表示するためのコンポーネント
+
 public sealed class BookController : MonoBehaviour
 {
     [Header("ページデータ")]
@@ -38,17 +41,17 @@ public sealed class BookController : MonoBehaviour
             m_rightPageView == null || m_captureCamera == null ||
             m_displayImage == null || m_textureA == null || m_textureB == null)
         {
-            Debug.LogWarning("BookControllerの参照をすべて設定してください。", this);
+            Debug.LogWarning("BookControllerの参照をすべて設定", this);
             return;
         }
         if (m_textureA == m_textureB)
         {
-            Debug.LogError("Texture AとBには別々のRender Textureが必要です。", this);
+            Debug.LogError("Texture_A/Bには別々のRenderTextureが必要", this);
             return;
         }
         if (!m_captureCamera.gameObject.activeInHierarchy)
         {
-            Debug.LogError("撮影CameraのGameObjectを有効にしてください。", this);
+            Debug.LogError("撮影CameraのGameObjectを有効に", this);
             return;
         }
         bool getSpreadFlag = m_bookData.TryGetSpread(
