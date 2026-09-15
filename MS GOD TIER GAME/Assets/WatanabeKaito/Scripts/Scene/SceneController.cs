@@ -23,6 +23,18 @@ public class SceneController : MonoBehaviour
     [Header("遷移管理")]
     [SerializeField] private TransitionManager m_transitionManager;
 
+    [Header("タイトルシーン名")]
+    [SerializeField] private string m_titleSceneName = "Title";
+
+    [Header("ゲームシーン名")]
+    [SerializeField] private string m_gameSceneName = "Game";
+
+    [Header("リザルトシーン名")]
+    [SerializeField] private string m_resultSceneName = "Result";
+
+    [Header("チュートリアルシーン名")]
+    [SerializeField] private string m_tutorialSceneName = "Tutorial";
+
     private bool m_changingSceneFlag = false;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -107,12 +119,12 @@ public class SceneController : MonoBehaviour
     {
         return sceneType switch
         {
-            SCENE_TYPE.TITLE => "Title",
-            SCENE_TYPE.GAME => "Game",
-            SCENE_TYPE.RESULT => "Result",
-            SCENE_TYPE.TUTORIAL => "Tutorial",
+            SCENE_TYPE.TITLE => m_titleSceneName,
+            SCENE_TYPE.GAME => m_gameSceneName,
+            SCENE_TYPE.RESULT => m_resultSceneName,
+            SCENE_TYPE.TUTORIAL => m_tutorialSceneName,
 
-            _ => "Title",
+            _ => m_titleSceneName,
         };
     }
 }

@@ -93,6 +93,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneController
   m_transitionManager: {fileID: 4705124975537107836}
+  m_titleSceneName: Title_test
+  m_gameSceneName: Game_test
+  m_resultSceneName: Result_test
+  m_tutorialSceneName: Tutorial_test
 --- !u!1 &1090828750894734493
 GameObject:
   m_ObjectHideFlags: 0
