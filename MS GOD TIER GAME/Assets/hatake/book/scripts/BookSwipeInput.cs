@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -11,7 +10,7 @@ public sealed class BookSwipeInput : MonoBehaviour,
     [SerializeField]
     private BookController m_bookController;
 
-    [Tooltip("見開き幅に対する、ページ移動に必要な移動量の割合。")]
+    [Tooltip("入力領域の幅に対する、ページ移動に必要な移動量の割合。")]
     [SerializeField, Range(0.05f, 0.5f)]
     private float m_swipeThresholdRatio = 0.15f;
 
@@ -52,8 +51,8 @@ public sealed class BookSwipeInput : MonoBehaviour,
 
     public void OnDrag(PointerEventData eventData)
     {
-        // 今回はドラッグ終了時に判定します。
-        // UIのドラッグイベントを受けるために実装。
+        // 今回はドラッグ終了時に判定
+        // ドラッグイベントを受け取るため
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -87,7 +86,7 @@ public sealed class BookSwipeInput : MonoBehaviour,
         float threshold =
             m_rectTransform.rect.width * m_swipeThresholdRatio;
 
-        // 短い移動と、縦方向が強い移動は無視。
+        // 短い移動と、縦方向が強い移動は無視
         if (Mathf.Abs(movement.x) < threshold ||
             Mathf.Abs(movement.x) <= Mathf.Abs(movement.y))
         {

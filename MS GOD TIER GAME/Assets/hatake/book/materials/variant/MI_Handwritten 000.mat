@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: MI_Handwritten 000
+  m_Shader: {fileID: 4800000, guid: 1185202075294014b97f3b0cc5467d88, type: 3}
+  m_Parent: {fileID: 2100000, guid: a851924758d5b37428e4209215389af6, type: 2}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - U_HATCH_ON
+  - U_PAPER_ON
+  - U_SKECH_ON
+  m_InvalidKeywords:
+  - _UCROSSHATCHENABLED_ON
+  - _UPAPERENABLED_ON
+  - _USKETCHENABLED_ON
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _uColorEnabled: 0
+    - _uCrossHatchEnabled: 1
+    - _uSketchEnabled: 1
+    m_Colors:
+    - _Color: {r: 0.933033, g: 0.933033, b: 0.933033, a: 1}
+    - _uPaperColor: {r: 0.3820755, g: 0.3820755, b: 0.3820755, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

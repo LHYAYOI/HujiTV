@@ -1,7 +1,5 @@
-
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 [CreateAssetMenu(
     fileName = "Book_New",
@@ -17,18 +15,18 @@ public sealed class BookData : ScriptableObject
 
     [Tooltip("先頭から、左・右・左・右の順に登録します。")]
     [SerializeField]
-    private List<BookPageData> m_pages = new List<BookPageData>();
+    private List<BookPageData> m_pages =
+        new List<BookPageData>();
 
     public string BookTitle => m_bookTitle;
-
     public int PageCount => m_pages.Count;
 
-    // ページ数が奇数なら、最後の右ページは空白になります。
+    // ページ数が奇数の場合、最後の右ページは空白
     public int SpreadCount => (PageCount + 1) / 2;
 
     /// <summary>
-    /// 0始まりの番号でページを取得します。
-    /// 範囲外、または未設定の場合はnullを返します。
+    /// 0始まりの番号でページを取得します
+    /// 範囲外、または未設定の場合はnullを返す
     /// </summary>
     public BookPageData GetPage(int pageIndex)
     {
@@ -41,8 +39,8 @@ public sealed class BookData : ScriptableObject
     }
 
     /// <summary>
-    /// 指定した見開きの左右ページを取得します。
-    /// 見開き番号は0始まりです。
+    /// 0始まりの見開き番号から、左右ページを取得します
+    /// 戻り値は見開き番号が有効かどうかを表す
     /// </summary>
     public bool TryGetSpread(
         int spreadIndex,

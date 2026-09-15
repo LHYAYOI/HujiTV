@@ -1,4 +1,3 @@
-
 using UnityEditor;
 using UnityEngine;
 
@@ -24,9 +23,15 @@ public sealed class BookPageDataEditor : Editor
         EditorGUILayout.PropertyField(imagesProperty, true);
 
         EditorGUILayout.Space();
+
         EditorGUILayout.LabelField(
             "画像をドラッグして配置",
             EditorStyles.boldLabel);
+
+        EditorGUILayout.HelpBox(
+            "サイズは画像リスト内で編集します。" +
+            "Materialの効果はこのプレビューには反映されません。",
+            MessageType.Info);
 
         Vector2 pageSize = BookPageData.PageSize;
 
@@ -45,7 +50,8 @@ public sealed class BookPageDataEditor : Editor
         int controlId = GUIUtility.GetControlID(
             FocusType.Passive);
 
-        float scale = previewRect.width / BookPageData.PageSize.x;
+        float scale =
+            previewRect.width / BookPageData.PageSize.x;
 
         Color backgroundColor = serializedObject
             .FindProperty("m_backgroundColor")
@@ -53,7 +59,7 @@ public sealed class BookPageDataEditor : Editor
 
         EditorGUI.DrawRect(previewRect, backgroundColor);
 
-        // ページ外への描画をクリップ。
+        // ページ外への描画をクリップ
         GUI.BeginGroup(previewRect);
 
         for (int imageIndex = 0;
@@ -63,19 +69,17 @@ public sealed class BookPageDataEditor : Editor
             SerializedProperty imageProperty =
                 imagesProperty.GetArrayElementAtIndex(imageIndex);
 
-            Texture2D texture = imageProperty
-                .FindPropertyRelative("m_texture")
-                .objectReferenceValue as Texture2D;
+            Sprite sprite = imageProperty
+                .FindPropertyRelative("m_sprite")
+                .objectReferenceValue as Sprite;
 
-            Rect imageRect = GetImageRect(imageProperty, scale);
+            Rect imageRect = GetImageRect(
+                imageProperty,
+                scale);
 
-            if (texture != null)
+            if (sprite != null)
             {
-                GUI.DrawTexture(
-                    imageRect,
-                    texture,
-                    ScaleMode.StretchToFill,
-                    true);
+                DrawSprite(imageRect, sprite);
             }
 
             if (imageIndex == m_selectedIndex)
@@ -97,7 +101,7 @@ public sealed class BookPageDataEditor : Editor
 
             m_selectedIndex = -1;
 
-            // 手前に表示されている画像から選択。
+            // 手前に表示されている画像から選択します。
             for (int imageIndex = imagesProperty.arraySize - 1;
                  imageIndex >= 0;
                  imageIndex--)
@@ -106,14 +110,17 @@ public sealed class BookPageDataEditor : Editor
                     imagesProperty.GetArrayElementAtIndex(imageIndex);
 
                 if (imageProperty
-                    .FindPropertyRelative("m_texture")
+                    .FindPropertyRelative("m_sprite")
                     .objectReferenceValue == null)
                 {
                     continue;
                 }
 
-                if (GetImageRect(imageProperty, scale)
-                    .Contains(mousePosition))
+                Rect imageRect = GetImageRect(
+                    imageProperty,
+                    scale);
+
+                if (imageRect.Contains(mousePosition))
                 {
                     m_selectedIndex = imageIndex;
                     break;
@@ -141,7 +148,8 @@ public sealed class BookPageDataEditor : Editor
             SerializedProperty positionProperty =
                 imageProperty.FindPropertyRelative("m_position");
 
-            positionProperty.vector2Value += inputEvent.delta / scale;
+            positionProperty.vector2Value +=
+                inputEvent.delta / scale;
 
             inputEvent.Use();
             Repaint();
@@ -171,7 +179,33 @@ public sealed class BookPageDataEditor : Editor
         size.x = Mathf.Max(1f, size.x);
         size.y = Mathf.Max(1f, size.y);
 
-        return new Rect(position * scale, size * scale);
+        return new Rect(
+            position * scale,
+            size * scale);
+    }
+
+    private void DrawSprite(Rect imageRect, Sprite sprite)
+    {
+        Texture2D texture = sprite.texture;
+
+        if (texture == null)
+        {
+            return;
+        }
+
+        Rect spriteRect = sprite.rect;
+
+        Rect textureCoordinates = new Rect(
+            spriteRect.x / texture.width,
+            spriteRect.y / texture.height,
+            spriteRect.width / texture.width,
+            spriteRect.height / texture.height);
+
+        GUI.DrawTextureWithTexCoords(
+            imageRect,
+            texture,
+            textureCoordinates,
+            true);
     }
 
     private void OnDisable()

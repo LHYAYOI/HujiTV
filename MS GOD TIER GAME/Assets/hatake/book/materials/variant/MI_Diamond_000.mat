@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: MI_Diamond_000
+  m_Shader: {fileID: 4800000, guid: 348ded6fe42ee9a47942a270a8f8edd4, type: 3}
+  m_Parent: {fileID: 2100000, guid: 471c32261f810d14da5ed76a3df1fd88, type: 2}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - U_DEBUG_DISTOTION_ON
+  - U_GLASS_ON
+  m_InvalidKeywords:
+  - _UDEBUGDISTORTION_ON
+  - _UGLASSENABLED_ON
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _uGlassMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _uBasicEnabled: 0
+    - _uDebugDistortion: 1
+    - _uFacetScale: 10.3
+    - _uFlickerSpeed: 2.1
+    - _uFresnelIntensity: 0.24
+    - _uGlassDistortion: 0
+    - _uGlassEnabled: 1
+    - _uSparkleIntensity: 0.09
+    - _uSparkleSharpness: 1
+    m_Colors:
+    - _uSparkleColor: {r: 2.556074, g: 4, b: 1.981132, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

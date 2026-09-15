@@ -13,7 +13,13 @@ MonoBehaviour:
   m_Name: Page_002
   m_EditorClassIdentifier: Assembly-CSharp::BookPageData
   m_pageName: page_002
+  m_backgroundColor: {r: 1, g: 0.8207547, b: 0.8207547, a: 1}
   m_images:
-  - m_texture: {fileID: 2800000, guid: d4d90f41b9b4d7240a763a47cfc46cc2, type: 3}
-    m_position: {x: 208.31131, y: 1.8051225}
-    m_size: {x: 100, y: 100}
+  - m_sprite: {fileID: 1600250937824392209, guid: d4d90f41b9b4d7240a763a47cfc46cc2, type: 3}
+    m_material: {fileID: 2100000, guid: bc1df8b23a20b2a48bd7aa8912e59552, type: 2}
+    m_position: {x: 4.881422, y: 70.74793}
+    m_size: {x: 300, y: 300}
+  - m_sprite: {fileID: -317014946, guid: d374a9c2650b7a6468c67100a61db33c, type: 3}
+    m_material: {fileID: 0}
+    m_position: {x: 3.9103954, y: 7.6312494}
+    m_size: {x: 60, y: 100}

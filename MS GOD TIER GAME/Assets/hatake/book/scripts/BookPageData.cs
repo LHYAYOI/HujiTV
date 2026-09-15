@@ -6,7 +6,11 @@ using UnityEngine;
 public sealed class BookImageData
 {
     [SerializeField]
-    private Texture2D m_texture;
+    private Sprite m_sprite;
+
+    [Tooltip("画像に適用するUI用Material。未設定なら標準表示。")]
+    [SerializeField]
+    private Material m_material;
 
     [Tooltip("ページ左上からの位置。Xは右向き、Yは下向き。")]
     [SerializeField]
@@ -16,7 +20,8 @@ public sealed class BookImageData
     [SerializeField]
     private Vector2 m_size = new Vector2(100f, 100f);
 
-    public Texture2D Texture => m_texture;
+    public Sprite Sprite => m_sprite;
+    public Material Material => m_material;
     public Vector2 Position => m_position;
 
     public Vector2 Size => new Vector2(
@@ -39,8 +44,6 @@ public sealed class BookPageData : ScriptableObject
     [SerializeField]
     private Color m_backgroundColor = Color.white;
 
-    public Color BackgroundColor => m_backgroundColor;
-
     [Header("画像レイアウト")]
 
     [Tooltip("後ろの要素ほど手前に表示します。")]
@@ -49,8 +52,9 @@ public sealed class BookPageData : ScriptableObject
         new List<BookImageData>();
 
     public string PageName => m_pageName;
+    public Color BackgroundColor => m_backgroundColor;
     public IReadOnlyList<BookImageData> Images => m_images;
 
-    // 全ページ共通の基準サイズ。
+    // 全ページ共通の基準サイズ
     public static Vector2 PageSize => new Vector2(310f, 360f);
 }
