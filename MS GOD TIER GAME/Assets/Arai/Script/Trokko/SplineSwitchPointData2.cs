@@ -13,7 +13,7 @@ public class SplineSwitchPointData2
 
     [SerializeField] private float m_switchPoint;
 
-    [SerializeField] private SplineContainer m_spline;
+    [SerializeField] private SplineController2 m_splineController;
 
     [SerializeField] private float m_switchOffset;
 
@@ -22,7 +22,8 @@ public class SplineSwitchPointData2
     // ―――――――――――――――――――――――――――――――――――――
     public float SwitchPoint { get { return m_switchPoint; } }
     public float SwitchChangeRange { get { return m_switchChangeRange; } }
-    public SplineContainer Spline { get { return m_spline; } }
+    public SplineController2 SplineController {  get { return m_splineController; } }
+    public SplineContainer Spline { get { return m_splineController?.Spline; } }
 
     public float SwitchOffset { get { return m_switchOffset; }}
 }

@@ -6,7 +6,28 @@ using UnityEngine.Splines;
 public class SplineController2 : MonoBehaviour
 {
     [SerializeField] private SplineContainer m_spline;
+    [SerializeField] private bool m_loopFlag;
     [SerializeField] private List<SplineSwitchPointData2> m_switchPoints;
+
+
+    public SplineContainer Spline => m_spline;
+    public bool LoopFlag => m_loopFlag;
+    public SplineSwitchPointData2 GetSwitchPointByDistance(float offset)
+    {
+        foreach(var data in m_switchPoints)
+        {
+            float max = data.SwitchPoint;
+            float min = max - data.SwitchChangeRange;
+
+            if(offset < max && offset > min)
+            {
+                return data;
+            }
+        }
+
+        return null;
+    }
+
 
 
     private void OnDrawGizmos()
