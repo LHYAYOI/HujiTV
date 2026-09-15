@@ -53,6 +53,6 @@ public class MagicSystem : MonoBehaviour
 
     private void Cast(MAGIC_TYPE magic)
     {
-        Debug.Log($"===== {magic} ”­“® =====");
+        Debug.Log($"===== {m_bookInputState.PlayerSlot}" + $" : {magic} ”­“® =====");
     }
 }

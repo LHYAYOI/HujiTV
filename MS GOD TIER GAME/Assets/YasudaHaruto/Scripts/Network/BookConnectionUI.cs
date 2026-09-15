@@ -22,6 +22,9 @@ public class BookConnectionUI : MonoBehaviour
     [SerializeField]
     private Button m_connectButton;
 
+    [SerializeField]
+    private TMP_Dropdown m_playerDropdown;
+
     private void Start()
     {
         if (m_networkClient != null)
@@ -34,14 +37,16 @@ public class BookConnectionUI : MonoBehaviour
 
     public void OnConnectButtonPressed()
     {
-        if (m_networkClient == null || m_ipInputField == null)
+        if (m_networkClient == null || m_ipInputField == null || m_playerDropdown == null)
         {
             return;
         }
 
         string ipAddress = m_ipInputField.text;
 
-        m_networkClient.Connect(ipAddress);
+        PLAYER_SLOT playerSlot = (PLAYER_SLOT)(m_playerDropdown.value + 1);
+
+        m_networkClient.Connect(ipAddress, playerSlot);
     }
 
     private void OnConnectionStateChanged(BOOK_CONNECTION_STATE state)
@@ -67,6 +72,11 @@ public class BookConnectionUI : MonoBehaviour
                     m_connectButton.interactable = true;
                 }
 
+                if (m_playerDropdown != null)
+                {
+                    m_playerDropdown.interactable = true;
+                }
+
                 break;
 
             case BOOK_CONNECTION_STATE.CONNECTING:
@@ -78,6 +88,11 @@ public class BookConnectionUI : MonoBehaviour
                     m_connectButton.interactable = false;
                 }
 
+                if (m_playerDropdown != null)
+                {
+                    m_playerDropdown.interactable = false;
+                }
+
                 break;
 
             case BOOK_CONNECTION_STATE.CONNECTED:
@@ -87,6 +102,11 @@ public class BookConnectionUI : MonoBehaviour
                 if (m_connectButton != null)
                 {
                     m_connectButton.interactable = false;
+                }
+
+                if (m_playerDropdown != null)
+                {
+                    m_playerDropdown.interactable = false;
                 }
 
                 break;

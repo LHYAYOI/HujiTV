@@ -5,14 +5,14 @@
 // 概要：本のページめくりをUnity Transportを使用して受信するサーバー
 //-----------------------------------------------
 using Unity.Collections;
+using System.Collections.Generic;
 using Unity.Networking.Transport;
 using Unity.Networking.Transport.Utilities;
 using UnityEngine;
 
 public class BookNetworkServer : MonoBehaviour
 {
-    [SerializeField]
-    private BookInputState m_bookInputState;
+    [SerializeField] private BookInputState[] m_bookInputStates;
 
     private const ushort Port = 7777;
 
@@ -21,10 +21,11 @@ public class BookNetworkServer : MonoBehaviour
 
     private NetworkPipeline m_reliablePipeline;
 
+    private readonly Dictionary<NetworkConnection, PLAYER_SLOT> m_playerSlots = new();
+
     private void Start()
     {
-        m_driver =
-            NetworkDriver.Create();
+        m_driver = NetworkDriver.Create();
 
         // Clientと同じPipelineを同じ順番で作る
         m_reliablePipeline = m_driver.CreatePipeline(typeof(ReliableSequencedPipelineStage));
@@ -104,12 +105,21 @@ public class BookNetworkServer : MonoBehaviour
                 switch (eventType)
                 {
                     case NetworkEvent.Type.Data:
-                        ReceiveData(reader);
+                        ReceiveData(connection, reader);
                         break;
 
                     case NetworkEvent.Type.Disconnect:
 
-                        Debug.Log("Book Clientが切断しました");
+                        if (m_playerSlots.TryGetValue(connection, out PLAYER_SLOT playerSlot))
+                        {
+                            Debug.Log($"{playerSlot}が切断しました");
+
+                            m_playerSlots.Remove(connection);
+                        }
+                        else
+                        {
+                            Debug.Log("未登録Clientが切断しました");
+                        }
 
                         m_connections[i] = default;
                         break;
@@ -118,7 +128,7 @@ public class BookNetworkServer : MonoBehaviour
         }
     }
 
-    private void ReceiveData(DataStreamReader reader)
+    private void ReceiveData(NetworkConnection connection, DataStreamReader reader)
     {
         if (reader.Length < 1)
         {
@@ -129,24 +139,26 @@ public class BookNetworkServer : MonoBehaviour
 
         switch (messageType)
         {
+            case BOOK_MESSAGE_TYPE.REGISTER_CONTROLLER:
+                ReceiveRegisterController(connection, reader);
+                break;
+
             case BOOK_MESSAGE_TYPE.PAGE_CHANGED:
-                ReceivePageChanged(reader);
+                ReceivePageChanged(connection, reader);
                 break;
 
             case BOOK_MESSAGE_TYPE.CAST_REQUEST:
-                ReceiveCastRequest(reader);
+                ReceiveCastRequest(connection, reader);
                 break;
 
 
             default:
-
                 Debug.LogWarning($"未対応Message : {messageType}");
-
                 break;
         }
     }
 
-    private void ReceivePageChanged(DataStreamReader reader)
+    private void ReceivePageChanged(NetworkConnection connection, DataStreamReader reader)
     {
         int remainingBytes = reader.Length - reader.GetBytesRead();
 
@@ -159,17 +171,19 @@ public class BookNetworkServer : MonoBehaviour
 
         int pageIndex = reader.ReadInt();
 
-        if (m_bookInputState == null)
+        BookInputState bookInputState = GetBookInputState(connection);
+
+        if (bookInputState == null)
         {
             Debug.LogError("BookInputStateが設定されていません");
 
             return;
         }
 
-        m_bookInputState.SetCurrentPage(pageIndex);
+        bookInputState.SetCurrentPage(pageIndex);
     }
 
-    private void ReceiveCastRequest(DataStreamReader reader)
+    private void ReceiveCastRequest(NetworkConnection connection, DataStreamReader reader)
     {
         int remainingBytes = reader.Length - reader.GetBytesRead();
 
@@ -184,21 +198,73 @@ public class BookNetworkServer : MonoBehaviour
 
         Debug.Log($"PC側 CastRequest受信 : Page {pageIndex}");
 
-        if (m_bookInputState != null && m_bookInputState.CurrentPage != pageIndex)
-        {
-            Debug.LogWarning($"ページ状態が不一致です。" + $" PC={m_bookInputState.CurrentPage}" + $" Book={pageIndex}");
-        }
+        BookInputState bookInputState = GetBookInputState(connection);
 
-        if (m_bookInputState == null)
+        if (bookInputState == null)
         {
             Debug.LogError("BookInputStateが設定されていません");
+            return;
+        }
+
+        bookInputState.RequestCast(pageIndex);
+    }
+
+    private void ReceiveRegisterController(NetworkConnection connection, DataStreamReader reader)
+    {
+        int remainingBytes = reader.Length - reader.GetBytesRead();
+
+        if (remainingBytes < 1)
+        {
+            Debug.LogWarning("RegisterControllerのデータが不足しています");
+            return;
+        }
+
+        PLAYER_SLOT playerSlot = (PLAYER_SLOT)reader.ReadByte();
+
+        if (playerSlot != PLAYER_SLOT.PLAYER1 && playerSlot != PLAYER_SLOT.PLAYER2)
+        {
+            Debug.LogWarning($"不正なPlayerSlotです : {playerSlot}");
 
             return;
         }
 
-        m_bookInputState.RequestCast(pageIndex);
+        // 同じPlayerがすでに使われていないか確認
+        foreach (var pair in m_playerSlots)
+        {
+            if (pair.Value == playerSlot && !pair.Key.Equals(connection))
+            {
+                Debug.LogWarning($"{playerSlot}はすでに接続済みです");
+                
+                m_driver.Disconnect(connection);
+                return;
+            }
+        }
+
+        m_playerSlots[connection] = playerSlot;
+
+        Debug.Log($"Controller登録成功 : {playerSlot}");
     }
 
+    private BookInputState GetBookInputState(NetworkConnection connection)
+    {
+        if (!m_playerSlots.TryGetValue(connection, out PLAYER_SLOT playerSlot))
+        {
+            Debug.LogWarning("未登録Controllerからデータを受信しました");
+            return null;
+        }
+
+        foreach (BookInputState state in m_bookInputStates)
+        {
+            if (state != null && state.PlayerSlot == playerSlot)
+            {
+                return state;
+            }
+        }
+
+        Debug.LogError($"{playerSlot}用のBookInputStateがありません");
+
+        return null;
+    }
     private void OnDestroy()
     {
         if (m_driver.IsCreated)

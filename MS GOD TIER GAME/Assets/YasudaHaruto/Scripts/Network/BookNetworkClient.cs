@@ -13,12 +13,17 @@ using UnityEngine;
 public class BookNetworkClient : MonoBehaviour
 {
     [SerializeField] private BookController m_bookController;
+    [SerializeField] private float m_connectionTimeoutSeconds = 5.0f;
 
     private const ushort Port = 7777;
 
     private NetworkDriver m_driver;
     private NetworkConnection m_connection;
     private NetworkPipeline m_reliablePipeline;
+
+    private PLAYER_SLOT m_playerSlot = PLAYER_SLOT.NONE;
+
+    private float m_connectionTimer;
 
     public BOOK_CONNECTION_STATE ConnectionState { get; private set; } = BOOK_CONNECTION_STATE.DISCONNECTED;
 
@@ -77,13 +82,32 @@ public class BookNetworkClient : MonoBehaviour
                     break;
             }
         }
+
+        // 接続タイマーを更新
+        if (ConnectionState == BOOK_CONNECTION_STATE.CONNECTING)
+        {
+            m_connectionTimer += Time.deltaTime;
+            if (m_connectionTimer < m_connectionTimeoutSeconds)
+            {
+                return;
+            }
+
+            Debug.LogWarning("Serverへの接続がタイムアウトしました");
+            Disconnect();
+        }
     }
 
-    public void Connect(string ipAddress)
+    public void Connect(string ipAddress, PLAYER_SLOT playerSlot)
     {
         if (ConnectionState != BOOK_CONNECTION_STATE.DISCONNECTED)
         {
             Debug.LogWarning("すでに接続中、または接続済みです");
+            return;
+        }
+
+        if (playerSlot == PLAYER_SLOT.NONE)
+        {
+            Debug.LogWarning("Playerが選択されていません");
             return;
         }
 
@@ -103,21 +127,48 @@ public class BookNetworkClient : MonoBehaviour
             return;
         }
 
+        m_playerSlot = playerSlot;
+
         Debug.Log($"Serverへ接続開始 : {ipAddress}:{Port}");
 
         // 接続を開始
         m_connection = m_driver.Connect(endpoint);
 
+        // 接続タイマーをリセット
+        m_connectionTimer = 0.0f;
+
         // 接続状態を更新
         SetConnectionState(BOOK_CONNECTION_STATE.CONNECTING);
     }
 
+    public void Disconnect()
+    {
+        if (m_driver.IsCreated && m_connection.IsCreated)
+        {
+            m_driver.Disconnect(m_connection);
+            m_driver.ScheduleUpdate().Complete();
+        }
+
+        m_connection = default;
+
+        m_connectionTimer = 0.0f;
+
+        SetConnectionState(BOOK_CONNECTION_STATE.DISCONNECTED);
+
+        Debug.Log("Book Serverから切断しました");
+    }
+
     private void OnConnected()
     {
-        Debug.Log("Book Serverへ接続成功");
+        m_connectionTimer = 0.0f;
+
+        Debug.Log($"Book Serverへ接続成功 : {m_playerSlot}");
 
         // 接続状態を更新
         SetConnectionState(BOOK_CONNECTION_STATE.CONNECTED);
+
+        // 接続後にPlayerSlotを送信
+        SendRegisterController();
 
         // 接続直後に現在ページを同期
         if (m_bookController != null)
@@ -131,6 +182,7 @@ public class BookNetworkClient : MonoBehaviour
         Debug.Log("Book Serverから切断されました");
 
         m_connection = default;
+        m_connectionTimer = 0.0f;
 
         // 接続状態を更新
         SetConnectionState(BOOK_CONNECTION_STATE.DISCONNECTED);
@@ -227,6 +279,37 @@ public class BookNetworkClient : MonoBehaviour
         }
 
         Debug.Log($"CastRequest送信 : Page {pageIndex}");
+    }
+
+    private void SendRegisterController()
+    {
+        if (!CanSend())
+        {
+            return;
+        }
+
+        int beginResult = m_driver.BeginSend(m_reliablePipeline, m_connection, out DataStreamWriter writer);
+
+        if (beginResult != 0)
+        {
+            Debug.LogError($"RegisterController BeginSend失敗 : {beginResult}");
+
+            return;
+        }
+
+        writer.WriteByte((byte)BOOK_MESSAGE_TYPE.REGISTER_CONTROLLER);
+
+        writer.WriteByte((byte)m_playerSlot);
+
+        int endResult = m_driver.EndSend(writer);
+
+        if (endResult < 0)
+        {
+            Debug.LogError($"RegisterController EndSend失敗 : {endResult}");
+            return;
+        }
+
+        Debug.Log($"Controller登録送信 : {m_playerSlot}");
     }
 
     private bool CanSend()

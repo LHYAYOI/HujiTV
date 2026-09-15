@@ -9,6 +9,10 @@ using UnityEngine;
 
 public class BookInputState : MonoBehaviour
 {
+    [SerializeField] private PLAYER_SLOT m_playerSlot = PLAYER_SLOT.NONE;
+
+    public PLAYER_SLOT PlayerSlot => m_playerSlot;
+
     public int CurrentPage { get; private set; } = -1;
 
     public event Action<int> OnPageChanged;

@@ -13,4 +13,5 @@ public enum BOOK_MESSAGE_TYPE : byte
 
     PAGE_CHANGED = 3,
     CAST_REQUEST = 4,
+    REGISTER_CONTROLLER = 5,
 }
