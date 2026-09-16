@@ -8,7 +8,7 @@ public sealed class BookSwipeInput : MonoBehaviour,
     IEndDragHandler
 {
     [SerializeField]
-    private BookController m_bookController;
+    private hatake.BookController m_bookController;
 
     [Tooltip("入力領域の幅に対する、ページ移動に必要な移動量の割合。")]
     [SerializeField, Range(0.05f, 0.5f)]
