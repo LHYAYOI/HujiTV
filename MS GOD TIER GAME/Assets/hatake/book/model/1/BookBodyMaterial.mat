@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: BookBodyMaterial
+  m_Shader: {fileID: 4800000, guid: e1ab2c4d6aabb6d4b8c72e014f78a374, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BackTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FrontTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _LeftTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 982f4d5777ca32243bd7444e5c31d805, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RightTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _DepthBias: 0
+    - _PageMode: 0
+    - _SwapFaces: 0
+    m_Colors:
+    - _LeftCrop: {r: 0.1125, g: 0.1, b: 0.3875, a: 0.8}
+    - _LeftUv: {r: 0.61918414, g: 0.6610755, b: 0.2959442, a: 0.31590146}
+    - _PageUv: {r: 0.17727607, g: 0.34024912, b: 0.24882883, a: 0.31599963}
+    - _RightCrop: {r: 0.5, g: 0.1, b: 0.3875, a: 0.8}
+    - _RightUv: {r: 0.17733896, g: 0.3402987, b: 0.24870294, a: 0.3159004}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

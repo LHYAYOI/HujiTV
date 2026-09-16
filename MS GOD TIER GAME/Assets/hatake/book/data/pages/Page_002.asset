@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4813d1ecc71b16843b3eafbef485a0c5, type: 3}
+  m_Name: Page_002
+  m_EditorClassIdentifier: Assembly-CSharp::BookPageData
+  m_pageName: page_002
+  m_backgroundColor: {r: 1, g: 0.8207547, b: 0.8207547, a: 1}
+  m_images:
+  - m_sprite: {fileID: 1600250937824392209, guid: d4d90f41b9b4d7240a763a47cfc46cc2, type: 3}
+    m_material: {fileID: 2100000, guid: 944ae067ab89e5444b79c418549ebf17, type: 2}
+    m_position: {x: 4.881422, y: 70.74793}
+    m_size: {x: 300, y: 300}
+  - m_sprite: {fileID: -317014946, guid: d374a9c2650b7a6468c67100a61db33c, type: 3}
+    m_material: {fileID: 0}
+    m_position: {x: 3.9103954, y: 7.6312494}
+    m_size: {x: 60, y: 100}

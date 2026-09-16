@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: MI_Grudge
+  m_Shader: {fileID: 4800000, guid: f54e158132925fb489c0e969073037be, type: 3}
+  m_Parent: {fileID: 2100000, guid: a7070c9ed3cbf2345a5d467408ba5447, type: 2}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - U_BASE_ON
+  - U_CHROMATIC_ON
+  - U_DISPLACEMENT_ON
+  - U_GLITCH_ON
+  - U_MOSH_ON
+  - U_PIXEL_ON
+  - U_SHARPEN_ON
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats: []
+    m_Colors: []
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
