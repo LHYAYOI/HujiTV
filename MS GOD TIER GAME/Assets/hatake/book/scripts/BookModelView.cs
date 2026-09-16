@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -23,6 +24,27 @@ public sealed class BookModelView : MonoBehaviour
     private MaterialPropertyBlock m_pageProperties;
 
     public RenderTexture OutputTexture => m_modelTexture;
+
+    [System.Serializable]
+    private sealed class JointPositionOffset
+    {
+        public Transform joint;
+        public Vector3 startOffset;
+        public Vector3 endOffset;
+    }
+
+
+    [Header("ジョイント位置補正")]
+    [Tooltip("Startはクリップ先頭、Endはクリップ末尾の位置補正です")]
+    [SerializeField]
+    private JointPositionOffset[] m_jointOffsets =
+    new JointPositionOffset[0];
+
+    private readonly Dictionary<Transform, Vector3> m_jointBasePositions =
+        new Dictionary<Transform, Vector3>();
+
+
+
     public bool Initialize()
     {
         if (m_graph.IsValid()) return true;
@@ -53,17 +75,17 @@ public sealed class BookModelView : MonoBehaviour
         AnimationPlayableOutput output = AnimationPlayableOutput.Create(
             m_graph, "BookPage", m_animator);
         output.SetSourcePlayable(m_clipPlayable);
-        
+
         m_graph.Play();
-        
+
         m_bookProperties = new MaterialPropertyBlock();
         m_pageProperties = new MaterialPropertyBlock();
-        
+
         m_pageRenderer.updateWhenOffscreen = true;
         m_pageRenderer.enabled = false;
         m_modelCamera.targetTexture = m_modelTexture;
         m_modelCamera.enabled = false;
-        
+
         return true;
     }
 
@@ -79,7 +101,7 @@ public sealed class BookModelView : MonoBehaviour
         SetBookTextures(
             advanceFlag ? currentTexture : nextTexture,
             advanceFlag ? nextTexture : currentTexture);
-        
+
 
         m_pageProperties.SetTexture("_FrontTex", advanceFlag ? currentTexture : nextTexture);
         m_pageProperties.SetTexture("_BackTex", advanceFlag ? nextTexture : currentTexture);
@@ -92,7 +114,7 @@ public sealed class BookModelView : MonoBehaviour
 
         float elapsedTime = 0f;
         float duration = Mathf.Max(0.1f, m_turnDuration);
-        
+
         while (elapsedTime < duration)
         {
             float progress = Mathf.Clamp01(elapsedTime / duration);
@@ -100,7 +122,7 @@ public sealed class BookModelView : MonoBehaviour
             yield return null;
             elapsedTime += Time.unscaledDeltaTime;
         }
-        
+
         SamplePose(playForwardFlag ? 1f : 0f);
         ShowSpread(nextTexture);
     }
@@ -113,10 +135,16 @@ public sealed class BookModelView : MonoBehaviour
 
     private void SamplePose(float progress)
     {
-        double time = progress * Mathf.Max(0f, m_pageClip.length - 0.0001f);
+        RestoreJointOffsets();
+
+        double time = Mathf.Clamp01(progress) *
+            Mathf.Max(0f, m_pageClip.length - 0.0001f);
+
         m_clipPlayable.SetTime(time);
         m_clipPlayable.SetDone(false);
         m_graph.Evaluate(0f);
+
+        ApplyJointOffsets(progress);
     }
 
     private void SetBookTextures(Texture leftTexture, Texture rightTexture)
@@ -135,4 +163,101 @@ public sealed class BookModelView : MonoBehaviour
     {
         if (m_graph.IsValid()) m_graph.Destroy();
     }
+
+
+    /// ======================================================================================--
+    /// ここから下は実験用コード、実行時に影響がない部分
+    /// 
+    private void RestoreJointOffsets()
+    {
+        foreach (KeyValuePair<Transform, Vector3> entry in m_jointBasePositions)
+        {
+            if (entry.Key != null)
+                entry.Key.localPosition = entry.Value;
+        }
+
+        m_jointBasePositions.Clear();
+    }
+
+
+    private void ApplyJointOffsets(float progress)
+    {
+        float weight = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(progress));
+
+        foreach (JointPositionOffset offset in m_jointOffsets)
+        {
+            if (offset == null || offset.joint == null)
+                continue;
+
+            // 同じジョイントの重複登録は無視します。
+            if (m_jointBasePositions.ContainsKey(offset.joint))
+                continue;
+
+            m_jointBasePositions.Add(
+                offset.joint, offset.joint.localPosition);
+
+            offset.joint.localPosition += Vector3.Lerp(
+                offset.startOffset, offset.endOffset, weight);
+        }
+    }
+
+#if UNITY_EDITOR
+    public bool CanPreviewPose =>
+        m_animator != null &&
+        m_pageClip != null &&
+        !m_pageClip.legacy &&
+        m_pageClip.length > 0f;
+    public void SampleEditorPose(float progress)
+    {
+        if (Application.isPlaying || !CanPreviewPose ||
+            !UnityEditor.AnimationMode.InAnimationMode())
+            return;
+
+        RestoreJointOffsets();
+
+        UnityEditor.AnimationMode.BeginSampling();
+        try
+        {
+            float time = Mathf.Clamp01(progress) *
+                Mathf.Max(0f, m_pageClip.length - 0.0001f);
+
+            UnityEditor.AnimationMode.SampleAnimationClip(
+                m_animator.gameObject, m_pageClip, time);
+
+            // セットアップ時は非表示なので、プレビュー中だけ表示します。
+            if (m_pageRenderer != null)
+            {
+                var modification = new UnityEditor.PropertyModification
+                {
+                    target = m_pageRenderer,
+                    propertyPath = "m_Enabled",
+                    value = m_pageRenderer.enabled ? "1" : "0"
+                };
+
+                UnityEditor.AnimationMode.AddPropertyModification(
+                    UnityEditor.EditorCurveBinding.DiscreteCurve(
+                        "", typeof(SkinnedMeshRenderer), "m_Enabled"),
+                    modification,
+                    true);
+
+                m_pageRenderer.enabled = true;
+            }
+        }
+        finally
+        {
+            UnityEditor.AnimationMode.EndSampling();
+        }
+
+        ApplyJointOffsets(progress);
+    }
+
+    public void ClearEditorPoseOffsets()
+    {
+        RestoreJointOffsets();
+    }
+#endif
 }
+
+
+
+

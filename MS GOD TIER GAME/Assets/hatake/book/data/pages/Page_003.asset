@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Page_003
   m_EditorClassIdentifier: Assembly-CSharp::BookPageData
   m_pageName: page_003
-  m_backgroundColor: {r: 1, g: 0.99353427, b: 0.8773585, a: 1}
+  m_backgroundColor: {r: 1, g: 0, b: 0.8889837, a: 1}
   m_images:
   - m_sprite: {fileID: 1600250937824392209, guid: d4d90f41b9b4d7240a763a47cfc46cc2, type: 3}
     m_material: {fileID: 2100000, guid: 67ab11bfa54a39c41aae9536d51e7440, type: 2}
