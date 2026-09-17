@@ -1,7 +1,7 @@
 using Unity.Cinemachine;
 using UnityEngine;
 
-public class CinemachineRotationShake:CinemachineExtension
+public class CinemachineRotationExtension:CinemachineExtension
 {
     private Vector3 m_rotationOffset;
 
@@ -19,9 +19,9 @@ public class CinemachineRotationShake:CinemachineExtension
     {
         if (stage == CinemachineCore.Stage.Finalize) 
         {
-            Quaternion shakeRotation = Quaternion.Euler(m_rotationOffset);
+            Quaternion rotation = Quaternion.Euler(m_rotationOffset);
 
-            state.RawOrientation = state.RawOrientation * shakeRotation;
+            state.RawOrientation = state.RawOrientation * rotation;
         }
     }
 }

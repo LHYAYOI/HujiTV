@@ -34,6 +34,21 @@ public class CameraManager : MonoBehaviour
         Instance = this;
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.U)) 
+        {
+            Debug.Log("FPS");
+            SwitchCamera("FPSCamera");
+        }
+
+        if (Input.GetKeyDown(KeyCode.Y))
+        {
+            Debug.Log("TPS");
+            SwitchCamera("TPSCamera");
+        }
+    }
+
     public void SwitchCamera(string cameraName)
     {
         foreach (CAMERA_DATA camera in m_cameraList)
