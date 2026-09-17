@@ -27,7 +27,8 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: 7833122117494664109}
   - {fileID: 7480310491420909410}
-  m_RendererFeatureMap: ad6b866f10d7b46c625fc572c266cf67
+  - {fileID: 1688605989335496976}
+  m_RendererFeatureMap: ad6b866f10d7b46c625fc572c266cf671079f05f33226f17
   m_UseNativeRenderPass: 1
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -56,6 +57,20 @@ MonoBehaviour:
   m_DepthTextureFormat: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 0
+--- !u!114 &1688605989335496976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4da2e73d269676e4f96fbb057d084a22, type: 3}
+  m_Name: Volumetric Light Shaft
+  m_EditorClassIdentifier: Assembly-CSharp::LightShaftLab.LightShaftFeature
+  m_Active: 1
+  shader: {fileID: 4800000, guid: c70ad90318342f049b5ac16d02cdeb64, type: 3}
 --- !u!114 &7480310491420909410
 MonoBehaviour:
   m_ObjectHideFlags: 0
