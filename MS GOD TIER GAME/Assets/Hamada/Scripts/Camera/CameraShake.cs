@@ -56,7 +56,7 @@ public class CameraShake : MonoBehaviour
             m_totalShakeOffset += currentOffset; // 新しいオフセットを加える
 
             //回転を適用
-            m_cinemachineRotationExtension.SetRotationOffset(m_totalShakeOffset);
+            m_cinemachineRotationExtension.SetShakeRotationOffset(m_totalShakeOffset);
 
             previousShake = currentOffset; // 今回のオフセットを保存
 
@@ -65,7 +65,7 @@ public class CameraShake : MonoBehaviour
 
         m_totalShakeOffset -= previousShake; // 最後のオフセットを打ち消す
 
-        m_cinemachineRotationExtension.SetRotationOffset(m_totalShakeOffset);
+        m_cinemachineRotationExtension.SetShakeRotationOffset(m_totalShakeOffset);
     }
 
     public void VHShake(float duration, float horizontalIntensity, float verticalIntensity) 
