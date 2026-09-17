@@ -596,11 +596,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f815b998ada864449912596c2370652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightShaftLab.LocalFogVolume
-  shape: 1
-  density: 0.16
-  tint: {r: 1, g: 0.6509804, b: 0.29803923, a: 1}
-  edgeFade: 0.3
-  subtract: 0
+  m_shape: 1
+  m_density: 0.16
+  m_tint: {r: 1, g: 0.6509804, b: 0.29803923, a: 1}
+  m_edgeFade: 0.3
+  m_subtractFlag: 0
 --- !u!4 &347173098
 Transform:
   m_ObjectHideFlags: 0
@@ -6041,11 +6041,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f815b998ada864449912596c2370652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightShaftLab.LocalFogVolume
-  shape: 0
-  density: 0.5
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  edgeFade: 0.3
-  subtract: 1
+  m_shape: 0
+  m_density: 0.5
+  m_tint: {r: 1, g: 1, b: 1, a: 1}
+  m_edgeFade: 0.3
+  m_subtractFlag: 1
 --- !u!4 &936070187
 Transform:
   m_ObjectHideFlags: 0
@@ -6296,36 +6296,14 @@ GameObject:
   - component: {fileID: 1385674558}
   - component: {fileID: 1385674557}
   - component: {fileID: 1385674556}
-  - component: {fileID: 1385674555}
+  - component: {fileID: 1385674559}
   m_Layer: 0
-  m_Name: Main Camera
+  m_Name: MainCamera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1385674555
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1385674554}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1ee896da1bfaf34da8d276607e810c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LightShaftLab.LightShaftDemoControls
-  volume: {fileID: 1954699541}
-  directional: {fileID: 1753037618}
-  spots:
-  - {fileID: 0}
-  - {fileID: 0}
-  localFog:
-  - {fileID: 936070186}
-  - {fileID: 1955068236}
-  - {fileID: 347173097}
-  dust: {fileID: 0}
 --- !u!114 &1385674556
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6436,6 +6414,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1385674559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385674554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1ee896da1bfaf34da8d276607e810c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LightShaftLab.LightShaftDemoControls
+  m_volume: {fileID: 1954699541}
+  m_directional: {fileID: 1753037618}
+  m_spots:
+  - {fileID: 0}
+  - {fileID: 0}
+  m_localFog:
+  - {fileID: 936070186}
+  - {fileID: 1955068236}
+  - {fileID: 347173097}
+  m_dust: {fileID: 440357738}
+  m_showPanel: 0
 --- !u!1 &1453919491
 GameObject:
   m_ObjectHideFlags: 0
@@ -6820,7 +6821,7 @@ GameObject:
   - component: {fileID: 1753037618}
   - component: {fileID: 1753037621}
   m_Layer: 0
-  m_Name: Directional - Roof Shafts
+  m_Name: Directional_RoofShafts
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6838,8 +6839,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e76134dd558eaee4c8142cb61a03a57e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightShaftLab.LightShaftEmitter
-  scattering: 0.85
-  shadows: 1
+  m_scattering: 0.85
+  m_castShadowsFlag: 1
 --- !u!108 &1753037619
 Light:
   m_ObjectHideFlags: 0
@@ -7027,11 +7028,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f815b998ada864449912596c2370652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightShaftLab.LocalFogVolume
-  shape: 0
-  density: 0.1
-  tint: {r: 0.7, g: 0.85, b: 1, a: 1}
-  edgeFade: 0.3
-  subtract: 0
+  m_shape: 0
+  m_density: 0.1
+  m_tint: {r: 0.7, g: 0.85, b: 1, a: 1}
+  m_edgeFade: 0.3
+  m_subtractFlag: 0
 --- !u!4 &1955068237
 Transform:
   m_ObjectHideFlags: 0
