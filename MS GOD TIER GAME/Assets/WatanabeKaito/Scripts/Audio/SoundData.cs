@@ -1,3 +1,9 @@
+//-----------------------------------------------
+// SoundData.cs
+// 制作日：2026/09/16
+// 制作者：渡辺開斗
+// 概要：サウンドデータのScriptableObject
+//-----------------------------------------------
 using System.Collections.Generic;
 using UnityEngine;
 

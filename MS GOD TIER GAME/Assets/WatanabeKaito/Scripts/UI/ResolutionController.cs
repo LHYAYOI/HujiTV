@@ -1,3 +1,9 @@
+//-----------------------------------------------
+// ResolutionController.cs
+// 制作日：2026/09/17
+// 制作者：渡辺開斗
+// 概要：解像度の切り替え管理クラス
+//-----------------------------------------------
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -29,8 +35,7 @@ public class ResolutionController : MonoBehaviour
                 filteredResolutions.Add(resolutions[i]);
 
                 // 現在の画面解像度と一致するインデックスを判定
-                if (resolutions[i].width == Screen.width &&
-                    resolutions[i].height == Screen.height)
+                if (resolutions[i].width == Screen.width && resolutions[i].height == Screen.height)
                 {
                     currentResolutionIndex = filteredResolutions.Count - 1;
                 }
@@ -49,6 +54,7 @@ public class ResolutionController : MonoBehaviour
     public void SetResolution(int index)
     {
         Resolution resolution = filteredResolutions[index];
+
         // 現在の画面モード（フルスクリーン / ウィンドウ）を維持したまま解像度を変更
         Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreenMode);
     }
