@@ -7,16 +7,34 @@ using UnityEngine.UIElements;
 
 public class CartController : MonoBehaviour
 {
+    private enum CartState
+    {
+        Idle,
+        Stop,
+        Move,
+        Switch
+    }
+    private CartState m_state;
+
+
     [SerializeField] private Transform m_targetCard;
 
     [SerializeField] private bool m_movingFlag;
     [SerializeField] private float m_speed;
+    [SerializeField] private float m_switchSpeed;
     [SerializeField] private float m_distance; // 全体の進んだ距離
 
 
     private SplineContainer m_spline;
+    
     private float m_splineAnchor = 0.0f; // 進んだ距離 - アンカーポイント
+    
     private bool m_loopFlag = false;
+    private bool m_switchFlag = false;
+
+
+
+
 
 
     // ------------------------------------------------------------------------
@@ -32,6 +50,11 @@ public class CartController : MonoBehaviour
         }
     }
 
+    private void Awake()
+    {
+        m_state = CartState.Move;
+    }
+
     private void Update()
     {
         if(m_targetCard == null)
@@ -39,17 +62,21 @@ public class CartController : MonoBehaviour
             return;
         }
 
-        MoveUpdate();
+        switch (m_state)
+        {
+            case CartState.Move:
+                MoveUpdate();
+                break;
+
+            case CartState.Switch:
+                SwitchMoveUpdate();
+                break;
+        }
+
     }
 
     private void MoveUpdate()
     {
-
-        if (m_movingFlag == false)
-        {
-            return;
-        }
-
         if(m_spline == null)
         {
             return;
@@ -65,6 +92,11 @@ public class CartController : MonoBehaviour
             {
                 m_splineAnchor += length;
             }
+            else
+            {
+                m_state = CartState.Stop;
+            }
+
 
             return;
         }
@@ -86,6 +118,36 @@ public class CartController : MonoBehaviour
 
     }
 
+    private void SwitchMoveUpdate()
+    {
+        if(m_spline == null)
+        {
+            return;
+        }
+
+
+        Vector3 start = m_targetCard.position;
+
+        float length = m_spline.CalculateLength();
+        float splineOffset = SplineOffset;
+        float value = splineOffset / length;
+        Vector3 end = m_spline.EvaluatePosition(value);
+
+        Vector3 direction = end - start;
+        float speed = m_switchSpeed * Time.deltaTime;
+        if(direction.sqrMagnitude > speed * speed)
+        {
+            direction = direction.normalized * speed;
+        }
+        else
+        {
+            m_state = CartState.Move;
+        }
+
+        m_targetCard.position += direction;
+    }
+
+
 
     // ------------------------------------------------------------------------
     // Public Event
@@ -105,6 +167,9 @@ public class CartController : MonoBehaviour
         m_spline = spline;
         m_splineAnchor = m_distance - offsetDistance;
         m_loopFlag = loopFlag;
+
+
+        m_state = CartState.Switch;
     }
     
     public float SplineOffset => m_distance - m_splineAnchor;

@@ -1558,6 +1558,7 @@ MonoBehaviour:
   m_targetCard: {fileID: 668627135}
   m_movingFlag: 1
   m_speed: 5
+  m_switchSpeed: 25
   m_distance: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
