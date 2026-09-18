@@ -19,22 +19,27 @@ public class RuneEditorWindow : EditorWindow
 
     private const float DRAWING_AREA_SIZE = 600f;
     private const float MIN_POINT_DISTANCE = 0.005f;
-    private const float SAMPLE_INTERVAL = 0.01f;
 
-    private enum EditorMode
+    private enum EDITOR_MODE
     {
-        Edit,
-        Test
+        EDIT,
+        TEST
     }
 
-    private EditorMode m_mode = EditorMode.Edit;
+    private EDITOR_MODE m_mode = EDITOR_MODE.EDIT;
 
     private readonly List<Vector2> m_testCurrentStroke = new();
     private RuneTraceSession m_testSession = new();
     private RuneTraceResult m_testResult;
 
     private bool m_isTestDrawing;
+    private bool m_showDebugVisualization = true;
 
+
+    private float m_lineWidth = 15f;
+
+    private const float MIN_LINE_WIDTH = 1f;
+    private const float MAX_LINE_WIDTH = 20f;
 
     [MenuItem("Tools/Rune Editor")]
     public static void Open()
@@ -51,20 +56,20 @@ public class RuneEditorWindow : EditorWindow
 
         if (m_runeData == null)
         {
-            EditorGUILayout.HelpBox(
-                "編集するRuneDataを選択してください。",
-                MessageType.Info);
+            EditorGUILayout.HelpBox("編集するRuneDataを選択してください。", MessageType.Info);
 
             return;
         }
 
         DrawModeSelector();
 
+        DrawDisplaySettings();
+
         EditorGUILayout.Space(5);
 
         switch (m_mode)
         {
-            case EditorMode.Edit:
+            case EDITOR_MODE.EDIT:
 
                 DrawToolbar();
 
@@ -79,13 +84,11 @@ public class RuneEditorWindow : EditorWindow
                 break;
 
 
-            case EditorMode.Test:
+            case EDITOR_MODE.TEST:
 
                 if (m_runeData.TraceData.Strokes.Count == 0)
                 {
-                    EditorGUILayout.HelpBox(
-                        "Bake済みのTraceDataがありません。Edit ModeでRuneをBakeしてください。",
-                        MessageType.Warning);
+                    EditorGUILayout.HelpBox("Bake済みのTraceDataがありません。Edit ModeでRuneをBakeしてください。", MessageType.Warning);
 
                     break;
                 }
@@ -150,6 +153,14 @@ public class RuneEditorWindow : EditorWindow
         EditorGUILayout.EndHorizontal();
     }
 
+    private void DrawDisplaySettings()
+    {
+        EditorGUILayout.Space(5);
+
+        EditorGUILayout.LabelField("Display Settings", EditorStyles.boldLabel);
+
+        m_lineWidth = EditorGUILayout.Slider("Line Width", m_lineWidth, MIN_LINE_WIDTH, MAX_LINE_WIDTH);
+    }
 
 
     private void DrawCanvas()
@@ -229,36 +240,33 @@ public class RuneEditorWindow : EditorWindow
     }
 
 
-    private void DrawStroke(IReadOnlyList<Vector2> points, Color color)
+    private void DrawStroke(
+    IReadOnlyList<Vector2> points,
+    Color color)
     {
-        // ポイントがnullまたは2未満の場合は処理を終了する
         if (points == null || points.Count < 2)
         {
             return;
         }
 
-        // GUI描画の開始
         Handles.BeginGUI();
 
-        // 現在のハンドルカラーを保存し、指定された色に設定する
         Color previousColor = Handles.color;
         Handles.color = color;
 
-        // ポイントを結ぶ線を描画する
-        for (int i = 0; i < points.Count - 1; i++)
+        Vector3[] canvasPoints = new Vector3[points.Count];
+
+        for (int i = 0; i < points.Count; i++)
         {
-            Vector2 start = NormalizedToCanvas(points[i]);
-            Vector2 end = NormalizedToCanvas(points[i + 1]);
-            Handles.DrawLine(start, end);
+            canvasPoints[i] = NormalizedToCanvas(points[i]);
         }
 
-        // ハンドルカラーを元に戻す
+        Handles.DrawAAPolyLine(m_lineWidth, canvasPoints);
+
         Handles.color = previousColor;
 
-        // GUI描画の終了
         Handles.EndGUI();
     }
-
 
     private void HandleDrawingInput()
     {
@@ -393,7 +401,7 @@ public class RuneEditorWindow : EditorWindow
         // Undo操作を記録する
         Undo.RecordObject(m_runeData, "Add Rune Stroke");
 
-        // 現在のストロークをRuneDataに追加する
+        // 現在のストロークをRuneStrokeDataに変換する
         RuneStrokeData stroke = new RuneStrokeData(m_currentStroke);
 
         // RuneDataのAuthoringDataにストロークを追加する
@@ -493,7 +501,7 @@ public class RuneEditorWindow : EditorWindow
         Undo.RecordObject(m_runeData, "Bake Rune");
 
         // RuneDataのAuthoringDataをBakeしてTraceDataに設定する
-        List<RuneStrokeData> bakedStrokes = RuneBaker.Bake(m_runeData.AuthoringData, SAMPLE_INTERVAL);
+        List<RuneStrokeData> bakedStrokes = RuneBaker.Bake(m_runeData.AuthoringData, RuneTraceSettings.SAMPLE_INTERVAL);
 
         // RuneDataのTraceDataにBakeされたストロークを設定する
         m_runeData.TraceData.SetStrokes(bakedStrokes);
@@ -537,9 +545,7 @@ public class RuneEditorWindow : EditorWindow
 
     private void DrawModeSelector()
     {
-        EditorMode newMode = (EditorMode)GUILayout.Toolbar(
-            (int)m_mode,
-            new string[] { "Edit", "Test" });
+        EDITOR_MODE newMode = (EDITOR_MODE)GUILayout.Toolbar((int)m_mode, new string[] { "Edit", "Test" });
 
         if (newMode == m_mode)
         {
@@ -566,30 +572,23 @@ public class RuneEditorWindow : EditorWindow
         }
 
         EditorGUILayout.EndHorizontal();
+
+        m_showDebugVisualization = EditorGUILayout.Toggle("Debug Visualization", m_showDebugVisualization);
     }
 
     private void DrawTestCanvas()
     {
-        float width = Mathf.Min(
-            position.width - 20f,
-            DRAWING_AREA_SIZE);
+        float width = Mathf.Min(position.width - 20f, DRAWING_AREA_SIZE);
 
-        m_drawingRect = GUILayoutUtility.GetRect(
-            width,
-            width,
-            GUILayout.ExpandWidth(false));
+        m_drawingRect = GUILayoutUtility.GetRect(width, width, GUILayout.ExpandWidth(false));
 
-        EditorGUI.DrawRect(
-            m_drawingRect,
-            new Color(0.15f, 0.15f, 0.15f));
+        EditorGUI.DrawRect(m_drawingRect, new Color(0.15f, 0.15f, 0.15f));
 
         DrawReferenceRune();
 
         DrawTestStrokes();
 
-        DrawStroke(
-            m_testCurrentStroke,
-            Color.yellow);
+        DrawStroke(m_testCurrentStroke, Color.yellow);
     }
 
     private void DrawReferenceRune()
@@ -599,23 +598,99 @@ public class RuneEditorWindow : EditorWindow
             return;
         }
 
-        foreach (RuneStrokeData stroke
-                 in m_runeData.TraceData.Strokes)
+        if (!m_showDebugVisualization || m_testSession.StrokeCount == 0)
         {
-            DrawStroke(
-                stroke.Points,
-                Color.gray);
+            foreach (RuneStrokeData stroke in m_runeData.TraceData.Strokes)
+            {
+                DrawStroke(stroke.Points, Color.gray);
+            }
+
+            return;
         }
+
+        DrawCoverageDebug();
+    }
+
+    private void DrawCoverageDebug()
+    {
+        List<RuneStrokeData> evaluationStrokes = RunePathUtility.ResampleStrokes(m_testSession.Strokes, RuneTraceSettings.SAMPLE_INTERVAL);
+
+        float tolerance = m_runeData.Rule.DistanceTolerance;
+
+        foreach (RuneStrokeData stroke in m_runeData.TraceData.Strokes)
+        {
+            IReadOnlyList<Vector2> points = stroke.Points;
+
+            for (int i = 0; i < points.Count - 1; i++)
+            {
+                Vector2 startPoint = points[i];
+                Vector2 endPoint = points[i + 1];
+
+                bool startCovered = RunePathUtility.IsPointNearStrokes(startPoint, evaluationStrokes, tolerance);
+
+                bool endCovered = RunePathUtility.IsPointNearStrokes(endPoint, evaluationStrokes, tolerance);
+
+                Color color = startCovered && endCovered ? Color.green : Color.red;
+
+                DrawSegment(startPoint, endPoint, color);
+            }
+        }
+    }
+
+    private void DrawSegment(Vector2 start, Vector2 end, Color color)
+    {
+        Handles.BeginGUI();
+
+        Color previousColor = Handles.color;
+        Handles.color = color;
+
+        Vector3[] points = {NormalizedToCanvas(start), NormalizedToCanvas(end) };
+
+        Handles.DrawAAPolyLine(m_lineWidth, points);
+
+        Handles.color = previousColor;
+
+        Handles.EndGUI();
     }
 
     private void DrawTestStrokes()
     {
-        foreach (RuneStrokeData stroke
-                 in m_testSession.Strokes)
+        if (!m_showDebugVisualization)
         {
-            DrawStroke(
-                stroke.Points,
-                Color.white);
+            foreach (RuneStrokeData stroke in m_testSession.Strokes)
+            {
+                DrawStroke(stroke.Points, Color.white);
+            }
+
+            return;
+        }
+
+        DrawAccuracyDebug();
+    }
+
+    private void DrawAccuracyDebug()
+    {
+        List<RuneStrokeData> evaluationStrokes = RunePathUtility.ResampleStrokes(m_testSession.Strokes, RuneTraceSettings.SAMPLE_INTERVAL);
+
+        float tolerance = m_runeData.Rule.DistanceTolerance;
+
+        foreach (RuneStrokeData stroke in m_testSession.Strokes)
+        {
+            IReadOnlyList<Vector2> points = stroke.Points;
+
+            for (int i = 0; i < points.Count - 1; i++)
+            {
+                Vector2 startPoint = points[i];
+                Vector2 endPoint = points[i + 1];
+
+                bool startAccurate = RunePathUtility.IsPointNearStrokes(startPoint, evaluationStrokes, tolerance);
+
+                bool endAccurate = RunePathUtility.IsPointNearStrokes(endPoint, evaluationStrokes, tolerance);
+
+                Color color = startAccurate && endAccurate ? Color.white : Color.yellow;
+
+                DrawSegment(startPoint, endPoint, color);
+            }
         }
     }
 
@@ -625,8 +700,7 @@ public class RuneEditorWindow : EditorWindow
 
         if (!m_drawingRect.Contains(e.mousePosition))
         {
-            if (m_isTestDrawing &&
-                e.type == EventType.MouseUp)
+            if (m_isTestDrawing && e.type == EventType.MouseUp)
             {
                 FinishTestStroke();
             }
@@ -652,8 +726,7 @@ public class RuneEditorWindow : EditorWindow
 
             case EventType.MouseDrag:
 
-                if (!m_isTestDrawing ||
-                    e.button != 0)
+                if (!m_isTestDrawing || e.button != 0)
                 {
                     return;
                 }
@@ -667,8 +740,7 @@ public class RuneEditorWindow : EditorWindow
 
             case EventType.MouseUp:
 
-                if (!m_isTestDrawing ||
-                    e.button != 0)
+                if (!m_isTestDrawing || e.button != 0)
                 {
                     return;
                 }
@@ -694,19 +766,13 @@ public class RuneEditorWindow : EditorWindow
 
     private void AddTestPoint(Vector2 mousePosition)
     {
-        Vector2 normalizedPoint =
-            CanvasToNormalized(mousePosition);
+        Vector2 normalizedPoint = CanvasToNormalized(mousePosition);
 
         if (m_testCurrentStroke.Count > 0)
         {
-            Vector2 lastPoint =
-                m_testCurrentStroke[
-                    m_testCurrentStroke.Count - 1];
+            Vector2 lastPoint = m_testCurrentStroke[m_testCurrentStroke.Count - 1];
 
-            float distance =
-                Vector2.Distance(
-                    lastPoint,
-                    normalizedPoint);
+            float distance = Vector2.Distance(lastPoint, normalizedPoint);
 
             if (distance < MIN_POINT_DISTANCE)
             {
@@ -735,8 +801,7 @@ public class RuneEditorWindow : EditorWindow
             return;
         }
 
-        m_testSession.AddStroke(
-            m_testCurrentStroke);
+        m_testSession.AddStroke(m_testCurrentStroke);
 
         m_testCurrentStroke.Clear();
 
@@ -753,10 +818,7 @@ public class RuneEditorWindow : EditorWindow
             return;
         }
 
-        m_testResult =
-            RuneTraceEvaluator.Evaluate(
-                m_runeData,
-                m_testSession);
+        m_testResult = RuneTraceEvaluator.Evaluate(m_runeData, m_testSession);
 
         Repaint();
     }
@@ -779,46 +841,36 @@ public class RuneEditorWindow : EditorWindow
 
         if (m_testResult == null)
         {
-            EditorGUILayout.LabelField(
-                "ルーンをなぞってください。");
+            EditorGUILayout.LabelField("ルーンをなぞってください。");
 
             return;
         }
 
         RuneTraceRule rule = m_runeData.Rule;
 
-        EditorGUILayout.LabelField(
-            $"Coverage : {m_testResult.Coverage:P1}");
+        EditorGUILayout.LabelField($"Coverage : {m_testResult.Coverage:P1}");
 
-        EditorGUILayout.LabelField(
-            $"Required : {rule.RequiredCoverage:P1}");
+        EditorGUILayout.LabelField($"Required : {rule.RequiredCoverage:P1}");
 
         EditorGUILayout.Space(3);
 
-        EditorGUILayout.LabelField(
-            $"Accuracy : {m_testResult.Accuracy:P1}");
+        EditorGUILayout.LabelField($"Accuracy : {m_testResult.Accuracy:P1}");
 
-        EditorGUILayout.LabelField(
-            $"Required : {rule.RequiredAccuracy:P1}");
+        EditorGUILayout.LabelField($"Required : {rule.RequiredAccuracy:P1}");
 
         EditorGUILayout.Space(3);
 
-        EditorGUILayout.LabelField(
-            $"Strokes : {m_testResult.StrokeCount} / {rule.MaxStrokeCount}");
+        EditorGUILayout.LabelField($"Strokes : {m_testResult.StrokeCount} / {rule.MaxStrokeCount}");
 
         EditorGUILayout.Space(5);
 
         if (m_testResult.IsSuccess)
         {
-            EditorGUILayout.HelpBox(
-                "SUCCESS",
-                MessageType.Info);
+            EditorGUILayout.HelpBox("SUCCESS", MessageType.Info);
         }
         else
         {
-            EditorGUILayout.HelpBox(
-                "FAILED",
-                MessageType.Warning);
+            EditorGUILayout.HelpBox("FAILED", MessageType.Warning);
         }
     }
 

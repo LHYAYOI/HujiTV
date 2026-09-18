@@ -18,9 +18,11 @@ public static class RuneTraceEvaluator
 
         RuneTraceRule rule = runeData.Rule;
 
-        float coverage = CalculateCoverage(runeData.TraceData.Strokes, session.Strokes, rule.DistanceTolerance);
+        List<RuneStrokeData> evaluationStrokes = RunePathUtility.ResampleStrokes(session.Strokes, RuneTraceSettings.SAMPLE_INTERVAL);
 
-        float accuracy = CalculateAccuracy(runeData.TraceData.Strokes, session.Strokes, rule.DistanceTolerance);
+        float coverage = CalculateCoverage(runeData.TraceData.Strokes, evaluationStrokes, rule.DistanceTolerance);
+
+        float accuracy = CalculateAccuracy(runeData.TraceData.Strokes, evaluationStrokes, rule.DistanceTolerance);
 
         bool strokeCountValid = session.StrokeCount <= rule.MaxStrokeCount;
 
@@ -41,7 +43,7 @@ public static class RuneTraceEvaluator
             {
                 totalPointCount++;
 
-                if (IsPointNearStrokes(referencePoint, inputStrokes, tolerance))
+                if (RunePathUtility.IsPointNearStrokes(referencePoint, inputStrokes, tolerance))
                 {
                     coveredPointCount++;
                 }
@@ -68,7 +70,7 @@ public static class RuneTraceEvaluator
             {
                 totalPointCount++;
 
-                if (IsPointNearStrokes(inputPoint, referenceStrokes, tolerance))
+                if (RunePathUtility.IsPointNearStrokes(inputPoint, referenceStrokes, tolerance))
                 {
                     accuratePointCount++;
                 }
@@ -83,46 +85,4 @@ public static class RuneTraceEvaluator
         return (float)accuratePointCount / totalPointCount;
     }
 
-
-
-    private static bool IsPointNearStrokes(Vector2 point, IReadOnlyList<RuneStrokeData> strokes, float tolerance)
-    {
-        foreach (RuneStrokeData stroke in strokes)
-        {
-            IReadOnlyList<Vector2> points = stroke.Points;
-
-            for (int i = 0; i < points.Count - 1; i++)
-            {
-                float distance = DistancePointToSegment(point, points[i], points[i + 1]);
-
-                if (distance <= tolerance)
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-
-    private static float DistancePointToSegment(Vector2 point, Vector2 segmentStart, Vector2 segmentEnd)
-    {
-        Vector2 segment = segmentEnd - segmentStart;
-
-        float segmentLengthSquared = segment.sqrMagnitude;
-
-        if (segmentLengthSquared <= Mathf.Epsilon)
-        {
-            return Vector2.Distance(point, segmentStart);
-        }
-
-        float t = Vector2.Dot(point - segmentStart, segment) / segmentLengthSquared;
-
-        t = Mathf.Clamp01(t);
-
-        Vector2 closestPoint = segmentStart + segment * t;
-
-        return Vector2.Distance(point, closestPoint);
-    }
 }
