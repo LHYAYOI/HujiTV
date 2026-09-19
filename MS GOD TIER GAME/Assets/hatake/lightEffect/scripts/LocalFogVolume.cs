@@ -15,6 +15,10 @@ namespace LightShaftLab
         [UnityEngine.Serialization.FormerlySerializedAs("shape")]
 
         public SHAPE m_shape;
+        [Min(0), Tooltip("画面上の大きさ・密度と合わせた選別の優先倍率。0=対象外。")]
+        public float m_priority = 1;
+        [Range(0, 10), Tooltip("この領域の太陽散乱を追加強調。0=通常、2=最大3倍。空間God Rayと霧が必要。境界はEdge Fadeでぼかす。重なりは最大値。")]
+        public float m_sunBoost;
         [Range(0, 0.5f)]
         [UnityEngine.Serialization.FormerlySerializedAs("density")]
         public float m_density = 0.1f;

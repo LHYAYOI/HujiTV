@@ -20,9 +20,11 @@ namespace LightShaftLab
         CursorLockMode m_previousLock;
         bool m_restoreCursorVisibleFlag;
         LightShaftDemoControls m_controls;
+        ShaftPerformanceDemo m_performanceDemo;
         void Awake()
         {
             m_controls = GetComponent<LightShaftDemoControls>();
+            m_performanceDemo = GetComponent<ShaftPerformanceDemo>();
         }
 
         void Update()
@@ -80,6 +82,7 @@ namespace LightShaftLab
             if (!holdMiddleFlag)
                 m_panFlag = false;
             bool capturePointerFlag = m_controls && m_controls.isActiveAndEnabled && m_controls.IsPointerOverPanel(position);
+            capturePointerFlag |= m_performanceDemo && m_performanceDemo.isActiveAndEnabled && m_performanceDemo.IsPointerOverPanel(position);
             if (pressRightFlag && !capturePointerFlag)
             {
                 m_previousLock = Cursor.lockState;

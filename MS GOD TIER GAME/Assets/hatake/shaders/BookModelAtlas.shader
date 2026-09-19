@@ -1,4 +1,5 @@
-Shader "Book/Model Atlas"
+
+Shader "custom/hatake/Book/Model Atlas"
 {
     Properties
     {
@@ -78,7 +79,6 @@ Shader "Book/Model Atlas"
                 }
                 else if (Contains(input.uv, _LeftUv))
                 {
-                    // The provided left island is rotated 180 degrees in its atlas.
                     float2 uv = 1.0 - (input.uv - _LeftUv.xy) / _LeftUv.zw;
                     color = tex2D(_LeftTex, CropUv(uv, _LeftCrop, _LeftTex_TexelSize));
                 }
