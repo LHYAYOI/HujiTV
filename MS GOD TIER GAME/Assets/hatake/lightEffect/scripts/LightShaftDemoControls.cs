@@ -123,32 +123,27 @@ namespace LightShaftLab
         {
             GUILayout.Label("Quality");
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("High"))
-            {
-                m_settings.m_resolutionDivisor.value = 1;
-                m_settings.m_steps.value = 64;
-            }
-
-            if (GUILayout.Button("Balanced"))
-            {
-                m_settings.m_resolutionDivisor.value = 2;
-                m_settings.m_steps.value = 48;
-            }
-
-            if (GUILayout.Button("Fast"))
-            {
-                m_settings.m_resolutionDivisor.value = 4;
-                m_settings.m_steps.value = 32;
-            }
-
+            if (GUILayout.Button("Near detail")) ShaftQualityPresets.Apply(m_settings,ShaftQualityPreset.NearDetail);
+            if (GUILayout.Button("Balanced")) ShaftQualityPresets.Apply(m_settings,ShaftQualityPreset.Balanced);
+            if (GUILayout.Button("Performance")) ShaftQualityPresets.Apply(m_settings,ShaftQualityPreset.Performance);
             GUILayout.EndHorizontal();
+            m_settings.m_refineRootsFlag.Override(GUILayout.Toggle(m_settings.m_refineRootsFlag.value,"Refine thin roots"));
+            m_settings.m_refineDepthEdgesFlag.Override(GUILayout.Toggle(m_settings.m_refineDepthEdgesFlag.value,"Refine depth edges"));
+            m_settings.m_temporalFlag.Override(GUILayout.Toggle(m_settings.m_temporalFlag.value,"Temporal reuse (optional)"));
+            m_settings.m_tileCullingFlag.Override(GUILayout.Toggle(m_settings.m_tileCullingFlag.value,"Tile culling (optional)"));
             GUILayout.Label($"Raymarch resolution 1/{m_settings.m_resolutionDivisor.value}");
             GUILayout.Label($"Density {m_settings.m_density.value:F3}");
             m_settings.m_density.value = GUILayout.HorizontalSlider(m_settings.m_density.value, 0, 0.15f);
             GUILayout.Label($"Scattering {m_settings.m_intensity.value:F2}");
             m_settings.m_intensity.value = GUILayout.HorizontalSlider(m_settings.m_intensity.value, 0, 3);
-            GUILayout.Label($"Samples {m_settings.m_steps.value}");
+            GUILayout.Label($"Base samples {m_settings.m_steps.value}");
             m_settings.m_steps.value = Mathf.RoundToInt(GUILayout.HorizontalSlider(m_settings.m_steps.value, 16, 96));
+            GUILayout.Label($"Spot minimum samples {m_settings.m_spotMinimumSamples.value}");
+            m_settings.m_spotMinimumSamples.Override(Mathf.RoundToInt(GUILayout.HorizontalSlider(m_settings.m_spotMinimumSamples.value, 2, 16)));
+            GUILayout.Label($"Local fog minimum samples {m_settings.m_localFogMinimumSamples.value}");
+            m_settings.m_localFogMinimumSamples.Override(Mathf.RoundToInt(GUILayout.HorizontalSlider(m_settings.m_localFogMinimumSamples.value, 1, 8)));
+            GUILayout.Label($"God Ray samples {m_settings.m_godRaySamples.value}");
+            m_settings.m_godRaySamples.Override(Mathf.RoundToInt(GUILayout.HorizontalSlider(m_settings.m_godRaySamples.value, 8, 64)));
             GUILayout.Label($"God Ray intensity {m_settings.m_godRayIntensity.value:F2}");
             m_settings.m_godRayIntensity.value = GUILayout.HorizontalSlider(m_settings.m_godRayIntensity.value, 0, 3);
         }
