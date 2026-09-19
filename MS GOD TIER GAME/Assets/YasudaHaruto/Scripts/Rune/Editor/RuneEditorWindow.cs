@@ -860,7 +860,7 @@ public class RuneEditorWindow : EditorWindow
 
         EditorGUILayout.Space(3);
 
-        EditorGUILayout.LabelField($"Strokes : {m_testResult.StrokeCount} / {rule.MaxStrokeCount}");
+        EditorGUILayout.LabelField($"Strokes : {m_testResult.StrokeCount} / {rule.RequiredStrokeCount}");
 
         EditorGUILayout.Space(5);
 

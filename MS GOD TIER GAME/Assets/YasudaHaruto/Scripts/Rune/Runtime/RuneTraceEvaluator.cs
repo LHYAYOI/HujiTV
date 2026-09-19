@@ -24,7 +24,7 @@ public static class RuneTraceEvaluator
 
         float accuracy = CalculateAccuracy(runeData.TraceData.Strokes, evaluationStrokes, rule.DistanceTolerance);
 
-        bool strokeCountValid = session.StrokeCount <= rule.MaxStrokeCount;
+        bool strokeCountValid = session.StrokeCount == rule.RequiredStrokeCount;
 
         bool success = strokeCountValid && coverage >= rule.RequiredCoverage && accuracy >= rule.RequiredAccuracy;
 
