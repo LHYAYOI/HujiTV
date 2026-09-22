@@ -136,6 +136,11 @@ public class CameraManager : MonoBehaviour
     {
         CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
 
+        if(currentVirtualCamera == null)
+        {
+            return;
+        }
+
         CameraShake shake = currentVirtualCamera.GetComponent<CameraShake>();
 
         if (shake == null)
@@ -150,6 +155,11 @@ public class CameraManager : MonoBehaviour
     public void ShakeCamera(float duration, float intensity)
     {
         CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
+
+        if (currentVirtualCamera == null)
+        {
+            return;
+        }
 
         CameraShake shake = currentVirtualCamera.GetComponent<CameraShake>();
 
@@ -166,6 +176,11 @@ public class CameraManager : MonoBehaviour
     {
         CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
 
+        if (currentVirtualCamera == null)
+        {
+            return;
+        }
+
         CameraTilt tilt = currentVirtualCamera.GetComponent<CameraTilt>();
 
         if (tilt == null)
@@ -180,6 +195,11 @@ public class CameraManager : MonoBehaviour
     public void ChangeCameraFOV(float duration, float FOV)
     {
         CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
+
+        if (currentVirtualCamera == null)
+        {
+            return;
+        }
 
         CameraZoom zoom = currentVirtualCamera.GetComponent<CameraZoom>();
 
