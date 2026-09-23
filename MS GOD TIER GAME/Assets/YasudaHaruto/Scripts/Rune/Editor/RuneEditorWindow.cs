@@ -422,7 +422,8 @@ public class RuneEditorWindow : EditorWindow
     {
         // 描画エリアの左上を原点とした正規化座標に変換する
         float x = (canvasPosition.x - m_drawingRect.x) / m_drawingRect.width;
-        float y = (canvasPosition.y - m_drawingRect.y) / m_drawingRect.height;
+        float y = 1f - (canvasPosition.y - m_drawingRect.y) / m_drawingRect.height;
+
 
         return new Vector2(Mathf.Clamp01(x), Mathf.Clamp01(y));
     }
@@ -432,7 +433,7 @@ public class RuneEditorWindow : EditorWindow
     {
         // 正規化座標を描画エリアの左上を原点としたキャンバス座標に変換する
         float x = m_drawingRect.x + normalizedPosition.x * m_drawingRect.width;
-        float y = m_drawingRect.y + normalizedPosition.y * m_drawingRect.height;
+        float y = m_drawingRect.y + (1f - normalizedPosition.y) * m_drawingRect.height;
 
         return new Vector2(x, y);
     }

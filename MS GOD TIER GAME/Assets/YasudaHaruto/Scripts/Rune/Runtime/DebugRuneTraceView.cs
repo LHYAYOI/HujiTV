@@ -3,16 +3,22 @@ using UnityEngine;
 
 public class DebugRuneTraceView : MonoBehaviour, IRuneTraceView
 {
+    [SerializeField] private RuneLineGraphic m_referenceGraphic;
+
+    [SerializeField] private RuneLineGraphic m_playerGraphic;
+
     public void BeginTrace(RuneData runeData)
     {
-        Debug.Log(
-            $"Rune Trace Start : {runeData.DisplayName}");
+        Debug.Log($"Rune Trace Start : {runeData.DisplayName}");
+
+        m_referenceGraphic.SetStrokes(runeData.TraceData.Strokes);
+
+        m_playerGraphic.Clear();
     }
 
-    public void UpdateCurrentStroke(
-        IReadOnlyList<Vector2> points)
+    public void UpdateCurrentStroke(IReadOnlyList<Vector2> points)
     {
-        // ç°ÇÕï\é¶Ç»Çµ
+        m_playerGraphic.SetCurrentStroke(points);
     }
 
     public void EndStroke()
@@ -41,5 +47,7 @@ public class DebugRuneTraceView : MonoBehaviour, IRuneTraceView
     public void Clear()
     {
         Debug.Log("Rune Trace Clear");
+
+        m_referenceGraphic.Clear();
     }
 }
