@@ -3,20 +3,24 @@
   "WorkspaceRootPath": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|d:\\github\\hujitv\\ms god tier game\\assets\\hamada\\scripts\\camera\\cameramanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\camera\\cameramanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|d:\\github\\hujitv\\ms god tier game\\assets\\hamada\\scripts\\test\\testbosscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\test\\testbosscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|d:\\github\\hujitv\\ms god tier game\\assets\\hamada\\scripts\\test\\cubtest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\test\\cubtest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\hitdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\hitdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|d:\\github\\hujitv\\ms god tier game\\assets\\hamada\\scripts\\attackdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\attackdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\ihitable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\ihitable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|d:\\github\\hujitv\\ms god tier game\\assets\\hamada\\scripts\\ihitable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\ihitable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\attackdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\attackdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -31,14 +35,27 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "CameraManager.cs",
-              "DocumentMoniker": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
-              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
-              "ToolTip": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
-              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
-              "ViewState": "AgIAAKQAAAAAAAAAAAD4v8YAAAAbAAAAAAAAAA==",
+              "Title": "TestBossController.cs",
+              "DocumentMoniker": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\test\\TestBossController.cs",
+              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\test\\TestBossController.cs",
+              "ToolTip": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\test\\TestBossController.cs",
+              "RelativeToolTip": "Assets\\Hamada\\Scripts\\test\\TestBossController.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAcAAAAEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-22T07:25:53.922Z",
+              "WhenOpened": "2026-09-24T03:17:22.458Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CubTest.cs",
+              "DocumentMoniker": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\test\\CubTest.cs",
+              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\test\\CubTest.cs",
+              "ToolTip": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\test\\CubTest.cs",
+              "RelativeToolTip": "Assets\\Hamada\\Scripts\\test\\CubTest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-24T03:07:44.247Z",
               "EditorCaption": ""
             },
             {
@@ -49,33 +66,33 @@
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\IHitable.cs",
               "ToolTip": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\IHitable.cs",
               "RelativeToolTip": "Assets\\Hamada\\Scripts\\IHitable.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAADwvwMAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-22T07:19:00.446Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "AttackData.cs",
               "DocumentMoniker": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\AttackData.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\AttackData.cs",
               "ToolTip": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\AttackData.cs",
               "RelativeToolTip": "Assets\\Hamada\\Scripts\\AttackData.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAABGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-22T07:04:15.946Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "HitData.cs",
               "DocumentMoniker": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\HitData.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\HitData.cs",
               "ToolTip": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\HitData.cs",
               "RelativeToolTip": "Assets\\Hamada\\Scripts\\HitData.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAADwvxAAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAtAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-22T07:01:16.622Z",
               "EditorCaption": ""

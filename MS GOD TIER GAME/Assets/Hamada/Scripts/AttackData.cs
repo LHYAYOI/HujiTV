@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "AttackData", menuName = "AttackObjects/AttackData")]
+[CreateAssetMenu(fileName = "AttackData", menuName = "ScriptableObject/AttackObjects/AttackData")]
 public class AttackData : ScriptableObject
 {
     [SerializeField] MAGIC_TYPE m_magicType;
