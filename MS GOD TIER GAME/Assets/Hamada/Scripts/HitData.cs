@@ -8,6 +8,8 @@ public class HitData
 
     MAGIC_TYPE m_magicType = MAGIC_TYPE.FIRE;
 
+    GameObject m_hitObject = null;
+
     public void SetDamage(float damage)
     {
         m_damage = damage;
@@ -22,6 +24,18 @@ public class HitData
     {
         m_magicType = magicType;
     }
+
+    //ƒeƒ“ƒvƒŒ‚Åî•ñ‚ğ•Ô‚·
+    public T GetHitObjectComponent<T>() where T : Component
+    {
+        if (m_hitObject == null) 
+        {
+            return null;
+        }
+
+        return m_hitObject.GetComponent<T>();
+    }
+
 
     public float GetDamage => m_damage;
 

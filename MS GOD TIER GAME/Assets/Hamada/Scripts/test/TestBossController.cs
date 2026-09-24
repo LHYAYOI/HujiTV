@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class TestBossController : MonoBehaviour
 {
-
     [SerializeField] GameObject m_hitCube;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
