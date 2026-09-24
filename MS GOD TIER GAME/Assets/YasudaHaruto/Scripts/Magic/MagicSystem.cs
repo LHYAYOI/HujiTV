@@ -7,52 +7,52 @@
 
 using UnityEngine;
 
-public class MagicSystem : MonoBehaviour
-{
-    [SerializeField]
-    private BookInputState m_bookInputState;
+//public class MagicSystem : MonoBehaviour
+//{
+//    [SerializeField]
+//    private BookInputState m_bookInputState;
 
-    [SerializeField]
-    private MAGIC_TYPE[] m_pageMagics =
-    {
-        MAGIC_TYPE.FIRE,
-        MAGIC_TYPE.ICE,
-        MAGIC_TYPE.THUNDER,
-        MAGIC_TYPE.HEAL
-    };
+//    [SerializeField]
+//    private MAGIC_TYPE[] m_pageMagics =
+//    {
+//        MAGIC_TYPE.FIRE,
+//        MAGIC_TYPE.ICE,
+//        MAGIC_TYPE.THUNDER,
+//        MAGIC_TYPE.HEAL
+//    };
 
-    private void OnEnable()
-    {
-        if (m_bookInputState != null)
-        {
-            m_bookInputState.OnCastRequested += OnCastRequested;
-        }
-    }
+//    private void OnEnable()
+//    {
+//        if (m_bookInputState != null)
+//        {
+//            m_bookInputState.OnCastRequested += OnCastRequested;
+//        }
+//    }
 
-    private void OnDisable()
-    {
-        if (m_bookInputState != null)
-        {
-            m_bookInputState.OnCastRequested -= OnCastRequested;
-        }
-    }
+//    private void OnDisable()
+//    {
+//        if (m_bookInputState != null)
+//        {
+//            m_bookInputState.OnCastRequested -= OnCastRequested;
+//        }
+//    }
 
-    private void OnCastRequested(int pageIndex)
-    {
-        if (pageIndex < 0 || pageIndex >= m_pageMagics.Length)
-        {
-            Debug.LogWarning($"ñÇñ@Ç™ê›íËÇ≥ÇÍÇƒÇ¢Ç»Ç¢PageÇ≈Ç∑ : {pageIndex}");
+//    private void OnCastRequested(int pageIndex)
+//    {
+//        if (pageIndex < 0 || pageIndex >= m_pageMagics.Length)
+//        {
+//            Debug.LogWarning($"ñÇñ@Ç™ê›íËÇ≥ÇÍÇƒÇ¢Ç»Ç¢PageÇ≈Ç∑ : {pageIndex}");
 
-            return;
-        }
+//            return;
+//        }
 
-        MAGIC_TYPE magic = m_pageMagics[pageIndex];
+//        MAGIC_TYPE magic = m_pageMagics[pageIndex];
 
-        Cast(magic);
-    }
+//        Cast(magic);
+//    }
 
-    private void Cast(MAGIC_TYPE magic)
-    {
-        Debug.Log($"===== {m_bookInputState.PlayerSlot}" + $" : {magic} î≠ìÆ =====");
-    }
-}
+//    private void Cast(MAGIC_TYPE magic)
+//    {
+//        Debug.Log($"===== {m_bookInputState.PlayerSlot}" + $" : {magic} î≠ìÆ =====");
+//    }
+//}
