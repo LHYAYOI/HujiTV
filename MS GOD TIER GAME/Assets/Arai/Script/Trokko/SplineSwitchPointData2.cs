@@ -17,6 +17,8 @@ public class SplineSwitchPointData2
 
     [SerializeField] private float m_switchOffset;
 
+    [SerializeField] private bool m_autoSwitch;
+
     // ―――――――――――――――――――――――――――――――――――――
     // Public Propaty
     // ―――――――――――――――――――――――――――――――――――――
@@ -26,4 +28,5 @@ public class SplineSwitchPointData2
     public SplineContainer Spline { get { return m_splineController?.Spline; } }
 
     public float SwitchOffset { get { return m_switchOffset; }}
+    public bool AutoSwitch { get { return m_autoSwitch; }}
 }

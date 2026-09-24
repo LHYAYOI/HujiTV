@@ -7,93 +7,19 @@ public class SplineController2 : MonoBehaviour
 {
     [SerializeField] private SplineContainer m_spline;
     [SerializeField] private bool m_loopFlag;
-    [SerializeField] private List<SplineSwitchPointData2> m_switchPoints;
+    
+    private Gimmick[] m_gimmicks;
 
 
     public SplineContainer Spline => m_spline;
     public bool LoopFlag => m_loopFlag;
-    public SplineSwitchPointData2 GetSwitchPointByDistance(float offset)
+
+
+    private void Awake()
     {
-        foreach(var data in m_switchPoints)
-        {
-            float max = data.SwitchPoint;
-            float min = max - data.SwitchChangeRange;
-
-            if(offset < max && offset > min)
-            {
-                return data;
-            }
-        }
-
-        return null;
+        m_gimmicks = GetComponentsInChildren<Gimmick>(true);
     }
 
+    public Gimmick[] Gimmicks => m_gimmicks;
 
-
-    private void OnDrawGizmos()
-    {
-        if (m_spline == null)
-        {
-            return;
-        }
-
-        foreach (var point in m_switchPoints)
-        {
-            // start end
-            float length = m_spline.CalculateLength();
-            if (length <= 0.01f)
-            {
-                continue;
-            }
-
-
-            // start point の描画
-            float switchPoint = point.SwitchPoint / length;
-            float rangeStart =
-                Mathf.Max(switchPoint - point.SwitchChangeRange / length, 0.0f);
-            float distance = Mathf.Abs(switchPoint - rangeStart);
-
-            Vector3 pointPosition = m_spline.EvaluatePosition(switchPoint);
-            Vector3 startPosition = m_spline.EvaluatePosition(rangeStart);
-
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawSphere(pointPosition, 0.5f);
-            Gizmos.DrawSphere(startPosition, 0.5f);
-
-
-            // start - point の line
-            Gizmos.color = Color.orange;
-
-            float delta = 0.05f;
-            for (float t = 0.0f; t <= 1.0f - delta; t += delta)
-            {
-                Vector3 start = m_spline.EvaluatePosition(rangeStart + distance * t);
-                start += Vector3.up * delta;
-                Vector3 end = m_spline.EvaluatePosition(rangeStart + distance * (t + delta));
-                end += Vector3.up * delta;
-
-                Gizmos.DrawLine(start, end);
-            }
-
-
-            // point - another point
-            SplineContainer anotherSpline = point.Spline;
-            if(anotherSpline == null)
-            {
-                continue;
-            }
-            float anotherLength = anotherSpline.CalculateLength();
-            float switchOffset = point.SwitchOffset / anotherLength;
-            Vector3 offsetPosition = anotherSpline.EvaluatePosition(switchOffset);
-
-            Gizmos.DrawLine(pointPosition, offsetPosition);
-
-            Gizmos.color = Color.red;
-            Gizmos.DrawSphere(offsetPosition, 0.5f);
-
-        }
-
-
-
-    }
 }
