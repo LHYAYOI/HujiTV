@@ -1,4 +1,5 @@
-﻿using Unity.Collections;
+﻿using System.Collections;
+using Unity.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -21,6 +22,7 @@ public class CartController : MonoBehaviour
 
     [SerializeField] private bool m_movingFlag;
     [SerializeField] private float m_speed;
+    private float m_baseSpeed;
     [SerializeField] private float m_switchSpeed;
     [SerializeField] private float m_distance; // 全体の進んだ距離
 
@@ -53,6 +55,8 @@ public class CartController : MonoBehaviour
     private void Awake()
     {
         m_state = CartState.Move;
+
+        m_baseSpeed = m_speed;
     }
 
     private void Update()
@@ -174,4 +178,18 @@ public class CartController : MonoBehaviour
     
     public float SplineOffset => m_distance - m_splineAnchor;
     
+    public IEnumerator SetSpeed(float speed, float time)
+    {
+        m_speed = speed;
+
+        yield return new WaitForSeconds(time);
+
+        ResetSpeed();
+    }
+
+    public void ResetSpeed()
+    {
+        m_speed = m_baseSpeed;
+    }
+
 }

@@ -12,74 +12,46 @@ public class StageSpline : MonoBehaviour
 
     // runtime
     private SplineController2 m_currentSplineController = null;
-    private SplineSwitchPointData2 m_switchPoint = null;
+    private GimmickContext m_gimmickContext = null;
 
 
     private void Start()
     {
-        m_currentSplineController = m_startSplineController;
+        SwitchSpline(m_startSplineController, m_startOffset);
 
-        m_cart.SetSpline(
-            m_currentSplineController.Spline, 
-            m_startOffset,
-            m_currentSplineController.LoopFlag);
+        m_gimmickContext = new GimmickContext(
+            m_cart,
+            SwitchSpline,
+            SetCartSpeed);
     }
 
     private void Update()
-    {
-        // 乗り換えポイントの切り替え
-        if (Keyboard.current.spaceKey.wasPressedThisFrame)
-        {
-            if(m_switchPoint != null)
-            {
-                m_switchPoint = null;
-            }
-            else
-            {
-                float currentDistanceOffset = m_cart.SplineOffset;
-
-                m_switchPoint = m_currentSplineController.GetSwitchPointByDistance(currentDistanceOffset);
-            }
-        }
-
-        // 乗り換え
-        if(m_switchPoint != null)
-        {
-            float currentOffset = m_cart.SplineOffset;
-
-            if(currentOffset > m_switchPoint.SwitchPoint)
-            {
-                // 乗り換え実行
-                m_currentSplineController = m_switchPoint.SplineController;
-
-                m_cart.SetSpline(
-                    m_currentSplineController.Spline, 
-                    m_switchPoint.SwitchOffset,
-                    m_currentSplineController.LoopFlag);
-
-                m_switchPoint = null;
-            }
-        }
-    }
-
-
-    private void OnDrawGizmos()
     {
         if(m_currentSplineController == null)
         {
             return;
         }
 
-        if(m_switchPoint != null)
+        var gimmicks = m_currentSplineController.Gimmicks;
+        
+        foreach(var g in gimmicks)
         {
-            SplineContainer spline = m_currentSplineController.Spline;
-            float distance = m_switchPoint.SwitchPoint / spline.CalculateLength();
-
-            Gizmos.color = Color.green;
-            Gizmos.DrawSphere(
-               (Vector3)spline.EvaluatePosition(distance)
-               + Vector3.up * 3.0f,
-               1.0f);
+            if(g.CanExecute(m_gimmickContext))
+            {
+                g.Execute(m_gimmickContext);
+            }
         }
+    }
+
+    private void SwitchSpline(SplineController2 controller,float offset)
+    {
+        m_cart.SetSpline(controller.Spline, offset, controller.LoopFlag);
+
+        m_currentSplineController = controller;
+    }
+
+    private void SetCartSpeed(float speed , float time)
+    {
+        StartCoroutine(m_cart.SetSpeed(speed, time));
     }
 }
