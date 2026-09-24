@@ -25,6 +25,11 @@ public class HitData
         m_magicType = magicType;
     }
 
+    public void SetHitObject(GameObject hitObject)
+    {
+        m_hitObject = hitObject;
+    }
+
     //ƒeƒ“ƒvƒŒ‚Åî•ñ‚ğ•Ô‚·
     public T GetHitObjectComponent<T>() where T : Component
     {
@@ -36,11 +41,11 @@ public class HitData
         return m_hitObject.GetComponent<T>();
     }
 
-
     public float GetDamage => m_damage;
 
     public string GetTag => m_tag;
 
     public MAGIC_TYPE GetMagicType => m_magicType;
 
+    public GameObject GetHitObject => m_hitObject;
 }
