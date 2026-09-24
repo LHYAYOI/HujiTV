@@ -34,6 +34,47 @@ public class CameraManager : MonoBehaviour
         Instance = this;
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.I)) 
+        {
+            Debug.Log("FPS");
+            SwitchCamera("FPSCamera");
+        }
+
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            Debug.Log("TPS");
+            SwitchCamera("TPSCamera");
+        }
+
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            TiltCamera(.4f, -20);
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            TiltCamera(.4f, 20);
+        }
+        else if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            TiltCamera(.4f, 0);
+        }
+
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            ChangeCameraFOV(.4f, 80);
+        }
+        else if (Input.GetKeyDown(KeyCode.K))
+        {
+            ChangeCameraFOV(.4f, 20);
+        }
+        else if (Input.GetKeyDown(KeyCode.J))
+        {
+            ChangeCameraFOV(.4f, 60);
+        }
+    }
+
     public void SwitchCamera(string cameraName)
     {
         foreach (CAMERA_DATA camera in m_cameraList)
@@ -45,6 +86,7 @@ public class CameraManager : MonoBehaviour
                 if (virtualCamera != null) 
                 {
                     virtualCamera.Priority = 0;
+                    virtualCamera.gameObject.SetActive(false);
                 }
 
                 continue;
@@ -59,7 +101,10 @@ public class CameraManager : MonoBehaviour
     {
         CAMERA_DATA previousCamera = m_currentCamera;
 
-        camera.GetCamera().Priority = 10;
+        CinemachineCamera virtualCamera = camera.GetCamera();
+
+        virtualCamera.gameObject.SetActive(true);
+        virtualCamera.Priority = 10;
 
         m_currentCamera = camera;
     }
@@ -86,9 +131,35 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-    public void ShakeCamera(float intensity, float duration)
+    //縦と横の強さを指定できるカメラシェイク
+    public void ShakeCameraInVH(float duration, float horizontalIntensity, float verticalIntensity) 
     {
         CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
+
+        if(currentVirtualCamera == null)
+        {
+            return;
+        }
+
+        CameraShake shake = currentVirtualCamera.GetComponent<CameraShake>();
+
+        if (shake == null)
+        {
+            return;
+        }
+
+        shake.VHShake(duration, horizontalIntensity, verticalIntensity);
+    }
+
+    //カメラシェイク
+    public void ShakeCamera(float duration, float intensity)
+    {
+        CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
+
+        if (currentVirtualCamera == null)
+        {
+            return;
+        }
 
         CameraShake shake = currentVirtualCamera.GetComponent<CameraShake>();
 
@@ -99,6 +170,47 @@ public class CameraManager : MonoBehaviour
 
         shake.ShakeCamera(intensity, duration);
     }
+
+    //傾ける
+    public void TiltCamera(float duration, float tiltDegree)
+    {
+        CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
+
+        if (currentVirtualCamera == null)
+        {
+            return;
+        }
+
+        CameraTilt tilt = currentVirtualCamera.GetComponent<CameraTilt>();
+
+        if (tilt == null)
+        {
+            return;
+        }
+
+        tilt.Tilt(duration, tiltDegree);
+    }
+
+    //  カメラのFOVを変更する
+    public void ChangeCameraFOV(float duration, float FOV)
+    {
+        CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
+
+        if (currentVirtualCamera == null)
+        {
+            return;
+        }
+
+        CameraZoom zoom = currentVirtualCamera.GetComponent<CameraZoom>();
+
+        if (zoom == null)
+        {
+            return;
+        }
+
+        zoom.ChangeFOV(duration, FOV);
+    }
+
 
     public CAMERA_DATA GetCameraByName(string cameraName)
     {
