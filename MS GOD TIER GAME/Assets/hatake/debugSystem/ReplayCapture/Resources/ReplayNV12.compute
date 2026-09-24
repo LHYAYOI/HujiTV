@@ -1,0 +1,30 @@
+#pragma kernel Convert
+Texture2D<float4> Source;
+RWStructuredBuffer<uint> Packed;
+int Width, Height, LinearColor, FlipY;
+float3 ReadRGB(int2 p)
+{
+    if (FlipY != 0) p.y = Height - 1 - p.y;
+    float3 c = saturate(Source.Load(int3(p, 0)).rgb);
+    if (LinearColor != 0)
+        c = lerp(c * 12.92, 1.055 * pow(max(c, 0.0), 1.0 / 2.4) - 0.055, step(0.0031308, c));
+    return saturate(c);
+}
+uint Y(float3 c) { return (uint)round(16 + 219 * dot(c, float3(0.2126, 0.7152, 0.0722))); }
+uint2 UV(float3 c)
+{
+    return (uint2)round(128 + 224 * float2(dot(c, float3(-0.114572, -0.385428, 0.5)), dot(c, float3(0.5, -0.454153, -0.045847))));
+}
+uint Pack(uint4 v) { return v.x | (v.y << 8) | (v.z << 16) | (v.w << 24); }
+[numthreads(8,8,1)]
+void Convert(uint3 thread : SV_DispatchThreadID)
+{
+    int2 p = int2(thread.x * 4, thread.y * 2);
+    if (p.x >= Width || p.y >= Height) return;
+    float3 a = ReadRGB(p), b = ReadRGB(p + int2(1,0)), c = ReadRGB(p + int2(2,0)), d = ReadRGB(p + int2(3,0));
+    float3 e = ReadRGB(p + int2(0,1)), f = ReadRGB(p + int2(1,1)), g = ReadRGB(p + int2(2,1)), h = ReadRGB(p + int2(3,1));
+    Packed[(uint)(p.y * Width + p.x) >> 2] = Pack(uint4(Y(a), Y(b), Y(c), Y(d)));
+    Packed[(uint)((p.y + 1) * Width + p.x) >> 2] = Pack(uint4(Y(e), Y(f), Y(g), Y(h)));
+    uint2 uv0 = UV((a+b+e+f) * 0.25), uv1 = UV((c+d+g+h) * 0.25);
+    Packed[(uint)(Width * Height + (p.y >> 1) * Width + p.x) >> 2] = Pack(uint4(uv0, uv1));
+}
