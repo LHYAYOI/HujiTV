@@ -1,0 +1,241 @@
+// Original project code. Uses Windows SDK / Windows Media Foundation only.
+#define NOMINMAX
+#include <windows.h>
+#include <mfapi.h>
+#include <mfidl.h>
+#include <mfreadwrite.h>
+#include <mferror.h>
+#include <codecapi.h>
+#include <strmif.h>
+#include <wrl/client.h>
+#include <algorithm>
+#include <cstdint>
+#include <fstream>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <cmath>
+using Microsoft::WRL::ComPtr;
+#define API extern "C" __declspec(dllexport)
+static thread_local std::string errorText;
+static void Check(HRESULT hr, const char* operation) {
+    if (FAILED(hr)) { char b[160]; sprintf_s(b, "%s: HRESULT 0x%08X", operation, (unsigned)hr); throw std::runtime_error(b); }
+}
+#define HR(call) Check((call), #call)
+API const char* __cdecl RP_Error() { return errorText.c_str(); }
+API int __cdecl RP_Initialize() {
+    try { HR(CoInitializeEx(nullptr, COINIT_MULTITHREADED)); HR(MFStartup(MF_VERSION)); return 0; }
+    catch (const std::exception& e) { errorText = e.what(); return -1; }
+}
+API void __cdecl RP_Shutdown() { MFShutdown(); CoUninitialize(); }
+struct Writer { ComPtr<IMFSinkWriter> sink; DWORD video = 0, audio = 0; int w, h, fps, rate; bool nv12=false; };
+static ComPtr<IMFMediaType> VideoType(GUID subtype, int w, int h, int fps) {
+    ComPtr<IMFMediaType> type; HR(MFCreateMediaType(&type));
+    HR(type->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Video)); HR(type->SetGUID(MF_MT_SUBTYPE, subtype));
+    HR(MFSetAttributeSize(type.Get(), MF_MT_FRAME_SIZE, w, h));
+    HR(MFSetAttributeRatio(type.Get(), MF_MT_FRAME_RATE, fps, 1));
+    HR(MFSetAttributeRatio(type.Get(), MF_MT_PIXEL_ASPECT_RATIO, 1, 1));
+    HR(type->SetUINT32(MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive)); return type;
+}
+static ComPtr<IMFMediaType> AudioType(GUID subtype, int rate) {
+    ComPtr<IMFMediaType> type; HR(MFCreateMediaType(&type));
+    HR(type->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Audio)); HR(type->SetGUID(MF_MT_SUBTYPE, subtype));
+    HR(type->SetUINT32(MF_MT_AUDIO_NUM_CHANNELS, 2)); HR(type->SetUINT32(MF_MT_AUDIO_SAMPLES_PER_SECOND, rate));
+    HR(type->SetUINT32(MF_MT_AUDIO_BITS_PER_SAMPLE, 16));
+    HR(type->SetUINT32(MF_MT_AUDIO_AVG_BYTES_PER_SECOND, subtype == MFAudioFormat_AAC ? 16000 : rate * 4));
+    HR(type->SetUINT32(MF_MT_AUDIO_BLOCK_ALIGNMENT, subtype == MFAudioFormat_AAC ? 1 : 4));
+    if (subtype == MFAudioFormat_AAC) HR(type->SetUINT32(MF_MT_AAC_PAYLOAD_TYPE, 0));
+    return type;
+}
+API void* __cdecl RP_Open(const wchar_t* path, int w, int h, int fps, int bitrate, int rate, int nv12) {
+    try {
+        auto writer = std::make_unique<Writer>(); writer->w=w; writer->h=h; writer->fps=fps; writer->rate=rate;
+        writer->nv12=nv12!=0;
+        ComPtr<IMFAttributes> attrs; HR(MFCreateAttributes(&attrs, 3));
+        HR(attrs->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE));
+        HR(attrs->SetUINT32(MF_LOW_LATENCY, TRUE));
+        // Leave throttling enabled: only this dedicated encoding thread may block.
+        HR(MFCreateSinkWriterFromURL(path, nullptr, attrs.Get(), &writer->sink));
+        auto video = VideoType(MFVideoFormat_H264,w,h,fps);
+        HR(video->SetUINT32(MF_MT_AVG_BITRATE, bitrate));
+        HR(video->SetUINT32(MF_MT_MPEG2_PROFILE, 77));
+        if(nv12) {
+            HR(video->SetUINT32(MF_MT_YUV_MATRIX,MFVideoTransferMatrix_BT709));
+            HR(video->SetUINT32(MF_MT_VIDEO_PRIMARIES,MFVideoPrimaries_BT709));
+            HR(video->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE,MFNominalRange_16_235));
+        }
+        HR(writer->sink->AddStream(video.Get(), &writer->video));
+        auto audio = AudioType(MFAudioFormat_AAC,rate); HR(writer->sink->AddStream(audio.Get(), &writer->audio));
+        auto input = VideoType(nv12?MFVideoFormat_NV12:MFVideoFormat_RGB32,w,h,fps);
+        HR(input->SetUINT32(MF_MT_DEFAULT_STRIDE,w*(nv12?1:4)));
+        if(nv12) {
+            HR(input->SetUINT32(MF_MT_YUV_MATRIX,MFVideoTransferMatrix_BT709));
+            HR(input->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE,MFNominalRange_16_235));
+        }
+        HR(writer->sink->SetInputMediaType(writer->video,input.Get(),nullptr));
+        auto pcm = AudioType(MFAudioFormat_PCM,rate); HR(writer->sink->SetInputMediaType(writer->audio,pcm.Get(),nullptr));
+        ComPtr<ICodecAPI> codec;
+        if (SUCCEEDED(writer->sink->GetServiceForStream(writer->video,GUID_NULL,IID_PPV_ARGS(&codec)))) {
+            VARIANT v; VariantInit(&v); v.vt=VT_UI4; v.ulVal=0;
+            codec->SetValue(&CODECAPI_AVEncMPVDefaultBPictureCount,&v);
+            v.ulVal=fps; codec->SetValue(&CODECAPI_AVEncMPVGOPSize,&v);
+        }
+        HR(writer->sink->BeginWriting()); return writer.release();
+    } catch(const std::exception& e) { errorText=e.what(); return nullptr; }
+}
+static void WriteSample(IMFSinkWriter* sink,DWORD stream,const void* data,DWORD bytes,LONGLONG time,LONGLONG duration,int flippedStride=0,int rows=0) {
+    ComPtr<IMFMediaBuffer> buffer; HR(MFCreateMemoryBuffer(bytes,&buffer));
+    BYTE* output=nullptr; HR(buffer->Lock(&output,nullptr,nullptr));
+    if(flippedStride) for(int row=0;row<rows;row++) memcpy(output+row*flippedStride,(const BYTE*)data+(rows-1-row)*flippedStride,flippedStride);
+    else memcpy(output,data,bytes);
+    HR(buffer->Unlock());
+    HR(buffer->SetCurrentLength(bytes)); ComPtr<IMFSample> sample; HR(MFCreateSample(&sample));
+    HR(sample->AddBuffer(buffer.Get())); HR(sample->SetSampleTime(time)); HR(sample->SetSampleDuration(duration));
+    HR(sink->WriteSample(stream,sample.Get()));
+}
+API int __cdecl RP_Write(void* handle,const void* bgra,int bytes,long long frame,const void* pcm,int audioFrames,int flipRows) {
+    try {
+        auto& w=*static_cast<Writer*>(handle);
+        if(bytes!=(w.nv12?w.w*w.h*3/2:w.w*w.h*4) || audioFrames<=0) throw std::runtime_error("Invalid frame buffer size");
+        auto time=frame*10000000/w.fps, end=(frame+1)*10000000/w.fps;
+        WriteSample(w.sink.Get(),w.video,bgra,bytes,time,end-time,flipRows && !w.nv12?w.w*4:0,w.h);
+        WriteSample(w.sink.Get(),w.audio,pcm,audioFrames*4,time,end-time); return 0;
+    } catch(const std::exception& e) { errorText=e.what(); return -1; }
+}
+API int __cdecl RP_Close(void* handle) {
+    std::unique_ptr<Writer> w(static_cast<Writer*>(handle));
+    if (!w) return 0;
+    try { HR(w->sink->Finalize()); return 0; }
+    catch(const std::exception& e) { errorText=e.what(); return -1; }
+}
+static ComPtr<IMFSourceReader> Reader(const wchar_t* path, bool decode=false) {
+    ComPtr<IMFAttributes> attrs; HR(MFCreateAttributes(&attrs,1));
+    if(decode) HR(attrs->SetUINT32(MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING,TRUE));
+    ComPtr<IMFSourceReader> reader; HR(MFCreateSourceReaderFromURL(path,attrs.Get(),&reader)); return reader;
+}
+// All segments use the same encoder configuration. Copy compressed samples: no re-encoding.
+API int __cdecl RP_Merge(const wchar_t* newlinePaths,const wchar_t* output) {
+    try {
+        std::wistringstream lines(newlinePaths); std::wstring path;
+        ComPtr<IMFSinkWriter> sink; DWORD outStreams[2]{}; LONGLONG offset=0, lastAudioEnd=-1, outputAudioFrames=0;
+        bool pcmMode=false; UINT32 pcmRate=0;
+        while(std::getline(lines,path)) {
+            if(path.empty()) continue;
+            std::wstring pcmPath=path.substr(0,path.find_last_of(L'.'))+L".pcm";
+            if(!sink) pcmMode=GetFileAttributesW(pcmPath.c_str())!=INVALID_FILE_ATTRIBUTES;
+            std::ifstream pcmFile;
+            if(pcmMode) { pcmFile.open(pcmPath,std::ios::binary); if(!pcmFile) throw std::runtime_error("Missing PCM segment"); }
+            auto reader=Reader(path.c_str());
+            HR(reader->SetStreamSelection(MF_SOURCE_READER_ALL_STREAMS,FALSE));
+            DWORD ids[]={static_cast<DWORD>(MF_SOURCE_READER_FIRST_VIDEO_STREAM),static_cast<DWORD>(MF_SOURCE_READER_FIRST_AUDIO_STREAM)};
+            ComPtr<IMFMediaType> types[2];
+            for(int i=0;i<2;i++) {
+                HR(reader->GetNativeMediaType(ids[i],0,&types[i]));
+                HR(reader->SetCurrentMediaType(ids[i],nullptr,types[i].Get()));
+                HR(reader->SetStreamSelection(ids[i],TRUE));
+            }
+            if(!sink) {
+                HR(MFCreateSinkWriterFromURL(output,nullptr,nullptr,&sink));
+                HR(types[1]->GetUINT32(MF_MT_AUDIO_SAMPLES_PER_SECOND,&pcmRate));
+                for(int i=0;i<2;i++) {
+                    auto outputType=pcmMode && i==1?AudioType(MFAudioFormat_AAC,pcmRate):types[i];
+                    HR(sink->AddStream(outputType.Get(),&outStreams[i]));
+                    auto input=pcmMode && i==1?AudioType(MFAudioFormat_PCM,pcmRate):types[i];
+                    Check(sink->SetInputMediaType(outStreams[i],input.Get(),nullptr),i==0?"Merge video input":"Merge audio input");
+                }
+                HR(sink->BeginWriting());
+            }
+            if(pcmMode) HR(reader->SetStreamSelection(MF_SOURCE_READER_FIRST_AUDIO_STREAM,FALSE));
+            // Interleave compressed tracks to keep muxer buffering bounded on long exports.
+            LONGLONG videoEnd=0;
+            bool ended[2]={false,pcmMode};
+            LONGLONG segmentAudioFrames=0;
+            std::vector<int16_t> pcmBuffer(8192);
+            while(!ended[0] || !ended[1]) {
+                    DWORD flags=0,actual=0; LONGLONG time=0; ComPtr<IMFSample> sample;
+                    HR(reader->ReadSample(MF_SOURCE_READER_ANY_STREAM,0,&actual,&flags,&time,&sample));
+                    if(flags & MF_SOURCE_READERF_ERROR) throw std::runtime_error("Source reader error");
+                    ComPtr<IMFMediaType> actualType; HR(reader->GetCurrentMediaType(actual,&actualType));
+                    GUID major; HR(actualType->GetGUID(MF_MT_MAJOR_TYPE,&major));
+                    int i=major==MFMediaType_Video?0:1;
+                    if(flags & MF_SOURCE_READERF_ENDOFSTREAM) ended[i]=true;
+                    if(sample) {
+                        LONGLONG duration=0; HR(sample->GetSampleDuration(&duration));
+                        if(i==0) videoEnd=std::max(videoEnd,time+duration);
+                        // AAC priming/padding from an independent segment may overlap the preceding one.
+                        if(time<0 || (i==1 && time+offset<lastAudioEnd)) continue;
+                        HR(sample->SetSampleTime(time+offset));
+                        UINT64 decodeTime=0;
+                        if(SUCCEEDED(sample->GetUINT64(MFSampleExtension_DecodeTimestamp,&decodeTime)))
+                            HR(sample->SetUINT64(MFSampleExtension_DecodeTimestamp,decodeTime+offset));
+                        HR(sink->WriteSample(outStreams[i],sample.Get()));
+                        if(pcmMode && i==0) {
+                            auto wanted=(LONGLONG)std::llround(videoEnd*(double)pcmRate/10000000.0);
+                            while(segmentAudioFrames<wanted) {
+                                auto count=(DWORD)std::min<LONGLONG>(4096,wanted-segmentAudioFrames);
+                                if(!pcmFile.read((char*)pcmBuffer.data(),count*4)) throw std::runtime_error("Truncated PCM segment");
+                                auto audioTime=outputAudioFrames*10000000/pcmRate;
+                                auto audioEnd=(outputAudioFrames+count)*10000000/pcmRate;
+                                WriteSample(sink.Get(),outStreams[1],pcmBuffer.data(),count*4,audioTime,audioEnd-audioTime);
+                                outputAudioFrames+=count; segmentAudioFrames+=count;
+                            }
+                        }
+                        if(i==1) lastAudioEnd=time+offset+duration;
+                    }
+            }
+            if(videoEnd<=0) throw std::runtime_error("Segment has no video");
+            offset+=videoEnd;
+        }
+        if(!sink) throw std::runtime_error("No closed segments to export");
+        HR(sink->Finalize()); return 0;
+    } catch(const std::exception& e) { errorText=e.what(); return -1; }
+}
+// Test-only decoding through the same OS API, with a BMP frame and audio RMS report.
+API int __cdecl RP_Inspect(const wchar_t* path,const wchar_t* report,const wchar_t* bmp) {
+    try {
+        auto reader=Reader(path,true); HR(reader->SetStreamSelection(MF_SOURCE_READER_ALL_STREAMS,FALSE));
+        HR(reader->SetStreamSelection(MF_SOURCE_READER_FIRST_VIDEO_STREAM,TRUE));
+        ComPtr<IMFMediaType> type; HR(MFCreateMediaType(&type));
+        HR(type->SetGUID(MF_MT_MAJOR_TYPE,MFMediaType_Video)); HR(type->SetGUID(MF_MT_SUBTYPE,MFVideoFormat_RGB32));
+        HR(reader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM,nullptr,type.Get()));
+        HR(reader->GetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM,&type));
+        UINT32 w=0,h=0,n=0,d=0; HR(MFGetAttributeSize(type.Get(),MF_MT_FRAME_SIZE,&w,&h));
+        MFGetAttributeRatio(type.Get(),MF_MT_FRAME_RATE,&n,&d);
+        long long frames=0,end=0,previous=-1; std::vector<BYTE> pixels;
+        for(;;) {
+            DWORD flags=0; LONGLONG time=0,duration=0; ComPtr<IMFSample> sample;
+            HR(reader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,0,nullptr,&flags,&time,&sample));
+            if(sample) {
+                if(time<=previous) throw std::runtime_error("Non-monotonic decoded video timestamps"); previous=time;
+                HR(sample->GetSampleDuration(&duration)); end=std::max(end,time+duration); frames++;
+                if(frames==1) { ComPtr<IMFMediaBuffer> b; HR(sample->ConvertToContiguousBuffer(&b)); BYTE* p; DWORD count; HR(b->Lock(&p,nullptr,&count)); pixels.assign(p,p+count); HR(b->Unlock()); }
+            }
+            if(flags & MF_SOURCE_READERF_ENDOFSTREAM) break;
+        }
+        if(pixels.size()<w*h*4) throw std::runtime_error("Invalid decoded image");
+        BITMAPFILEHEADER fh{}; BITMAPINFOHEADER ih{}; fh.bfType=0x4D42; fh.bfOffBits=sizeof(fh)+sizeof(ih); fh.bfSize=fh.bfOffBits+w*h*4;
+        ih.biSize=sizeof(ih); ih.biWidth=w; ih.biHeight=h; ih.biPlanes=1; ih.biBitCount=32; ih.biSizeImage=w*h*4;
+        std::ofstream picture(bmp,std::ios::binary); picture.write((char*)&fh,sizeof(fh)); picture.write((char*)&ih,sizeof(ih)); picture.write((char*)pixels.data(),w*h*4);
+        reader=Reader(path); HR(reader->SetStreamSelection(MF_SOURCE_READER_ALL_STREAMS,FALSE));
+        HR(reader->SetStreamSelection(MF_SOURCE_READER_FIRST_AUDIO_STREAM,TRUE));
+        type.Reset(); HR(MFCreateMediaType(&type)); HR(type->SetGUID(MF_MT_MAJOR_TYPE,MFMediaType_Audio)); HR(type->SetGUID(MF_MT_SUBTYPE,MFAudioFormat_PCM));
+        HR(reader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_AUDIO_STREAM,nullptr,type.Get()));
+        long long values=0; double sum=0; long long audioEnd=0, silentRun=0, maxInteriorSilence=0;
+        for(;;) {
+            DWORD flags=0; LONGLONG time=0,duration=0; ComPtr<IMFSample> sample;
+            HR(reader->ReadSample(MF_SOURCE_READER_FIRST_AUDIO_STREAM,0,nullptr,&flags,&time,&sample));
+            if(sample) { sample->GetSampleDuration(&duration); audioEnd=std::max(audioEnd,time+duration);
+                ComPtr<IMFMediaBuffer> b; HR(sample->ConvertToContiguousBuffer(&b)); BYTE* p; DWORD count; HR(b->Lock(&p,nullptr,&count));
+                for(DWORD j=0;j+1<count;j+=2) { double v=*(int16_t*)(p+j)/32768.0; sum+=v*v; values++;
+                    if(values>8192) {
+                        if(std::abs(v)<0.001) silentRun++;
+                        else { maxInteriorSilence=std::max(maxInteriorSilence,silentRun); silentRun=0; }
+                    }
+                } HR(b->Unlock()); }
+            if(flags & MF_SOURCE_READERF_ENDOFSTREAM) break;
+        }
+        std::ofstream out(report); out<<"width="<<w<<"\nheight="<<h<<"\nfps="<<n<<"/"<<d<<"\nframes="<<frames<<"\nvideo_seconds="<<end/1e7<<"\naudio_seconds="<<audioEnd/1e7<<"\naudio_rms="<<(values?std::sqrt(sum/values):0)<<"\nmax_interior_silence_sample_values="<<maxInteriorSilence<<"\n";
+        return 0;
+    } catch(const std::exception& e) { errorText=e.what(); return -1; }
+}

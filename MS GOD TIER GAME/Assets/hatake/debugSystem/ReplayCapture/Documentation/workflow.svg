@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="260" viewBox="0 0 960 260">
+<rect width="960" height="260" rx="16" fill="#171d2b"/>
+<g font-family="Yu Gothic,Meiryo,sans-serif" fill="#eef3ff">
+<text x="28" y="42" font-size="24" font-weight="bold">Editor録画：3つの手順</text>
+<g fill="#26334d" stroke="#698dd4"><rect x="28" y="70" width="270" height="155" rx="10"/><rect x="345" y="70" width="270" height="155" rx="10"/><rect x="662" y="70" width="270" height="155" rx="10"/></g>
+<g font-size="17"><text x="45" y="102" fill="#7adccc">1. 録画オブジェクトを追加</text><text x="45" y="140">Tools → Replay Capture</text><text x="45" y="172">Add Editor MP4 Recorder</text><text x="45" y="205">AudioListenerは1つ有効に</text>
+<text x="362" y="102" fill="#7adccc">2. Playして保存</text><text x="362" y="140">Game Viewをクリック</text><text x="362" y="172">F9 または Save recent MP4</text><text x="362" y="205">停止する前に保存します</text>
+<text x="679" y="102" fill="#7adccc">3. 保存完了を確認</text><text x="679" y="140">Console：Replay MP4 saved</text><text x="679" y="172">Recordings フォルダー</text><text x="679" y="205">動画とUnity音声を再生確認</text></g>
+<g font-size="28" fill="#7adccc"><text x="307" y="155">→</text><text x="624" y="155">→</text></g>
+</g></svg>
