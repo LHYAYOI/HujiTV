@@ -35,13 +35,6 @@ public abstract class GimmickSpline : Gimmick
     }
 #endif
 
-    // ―――――――――――――――――――――――――――――――――――――
-    // Public Event
-    // ―――――――――――――――――――――――――――――――――――――
-    public override bool CanExecute(GimmickContext context)
-    {
-        return ExecuteFlag && (GimmickPoint < context.Cart.SplineOffset);
-    }
 
     // ―――――――――――――――――――――――――――――――――――――
     // Private Event

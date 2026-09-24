@@ -23,14 +23,9 @@ public class GimmickSplineSwitchPoint : GimmickSpline
     // ―――――――――――――――――――――――――――――――――――――
     // Public Event
     // ―――――――――――――――――――――――――――――――――――――    
-    public override void Execute(GimmickContext context)
+    public void Switch(HitData hitdata)
     {
-        context.SwitchSpline(
-            m_targetSplineController,
-            m_switchOffset);
 
-        // 切る
-        ExecuteFlag = false;
     }
 
     // ―――――――――――――――――――――――――――――――――――――
@@ -38,7 +33,6 @@ public class GimmickSplineSwitchPoint : GimmickSpline
     // ―――――――――――――――――――――――――――――――――――――
     private void OnDrawGizmos()
     {
-        OnGizmosOnOff();
         OnGizmosMyPosition();
 
 

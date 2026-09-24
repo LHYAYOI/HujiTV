@@ -164,9 +164,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1871145633}
-  - {fileID: 2024667471}
-  - {fileID: 1538937548}
-  - {fileID: 292417627}
   m_Father: {fileID: 1235063656}
   m_LocalEulerAnglesHint: {x: 0, y: 89.29, z: 0}
 --- !u!1 &114704280
@@ -217,56 +214,6 @@ Transform:
   - {fileID: 1063911473}
   m_Father: {fileID: 1235063656}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &179026541
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 179026542}
-  - component: {fileID: 179026543}
-  m_Layer: 0
-  m_Name: OnOff Reset
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &179026542
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 179026541}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.14786988, y: -0.000000099623556, z: 9.349078}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1788917382}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &179026543
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 179026541}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 79c677a8c6c76b4409113b6fa65c94f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GimmickSplineOnOffReset
-  m_executeFlag: 1
-  m_gimmickPoint: 9.35
-  m_onOff: 1
-  m_targetGimmics:
-  - {fileID: 1063911474}
-  - {fileID: 1669231465}
 --- !u!1 &222597968
 GameObject:
   m_ObjectHideFlags: 0
@@ -277,6 +224,8 @@ GameObject:
   m_Component:
   - component: {fileID: 222597969}
   - component: {fileID: 222597970}
+  - component: {fileID: 222597972}
+  - component: {fileID: 222597971}
   m_Layer: 0
   m_Name: SwitchPoint
   m_TagString: Untagged
@@ -311,58 +260,63 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a01afd66ece95f4caaef2f4d32d27bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GimmickSplineSwitchPoint
-  m_executeFlag: 0
   m_gimmickPoint: 23.3
   m_targetSplineController: {fileID: 114704281}
   m_switchOffset: 12.43
---- !u!1 &292417626
-GameObject:
+--- !u!135 &222597971
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 292417627}
-  - component: {fileID: 292417628}
-  m_Layer: 0
-  m_Name: Set Cart Speed (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &292417627
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 292417626}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -13.678564, y: 2.983446, z: 1.317317}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 73782422}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &292417628
+  m_GameObject: {fileID: 222597968}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &222597972
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 292417626}
+  m_GameObject: {fileID: 222597968}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 66145fa20d8fd3d4f9f26f68ce3dda1f, type: 3}
+  m_Script: {fileID: 11500000, guid: ced5332850543c24ca276d1983454a1c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GimmickSplineSpeedChanger
-  m_executeFlag: 1
-  m_gimmickPoint: 65.4
-  m_speed: 15
-  m_time: 0.7
+  m_EditorClassIdentifier: Assembly-CSharp::HitReceiverController
+  m_onHit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 222597970}
+        m_TargetAssemblyTypeName: GimmickSplineSwitchPoint, Assembly-CSharp
+        m_MethodName: Switch
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_onStay:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onExit:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &351155575
 GameObject:
   m_ObjectHideFlags: 0
@@ -1281,6 +1235,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1063911473}
   - component: {fileID: 1063911474}
+  - component: {fileID: 1063911476}
+  - component: {fileID: 1063911475}
   m_Layer: 0
   m_Name: SwitchPoint ForLoop
   m_TagString: Untagged
@@ -1315,59 +1271,63 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a01afd66ece95f4caaef2f4d32d27bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GimmickSplineSwitchPoint
-  m_executeFlag: 1
   m_gimmickPoint: 47.9
   m_targetSplineController: {fileID: 73782421}
   m_switchOffset: 12.91
---- !u!1 &1189367938
-GameObject:
+--- !u!135 &1063911475
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1189367939}
-  - component: {fileID: 1189367940}
-  m_Layer: 0
-  m_Name: OnOff
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1189367939
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1189367938}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.162887, y: -0.00000014411171, z: 22.39871}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1788917382}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1189367940
+  m_GameObject: {fileID: 1063911472}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1063911476
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1189367938}
+  m_GameObject: {fileID: 1063911472}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 78b849cafbed8cb48a05346076bf3b42, type: 3}
+  m_Script: {fileID: 11500000, guid: ced5332850543c24ca276d1983454a1c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GimmickSplineOnOffChanger
-  m_executeFlag: 1
-  m_gimmickPoint: 22.4
-  m_once: 0
-  m_range: 9.17
-  m_target: {fileID: 222597970}
+  m_EditorClassIdentifier: Assembly-CSharp::HitReceiverController
+  m_onHit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1063911474}
+        m_TargetAssemblyTypeName: GimmickSplineSwitchPoint, Assembly-CSharp
+        m_MethodName: Switch
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_onStay:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onExit:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1235063654
 GameObject:
   m_ObjectHideFlags: 0
@@ -1419,54 +1379,6 @@ Transform:
   - {fileID: 1936601349}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1538937547
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1538937548}
-  - component: {fileID: 1538937549}
-  m_Layer: 0
-  m_Name: Set Cart Speed
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1538937548
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1538937547}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.2011089, y: 0.95946884, z: 9.392542}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 73782422}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1538937549
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1538937547}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 66145fa20d8fd3d4f9f26f68ce3dda1f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GimmickSplineSpeedChanger
-  m_executeFlag: 1
-  m_gimmickPoint: 20.75
-  m_speed: 15
-  m_time: 0.7
 --- !u!1 &1669231463
 GameObject:
   m_ObjectHideFlags: 0
@@ -1477,6 +1389,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1669231464}
   - component: {fileID: 1669231465}
+  - component: {fileID: 1669231467}
+  - component: {fileID: 1669231466}
   m_Layer: 0
   m_Name: SwitchPoint ForLoop
   m_TagString: Untagged
@@ -1511,10 +1425,63 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a01afd66ece95f4caaef2f4d32d27bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GimmickSplineSwitchPoint
-  m_executeFlag: 1
   m_gimmickPoint: 83.7
   m_targetSplineController: {fileID: 73782421}
   m_switchOffset: 6.9
+--- !u!114 &1669231466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1669231463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ced5332850543c24ca276d1983454a1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitReceiverController
+  m_onHit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1669231465}
+        m_TargetAssemblyTypeName: GimmickSplineSwitchPoint, Assembly-CSharp
+        m_MethodName: Switch
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_onStay:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onExit:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!135 &1669231467
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1669231463}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1788917380
 GameObject:
   m_ObjectHideFlags: 0
@@ -1561,9 +1528,7 @@ Transform:
   m_Children:
   - {fileID: 1000027698}
   - {fileID: 222597969}
-  - {fileID: 1189367939}
   - {fileID: 1669231464}
-  - {fileID: 179026542}
   m_Father: {fileID: 1235063656}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1833042500
@@ -1842,6 +1807,59 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1894022870
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1894022872}
+  - component: {fileID: 1894022871}
+  m_Layer: 0
+  m_Name: HitReceiverTest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1894022871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1894022870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ced5332850543c24ca276d1983454a1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitReceiverController
+  m_onHit:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onStay:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onExit:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!4 &1894022872
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1894022870}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 9.19301, y: -0, z: 73.31188}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1936601347
 GameObject:
   m_ObjectHideFlags: 0
@@ -1892,56 +1910,6 @@ MonoBehaviour:
   m_speed: 5
   m_switchSpeed: 25
   m_distance: 0
---- !u!1 &2024667470
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2024667471}
-  - component: {fileID: 2024667472}
-  m_Layer: 0
-  m_Name: OnOff Reset
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2024667471
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2024667470}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.6684327, y: -0.1820502, z: -9.786201}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 73782422}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2024667472
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2024667470}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 79c677a8c6c76b4409113b6fa65c94f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GimmickSplineOnOffReset
-  m_executeFlag: 1
-  m_gimmickPoint: 1.2
-  m_onOff: 1
-  m_targetGimmics:
-  - {fileID: 1538937549}
-  - {fileID: 292417628}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1951,3 +1919,4 @@ SceneRoots:
   - {fileID: 1882006329}
   - {fileID: 1833042502}
   - {fileID: 1235063656}
+  - {fileID: 1894022872}
