@@ -18,8 +18,7 @@ public class CartController : MonoBehaviour
     private CartState m_state;
 
 
-    [SerializeField] private Transform m_targetCard;
-
+    
     [SerializeField] private bool m_movingFlag;
     [SerializeField] private float m_speed;
     private float m_baseSpeed;
@@ -61,10 +60,7 @@ public class CartController : MonoBehaviour
 
     private void Update()
     {
-        if(m_targetCard == null)
-        {
-            return;
-        }
+
 
         switch (m_state)
         {
@@ -113,12 +109,8 @@ public class CartController : MonoBehaviour
         float value = splineOffset / length;
         Vector3 position = m_spline.EvaluatePosition(value);
 
-        if(m_targetCard == null)
-        {
-            return;
-        }
 
-        m_targetCard.position = position;
+        transform.position = position;
 
     }
 
@@ -130,7 +122,7 @@ public class CartController : MonoBehaviour
         }
 
 
-        Vector3 start = m_targetCard.position;
+        Vector3 start = transform.position;
 
         float length = m_spline.CalculateLength();
         float splineOffset = SplineOffset;
@@ -148,7 +140,7 @@ public class CartController : MonoBehaviour
             m_state = CartState.Move;
         }
 
-        m_targetCard.position += direction;
+        transform.position += direction;
     }
 
 

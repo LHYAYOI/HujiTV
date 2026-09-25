@@ -26,6 +26,17 @@ public class GimmickSplineSwitchPoint : GimmickSpline
     public void Switch(HitData hitdata)
     {
 
+        Debug.Log("C");
+
+        CartController cart = hitdata.GetHitObjectComponent<CartController>();
+
+
+        if(cart == null)
+        {
+            Debug.Log("null");
+            return;
+        }
+        cart.SetSpline(m_targetSplineController.Spline, m_switchOffset, m_targetSplineController.LoopFlag);
     }
 
     // ―――――――――――――――――――――――――――――――――――――
