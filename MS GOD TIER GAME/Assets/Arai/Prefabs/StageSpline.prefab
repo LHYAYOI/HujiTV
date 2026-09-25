@@ -1,0 +1,749 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1093486984789000584
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4752580067042511264}
+  - component: {fileID: 8046254419351700863}
+  m_Layer: 0
+  m_Name: Spline (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4752580067042511264
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1093486984789000584}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2728207333951576506}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8046254419351700863
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1093486984789000584}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dab5c7d4c32e743048dfca98e2d5914f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Splines::UnityEngine.Splines.SplineContainer
+  m_Spline:
+    m_EditModeType: 1
+    m_Knots: []
+    m_MetaData: []
+    m_Closed: 0
+    m_IntData:
+      m_Data: []
+    m_FloatData:
+      m_Data: []
+    m_Float4Data:
+      m_Data: []
+    m_ObjectData:
+      m_Data: []
+  m_Splines:
+  - m_EditModeType: 1
+    m_Knots:
+    - Position:
+        x: 0.0049836636
+        y: -0.0000004627991
+        z: -10.720299
+      TangentIn:
+        x: -0
+        y: -0
+        z: -2.8088877
+      TangentOut:
+        x: 0
+        y: 0
+        z: 2.0980244
+      Rotation:
+        value:
+          x: 0.030945295
+          y: 0.5682184
+          z: -0.15244482
+          w: 0.8080414
+    - Position:
+        x: 0.13121676
+        y: -0.000000646588
+        z: 4.557266
+      TangentIn:
+        x: -0
+        y: -0
+        z: -4.373643
+      TangentOut:
+        x: 0
+        y: 0
+        z: 3.3836243
+      Rotation:
+        value:
+          x: -0.058718003
+          y: -0.061570317
+          z: 0.029642416
+          w: 0.995933
+    - Position:
+        x: -2.2150164
+        y: 2.0399995
+        z: 13.156702
+      TangentIn:
+        x: -0
+        y: -0
+        z: -3.0644736
+      TangentOut:
+        x: 0
+        y: 0
+        z: 3.164123
+      Rotation:
+        value:
+          x: -0.13605604
+          y: -0.058337502
+          z: 0.016256453
+          w: 0.9888484
+    - Position:
+        x: -2.0250163
+        y: 5.0199995
+        z: 22.4367
+      TangentIn:
+        x: -0
+        y: -0
+        z: -1.6615356
+      TangentOut:
+        x: 0
+        y: 0
+        z: 2.3905215
+      Rotation:
+        value:
+          x: -0.382631
+          y: -0.40985343
+          z: 0.32425627
+          w: 0.76188684
+    - Position:
+        x: -17.68087
+        y: 4.4
+        z: 9.7199135
+      TangentIn:
+        x: -0
+        y: -0
+        z: -5.0523853
+      TangentOut:
+        x: 0
+        y: 0
+        z: 5.8857393
+      Rotation:
+        value:
+          x: 0.5146278
+          y: 0.85337067
+          z: -0.083045505
+          w: -0.0044928435
+    m_MetaData:
+    - Mode: 0
+      Tension: 0.5
+    - Mode: 0
+      Tension: 0.5
+    - Mode: 0
+      Tension: 0.5
+    - Mode: 0
+      Tension: 0.5
+    - Mode: 0
+      Tension: 0.5
+    m_Closed: 1
+    m_IntData:
+      m_Data: []
+    m_FloatData:
+      m_Data: []
+    m_Float4Data:
+      m_Data: []
+    m_ObjectData:
+      m_Data: []
+  m_Knots:
+    m_KnotsLink: []
+--- !u!1 &1153521877830602592
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8640142302315666395}
+  - component: {fileID: 237199787372669941}
+  m_Layer: 0
+  m_Name: SplineController2 (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8640142302315666395
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1153521877830602592}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 4.9, y: 0, z: 27.88}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8745916218401426027}
+  - {fileID: 1928374116188146898}
+  m_Father: {fileID: 4372441462204169088}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &237199787372669941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1153521877830602592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9cb05fac2f1bb648accdb5d6724626e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SplineController2
+  m_spline: {fileID: 2634704838608013247}
+  m_loopFlag: 0
+--- !u!1 &3202393950936544214
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4372441462204169088}
+  - component: {fileID: 6811702407854686011}
+  m_Layer: 0
+  m_Name: StageSpline
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4372441462204169088
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3202393950936544214}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2728207333951576506}
+  - {fileID: 8640142302315666395}
+  - {fileID: 6784966971322275463}
+  - {fileID: 1882515359513837263}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6811702407854686011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3202393950936544214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 122cde9bc53b3d747ad0251e528e4d4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageSpline
+  m_startSplineController: {fileID: 3720767419663881909}
+  m_startOffset: 0
+  m_cart: {fileID: 8060513738135779989}
+--- !u!1 &3709202646950990771
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2728207333951576506}
+  - component: {fileID: 7722151228001562429}
+  m_Layer: 0
+  m_Name: SplineController2 (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2728207333951576506
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3709202646950990771}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.70271057, z: -0, w: 0.7114759}
+  m_LocalPosition: {x: 4.9, y: 0, z: 74.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4752580067042511264}
+  m_Father: {fileID: 4372441462204169088}
+  m_LocalEulerAnglesHint: {x: 0, y: 89.29, z: 0}
+--- !u!114 &7722151228001562429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3709202646950990771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9cb05fac2f1bb648accdb5d6724626e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SplineController2
+  m_spline: {fileID: 8046254419351700863}
+  m_loopFlag: 1
+--- !u!1 &7176433159584372549
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8745916218401426027}
+  - component: {fileID: 2634704838608013247}
+  m_Layer: 0
+  m_Name: Spline (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8745916218401426027
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7176433159584372549}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8640142302315666395}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2634704838608013247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7176433159584372549}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dab5c7d4c32e743048dfca98e2d5914f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Splines::UnityEngine.Splines.SplineContainer
+  m_Spline:
+    m_EditModeType: 1
+    m_Knots: []
+    m_MetaData: []
+    m_Closed: 0
+    m_IntData:
+      m_Data: []
+    m_FloatData:
+      m_Data: []
+    m_Float4Data:
+      m_Data: []
+    m_ObjectData:
+      m_Data: []
+  m_Splines:
+  - m_EditModeType: 1
+    m_Knots:
+    - Position:
+        x: 0.0049836636
+        y: -0.0000004627991
+        z: -10.720299
+      TangentIn:
+        x: -0
+        y: -0
+        z: -1.5278087
+      TangentOut:
+        x: 0
+        y: 0
+        z: 1.5278087
+      Rotation:
+        value:
+          x: 0.000000006013304
+          y: 0.004131217
+          z: -3.7139433e-10
+          w: 0.9999915
+    - Position:
+        x: 0.13121676
+        y: -0.000000646588
+        z: 4.557266
+      TangentIn:
+        x: -0
+        y: -0
+        z: -4.373643
+      TangentOut:
+        x: 0
+        y: 0
+        z: 3.3836243
+      Rotation:
+        value:
+          x: -0.058718003
+          y: -0.061570317
+          z: 0.029642416
+          w: 0.995933
+    - Position:
+        x: -2.2150164
+        y: 2.0399995
+        z: 13.156702
+      TangentIn:
+        x: -0
+        y: -0
+        z: -3.0644736
+      TangentOut:
+        x: 0
+        y: 0
+        z: 3.164123
+      Rotation:
+        value:
+          x: -0.13605604
+          y: -0.058337502
+          z: 0.016256453
+          w: 0.9888484
+    - Position:
+        x: -2.0250163
+        y: 5.0199995
+        z: 22.4367
+      TangentIn:
+        x: -0
+        y: -0
+        z: -3.5257537
+      TangentOut:
+        x: 0
+        y: 0
+        z: 4.2859144
+      Rotation:
+        value:
+          x: -0.080709346
+          y: 0.0020982393
+          z: 0.0007349803
+          w: 0.9967352
+    - Position:
+        x: -2.1899996
+        y: 5.1999993
+        z: 36.840004
+      TangentIn:
+        x: -0
+        y: -0
+        z: -1.4405373
+      TangentOut:
+        x: 0
+        y: 0
+        z: 1.4405373
+      Rotation:
+        value:
+          x: -0.006247428
+          y: -0.0057271575
+          z: -0.000080361424
+          w: 0.9999642
+    m_MetaData:
+    - Mode: 0
+      Tension: 0.5
+    - Mode: 0
+      Tension: 0.5
+    - Mode: 0
+      Tension: 0.5
+    - Mode: 0
+      Tension: 0.5
+    - Mode: 0
+      Tension: 0.5
+    m_Closed: 0
+    m_IntData:
+      m_Data: []
+    m_FloatData:
+      m_Data: []
+    m_Float4Data:
+      m_Data: []
+    m_ObjectData:
+      m_Data: []
+  m_Knots:
+    m_KnotsLink: []
+--- !u!1 &7855257289301967739
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1928374116188146898}
+  - component: {fileID: 6580154831555577982}
+  - component: {fileID: 5228402558525592819}
+  - component: {fileID: 3105199736872201361}
+  m_Layer: 0
+  m_Name: SwitchPoint ForLoop
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1928374116188146898
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7855257289301967739}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -2.178863, y: 5.212796, z: 36.07023}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8640142302315666395}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6580154831555577982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7855257289301967739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a01afd66ece95f4caaef2f4d32d27bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GimmickSplineSwitchPoint
+  m_gimmickPoint: 47.9
+  m_targetSplineController: {fileID: 7722151228001562429}
+  m_switchOffset: 12.91
+--- !u!114 &5228402558525592819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7855257289301967739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ced5332850543c24ca276d1983454a1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitReceiverController
+  m_onHit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6580154831555577982}
+        m_TargetAssemblyTypeName: GimmickSplineSwitchPoint, Assembly-CSharp
+        m_MethodName: Switch
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_onStay:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onExit:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!135 &3105199736872201361
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7855257289301967739}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1001 &3614664833332162057
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 4372441462204169088}
+    m_Modifications:
+    - target: {fileID: 2022257796002766517, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+      propertyPath: m_targetSplineController
+      value: 
+      objectReference: {fileID: 237199787372669941}
+    - target: {fileID: 5475686820113671116, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+      propertyPath: m_Name
+      value: SplineController2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6405866703437215404, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+      propertyPath: m_targetSplineController
+      value: 
+      objectReference: {fileID: 7722151228001562429}
+    - target: {fileID: 7782454354869500046, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7782454354869500046, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7782454354869500046, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7782454354869500046, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7782454354869500046, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7782454354869500046, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7782454354869500046, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7782454354869500046, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7782454354869500046, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7782454354869500046, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+--- !u!114 &3720767419663881909 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 111196645449119932, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+  m_PrefabInstance: {fileID: 3614664833332162057}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9cb05fac2f1bb648accdb5d6724626e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SplineController2
+--- !u!4 &6784966971322275463 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7782454354869500046, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+  m_PrefabInstance: {fileID: 3614664833332162057}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &5729887638330837451
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 4372441462204169088}
+    m_Modifications:
+    - target: {fileID: 2753807108439008101, guid: 184705a9018d2f743a4bb405deda5c11, type: 3}
+      propertyPath: m_Name
+      value: TrokkoController
+      objectReference: {fileID: 0}
+    - target: {fileID: 6171250681145816836, guid: 184705a9018d2f743a4bb405deda5c11, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6171250681145816836, guid: 184705a9018d2f743a4bb405deda5c11, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6171250681145816836, guid: 184705a9018d2f743a4bb405deda5c11, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6171250681145816836, guid: 184705a9018d2f743a4bb405deda5c11, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.99997705
+      objectReference: {fileID: 0}
+    - target: {fileID: 6171250681145816836, guid: 184705a9018d2f743a4bb405deda5c11, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.0000000047860578
+      objectReference: {fileID: 0}
+    - target: {fileID: 6171250681145816836, guid: 184705a9018d2f743a4bb405deda5c11, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.0067743217
+      objectReference: {fileID: 0}
+    - target: {fileID: 6171250681145816836, guid: 184705a9018d2f743a4bb405deda5c11, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 3.2423033e-11
+      objectReference: {fileID: 0}
+    - target: {fileID: 6171250681145816836, guid: 184705a9018d2f743a4bb405deda5c11, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6171250681145816836, guid: 184705a9018d2f743a4bb405deda5c11, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6171250681145816836, guid: 184705a9018d2f743a4bb405deda5c11, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 184705a9018d2f743a4bb405deda5c11, type: 3}
+--- !u!4 &1882515359513837263 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6171250681145816836, guid: 184705a9018d2f743a4bb405deda5c11, type: 3}
+  m_PrefabInstance: {fileID: 5729887638330837451}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8060513738135779989 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2330635876257870686, guid: 184705a9018d2f743a4bb405deda5c11, type: 3}
+  m_PrefabInstance: {fileID: 5729887638330837451}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4dc289ec95184014ead9be83a39a782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CartController
