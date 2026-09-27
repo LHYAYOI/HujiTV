@@ -4,6 +4,7 @@
 // 制作者：安田晴人
 // 概要： 本のページの入力状態を管理するクラス
 //-----------------------------------------------
+
 public class BookInputController
 {
     private BOOK_INPUT_STATE m_state = BOOK_INPUT_STATE.NORMAL;
@@ -21,6 +22,11 @@ public class BookInputController
 
     public void EndRuneTrace()
     {
+        if (m_state != BOOK_INPUT_STATE.RUNE_TRACING)
+        {
+            return;
+        }
+
         m_state = BOOK_INPUT_STATE.NORMAL;
     }
 
@@ -31,6 +37,11 @@ public class BookInputController
 
     public void EndPageTransition()
     {
+        if (m_state != BOOK_INPUT_STATE.PAGE_TRANSITION)
+        {
+            return;
+        }
+
         m_state = BOOK_INPUT_STATE.NORMAL;
     }
 
@@ -41,6 +52,11 @@ public class BookInputController
 
     public void Enable()
     {
+        if (m_state != BOOK_INPUT_STATE.DISABLED)
+        {
+            return;
+        }
+
         m_state = BOOK_INPUT_STATE.NORMAL;
     }
 }

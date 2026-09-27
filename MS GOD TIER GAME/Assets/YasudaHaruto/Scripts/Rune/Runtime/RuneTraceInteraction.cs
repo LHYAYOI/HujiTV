@@ -4,8 +4,7 @@
 // 制作者：安田晴人
 // 概要： ルーンのなぞりインタラクション
 //-----------------------------------------------
-public class RuneTraceInteraction
-    : IPageInteraction
+public class RuneTraceInteraction : IPageInteraction
 {
     private readonly RuneData m_runeData;
 

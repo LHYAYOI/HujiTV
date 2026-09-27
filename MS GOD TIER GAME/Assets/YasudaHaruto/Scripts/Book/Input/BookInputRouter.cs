@@ -1,18 +1,27 @@
+//-----------------------------------------------
+// BookInputRouter.cs
+// 制作日：2026/09/20
+// 制作者：安田晴人
+// 概要： 本のページめくりの入力をルーティングするクラス
+//-----------------------------------------------
 using UnityEngine;
 
 public class BookInputRouter : MonoBehaviour
 {
     private IBookPointerInput m_pointerInput;
-
     private BookInputController m_inputController;
-
     private RuneTraceController m_runeTraceController;
+    private PageNavigationInput m_pageNavigationInput;
+
+    public event System.Action<PAGE_NAVIGATION_DIRECTION> PageNavigationRequested;
 
     public void Initialize(IBookPointerInput pointerInput, BookInputController inputController, RuneTraceController runeTraceController)
     {
         m_pointerInput = pointerInput;
         m_inputController = inputController;
         m_runeTraceController = runeTraceController;
+
+        m_pageNavigationInput = new PageNavigationInput();
     }
 
     private void Update()
@@ -40,7 +49,18 @@ public class BookInputRouter : MonoBehaviour
 
     private void UpdateNormalInput()
     {
-        // 次にページSwipeを実装する
+        if (m_pointerInput.TryGetPointerDown(out BookPointerData down))
+        {
+            m_pageNavigationInput.Begin(down.Position);
+        }
+
+        if (m_pointerInput.TryGetPointerUp(out BookPointerData up))
+        {
+            if (m_pageNavigationInput.End(up.Position, out PAGE_NAVIGATION_DIRECTION direction))
+            {
+                PageNavigationRequested?.Invoke(direction);
+            }
+        }
     }
 
     private void UpdateRuneTraceInput()

@@ -2,27 +2,20 @@ using UnityEngine;
 
 public class RuneTraceTestBootstrap : MonoBehaviour
 {
-    [Header("Page")]
     [SerializeField]
     private PageData m_pageData;
 
-    [Header("Rune")]
     [SerializeField]
     private RuneData m_runeData;
 
-    [Header("View")]
     [SerializeField]
     private DebugRuneTraceView m_view;
 
-    [Header("Input")]
     [SerializeField]
     private MouseBookPointerInput m_mouseInput;
-    
-    [SerializeField]
-    private BookInputRouter m_inputRouter;
 
     [SerializeField]
-    private RectTransform m_traceArea;
+    private BookInputRouter m_inputRouter;
 
     private PageInstance m_pageInstance;
 
@@ -50,7 +43,16 @@ public class RuneTraceTestBootstrap : MonoBehaviour
             inputController,
             runeController);
 
-        m_pageInstance.BeginInteraction();
+        //m_pageInstance.BeginInteraction();
+
+        m_inputRouter.PageNavigationRequested += OnPageNavigationRequested;
+    }
+
+    private void OnPageNavigationRequested(
+    PAGE_NAVIGATION_DIRECTION direction)
+    {
+        Debug.Log(
+            $"Page Navigation Requested : {direction}");
     }
 
     private void OnDestroy()
