@@ -40,8 +40,8 @@ public class BookNetworkClient : MonoBehaviour
         // BookControllerのイベントに登録
         if (m_bookController != null)
         {
-            m_bookController.OnPageChanged += OnPageChanged;
-            m_bookController.OnCastRequested += OnCastRequested;
+            //m_bookController.OnPageChanged += OnPageChanged;
+            //m_bookController.OnCastRequested += OnCastRequested;
         }
 
         SetConnectionState(BOOK_CONNECTION_STATE.DISCONNECTED);
@@ -173,7 +173,7 @@ public class BookNetworkClient : MonoBehaviour
         // 接続直後に現在ページを同期
         if (m_bookController != null)
         {
-            SendPageChanged(m_bookController.CurrentPage);
+            //SendPageChanged(m_bookController.CurrentPage);
         }
     }
 
@@ -328,8 +328,8 @@ public class BookNetworkClient : MonoBehaviour
         if (m_bookController != null)
         {
             // BookControllerのイベントから登録解除
-            m_bookController.OnPageChanged -= OnPageChanged;
-            m_bookController.OnCastRequested -= OnCastRequested;
+            //m_bookController.OnPageChanged -= OnPageChanged;
+            //m_bookController.OnCastRequested -= OnCastRequested;
         }
 
         if (!m_driver.IsCreated)

@@ -1,94 +1,116 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\",
+  "WorkspaceRootPath": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\pc_user\\onedrive\\documents\\github\\hujitv\\ms god tier game\\assets\\yasudaharuto\\scripts\\book\\input\\bookinputcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\ths30546\\documents\\github\\hujitv\\ms god tier game\\assets\\yasudaharuto\\scripts\\book\\booktestbootstrap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\book\\booktestbootstrap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\ths30546\\documents\\github\\hujitv\\ms god tier game\\assets\\yasudaharuto\\scripts\\page\\debugpageinteraction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\page\\debugpageinteraction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{ACEC4F48-E81A-68A0-C497-E93ACE81DED1}|Assembly-CSharp-Editor.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hatake\\book\\editor\\bookmodelsetup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ACEC4F48-E81A-68A0-C497-E93ACE81DED1}|Assembly-CSharp-Editor.csproj|solutionrelative:assets\\hatake\\book\\editor\\bookmodelsetup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\network\\booknetworkclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\network\\booknetworkclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\book\\bookcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\book\\bookcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\book\\bookmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\book\\bookmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\book\\input\\bookpointerdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\book\\input\\bookpointerdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\book\\input\\bookinputcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\book\\input\\bookinputcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\pc_user\\onedrive\\documents\\github\\hujitv\\ms god tier game\\assets\\yasudaharuto\\scripts\\book\\input\\bookinputstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\book\\input\\bookinputstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\book\\input\\bookinputstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\runetestbootstrap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\runetestbootstrap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\rune\\runtime\\runetestbootstrap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{ACEC4F48-E81A-68A0-C497-E93ACE81DED1}|Assembly-CSharp-Editor.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\editor\\runeeditorwindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{ACEC4F48-E81A-68A0-C497-E93ACE81DED1}|Assembly-CSharp-Editor.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\editor\\runeeditorwindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{ACEC4F48-E81A-68A0-C497-E93ACE81DED1}|Assembly-CSharp-Editor.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\rune\\editor\\runeeditorwindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\runelinegraphic.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\runelinegraphic.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\rune\\runtime\\runelinegraphic.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\debugrunetraceview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\debugrunetraceview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\rune\\runtime\\debugrunetraceview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\book\\mousebookpointerinput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\book\\mousebookpointerinput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\runetracemouseinput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\rune\\runtime\\runetracemouseinput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\book\\bookinputrouter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\book\\bookinputrouter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\book\\ibookpointerinput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\book\\ibookpointerinput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\runetraceinteraction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\runetraceinteraction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\rune\\runtime\\runetraceinteraction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\book\\bookpointerdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\book\\bookpointerdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\irunetraceview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\irunetraceview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\rune\\runtime\\irunetraceview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\page\\pageinstance.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\page\\pageinstance.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\page\\pageinstance.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\runetracesession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\runetracesession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\rune\\runtime\\runetracesession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\runepathutility.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\runepathutility.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\rune\\runtime\\runepathutility.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\runebaker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\runebaker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\rune\\runtime\\runebaker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\data\\runedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\data\\runedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\rune\\data\\runedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\data\\runetracedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\data\\runetracedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\rune\\data\\runetracedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\data\\runeauthoringdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\data\\runeauthoringdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\rune\\data\\runeauthoringdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\data\\runestrokedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\data\\runestrokedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\rune\\data\\runestrokedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\book\\bookinputcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:assets\\yasudaharuto\\scripts\\book\\bookinputcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookInputController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookPointerData.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceMouseInput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\MouseBookPointerInput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\IBookPointerInput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookInputRouter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -103,36 +125,120 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "BookInputController.cs",
-              "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputController.cs",
-              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputController.cs",
-              "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputController.cs",
-              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputController.cs",
-              "ViewState": "AgIAAB4AAAAAAAAAAAAYwDsAAAAqAAAAAAAAAA==",
+              "Title": "BookTestBootstrap.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookTestBootstrap.cs",
+              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\BookTestBootstrap.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookTestBootstrap.cs",
+              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Book\\BookTestBootstrap.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEIAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-24T08:03:57.884Z",
+              "WhenOpened": "2026-09-28T03:01:05.785Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "BookInputState.cs",
-              "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputState.cs",
-              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputState.cs",
-              "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputState.cs",
-              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputState.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Title": "DebugPageInteraction.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Page\\DebugPageInteraction.cs",
+              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Page\\DebugPageInteraction.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Page\\DebugPageInteraction.cs",
+              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Page\\DebugPageInteraction.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-24T08:03:39.996Z",
+              "WhenOpened": "2026-09-28T02:46:35.45Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "BookModelSetup.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\hatake\\book\\Editor\\BookModelSetup.cs",
+              "RelativeDocumentMoniker": "Assets\\hatake\\book\\Editor\\BookModelSetup.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\hatake\\book\\Editor\\BookModelSetup.cs",
+              "RelativeToolTip": "Assets\\hatake\\book\\Editor\\BookModelSetup.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAABWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-28T02:40:35.93Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "BookNetworkClient.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkClient.cs",
+              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkClient.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkClient.cs",
+              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkClient.cs",
+              "ViewState": "AgIAABoAAAAAAAAAAAAowCsAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-28T02:40:00.155Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "BookController.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookController.cs",
+              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\BookController.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookController.cs",
+              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Book\\BookController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAD8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-28T02:37:32.81Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "BookModel.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookModel.cs",
+              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\BookModel.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookModel.cs",
+              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Book\\BookModel.cs",
+              "ViewState": "AgIAAJEAAAAAAAAAAADwv5wAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-28T02:31:48.36Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "BookPointerData.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookPointerData.cs",
+              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookPointerData.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookPointerData.cs",
+              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookPointerData.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-24T08:09:11.54Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "BookInputController.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputController.cs",
+              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputController.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputController.cs",
+              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputController.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAYwDsAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-24T08:03:57.884Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "BookInputState.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputState.cs",
+              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputState.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputState.cs",
+              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputState.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-24T08:03:39.996Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
               "Title": "RuneTestBootstrap.cs",
-              "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTestBootstrap.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTestBootstrap.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTestBootstrap.cs",
-              "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTestBootstrap.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTestBootstrap.cs",
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTestBootstrap.cs",
               "ViewState": "AgIAABEAAAAAAAAAAADwvygAAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -140,23 +246,23 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 25,
               "Title": "RuneTraceMouseInput.cs",
               "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceMouseInput.cs",
-              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceMouseInput.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceMouseInput.cs",
               "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceMouseInput.cs",
-              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceMouseInput.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceMouseInput.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-19T14:37:30.275Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 15,
               "Title": "PageInstance.cs",
-              "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Page\\PageInstance.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Page\\PageInstance.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Page\\PageInstance.cs",
-              "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Page\\PageInstance.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Page\\PageInstance.cs",
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Page\\PageInstance.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -164,11 +270,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 14,
               "Title": "IRuneTraceView.cs",
-              "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\IRuneTraceView.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\IRuneTraceView.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\IRuneTraceView.cs",
-              "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\IRuneTraceView.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\IRuneTraceView.cs",
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\IRuneTraceView.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -176,11 +282,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 13,
               "Title": "RuneTraceInteraction.cs",
-              "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceInteraction.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceInteraction.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceInteraction.cs",
-              "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceInteraction.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceInteraction.cs",
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceInteraction.cs",
               "ViewState": "AgIAABAAAAAAAAAAAAAAwCoAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -188,11 +294,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 12,
               "Title": "DebugRuneTraceView.cs",
-              "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\DebugRuneTraceView.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\DebugRuneTraceView.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\DebugRuneTraceView.cs",
-              "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\DebugRuneTraceView.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\DebugRuneTraceView.cs",
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\DebugRuneTraceView.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -200,11 +306,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 11,
               "Title": "RuneLineGraphic.cs",
-              "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneLineGraphic.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneLineGraphic.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneLineGraphic.cs",
-              "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneLineGraphic.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneLineGraphic.cs",
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneLineGraphic.cs",
               "ViewState": "AgIAAFEAAAAAAAAAAAAYwGoAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -212,23 +318,23 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 23,
               "Title": "BookInputController.cs",
               "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookInputController.cs",
-              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\BookInputController.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookInputController.cs",
               "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookInputController.cs",
-              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Book\\BookInputController.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookInputController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-19T15:21:11.586Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 10,
               "Title": "RuneEditorWindow.cs",
-              "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Editor\\RuneEditorWindow.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Editor\\RuneEditorWindow.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Editor\\RuneEditorWindow.cs",
-              "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Editor\\RuneEditorWindow.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Editor\\RuneEditorWindow.cs",
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Rune\\Editor\\RuneEditorWindow.cs",
               "ViewState": "AgIAAJgBAAAAAAAAAAAewLMBAABXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -236,59 +342,59 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 26,
               "Title": "MouseBookPointerInput.cs",
               "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\MouseBookPointerInput.cs",
-              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\MouseBookPointerInput.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\MouseBookPointerInput.cs",
               "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\MouseBookPointerInput.cs",
-              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Book\\MouseBookPointerInput.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\MouseBookPointerInput.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAA3AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-19T15:31:41.145Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 24,
               "Title": "BookPointerData.cs",
               "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookPointerData.cs",
-              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\BookPointerData.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookPointerData.cs",
               "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookPointerData.cs",
-              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Book\\BookPointerData.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookPointerData.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-19T15:24:12.912Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 27,
               "Title": "IBookPointerInput.cs",
               "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\IBookPointerInput.cs",
-              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\IBookPointerInput.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\IBookPointerInput.cs",
               "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\IBookPointerInput.cs",
-              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Book\\IBookPointerInput.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\IBookPointerInput.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-19T15:28:57.7Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 28,
               "Title": "BookInputRouter.cs",
               "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookInputRouter.cs",
-              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\BookInputRouter.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookInputRouter.cs",
               "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookInputRouter.cs",
-              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Book\\BookInputRouter.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookInputRouter.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAsAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-19T15:34:39.263Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 17,
               "Title": "RunePathUtility.cs",
-              "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RunePathUtility.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RunePathUtility.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RunePathUtility.cs",
-              "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RunePathUtility.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RunePathUtility.cs",
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RunePathUtility.cs",
               "ViewState": "AgIAAHQAAAAAAAAAAAAIwK4AAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -296,11 +402,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 16,
               "Title": "RuneTraceSession.cs",
-              "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceSession.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceSession.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceSession.cs",
-              "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceSession.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceSession.cs",
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceSession.cs",
               "ViewState": "AgIAAAYAAAAAAAAAAAAAAAkAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -308,11 +414,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 18,
               "Title": "RuneBaker.cs",
-              "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneBaker.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneBaker.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneBaker.cs",
-              "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneBaker.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneBaker.cs",
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneBaker.cs",
               "ViewState": "AgIAAAcAAAAAAAAAAAAowBwAAABkAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -320,11 +426,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 19,
               "Title": "RuneData.cs",
-              "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneData.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneData.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneData.cs",
-              "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneData.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneData.cs",
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneData.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -332,11 +438,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 20,
               "Title": "RuneTraceData.cs",
-              "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneTraceData.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneTraceData.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneTraceData.cs",
-              "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneTraceData.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneTraceData.cs",
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneTraceData.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -344,11 +450,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 21,
               "Title": "RuneAuthoringData.cs",
-              "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneAuthoringData.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneAuthoringData.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneAuthoringData.cs",
-              "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneAuthoringData.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneAuthoringData.cs",
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneAuthoringData.cs",
               "ViewState": "AgIAAAkAAAAAAAAAAAAAACEAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -356,11 +462,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 22,
               "Title": "RuneStrokeData.cs",
-              "DocumentMoniker": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneStrokeData.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneStrokeData.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneStrokeData.cs",
-              "ToolTip": "C:\\Users\\PC_User\\OneDrive\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneStrokeData.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneStrokeData.cs",
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneStrokeData.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
