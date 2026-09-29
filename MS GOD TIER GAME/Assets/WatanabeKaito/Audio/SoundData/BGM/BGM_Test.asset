@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a1f551aa4d1ddb8469c74ab74a487ea8, type: 3}
-  m_Name: TestBGM
+  m_Name: BGM_Test
   m_EditorClassIdentifier: Assembly-CSharp::SoundData
   m_id: Title_BGM
   m_clip: {fileID: 8300000, guid: 5df4dd4f139bbca43b102b9c09a6a418, type: 3}

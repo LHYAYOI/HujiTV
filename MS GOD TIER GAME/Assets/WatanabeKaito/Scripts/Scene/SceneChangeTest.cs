@@ -12,7 +12,7 @@ public class SceneChangeTest : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            SceneController.Instance.ChangeScene(SceneController.SCENE_TYPE.TITLE, SceneTransition.TRANSITION_TYPE.IRIS);
+            AudioManager.Instance.PlaySE("SE");
         }
     }
 
