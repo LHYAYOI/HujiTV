@@ -25,6 +25,8 @@ public class BookConnectionUI : MonoBehaviour
     [SerializeField]
     private TMP_Dropdown m_playerDropdown;
 
+    private int m_testPingValue;
+
     private void Start()
     {
         if (m_networkClient != null)
@@ -111,6 +113,18 @@ public class BookConnectionUI : MonoBehaviour
 
                 break;
         }
+    }
+
+    public void OnTestPingButtonPressed()
+    {
+        if (m_networkClient == null)
+        {
+            return;
+        }
+
+        m_testPingValue++;
+
+        m_networkClient.SendTestPing(m_testPingValue);
     }
 
     private void OnDestroy()

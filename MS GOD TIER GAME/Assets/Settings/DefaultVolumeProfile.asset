@@ -468,6 +468,7 @@ MonoBehaviour:
   - {fileID: -6288072647309666549}
   - {fileID: 7518938298396184218}
   - {fileID: -1410297666881709256}
+  - {fileID: 8928746462363520186}
 --- !u!114 &853819529557874667
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -925,6 +926,109 @@ MonoBehaviour:
   scale:
     m_OverrideState: 1
     m_Value: 1
+--- !u!114 &8928746462363520186
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01609eb22f9129149a0a08eb327c4db3, type: 3}
+  m_Name: LightShaftVolume
+  m_EditorClassIdentifier: Assembly-CSharp::LightShaftLab.LightShaftVolume
+  active: 1
+  m_enableFlag:
+    m_OverrideState: 1
+    m_Value: 0
+  m_density:
+    m_OverrideState: 1
+    m_Value: 0.035
+  m_scatteringTint:
+    m_OverrideState: 1
+    m_Value: {r: 0.8, g: 0.87, b: 1, a: 1}
+  m_intensity:
+    m_OverrideState: 1
+    m_Value: 1
+  m_steps:
+    m_OverrideState: 1
+    m_Value: 48
+  m_spotMinimumSamples:
+    m_OverrideState: 1
+    m_Value: 8
+  m_localFogMinimumSamples:
+    m_OverrideState: 1
+    m_Value: 3
+  m_sampleJitter:
+    m_OverrideState: 1
+    m_Value: 0.35
+  m_resolutionDivisor:
+    m_OverrideState: 1
+    m_Value: 2
+  m_refineRootsFlag:
+    m_OverrideState: 1
+    m_Value: 1
+  m_refineDepthEdgesFlag:
+    m_OverrideState: 1
+    m_Value: 1
+  m_tileCullingFlag:
+    m_OverrideState: 1
+    m_Value: 0
+  m_temporalFlag:
+    m_OverrideState: 1
+    m_Value: 0
+  m_historyWeight:
+    m_OverrideState: 1
+    m_Value: 0.85
+  m_enableGodRaysFlag:
+    m_OverrideState: 1
+    m_Value: 0
+  m_enableSpatialGodRaysFlag:
+    m_OverrideState: 1
+    m_Value: 0
+  m_spatialGodRayIntensity:
+    m_OverrideState: 1
+    m_Value: 1
+  m_godRayIntensity:
+    m_OverrideState: 1
+    m_Value: 0.6
+  m_godRayRadius:
+    m_OverrideState: 1
+    m_Value: 0.35
+  m_godRaySamples:
+    m_OverrideState: 1
+    m_Value: 32
+  m_maxDistance:
+    m_OverrideState: 1
+    m_Value: 35
+  m_anisotropy:
+    m_OverrideState: 1
+    m_Value: 0.35
+  m_baseHeight:
+    m_OverrideState: 1
+    m_Value: 0
+  m_heightFalloff:
+    m_OverrideState: 1
+    m_Value: 0.15
+  m_noiseAmount:
+    m_OverrideState: 1
+    m_Value: 0.3
+  m_noiseScale:
+    m_OverrideState: 1
+    m_Value: 0.45
+  m_wind:
+    m_OverrideState: 1
+    m_Value: {x: 0.08, y: 0, z: 0.03}
+  m_ambient:
+    m_OverrideState: 1
+    m_Value: 0.04
+  m_selectionFadeSeconds:
+    m_OverrideState: 1
+    m_Value: 0.35
+  m_selectionHysteresis:
+    m_OverrideState: 1
+    m_Value: 0.2
 --- !u!114 &9001657382290151224
 MonoBehaviour:
   m_ObjectHideFlags: 3

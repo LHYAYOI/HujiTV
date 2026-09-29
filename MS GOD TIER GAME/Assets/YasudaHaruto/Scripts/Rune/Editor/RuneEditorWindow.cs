@@ -38,6 +38,20 @@ public class RuneEditorWindow : EditorWindow
 
     private float m_lineWidth = 15f;
 
+    private Texture2D m_sourceRuneImage;
+
+    private bool[,] m_binaryRuneImage;
+
+    private bool[,] m_skeletonRuneImage;
+
+    private float m_imageThreshold = 0.5f;
+
+    private bool m_showBinaryPreview;
+    private bool m_showSkeletonPreview = true;
+
+    private const float MIN_IMAGE_THRESHOLD = 0f;
+    private const float MAX_IMAGE_THRESHOLD = 1f;
+
     private const float MIN_LINE_WIDTH = 1f;
     private const float MAX_LINE_WIDTH = 20f;
 
@@ -72,6 +86,8 @@ public class RuneEditorWindow : EditorWindow
             case EDITOR_MODE.EDIT:
 
                 DrawToolbar();
+
+                DrawImageImportSettings();
 
                 EditorGUILayout.Space(5);
 
@@ -171,16 +187,22 @@ public class RuneEditorWindow : EditorWindow
         // 描画エリアの矩形を取得する
         m_drawingRect = GUILayoutUtility.GetRect(width, width, GUILayout.ExpandWidth(false));
 
-        // 描画エリアの背景を描画する
-        EditorGUI.DrawRect(m_drawingRect, new Color(0.15f, 0.15f, 0.15f));
+       EditorGUI.DrawRect(m_drawingRect, new Color(0.15f, 0.15f, 0.15f));
 
-        // 保存されたストロークを描画する
+        if (m_showBinaryPreview)
+        {
+            DrawBinaryImagePreview();
+        }
+
+        if (m_showSkeletonPreview)
+        {
+            DrawSkeletonPreview();
+        }
+
         DrawSavedStrokes();
 
-        // Bakeされたストロークを描画する
         DrawBakedPoints();
 
-        // 現在のストロークを描画する
         DrawCurrentStroke();
     }
 
@@ -882,5 +904,133 @@ public class RuneEditorWindow : EditorWindow
 
         m_isDrawing = false;
         m_isTestDrawing = false;
+    }
+
+
+    private void DrawImageImportSettings()
+    {
+        EditorGUILayout.Space(5);
+
+        EditorGUILayout.LabelField("Image Import", EditorStyles.boldLabel);
+
+        m_sourceRuneImage = (Texture2D)EditorGUILayout.ObjectField(
+            "Source Image",
+            m_sourceRuneImage,
+            typeof(Texture2D),
+            false);
+
+        m_imageThreshold = EditorGUILayout.Slider(
+            "Threshold",
+            m_imageThreshold,
+            MIN_IMAGE_THRESHOLD,
+            MAX_IMAGE_THRESHOLD);
+
+        m_showBinaryPreview =
+    EditorGUILayout.Toggle(
+        "Show Binary",
+        m_showBinaryPreview);
+
+        m_showSkeletonPreview =
+            EditorGUILayout.Toggle(
+                "Show Skeleton",
+                m_showSkeletonPreview);
+
+        EditorGUI.BeginDisabledGroup(m_sourceRuneImage == null);
+
+        if (GUILayout.Button("Analyze Image"))
+        {
+            AnalyzeRuneImage();
+        }
+
+        EditorGUI.EndDisabledGroup();
+    }
+
+    private void AnalyzeRuneImage()
+    {
+        if (m_sourceRuneImage == null)
+        {
+            return;
+        }
+
+        // 画像を二値化
+        m_binaryRuneImage =
+            RuneImagePreprocessor.Binarize(
+                m_sourceRuneImage,
+                m_imageThreshold);
+
+        // 二値画像を細線化
+        m_skeletonRuneImage =
+            RuneSkeletonizer.Skeletonize(
+                m_binaryRuneImage);
+
+        Repaint();
+    }
+
+    private void DrawBinaryImagePreview()
+    {
+        if (m_binaryRuneImage == null)
+        {
+            return;
+        }
+
+        int width = m_binaryRuneImage.GetLength(0);
+        int height = m_binaryRuneImage.GetLength(1);
+
+        float pixelWidth = m_drawingRect.width / width;
+        float pixelHeight = m_drawingRect.height / height;
+
+        Color runeColor = new Color(0.4f, 0.4f, 0.4f);
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                if (!m_binaryRuneImage[x, y])
+                {
+                    continue;
+                }
+
+                Rect pixelRect = new Rect(
+                    m_drawingRect.x + x * pixelWidth,
+                    m_drawingRect.y + (height - 1 - y) * pixelHeight,
+                    pixelWidth,
+                    pixelHeight);
+
+                EditorGUI.DrawRect(pixelRect, runeColor);
+            }
+        }
+    }
+
+    private void DrawSkeletonPreview()
+    {
+        if (m_skeletonRuneImage == null)
+        {
+            return;
+        }
+
+        int width = m_skeletonRuneImage.GetLength(0);
+        int height = m_skeletonRuneImage.GetLength(1);
+
+        float pixelWidth = m_drawingRect.width / width;
+        float pixelHeight = m_drawingRect.height / height;
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                if (!m_skeletonRuneImage[x, y])
+                {
+                    continue;
+                }
+
+                Rect pixelRect = new Rect(
+                    m_drawingRect.x + x * pixelWidth,
+                    m_drawingRect.y + (height - 1 - y) * pixelHeight,
+                    Mathf.Max(pixelWidth, 1f),
+                    Mathf.Max(pixelHeight, 1f));
+
+                EditorGUI.DrawRect(pixelRect, Color.cyan);
+            }
+        }
     }
 }
