@@ -12,6 +12,10 @@ using UnityEngine;
 
 public class BookNetworkClient : MonoBehaviour
 {
+    private static BookNetworkClient s_instance;
+
+    public static BookNetworkClient Instance => s_instance;
+
     [SerializeField] private float m_connectionTimeoutSeconds = 5.0f;
 
     private const ushort Port = 7777;
@@ -27,6 +31,20 @@ public class BookNetworkClient : MonoBehaviour
     public BOOK_CONNECTION_STATE ConnectionState { get; private set; } = BOOK_CONNECTION_STATE.DISCONNECTED;
 
     public event Action<BOOK_CONNECTION_STATE> OnConnectionStateChanged;
+
+
+    private void Awake()
+    {
+        if (s_instance != null && s_instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        s_instance = this;
+
+        DontDestroyOnLoad(gameObject);
+    }
 
     private void Start()
     {
@@ -156,10 +174,8 @@ public class BookNetworkClient : MonoBehaviour
 
         Debug.Log($"Book Serverへ接続成功 : {m_playerSlot}");
 
-        // 接続状態を更新
         SetConnectionState(BOOK_CONNECTION_STATE.CONNECTED);
 
-        // 接続後にPlayerSlotを送信
         SendRegisterController();
     }
 
@@ -253,6 +269,44 @@ public class BookNetworkClient : MonoBehaviour
         Debug.Log($"TestPing送信 : {value}");
     }
 
+    public bool SendCastSkill(byte skillId)
+    {
+        if (!CanSend())
+        {
+            Debug.LogWarning("未接続のためSkillを送信できません");
+            return false;
+        }
+
+        if (skillId == 0)
+        {
+            Debug.LogWarning("SkillId 0は無効です");
+            return false;
+        }
+
+        int beginResult = m_driver.BeginSend(m_reliablePipeline, m_connection, out DataStreamWriter writer);
+
+        if (beginResult != 0)
+        {
+            Debug.LogError($"CastSkill BeginSend失敗 : {beginResult}");
+            return false;
+        }
+
+        writer.WriteByte((byte)BOOK_MESSAGE_TYPE.CAST_SKILL);
+
+        writer.WriteByte(skillId);
+
+        int endResult = m_driver.EndSend(writer);
+
+        if (endResult < 0)
+        {
+            Debug.LogError($"CastSkill EndSend失敗 : {endResult}");
+            return false;
+        }
+
+        Debug.Log($"CastSkill送信 : SkillId={skillId}");
+
+        return true;
+    }
     private bool CanSend()
     {
         // 接続状態がCONNECTEDであり、接続が作成されている場合に送信可能
@@ -303,6 +357,13 @@ public class BookNetworkClient : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (s_instance != this)
+        {
+            return;
+        }
+
+        s_instance = null;
+
         if (!m_driver.IsCreated)
         {
             return;
@@ -310,7 +371,6 @@ public class BookNetworkClient : MonoBehaviour
 
         if (m_connection.IsCreated)
         {
-            // 接続が作成されている場合は切断
             m_driver.Disconnect(m_connection);
             m_driver.ScheduleUpdate().Complete();
         }

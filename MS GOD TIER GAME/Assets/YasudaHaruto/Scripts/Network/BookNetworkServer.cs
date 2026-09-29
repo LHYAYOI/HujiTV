@@ -145,6 +145,10 @@ public class BookNetworkServer : MonoBehaviour
                 ReceiveTestPing(connection, reader);
                 break;
 
+            case BOOK_MESSAGE_TYPE.CAST_SKILL:
+                ReceiveCastSkill(connection, reader);
+                break;
+
             default:
                 Debug.LogWarning($"未対応Message : {messageType}");
                 break;
@@ -174,6 +178,33 @@ public class BookNetworkServer : MonoBehaviour
         Debug.Log($"TestPing受信 : {playerSlot} / {value}");
 
         SendTestPong(connection, value + 1);
+    }
+
+    private void ReceiveCastSkill(NetworkConnection connection, DataStreamReader reader)
+    {
+        int remainingBytes = reader.Length - reader.GetBytesRead();
+
+        if (remainingBytes < 1)
+        {
+            Debug.LogWarning("CastSkillのデータが不足しています");
+            return;
+        }
+
+        if (!m_playerSlots.TryGetValue(connection, out PLAYER_SLOT playerSlot))
+        {
+            Debug.LogWarning("未登録ControllerからCastSkillを受信しました");
+            return;
+        }
+
+        byte skillId = reader.ReadByte();
+
+        if (skillId == 0)
+        {
+            Debug.LogWarning($"{playerSlot}から無効なSkillIdを受信しました");
+            return;
+        }
+
+        Debug.Log($"CastSkill受信 : {playerSlot} / SkillId={skillId}");
     }
 
     private void SendTestPong(NetworkConnection connection, int value)

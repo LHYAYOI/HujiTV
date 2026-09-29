@@ -27,11 +27,25 @@ public class RuneTraceTestBootstrap : MonoBehaviour
         RuneTraceController runeController =
             new RuneTraceController(m_view);
 
+        BookNetworkClient client = BookNetworkClient.Instance;
+
+        BookNetworkService networkService = new BookNetworkService(client);
+
+        IPageCommand castCommand = new CastMagicCommand(1, networkService);
+
+        RuneTraceInteraction runeInteraction =
+            new RuneTraceInteraction(
+                m_runeData,
+                runeController,
+                inputController,
+                castCommand);
+
         RuneTraceInteraction interaction =
             new RuneTraceInteraction(
                 m_runeData,
                 runeController,
-                inputController);
+                inputController,
+                castCommand);
 
         m_pageInstance =
             new PageInstance(
@@ -43,7 +57,7 @@ public class RuneTraceTestBootstrap : MonoBehaviour
             inputController,
             runeController);
 
-        //m_pageInstance.BeginInteraction();
+        m_pageInstance.BeginInteraction();
 
         m_inputRouter.PageNavigationRequested += OnPageNavigationRequested;
     }

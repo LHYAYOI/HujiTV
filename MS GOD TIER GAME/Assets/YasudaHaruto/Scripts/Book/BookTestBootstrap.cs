@@ -50,6 +50,7 @@ public class BookTestBootstrap : MonoBehaviour
         m_inputRouter.PageNavigationRequested +=
             m_bookController.RequestNavigation;
 
+
         m_bookController.Begin();
     }
 

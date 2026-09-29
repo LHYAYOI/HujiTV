@@ -12,14 +12,18 @@ public class RuneTraceInteraction : IPageInteraction
 
     private readonly BookInputController m_inputController;
 
+    private readonly IPageCommand m_successCommand;
+
     public bool IsActive => m_runeTraceController.IsTracing;
 
-    public RuneTraceInteraction(RuneData runeData, RuneTraceController runeTraceController, BookInputController inputController)
+    public RuneTraceInteraction(RuneData runeData, RuneTraceController runeTraceController, BookInputController inputController, IPageCommand successCommand)
     {
         m_runeData = runeData;
         m_runeTraceController = runeTraceController;
 
         m_inputController = inputController;
+
+        m_successCommand = successCommand;
 
         m_runeTraceController.TraceSucceeded += OnTraceSucceeded;
     }
@@ -42,6 +46,6 @@ public class RuneTraceInteraction : IPageInteraction
     {
         m_inputController.EndRuneTrace();
 
-        // Œã‚Å‚±‚±‚©‚çCommand‚ÖŒq‚®
+        m_successCommand?.Execute();
     }
 }
