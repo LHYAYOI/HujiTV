@@ -119,7 +119,7 @@ namespace Laboratory.ReplayCapture
                     nv12Buffer=new ComputeBuffer(captureWidth*captureHeight*3/8,4);
                     converter.SetInt("Width",captureWidth); converter.SetInt("Height",captureHeight);
                     converter.SetInt("LinearColor",QualitySettings.activeColorSpace==ColorSpace.Linear?1:0);
-                    converter.SetInt("FlipY",SystemInfo.graphicsUVStartsAtTop?1:0);
+                    converter.SetInt("FlipY", SystemInfo.graphicsUVStartsAtTop ? 0 : 1);
                     converter.SetBuffer(kernel,"Packed",nv12Buffer);
                 }
                 session=new ReplayDiskSession(captureWidth,captureHeight,captureFps,Mathf.Clamp(bitrateMegabits,2,40)*1000000,sampleRate,
