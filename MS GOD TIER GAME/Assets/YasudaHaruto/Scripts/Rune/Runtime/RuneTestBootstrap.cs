@@ -17,45 +17,38 @@ public class RuneTraceTestBootstrap : MonoBehaviour
     [SerializeField]
     private BookInputRouter m_inputRouter;
 
+
     private PageInstance m_pageInstance;
 
     private void Start()
     {
-        BookInputController inputController =
-            new BookInputController();
+        BookInputController inputController = new BookInputController();
 
-        RuneTraceController runeController =
-            new RuneTraceController(m_view);
+        RuneTraceController runeTraceController = new RuneTraceController(m_view);
 
         BookNetworkClient client = BookNetworkClient.Instance;
 
+        if (client == null)
+        {
+            Debug.LogError("BookNetworkClientÇ™ë∂ç›ÇµÇ‹ÇπÇÒ");
+            return;
+        }
+
         BookNetworkService networkService = new BookNetworkService(client);
 
-        IPageCommand castCommand = new CastMagicCommand(1, networkService);
+        PageFactory pageFactory = new PageFactory(runeTraceController, inputController, networkService);
 
-        RuneTraceInteraction runeInteraction =
-            new RuneTraceInteraction(
-                m_runeData,
-                runeController,
-                inputController,
-                castCommand);
+        PageInstance page = pageFactory.Create(m_pageData);
 
-        RuneTraceInteraction interaction =
-            new RuneTraceInteraction(
-                m_runeData,
-                runeController,
-                inputController,
-                castCommand);
+        //bookModel.AddPage(page);
 
-        m_pageInstance =
-            new PageInstance(
-                m_pageData,
-                interaction);
+        if (page == null)
+        {
+            Debug.LogError($"PageInstanceê∂ê¨é∏îs : {m_pageData?.name}");
+            return;
+        }
 
-        m_inputRouter.Initialize(
-            m_mouseInput,
-            inputController,
-            runeController);
+        //m_inputRouter.Initialize(m_mouseInput, inputController, runeTraceController);
 
         m_pageInstance.BeginInteraction();
 

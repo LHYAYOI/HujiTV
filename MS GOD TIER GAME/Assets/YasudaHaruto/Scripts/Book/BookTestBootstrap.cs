@@ -2,55 +2,102 @@ using UnityEngine;
 
 public class BookTestBootstrap : MonoBehaviour
 {
+    [Header("Page")]
+    [SerializeField]
+    private PageData[] m_initialPages;
+
+    [Header("Rune")]
+    [SerializeField]
+    private DebugRuneTraceView m_runeTraceView;
+
+    [Header("Input")]
     [SerializeField]
     private BookInputRouter m_inputRouter;
 
     [SerializeField]
     private MouseBookPointerInput m_mouseInput;
 
+    [SerializeField]
+    private RuneInputArea m_runeInputArea;
+
+    [Header("Book")]
+    [SerializeField]
+    private int m_maxPageCount = 10;
+
     private BookController m_bookController;
 
     private void Start()
     {
+        // Input
         BookInputController inputController =
             new BookInputController();
 
+        // Rune
+        RuneTraceController runeTraceController =
+            new RuneTraceController(m_runeTraceView);
+
+        // Network
+        BookNetworkClient networkClient =
+            BookNetworkClient.Instance;
+
+        if (networkClient == null)
+        {
+            Debug.LogError(
+                "BookNetworkClientが存在しません");
+            return;
+        }
+
+        BookNetworkService networkService =
+            new BookNetworkService(networkClient);
+
+        // Page
+        PageFactory pageFactory =
+            new PageFactory(
+                runeTraceController,
+                inputController,
+                networkService);
+
+        // Book
         BookModel bookModel =
-            new BookModel(10);
+            new BookModel(m_maxPageCount);
 
-        PageInstance pageA =
-            new PageInstance(
-                null,
-                new DebugPageInteraction("Page A"));
+        foreach (PageData pageData in m_initialPages)
+        {
+            if (pageData == null)
+            {
+                continue;
+            }
 
-        PageInstance pageB =
-            new PageInstance(
-                null,
-                new DebugPageInteraction("Page B"));
+            PageInstance page =
+                pageFactory.Create(pageData);
 
-        PageInstance pageC =
-            new PageInstance(
-                null,
-                new DebugPageInteraction("Page C"));
+            if (page == null)
+            {
+                Debug.LogError(
+                    $"PageInstance生成失敗 : {pageData.name}");
+                continue;
+            }
 
-        bookModel.AddPage(pageA);
-        bookModel.AddPage(pageB);
-        bookModel.AddPage(pageC);
+            bookModel.AddPage(page);
+        }
 
+        // Book Controller
         m_bookController =
             new BookController(
                 bookModel,
                 inputController);
 
+        // Input Router
         m_inputRouter.Initialize(
             m_mouseInput,
             inputController,
-            null);
+            runeTraceController,
+            m_runeInputArea);
 
         m_inputRouter.PageNavigationRequested +=
             m_bookController.RequestNavigation;
 
-
+        // 最初のページ開始
         m_bookController.Begin();
     }
 

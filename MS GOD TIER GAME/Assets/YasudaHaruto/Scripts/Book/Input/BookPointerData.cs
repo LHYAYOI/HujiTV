@@ -6,12 +6,14 @@
 //-----------------------------------------------
 using UnityEngine;
 
-public struct BookPointerData
+public readonly struct BookPointerData
 {
     public Vector2 Position { get; }
+    public Vector2 ScreenPosition { get; }
 
-    public BookPointerData(Vector2 position)
+    public BookPointerData(Vector2 position, Vector2 screenPosition)
     {
         Position = position;
+        ScreenPosition = screenPosition;
     }
 }

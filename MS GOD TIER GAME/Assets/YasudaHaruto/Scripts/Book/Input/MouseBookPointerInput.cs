@@ -14,7 +14,7 @@ public class MouseBookPointerInput : MonoBehaviour, IBookPointerInput
     {
         if (Input.GetMouseButtonDown(0) && TryGetNormalizedPosition(out Vector2 position))
         {
-            data = new BookPointerData(position);
+            data = new BookPointerData(position, Input.mousePosition);
 
             return true;
         }
@@ -27,7 +27,7 @@ public class MouseBookPointerInput : MonoBehaviour, IBookPointerInput
     {
         if (Input.GetMouseButton(0) && TryGetNormalizedPosition(out Vector2 position))
         {
-            data = new BookPointerData(position);
+            data = new BookPointerData(position, Input.mousePosition);
 
             return true;
         }
@@ -40,7 +40,7 @@ public class MouseBookPointerInput : MonoBehaviour, IBookPointerInput
     {
         if (Input.GetMouseButtonUp(0) && TryGetNormalizedPosition(out Vector2 position))
         {
-            data = new BookPointerData(position);
+            data = new BookPointerData(position, Input.mousePosition);
 
             return true;
         }

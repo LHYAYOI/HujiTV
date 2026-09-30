@@ -8,7 +8,7 @@ using UnityEngine;
 
 public enum PAGE_TYPE
 {
-    SKILL,
+    MAGIC,
     GUIDE,
     OBSTACLE
 }
@@ -25,7 +25,16 @@ public class PageData : ScriptableObject
     [SerializeField]
     private PAGE_TYPE m_pageType;
 
+    [SerializeField]
+    private PageInteractionData m_interaction;
+
+    [SerializeField]
+    private PageActionData m_action;
+
     public string PageId => m_pageId;
     public string DisplayName => m_displayName;
     public PAGE_TYPE PageType => m_pageType;
+
+    public PageInteractionData Interaction => m_interaction;
+    public PageActionData Action => m_action;
 }

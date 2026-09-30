@@ -15,3 +15,9 @@ MonoBehaviour:
   m_pageId: 1
   m_displayName: Test
   m_pageType: 0
+  m_interaction:
+    m_type: 1
+    m_runeData: {fileID: 11400000, guid: 195a7a19dfd1a9d478b6bdb71bd92270, type: 2}
+  m_action:
+    m_type: 1
+    m_magicData: {fileID: 11400000, guid: 969aa2658e05a8f4bbade20cf8808934, type: 2}

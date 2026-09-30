@@ -26,20 +26,23 @@ public class RuneTraceInteraction : IPageInteraction
         m_successCommand = successCommand;
 
         m_runeTraceController.TraceSucceeded += OnTraceSucceeded;
+        m_runeTraceController.TraceFailed += OnTraceFailed;
     }
 
     public void Begin()
     {
-        m_inputController.BeginRuneTrace();
-
         m_runeTraceController.BeginTrace(m_runeData);
+        m_inputController.BeginRuneTrace();
     }
 
     public void End()
     {
         m_runeTraceController.Cancel();
 
-        m_inputController.EndRuneTrace();
+        if (m_inputController.State == BOOK_INPUT_STATE.RUNE_TRACING)
+        {
+            m_inputController.EndRuneTrace();
+        }
     }
 
     private void OnTraceSucceeded(RuneTraceResult result)
@@ -47,5 +50,10 @@ public class RuneTraceInteraction : IPageInteraction
         m_inputController.EndRuneTrace();
 
         m_successCommand?.Execute();
+    }
+
+    private void OnTraceFailed(RuneTraceResult result)
+    {
+        m_inputController.EndRuneTrace();
     }
 }
