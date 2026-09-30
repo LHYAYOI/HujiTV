@@ -24,6 +24,7 @@ public class CartController : MonoBehaviour
     private float m_baseSpeed;
     [SerializeField] private float m_switchSpeed;
     [SerializeField] private float m_distance; // 全体の進んだ距離
+    [SerializeField] private bool m_isChangeDirectionFlag;
 
 
     private SplineContainer m_spline;
@@ -109,6 +110,22 @@ public class CartController : MonoBehaviour
         float value = splineOffset / length;
         Vector3 position = m_spline.EvaluatePosition(value);
 
+
+        if(m_isChangeDirectionFlag)
+        {
+            float delta = splineOffset + 0.1f;
+            if (delta > length)
+            {
+                delta -= length;
+            }
+            delta /= length;
+            Vector3 deltaPosition = m_spline.EvaluatePosition(delta);
+
+            Vector3 direction = (deltaPosition - position).normalized;
+            transform.forward = direction;
+
+
+        }
 
         transform.position = position;
 
