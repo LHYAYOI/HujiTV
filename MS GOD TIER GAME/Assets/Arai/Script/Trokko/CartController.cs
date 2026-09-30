@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Unity.Collections;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -24,7 +25,6 @@ public class CartController : MonoBehaviour
     private float m_baseSpeed;
     [SerializeField] private float m_switchSpeed;
     [SerializeField] private float m_distance; // 全体の進んだ距離
-    [SerializeField] private bool m_isChangeDirectionFlag;
 
 
     private SplineContainer m_spline;
@@ -32,7 +32,6 @@ public class CartController : MonoBehaviour
     private float m_splineAnchor = 0.0f; // 進んだ距離 - アンカーポイント
     
     private bool m_loopFlag = false;
-    private bool m_switchFlag = false;
 
 
 
@@ -101,6 +100,19 @@ public class CartController : MonoBehaviour
 
             return;
         }
+        if(splineOffset < 0.0f)
+        {
+            if(m_loopFlag)
+            {
+                m_splineAnchor -= length;
+            }
+            else
+            {
+                m_state = CartState.Stop;
+            }
+
+            return; 
+        }
 
         // 進む
         m_distance += m_speed * Time.deltaTime;
@@ -108,25 +120,11 @@ public class CartController : MonoBehaviour
 
         // Transform位置更新
         float value = splineOffset / length;
-        Vector3 position = m_spline.EvaluatePosition(value);
 
+        float3 position, tangent, up;
+        m_spline.Evaluate(0, value, out position, out tangent, out up);
 
-        if(m_isChangeDirectionFlag)
-        {
-            float delta = splineOffset + 0.1f;
-            if (delta > length)
-            {
-                delta -= length;
-            }
-            delta /= length;
-            Vector3 deltaPosition = m_spline.EvaluatePosition(delta);
-
-            Vector3 direction = (deltaPosition - position).normalized;
-            transform.forward = direction;
-
-
-        }
-
+        transform.rotation = Quaternion.LookRotation(tangent,up);
         transform.position = position;
 
     }
