@@ -4,6 +4,8 @@
 // 制作者：安田晴人
 // 概要： ルーンのなぞりインタラクション
 //-----------------------------------------------
+using UnityEngine;
+
 public class RuneTraceInteraction : IPageInteraction
 {
     private readonly RuneData m_runeData;
@@ -32,7 +34,6 @@ public class RuneTraceInteraction : IPageInteraction
     public void Begin()
     {
         m_runeTraceController.BeginTrace(m_runeData);
-        m_inputController.BeginRuneTrace();
     }
 
     public void End()
@@ -54,6 +55,10 @@ public class RuneTraceInteraction : IPageInteraction
 
     private void OnTraceFailed(RuneTraceResult result)
     {
+        Debug.Log($"Rune失敗 Before : {m_inputController.State}");
+
         m_inputController.EndRuneTrace();
+
+        Debug.Log($"Rune失敗 After : {m_inputController.State}");
     }
 }

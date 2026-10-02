@@ -42,9 +42,8 @@ public class BookTestBootstrap : MonoBehaviour
 
         if (networkClient == null)
         {
-            Debug.LogError(
-                "BookNetworkClientÇ™ë∂ç›ÇµÇ‹ÇπÇÒ");
-            return;
+            Debug.LogError("BookNetworkClientÇ™ë∂ç›ÇµÇ‹ÇπÇÒ");
+            //return;
         }
 
         BookNetworkService networkService =

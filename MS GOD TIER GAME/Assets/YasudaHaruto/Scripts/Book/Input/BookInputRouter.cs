@@ -59,6 +59,23 @@ public class BookInputRouter : MonoBehaviour
 
     private void UpdateNormalInput()
     {
+        // ページスワイプ中
+        if (m_currentGesture == BOOK_POINTER_GESTURE.PAGE_NAVIGATION)
+        {
+            if (m_pointerInput.TryGetPointerUp(out BookPointerData up))
+            {
+                EndPageNavigationGesture(up);
+            }
+
+            return;
+        }
+
+        // 何も操作していない
+        if (m_currentGesture != BOOK_POINTER_GESTURE.NONE)
+        {
+            return;
+        }
+
         if (!m_pointerInput.TryGetPointerDown(out BookPointerData down))
         {
             return;
@@ -71,6 +88,25 @@ public class BookInputRouter : MonoBehaviour
         }
 
         BeginPageNavigationGesture(down);
+    }
+
+    private void EndPageNavigationGesture(BookPointerData up)
+    {
+        if (m_pageNavigationInput.End(
+            up.Position,
+            out PAGE_NAVIGATION_DIRECTION direction))
+        {
+            PageNavigationRequested?.Invoke(direction);
+
+            Debug.Log(
+                $"Page Navigation Requested : {direction}");
+        }
+
+        m_currentGesture =
+            BOOK_POINTER_GESTURE.NONE;
+
+        Debug.Log(
+            $"State : {m_inputController.State} / Gesture : {m_currentGesture}");
     }
 
     private bool CanStartRuneTrace(BookPointerData data)
@@ -105,6 +141,8 @@ public class BookInputRouter : MonoBehaviour
         m_inputController.BeginRuneTrace();
 
         m_runeTraceController.BeginStroke(runePosition);
+
+        Debug.Log($"State : {m_inputController.State} / Gesture : {m_currentGesture}");
     }
 
     private void BeginPageNavigationGesture(BookPointerData down)
@@ -112,6 +150,8 @@ public class BookInputRouter : MonoBehaviour
         m_currentGesture = BOOK_POINTER_GESTURE.PAGE_NAVIGATION;
 
         m_pageNavigationInput.Begin(down.Position);
+
+        Debug.Log($"State : {m_inputController.State} / Gesture : {m_currentGesture}");
     }
 
     private void UpdateRuneTraceInput()
@@ -144,6 +184,8 @@ public class BookInputRouter : MonoBehaviour
             m_runeTraceController.EndStroke();
 
             m_currentGesture = BOOK_POINTER_GESTURE.NONE;
+
+            Debug.Log($"State : {m_inputController.State} / Gesture : {m_currentGesture}");
         }
     }
 }

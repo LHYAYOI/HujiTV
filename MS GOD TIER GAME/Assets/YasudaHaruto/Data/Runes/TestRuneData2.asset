@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b3b6861f38275f438cb80dde21fbd50, type: 3}
+  m_Name: TestRuneData2
+  m_EditorClassIdentifier: Assembly-CSharp::RuneData
+  m_runeId: 1
+  m_displayName: TestRune
+  m_authoringData:
+    m_strokes: []
+  m_traceData:
+    m_strokes: []
+  m_rule:
+    m_requiredStrokeCount: 1
+    m_distanceTolerance: 0.05
+    m_requiredCoverage: 0.95
+    m_requiredAccuracy: 0.9

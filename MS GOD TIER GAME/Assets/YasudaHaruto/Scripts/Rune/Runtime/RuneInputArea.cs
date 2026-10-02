@@ -47,6 +47,11 @@ public class RuneInputArea : MonoBehaviour
             camera = canvas.worldCamera;
         }
 
+        if (!RectTransformUtility.RectangleContainsScreenPoint(m_runeArea, screenPosition, camera))
+        {
+            return false;
+        }
+
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(m_runeArea, screenPosition, camera, out Vector2 localPosition))
         {
             return false;
@@ -58,7 +63,7 @@ public class RuneInputArea : MonoBehaviour
 
         float y = Mathf.InverseLerp(rect.yMin, rect.yMax, localPosition.y);
 
-        normalizedPosition = new Vector2(Mathf.Clamp01(x), Mathf.Clamp01(y));
+        normalizedPosition = new Vector2(x, y);
 
         return true;
     }

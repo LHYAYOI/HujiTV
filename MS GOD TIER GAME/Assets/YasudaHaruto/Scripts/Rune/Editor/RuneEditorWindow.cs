@@ -44,10 +44,19 @@ public class RuneEditorWindow : EditorWindow
 
     private bool[,] m_skeletonRuneImage;
 
-    private float m_imageThreshold = 0.5f;
+    private float m_imageThreshold = 0.3f;
 
     private bool m_showBinaryPreview;
     private bool m_showSkeletonPreview = true;
+
+    private List<RuneStrokeData> m_importedRuneStrokes = new();
+
+    private float m_simplifyTolerance = 0.002f;
+
+    private int m_extractedPointCount;
+
+    private const float MIN_SIMPLIFY_TOLERANCE = 0f;
+    private const float MAX_SIMPLIFY_TOLERANCE = 0.02f;
 
     private const float MIN_IMAGE_THRESHOLD = 0f;
     private const float MAX_IMAGE_THRESHOLD = 1f;
@@ -198,6 +207,8 @@ public class RuneEditorWindow : EditorWindow
         {
             DrawSkeletonPreview();
         }
+
+        DrawImportedStrokes();
 
         DrawSavedStrokes();
 
@@ -911,35 +922,96 @@ public class RuneEditorWindow : EditorWindow
     {
         EditorGUILayout.Space(5);
 
-        EditorGUILayout.LabelField("Image Import", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField(
+            "Image Import",
+            EditorStyles.boldLabel);
 
-        m_sourceRuneImage = (Texture2D)EditorGUILayout.ObjectField(
-            "Source Image",
-            m_sourceRuneImage,
-            typeof(Texture2D),
-            false);
+        m_sourceRuneImage =
+            (Texture2D)EditorGUILayout.ObjectField(
+                "Source Image",
+                m_sourceRuneImage,
+                typeof(Texture2D),
+                false);
 
-        m_imageThreshold = EditorGUILayout.Slider(
-            "Threshold",
-            m_imageThreshold,
-            MIN_IMAGE_THRESHOLD,
-            MAX_IMAGE_THRESHOLD);
+        m_imageThreshold =
+            EditorGUILayout.Slider(
+                "Threshold",
+                m_imageThreshold,
+                MIN_IMAGE_THRESHOLD,
+                MAX_IMAGE_THRESHOLD);
+
+        m_simplifyTolerance =
+            EditorGUILayout.Slider(
+                "Simplify Tolerance",
+                m_simplifyTolerance,
+                MIN_SIMPLIFY_TOLERANCE,
+                MAX_SIMPLIFY_TOLERANCE);
 
         m_showBinaryPreview =
-    EditorGUILayout.Toggle(
-        "Show Binary",
-        m_showBinaryPreview);
+            EditorGUILayout.Toggle(
+                "Show Binary",
+                m_showBinaryPreview);
 
         m_showSkeletonPreview =
             EditorGUILayout.Toggle(
                 "Show Skeleton",
                 m_showSkeletonPreview);
 
-        EditorGUI.BeginDisabledGroup(m_sourceRuneImage == null);
+        EditorGUILayout.Space(5);
+
+        // -------------------------
+        // Analyze
+        // -------------------------
+
+        EditorGUI.BeginDisabledGroup(
+            m_sourceRuneImage == null);
 
         if (GUILayout.Button("Analyze Image"))
         {
             AnalyzeRuneImage();
+        }
+
+        EditorGUI.EndDisabledGroup();
+
+        // -------------------------
+        // Analyze Result
+        // -------------------------
+
+        if (m_importedRuneStrokes != null &&
+            m_importedRuneStrokes.Count > 0)
+        {
+            int simplifiedPointCount = 0;
+
+            foreach (RuneStrokeData stroke
+                     in m_importedRuneStrokes)
+            {
+                simplifiedPointCount +=
+                    stroke.Points.Count;
+            }
+
+            EditorGUILayout.Space(5);
+
+            EditorGUILayout.LabelField(
+                $"Detected Strokes : {m_importedRuneStrokes.Count}");
+
+            EditorGUILayout.LabelField(
+                $"Points : {m_extractedPointCount} -> {simplifiedPointCount}");
+
+            EditorGUILayout.Space(5);
+        }
+
+        // -------------------------
+        // Apply
+        // -------------------------
+
+        EditorGUI.BeginDisabledGroup(
+            m_runeData == null ||
+            m_importedRuneStrokes == null ||
+            m_importedRuneStrokes.Count == 0);
+
+        if (GUILayout.Button("Apply to Rune"))
+        {
+            ApplyImportedRune();
         }
 
         EditorGUI.EndDisabledGroup();
@@ -962,6 +1034,39 @@ public class RuneEditorWindow : EditorWindow
         m_skeletonRuneImage =
             RuneSkeletonizer.Skeletonize(
                 m_binaryRuneImage);
+
+        // SkeletonからStrokeを抽出
+        m_importedRuneStrokes =
+            RuneStrokeExtractor.Extract(
+                m_skeletonRuneImage);
+
+        // SkeletonからStrokeを抽出
+        List<RuneStrokeData> extractedStrokes =
+            RuneStrokeExtractor.Extract(
+                m_skeletonRuneImage);
+
+        // 抽出されたStrokeを簡略化
+        m_importedRuneStrokes.Clear();
+        m_extractedPointCount = 0;
+
+        foreach (RuneStrokeData stroke in extractedStrokes)
+        {
+            m_extractedPointCount += stroke.Points.Count;
+
+            List<Vector2> simplifiedPoints =
+                RunePathSimplifier.Simplify(
+                    stroke.Points,
+                    m_simplifyTolerance);
+
+            if (simplifiedPoints.Count < 2)
+            {
+                continue;
+            }
+
+            m_importedRuneStrokes.Add(
+                new RuneStrokeData(
+                    simplifiedPoints));
+        }
 
         Repaint();
     }
@@ -1032,5 +1137,52 @@ public class RuneEditorWindow : EditorWindow
                 EditorGUI.DrawRect(pixelRect, Color.cyan);
             }
         }
+    }
+
+    private void DrawImportedStrokes()
+    {
+        if (m_importedRuneStrokes == null)
+        {
+            return;
+        }
+
+        foreach (RuneStrokeData stroke
+                 in m_importedRuneStrokes)
+        {
+            DrawStroke(
+                stroke.Points,
+                Color.magenta);
+        }
+    }
+
+    private void ApplyImportedRune()
+    {
+        if (m_runeData == null)
+        {
+            return;
+        }
+
+        if (m_importedRuneStrokes == null ||
+            m_importedRuneStrokes.Count == 0)
+        {
+            return;
+        }
+
+        // Undo操作を記録
+        Undo.RecordObject(
+            m_runeData,
+            "Apply Imported Rune");
+
+        // 解析結果をAuthoringDataに設定
+        m_runeData.AuthoringData.SetStrokes(
+            m_importedRuneStrokes);
+
+        // 以前のBake結果は無効になるため削除
+        m_runeData.TraceData.Clear();
+
+        // RuneDataを変更済みに設定
+        EditorUtility.SetDirty(m_runeData);
+
+        Repaint();
     }
 }
