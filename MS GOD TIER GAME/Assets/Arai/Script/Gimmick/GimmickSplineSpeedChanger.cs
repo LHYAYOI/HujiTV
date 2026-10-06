@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GimmickSpeedChanger : GimmickSpline
 {
@@ -30,15 +30,19 @@ public class GimmickSpeedChanger : GimmickSpline
 
     public void SpeedChangeNT(CartController cart , float rate)
     {
-        float from = cart.BaseSpeed;
-        float to = m_targetSpeed;
+        float sign = Mathf.Sign(cart.Speed);
+
+        float from = cart.BaseSpeed * sign;
+        float to = m_targetSpeed * sign;
         float spd = Mathf.Lerp(from, to, rate);
         cart.SetSpeed(spd);
     }
     public void SpeedChangeTN(CartController cart , float rate)
     {
-        float from = m_targetSpeed;
-        float to = cart.BaseSpeed;
+        float sign = Mathf.Sign(cart.Speed);
+
+        float from = m_targetSpeed * sign;
+        float to = cart.BaseSpeed * sign;
         float spd = Mathf.Lerp(from, to, rate);
         cart.SetSpeed(spd);
     }
