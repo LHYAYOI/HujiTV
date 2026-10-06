@@ -7,9 +7,8 @@
 public enum BOOK_MESSAGE_TYPE : byte
 {
     REGISTER_CONTROLLER,
-
     TEST_PING,
     TEST_PONG,
-
-    CAST_SKILL
+    CAST_MAGIC,
+    ADD_PAGE
 }

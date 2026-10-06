@@ -9,11 +9,8 @@ using UnityEngine;
 public class RuneTraceInteraction : IPageInteraction
 {
     private readonly RuneData m_runeData;
-
     private readonly RuneTraceController m_runeTraceController;
-
     private readonly BookInputController m_inputController;
-
     private readonly IPageCommand m_successCommand;
 
     public bool IsActive => m_runeTraceController.IsTracing;
@@ -22,22 +19,23 @@ public class RuneTraceInteraction : IPageInteraction
     {
         m_runeData = runeData;
         m_runeTraceController = runeTraceController;
-
         m_inputController = inputController;
-
         m_successCommand = successCommand;
-
-        m_runeTraceController.TraceSucceeded += OnTraceSucceeded;
-        m_runeTraceController.TraceFailed += OnTraceFailed;
     }
 
     public void Begin()
     {
+        m_runeTraceController.TraceSucceeded += OnTraceSucceeded;
+        m_runeTraceController.TraceFailed += OnTraceFailed;
+
         m_runeTraceController.BeginTrace(m_runeData);
     }
 
     public void End()
     {
+        m_runeTraceController.TraceSucceeded -= OnTraceSucceeded;
+        m_runeTraceController.TraceFailed -= OnTraceFailed;
+
         m_runeTraceController.Cancel();
 
         if (m_inputController.State == BOOK_INPUT_STATE.RUNE_TRACING)
@@ -49,7 +47,6 @@ public class RuneTraceInteraction : IPageInteraction
     private void OnTraceSucceeded(RuneTraceResult result)
     {
         m_inputController.EndRuneTrace();
-
         m_successCommand?.Execute();
     }
 

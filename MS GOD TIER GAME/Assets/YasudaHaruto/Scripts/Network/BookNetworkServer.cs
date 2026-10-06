@@ -65,6 +65,16 @@ public class BookNetworkServer : MonoBehaviour
         RemoveDisconnectedClients();
         AcceptClients();
         ProcessEvents();
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            SendAddPage(PLAYER_SLOT.PLAYER1, 1);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            SendAddPage(PLAYER_SLOT.PLAYER1, 10);
+        }
     }
 
     private void RemoveDisconnectedClients()
@@ -126,6 +136,46 @@ public class BookNetworkServer : MonoBehaviour
         }
     }
 
+    public bool SendAddPage(PLAYER_SLOT playerSlot, byte pageId)
+    {
+        if (pageId == 0)
+        {
+            Debug.LogWarning("PageId 0ÇÕëóêMÇ≈Ç´Ç‹ÇπÇÒ");
+            return false;
+        }
+
+        foreach (var pair in m_playerSlots)
+        {
+            if (pair.Value != playerSlot)
+            {
+                continue;
+            }
+
+            NetworkConnection connection = pair.Key;
+
+            if (!connection.IsCreated)
+            {
+                return false;
+            }
+
+            if (m_driver.BeginSend(m_reliablePipeline, connection, out DataStreamWriter writer) != 0)
+            {
+                return false;
+            }
+
+            writer.WriteByte((byte)BOOK_MESSAGE_TYPE.ADD_PAGE);
+            writer.WriteByte(pageId);
+
+            m_driver.EndSend(writer);
+
+            Debug.Log($"AddPageëóêM : {playerSlot} / PageId={pageId}");
+            return true;
+        }
+
+        Debug.LogWarning($"ëóêMëŒè€Ç™å©Ç¬Ç©ÇËÇ‹ÇπÇÒ : {playerSlot}");
+        return false;
+    }
+
     private void ReceiveData(NetworkConnection connection, DataStreamReader reader)
     {
         if (reader.Length < 1)
@@ -145,8 +195,8 @@ public class BookNetworkServer : MonoBehaviour
                 ReceiveTestPing(connection, reader);
                 break;
 
-            case BOOK_MESSAGE_TYPE.CAST_SKILL:
-                ReceiveCastSkill(connection, reader);
+            case BOOK_MESSAGE_TYPE.CAST_MAGIC:
+                ReceiveCastMagic(connection, reader);
                 break;
 
             default:
@@ -180,7 +230,7 @@ public class BookNetworkServer : MonoBehaviour
         SendTestPong(connection, value + 1);
     }
 
-    private void ReceiveCastSkill(NetworkConnection connection, DataStreamReader reader)
+    private void ReceiveCastMagic(NetworkConnection connection, DataStreamReader reader)
     {
         int remainingBytes = reader.Length - reader.GetBytesRead();
 

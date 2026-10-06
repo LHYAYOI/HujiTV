@@ -10,10 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0348284d6c830c745b43a7bc4bbddec7, type: 3}
-  m_Name: TestPageData
+  m_Name: TestMagicPage
   m_EditorClassIdentifier: Assembly-CSharp::PageData
   m_pageId: 1
-  m_displayName: Test
+  m_insertType: 1
+  m_displayName: TestMagic
   m_pageType: 0
   m_interaction:
     m_type: 1
@@ -21,3 +22,5 @@ MonoBehaviour:
   m_action:
     m_type: 1
     m_magicData: {fileID: 11400000, guid: 969aa2658e05a8f4bbade20cf8808934, type: 2}
+  m_leftVisualData: {fileID: 11400000, guid: ec9ee33f1dd87b741af4c870eac5ed96, type: 2}
+  m_rightVisualData: {fileID: 11400000, guid: a50ce475f3162854cad21c04323e18b7, type: 2}

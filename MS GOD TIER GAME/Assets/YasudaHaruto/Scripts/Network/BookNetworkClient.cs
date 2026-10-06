@@ -31,6 +31,7 @@ public class BookNetworkClient : MonoBehaviour
     public BOOK_CONNECTION_STATE ConnectionState { get; private set; } = BOOK_CONNECTION_STATE.DISCONNECTED;
 
     public event Action<BOOK_CONNECTION_STATE> OnConnectionStateChanged;
+    public event System.Action<byte> AddPageReceived;
 
 
     private void Awake()
@@ -291,7 +292,7 @@ public class BookNetworkClient : MonoBehaviour
             return false;
         }
 
-        writer.WriteByte((byte)BOOK_MESSAGE_TYPE.CAST_SKILL);
+        writer.WriteByte((byte)BOOK_MESSAGE_TYPE.CAST_MAGIC);
 
         writer.WriteByte(skillId);
 
@@ -329,6 +330,10 @@ public class BookNetworkClient : MonoBehaviour
                 ReceiveTestPong(reader);
                 break;
 
+            case BOOK_MESSAGE_TYPE.ADD_PAGE:
+                ReceiveAddPage(reader);
+                break;
+
             default:
                 Debug.LogWarning(
                     $"未対応Message : {messageType}");
@@ -355,6 +360,20 @@ public class BookNetworkClient : MonoBehaviour
         Debug.Log($"TestPong受信 : {value}");
     }
 
+    private void ReceiveAddPage(DataStreamReader reader)
+    {
+        if (reader.GetBytesRead() + 1 > reader.Length)
+        {
+            Debug.LogWarning("ADD_PAGEのデータが不足しています");
+            return;
+        }
+
+        byte pageId = reader.ReadByte();
+
+        Debug.Log($"AddPage受信 : PageId={pageId}");
+
+        AddPageReceived?.Invoke(pageId);
+    }
     private void OnDestroy()
     {
         if (s_instance != this)
