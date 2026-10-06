@@ -184,14 +184,12 @@ public class CartController : MonoBehaviour
     }
     
     public float SplineOffset => m_distance - m_splineAnchor;
-    
-    public IEnumerator SetSpeed(float speed, float time)
+
+    public float BaseSpeed => m_baseSpeed;
+    public float Speed => m_speed;
+    public void SetSpeed(float speed)
     {
         m_speed = speed;
-
-        yield return new WaitForSeconds(time);
-
-        ResetSpeed();
     }
 
     public void ResetSpeed()
