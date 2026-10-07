@@ -21,6 +21,8 @@ public class BookNetworkServer : MonoBehaviour
 
     private readonly Dictionary<NetworkConnection, PLAYER_SLOT> m_playerSlots = new();
 
+    [SerializeField] private MagicManager m_magicManager;
+
     private void Start()
     {
         m_driver = NetworkDriver.Create();
@@ -66,15 +68,15 @@ public class BookNetworkServer : MonoBehaviour
         AcceptClients();
         ProcessEvents();
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            SendAddPage(PLAYER_SLOT.PLAYER1, 1);
-        }
+        //if (Input.GetKeyDown(KeyCode.Alpha1))
+        //{
+        //    SendAddPage(PLAYER_SLOT.PLAYER1, 1);
+        //}
 
-        if (Input.GetKeyDown(KeyCode.Alpha0))
-        {
-            SendAddPage(PLAYER_SLOT.PLAYER1, 10);
-        }
+        //if (Input.GetKeyDown(KeyCode.Alpha0))
+        //{
+        //    SendAddPage(PLAYER_SLOT.PLAYER1, 10);
+        //}
     }
 
     private void RemoveDisconnectedClients()
@@ -255,6 +257,8 @@ public class BookNetworkServer : MonoBehaviour
         }
 
         Debug.Log($"CastSkilléÛêM : {playerSlot} / SkillId={skillId}");
+
+        m_magicManager.RequestCast(skillId);
     }
 
     private void SendTestPong(NetworkConnection connection, int value)
