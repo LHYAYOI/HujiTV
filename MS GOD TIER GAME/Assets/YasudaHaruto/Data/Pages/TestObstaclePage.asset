@@ -17,10 +17,10 @@ MonoBehaviour:
   m_displayName: TestObstacle
   m_pageType: 2
   m_interaction:
-    m_type: 0
-    m_runeData: {fileID: 0}
+    m_type: 1
+    m_runeData: {fileID: 11400000, guid: 803778e1ac00bca4b868b67ffbc25833, type: 2}
   m_action:
-    m_type: 0
-    m_magicData: {fileID: 0}
+    m_type: 1
+    m_magicData: {fileID: 11400000, guid: 969aa2658e05a8f4bbade20cf8808934, type: 2}
   m_leftVisualData: {fileID: 11400000, guid: f77776490aa6fc24f93eb19393879ccc, type: 2}
   m_rightVisualData: {fileID: 11400000, guid: 7a1eea5c254fdfb4da586e878b790100, type: 2}
