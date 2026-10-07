@@ -6,12 +6,9 @@
 //-----------------------------------------------
 public enum BOOK_MESSAGE_TYPE : byte
 {
-    NONE = 0,
-
-    BUTTON_PRESSED = 1,
-    ORIENTATION = 2,
-
-    PAGE_CHANGED = 3,
-    CAST_REQUEST = 4,
-    REGISTER_CONTROLLER = 5,
+    REGISTER_CONTROLLER,
+    TEST_PING,
+    TEST_PONG,
+    CAST_MAGIC,
+    ADD_PAGE
 }

@@ -131,21 +131,21 @@ public class TransportServerTest : MonoBehaviour
         BOOK_MESSAGE_TYPE messageType =
             (BOOK_MESSAGE_TYPE)reader.ReadByte();
 
-        switch (messageType)
-        {
-            case BOOK_MESSAGE_TYPE.BUTTON_PRESSED:
-                ReceiveButtonPressed(reader);
-                break;
+        //switch (messageType)
+        //{
+        //    case BOOK_MESSAGE_TYPE.BUTTON_PRESSED:
+        //        ReceiveButtonPressed(reader);
+        //        break;
 
-            case BOOK_MESSAGE_TYPE.ORIENTATION:
-                ReceiveOrientation(reader);
-                break;
+        //    case BOOK_MESSAGE_TYPE.ORIENTATION:
+        //        ReceiveOrientation(reader);
+        //        break;
 
-            default:
-                Debug.LogWarning(
-                    $"–¢‘Î‰ž‚ÌMessageType‚Å‚· : {messageType}");
-                break;
-        }
+        //    default:
+        //        Debug.LogWarning(
+        //            $"–¢‘Î‰ž‚ÌMessageType‚Å‚· : {messageType}");
+        //        break;
+        //}
     }
 
     private void ReceiveButtonPressed(DataStreamReader reader)

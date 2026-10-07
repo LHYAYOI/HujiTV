@@ -27,6 +27,19 @@ public class RuneAuthoringData
         m_strokes.Add(stroke);
     }
 
+    // ルーンのストロークデータを設定するメソッド
+    public void SetStrokes(IEnumerable<RuneStrokeData> strokes)
+    {
+        m_strokes.Clear();
+
+        if (strokes == null)
+        {
+            return;
+        }
+
+        m_strokes.AddRange(strokes);
+    }
+
     // ルーンの最後のストロークデータを削除するメソッド
     public void RemoveLastStroke()
     {
