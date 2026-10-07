@@ -1,4 +1,6 @@
+using NUnit.Framework;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class AimScript : MonoBehaviour
 {
@@ -7,6 +9,14 @@ public class AimScript : MonoBehaviour
     [SerializeField] private PhoneAttitudeController m_phoneAttitudeController;
 
     [SerializeField] private RectTransform m_reticle;
+
+    [SerializeField] private float m_lockOnRange = 10.0f;
+
+    [SerializeField] private LayerMask m_lockOnLayerMask;
+
+    //List<GameObject> m_targets = new List<GameObject>();
+
+    GameObject m_target;
 
     [Header("ècâ°ÉGÉCÉÄÇÃÉåÉìÉW")]
 
@@ -20,6 +30,7 @@ public class AimScript : MonoBehaviour
     {
         Vector2 normalizedAngle = m_phoneAttitudeController.GetNormalizedAngles();
         UpdateReticlePosition(-normalizedAngle.x, normalizedAngle.y);
+        LockOnTargetProcess();
     }
 
     private void UpdateReticlePosition(float horizontal, float vertical)
@@ -43,5 +54,33 @@ public class AimScript : MonoBehaviour
         Vector2 parentUIHalfSize = new Vector2(size.x * 0.5f, size.y * 0.5f);
 
         m_reticle.anchoredPosition = new Vector2(normalizedX * parentUIHalfSize.x, normalizedY * parentUIHalfSize.y);
+    }
+
+    private void LockOnTargetProcess() 
+    {
+        Vector2 screenPosition = RectTransformUtility.WorldToScreenPoint(null, m_reticle.position);
+
+        Ray ray = Camera.main.ScreenPointToRay(screenPosition);
+
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, m_lockOnRange, m_lockOnLayerMask))
+        {
+            if (m_target != hit.collider.gameObject)
+            {
+                m_target = hit.collider.gameObject;
+                Debug.Log("Lock on target: " + m_target.name);
+            }
+        }
+    }
+
+    //public List<GameObject> GetLockedOnTargets() 
+    //{
+    //    return m_targets;
+    //}
+
+    public GameObject GetLockedOnTarget() 
+    {
+        return m_target;
     }
 }

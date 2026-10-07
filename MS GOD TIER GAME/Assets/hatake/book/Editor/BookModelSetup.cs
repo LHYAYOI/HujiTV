@@ -16,6 +16,7 @@ public static class BookModelSetup
             Debug.LogError("実行中は使えません");
             return;
         }
+
         hatake.BookController controller = Selection.activeGameObject != null
             ? Selection.activeGameObject.GetComponent<hatake.BookController>() : null;
 

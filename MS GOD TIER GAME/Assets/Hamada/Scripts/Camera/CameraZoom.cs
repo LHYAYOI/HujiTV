@@ -5,7 +5,6 @@ using UnityEngine;
 public class CameraZoom : MonoBehaviour
 {
     [SerializeField] CinemachineCamera m_cinemachineCamera;
-    [SerializeField] float m_defaultFOV = 60.0f;
 
     Coroutine m_FOVCoroutine;
 

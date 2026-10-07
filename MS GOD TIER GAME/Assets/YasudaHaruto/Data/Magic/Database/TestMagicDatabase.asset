@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46b2f5749e5e5234a91d2153994d8843, type: 3}
+  m_Name: TestMagicDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::MagicDatabase
+  m_magicList:
+  - {fileID: 11400000, guid: 969aa2658e05a8f4bbade20cf8808934, type: 2}
+  - {fileID: 11400000, guid: be3036e9517a54049a1fc18960aa09a5, type: 2}
