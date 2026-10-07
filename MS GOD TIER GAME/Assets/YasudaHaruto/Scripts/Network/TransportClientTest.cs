@@ -169,7 +169,7 @@ public class TransportClientTest : MonoBehaviour
         }
 
         // 最初に「これは何のデータか」を書く
-        writer.WriteByte((byte)BOOK_MESSAGE_TYPE.BUTTON_PRESSED);
+        //writer.WriteByte((byte)BOOK_MESSAGE_TYPE.BUTTON_PRESSED);
 
         // 次にButtonPressed固有のデータを書く
         writer.WriteByte((byte)buttonId);
@@ -208,8 +208,7 @@ public class TransportClientTest : MonoBehaviour
             return;
         }
 
-        writer.WriteByte(
-            (byte)BOOK_MESSAGE_TYPE.ORIENTATION);
+        //writer.WriteByte((byte)BOOK_MESSAGE_TYPE.ORIENTATION);
 
         writer.WriteFloat(rotation.x);
         writer.WriteFloat(rotation.y);

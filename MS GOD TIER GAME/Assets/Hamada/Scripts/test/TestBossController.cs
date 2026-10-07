@@ -30,4 +30,23 @@ public class TestBossController : MonoBehaviour
         Debug.Log("MagicType:" + hitData.GetMagicType);
         Debug.Log("hitObjectTag:" + hitData.GetTag);
     }
+
+    public void HitProcess(HitData hitData) 
+    {
+        if (hitData.GetHitObject.tag == "Bullet") 
+        {
+            if (hitData.GetMagicType == MAGIC_TYPE.FIRE)
+            {
+                Debug.Log("Hit by FIRE magic!");
+            }
+            else if (hitData.GetMagicType == MAGIC_TYPE.ICE)
+            {
+                Debug.Log("Hit by ICE magic!");
+            }
+            else
+            {
+                Debug.Log("Hit by other magic!");
+            }
+        }
+    }
 }

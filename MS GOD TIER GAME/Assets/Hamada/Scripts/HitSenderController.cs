@@ -3,11 +3,14 @@ using UnityEngine;
 
 public class BulletHitSenderController : MonoBehaviour
 {
+    [SerializeField] GameObject m_parentObject;
     [SerializeField] MagicBulletController m_magicBulletController;
 
     private void OnCollisionEnter(Collision collision)
     {
         SendHit(collision.gameObject);
+
+        Destroy(m_parentObject);
     }
 
     private void OnCollisionStay(Collision collision)
@@ -23,6 +26,8 @@ public class BulletHitSenderController : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         SendHit(other.gameObject);
+
+        Destroy(m_parentObject);
     }
 
     private void OnTriggerStay(Collider other)

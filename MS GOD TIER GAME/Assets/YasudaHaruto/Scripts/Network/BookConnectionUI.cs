@@ -7,6 +7,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class BookConnectionUI : MonoBehaviour
 {
@@ -25,6 +26,12 @@ public class BookConnectionUI : MonoBehaviour
     [SerializeField]
     private TMP_Dropdown m_playerDropdown;
 
+    [SerializeField]
+    private string m_bookSceneName = "BookScene";
+
+    private int m_testPingValue;
+    private bool m_shouldLoadBookScene;
+
     private void Start()
     {
         if (m_networkClient != null)
@@ -33,6 +40,18 @@ public class BookConnectionUI : MonoBehaviour
 
             UpdateStatus(m_networkClient.ConnectionState);
         }
+    }
+
+    private void LateUpdate()
+    {
+        if (!m_shouldLoadBookScene)
+        {
+            return;
+        }
+
+        m_shouldLoadBookScene = false;
+
+        SceneManager.LoadScene(m_bookSceneName);
     }
 
     public void OnConnectButtonPressed()
@@ -52,6 +71,11 @@ public class BookConnectionUI : MonoBehaviour
     private void OnConnectionStateChanged(BOOK_CONNECTION_STATE state)
     {
         UpdateStatus(state);
+
+        if (state == BOOK_CONNECTION_STATE.CONNECTED)
+        {
+            m_shouldLoadBookScene = true;
+        }
     }
 
     private void UpdateStatus(BOOK_CONNECTION_STATE state)
@@ -111,6 +135,18 @@ public class BookConnectionUI : MonoBehaviour
 
                 break;
         }
+    }
+
+    public void OnTestPingButtonPressed()
+    {
+        if (m_networkClient == null)
+        {
+            return;
+        }
+
+        m_testPingValue++;
+
+        m_networkClient.SendTestPing(m_testPingValue);
     }
 
     private void OnDestroy()

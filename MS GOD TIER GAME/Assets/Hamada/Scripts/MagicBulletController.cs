@@ -6,6 +6,11 @@ public class MagicBulletController : MonoBehaviour
 
     GameObject m_target;
 
+    private void Update()
+    {
+        MoveProcess();
+    }
+
     public AttackData GetAttackData()
     {
         return m_attackData;
@@ -14,6 +19,16 @@ public class MagicBulletController : MonoBehaviour
     public void SetTarget(GameObject target)
     {
         m_target = target;
+    }
+
+    private void MoveProcess() 
+    {
+        if (m_target == null) 
+        {
+            return;
+        }
+
+        gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, m_target.transform.position, 10 * Time.deltaTime);
     }
 
     //î≠éÀèàóù

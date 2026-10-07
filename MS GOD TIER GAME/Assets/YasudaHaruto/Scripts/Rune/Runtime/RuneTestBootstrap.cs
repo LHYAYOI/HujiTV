@@ -2,55 +2,64 @@ using UnityEngine;
 
 public class RuneTraceTestBootstrap : MonoBehaviour
 {
-    [Header("Page")]
     [SerializeField]
     private PageData m_pageData;
 
-    [Header("Rune")]
     [SerializeField]
     private RuneData m_runeData;
 
-    [Header("View")]
     [SerializeField]
     private DebugRuneTraceView m_view;
 
-    [Header("Input")]
     [SerializeField]
     private MouseBookPointerInput m_mouseInput;
-    
+
     [SerializeField]
     private BookInputRouter m_inputRouter;
 
-    [SerializeField]
-    private RectTransform m_traceArea;
 
     private PageInstance m_pageInstance;
 
     private void Start()
     {
-        BookInputController inputController =
-            new BookInputController();
+        BookInputController inputController = new BookInputController();
 
-        RuneTraceController runeController =
-            new RuneTraceController(m_view);
+        RuneTraceController runeTraceController = new RuneTraceController(m_view);
 
-        RuneTraceInteraction interaction =
-            new RuneTraceInteraction(
-                m_runeData,
-                runeController,
-                inputController);
+        BookNetworkClient client = BookNetworkClient.Instance;
 
-        m_pageInstance =
-            new PageInstance(
-                m_pageData,
-                interaction);
+        if (client == null)
+        {
+            Debug.LogError("BookNetworkClientÇ™ë∂ç›ÇµÇ‹ÇπÇÒ");
+            return;
+        }
 
-        m_inputRouter.Initialize(
-            m_mouseInput,
-            inputController,
-            runeController);
+        BookNetworkService networkService = new BookNetworkService(client);
+
+        PageFactory pageFactory = new PageFactory(runeTraceController, inputController, networkService);
+
+        PageInstance page = pageFactory.Create(m_pageData);
+
+        //bookModel.AddPage(page);
+
+        if (page == null)
+        {
+            Debug.LogError($"PageInstanceê∂ê¨é∏îs : {m_pageData?.name}");
+            return;
+        }
+
+        //m_inputRouter.Initialize(m_mouseInput, inputController, runeTraceController);
 
         m_pageInstance.BeginInteraction();
+
+        m_inputRouter.PageNavigationRequested += OnPageNavigationRequested;
+    }
+
+    private void OnPageNavigationRequested(
+    PAGE_NAVIGATION_DIRECTION direction)
+    {
+        Debug.Log(
+            $"Page Navigation Requested : {direction}");
     }
 
     private void OnDestroy()

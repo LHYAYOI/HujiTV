@@ -17,8 +17,8 @@ public static class BookModelSetup
             return;
         }
 
-        BookController controller = Selection.activeGameObject != null
-            ? Selection.activeGameObject.GetComponent<BookController>() : null;
+        hatake.BookController controller = Selection.activeGameObject != null
+            ? Selection.activeGameObject.GetComponent<hatake.BookController>() : null;
 
         if (controller == null)
         {

@@ -7,68 +7,90 @@
 using System;
 using UnityEngine;
 
-public class BookController : MonoBehaviour
+public class BookController
 {
-    [SerializeField, Min(1)]
-    private int m_pageCount = 4;
+    private readonly BookModel m_model;
+    private readonly BookInputController m_inputController;
+    private readonly BookDisplayController m_displayController;
 
-    [SerializeField]
-    private int m_initialPage = 0;
-
-    [SerializeField]
-    private bool m_loopPages = false;
-
-    public int CurrentPage { get; private set; }
-
-    public event Action<int> OnPageChanged;
-    public event Action<int> OnCastRequested;
-
-    private void Start()
+    public BookController(BookModel model, BookInputController inputController, BookDisplayController displayController)
     {
-        CurrentPage = Mathf.Clamp(m_initialPage, 0, m_pageCount - 1);
-
-        Debug.Log($"初期ページ : {CurrentPage}");
+        m_model = model;
+        m_inputController = inputController;
+        m_displayController = displayController;
     }
 
-    public void NextPage()
+    public void Begin()
     {
-        SetPage(CurrentPage + 1);
+        BeginCurrentPageInteraction();
     }
 
-    public void PreviousPage()
+    public void RequestNavigation(PAGE_NAVIGATION_DIRECTION direction)
     {
-        SetPage(CurrentPage - 1);
-    }
+        Debug.Log($"Navigation Request : {direction} / Current={m_model.CurrentPageIndex} / CanNavigate={m_inputController.CanNavigatePage}");
 
-    public void SetPage(int pageIndex)
-    {
-        int nextPage;
-
-        if (m_loopPages)
-        {
-            nextPage = (pageIndex % m_pageCount + m_pageCount) % m_pageCount;
-        }
-        else
-        {
-            nextPage = Mathf.Clamp(pageIndex, 0, m_pageCount - 1);
-        }
-
-        if (nextPage == CurrentPage)
+        if (!m_inputController.CanNavigatePage)
         {
             return;
         }
 
-        CurrentPage = nextPage;
+        bool canMove = direction switch
+        {
+            PAGE_NAVIGATION_DIRECTION.NEXT => m_model.CanMoveNext,
+            PAGE_NAVIGATION_DIRECTION.PREVIOUS => m_model.CanMovePrevious,
+            _ => false
+        };
 
-        Debug.Log($"ページ変更 : {CurrentPage}");
+        Debug.Log($"CanMove={canMove}");
 
-        OnPageChanged?.Invoke(CurrentPage);
+        if (!canMove)
+        {
+            return;
+        }
+
+        EndCurrentPageInteraction();
+        m_inputController.BeginPageTransition();
+
+        bool moved = direction switch
+        {
+            PAGE_NAVIGATION_DIRECTION.NEXT => m_model.MoveNext(),
+            PAGE_NAVIGATION_DIRECTION.PREVIOUS => m_model.MovePrevious(),
+            _ => false
+        };
+
+        Debug.Log($"Moved={moved} / NewIndex={m_model.CurrentPageIndex}");
+
+        if (!moved)
+        {
+            m_inputController.EndPageTransition();
+            BeginCurrentPageInteraction();
+            return;
+        }
+
+        bool forward = direction == PAGE_NAVIGATION_DIRECTION.NEXT;
+        m_displayController.PlayTurn(m_model.CurrentPage.Data, forward, OnPageTransitionCompleted);
     }
 
-    public void RequestCast()
+    private void OnPageTransitionCompleted()
     {
-        Debug.Log($"魔法発動要求 : Page {CurrentPage}");
+        Debug.Log($"PageTransition Completed / Index={m_model.CurrentPageIndex}");
 
-        OnCastRequested?.Invoke(CurrentPage);
+        m_inputController.EndPageTransition();
+        BeginCurrentPageInteraction();
+    }
+
+    public void End()
+    {
+        EndCurrentPageInteraction();
+    }
+
+    private void BeginCurrentPageInteraction()
+    {
+        m_model.CurrentPage?.BeginInteraction();
+    }
+
+    private void EndCurrentPageInteraction()
+    {
+        m_model.CurrentPage?.EndInteraction();
     }
 }

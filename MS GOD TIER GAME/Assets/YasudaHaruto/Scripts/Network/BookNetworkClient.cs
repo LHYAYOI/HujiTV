@@ -12,7 +12,10 @@ using UnityEngine;
 
 public class BookNetworkClient : MonoBehaviour
 {
-    [SerializeField] private BookController m_bookController;
+    private static BookNetworkClient s_instance;
+
+    public static BookNetworkClient Instance => s_instance;
+
     [SerializeField] private float m_connectionTimeoutSeconds = 5.0f;
 
     private const ushort Port = 7777;
@@ -28,6 +31,21 @@ public class BookNetworkClient : MonoBehaviour
     public BOOK_CONNECTION_STATE ConnectionState { get; private set; } = BOOK_CONNECTION_STATE.DISCONNECTED;
 
     public event Action<BOOK_CONNECTION_STATE> OnConnectionStateChanged;
+    public event System.Action<byte> AddPageReceived;
+
+
+    private void Awake()
+    {
+        if (s_instance != null && s_instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        s_instance = this;
+
+        DontDestroyOnLoad(gameObject);
+    }
 
     private void Start()
     {
@@ -36,13 +54,6 @@ public class BookNetworkClient : MonoBehaviour
 
         // ReliableSequencedPipelineStageを使用して信頼性のあるパイプラインを作成
         m_reliablePipeline = m_driver.CreatePipeline(typeof(ReliableSequencedPipelineStage));
-
-        // BookControllerのイベントに登録
-        if (m_bookController != null)
-        {
-            m_bookController.OnPageChanged += OnPageChanged;
-            m_bookController.OnCastRequested += OnCastRequested;
-        }
 
         SetConnectionState(BOOK_CONNECTION_STATE.DISCONNECTED);
     }
@@ -164,17 +175,9 @@ public class BookNetworkClient : MonoBehaviour
 
         Debug.Log($"Book Serverへ接続成功 : {m_playerSlot}");
 
-        // 接続状態を更新
         SetConnectionState(BOOK_CONNECTION_STATE.CONNECTED);
 
-        // 接続後にPlayerSlotを送信
         SendRegisterController();
-
-        // 接続直後に現在ページを同期
-        if (m_bookController != null)
-        {
-            SendPageChanged(m_bookController.CurrentPage);
-        }
     }
 
     private void OnDisconnected()
@@ -202,84 +205,6 @@ public class BookNetworkClient : MonoBehaviour
         OnConnectionStateChanged?.Invoke(state);
     }
 
-    private void OnPageChanged(int pageIndex)
-    {
-        SendPageChanged(pageIndex);
-    }
-
-    private void OnCastRequested(int pageIndex)
-    {
-        SendCastRequest(pageIndex);
-    }
-
-    private void SendPageChanged(int pageIndex)
-    {
-        if (!CanSend())
-        {
-            return;
-        }
-
-        // BeginSendを呼び出して送信の準備を行う
-        int beginResult = m_driver.BeginSend(m_reliablePipeline, m_connection, out DataStreamWriter writer);
-
-        if (beginResult != 0)
-        {
-            Debug.LogError($"PageChanged BeginSend失敗 : {beginResult}");
-
-            return;
-        }
-
-        // メッセージタイプを送信
-        writer.WriteByte((byte)BOOK_MESSAGE_TYPE.PAGE_CHANGED);
-
-        // ページ番号を送信
-        writer.WriteInt(pageIndex);
-
-        // EndSendを呼び出して送信を完了する
-        int endResult = m_driver.EndSend(writer);
-
-        if (endResult < 0)
-        {
-            Debug.LogError($"PageChanged EndSend失敗 : {endResult}");
-
-            return;
-        }
-
-        Debug.Log($"PageChanged送信 : {pageIndex}");
-    }
-
-    private void SendCastRequest(int pageIndex)
-    {
-        if (!CanSend())
-        {// 送信可能か確認
-            return;
-        }
-
-        // BeginSendを呼び出して送信の準備を行う
-        int beginResult = m_driver.BeginSend(m_reliablePipeline, m_connection, out DataStreamWriter writer);
-
-        if (beginResult != 0)
-        {
-            Debug.LogError($"CastRequest BeginSend失敗 : {beginResult}");
-            return;
-        }
-
-        // メッセージタイプを送信
-        writer.WriteByte((byte)BOOK_MESSAGE_TYPE.CAST_REQUEST);
-
-        // ページ番号を送信
-        writer.WriteInt(pageIndex);
-
-        int endResult = m_driver.EndSend(writer);
-
-        if (endResult < 0)
-        {
-            Debug.LogError($"CastRequest EndSend失敗 : {endResult}");
-            return;
-        }
-
-        Debug.Log($"CastRequest送信 : Page {pageIndex}");
-    }
 
     private void SendRegisterController()
     {
@@ -312,6 +237,108 @@ public class BookNetworkClient : MonoBehaviour
         Debug.Log($"Controller登録送信 : {m_playerSlot}");
     }
 
+    public void SendTestPing(int value)
+    {
+        if (!CanSend())
+        {
+            Debug.LogWarning("未接続のためTestPingを送信できません");
+            return;
+        }
+
+        int beginResult = m_driver.BeginSend(m_reliablePipeline, m_connection, out DataStreamWriter writer);
+
+        if (beginResult != 0)
+        {
+            Debug.LogError($"TestPing BeginSend失敗 : {beginResult}");
+
+            return;
+        }
+
+        writer.WriteByte((byte)BOOK_MESSAGE_TYPE.TEST_PING);
+
+        writer.WriteInt(value);
+
+        int endResult = m_driver.EndSend(writer);
+
+        if (endResult < 0)
+        {
+            Debug.LogError($"TestPing EndSend失敗 : {endResult}");
+
+            return;
+        }
+
+        Debug.Log($"TestPing送信 : {value}");
+    }
+
+    public bool SendCastSkill(byte skillId)
+    {
+        if (!CanSend())
+        {
+            Debug.LogWarning("未接続のためSkillを送信できません");
+            return false;
+        }
+
+        if (skillId == 0)
+        {
+            Debug.LogWarning("SkillId 0は無効です");
+            return false;
+        }
+
+        int beginResult = m_driver.BeginSend(m_reliablePipeline, m_connection, out DataStreamWriter writer);
+
+        if (beginResult != 0)
+        {
+            Debug.LogError($"CastSkill BeginSend失敗 : {beginResult}");
+            return false;
+        }
+
+        writer.WriteByte((byte)BOOK_MESSAGE_TYPE.CAST_MAGIC);
+
+        writer.WriteByte(skillId);
+
+        int endResult = m_driver.EndSend(writer);
+
+        if (endResult < 0)
+        {
+            Debug.LogError($"CastSkill EndSend失敗 : {endResult}");
+            return false;
+        }
+
+        Debug.Log($"CastSkill送信 : SkillId={skillId}");
+
+        return true;
+    }
+
+    public void SendVector2(Vector2 value)
+    {
+        if (!CanSend())
+        {
+            return;
+        }
+
+        int beginResult = m_driver.BeginSend(m_connection, out DataStreamWriter writer);
+
+        if (beginResult != 0)
+        {
+            Debug.LogError($"Vector2 BeginSend失敗 : {beginResult}");
+            return;
+        }
+
+        writer.WriteByte((byte)BOOK_MESSAGE_TYPE.CURSOR_POSITION);
+        writer.WriteFloat(value.x);
+        writer.WriteFloat(value.y);
+
+        int endResult = m_driver.EndSend(writer);
+
+        if (endResult < 0)
+        {
+            Debug.LogError($"Vector2 EndSend失敗 : {endResult}");
+            return;
+        }
+
+        Debug.Log($"Vector2送信 : {value}");
+    }
+
     private bool CanSend()
     {
         // 接続状態がCONNECTEDであり、接続が作成されている場合に送信可能
@@ -320,17 +347,72 @@ public class BookNetworkClient : MonoBehaviour
 
     private void ReceiveData(DataStreamReader reader)
     {
-        // PC → Book通信は今後ここで処理
+        if (reader.Length < 1)
+        {
+            return;
+        }
+
+        BOOK_MESSAGE_TYPE messageType =
+            (BOOK_MESSAGE_TYPE)reader.ReadByte();
+
+        switch (messageType)
+        {
+            case BOOK_MESSAGE_TYPE.TEST_PONG:
+                ReceiveTestPong(reader);
+                break;
+
+            case BOOK_MESSAGE_TYPE.ADD_PAGE:
+                ReceiveAddPage(reader);
+                break;
+
+            default:
+                Debug.LogWarning(
+                    $"未対応Message : {messageType}");
+                break;
+        }
     }
 
+    private void ReceiveTestPong(
+        DataStreamReader reader)
+    {
+        int remainingBytes =
+            reader.Length - reader.GetBytesRead();
+
+        if (remainingBytes < 4)
+        {
+            Debug.LogWarning(
+                "TestPongのデータが不足しています");
+
+            return;
+        }
+
+        int value = reader.ReadInt();
+
+        Debug.Log($"TestPong受信 : {value}");
+    }
+
+    private void ReceiveAddPage(DataStreamReader reader)
+    {
+        if (reader.GetBytesRead() + 1 > reader.Length)
+        {
+            Debug.LogWarning("ADD_PAGEのデータが不足しています");
+            return;
+        }
+
+        byte pageId = reader.ReadByte();
+
+        Debug.Log($"AddPage受信 : PageId={pageId}");
+
+        AddPageReceived?.Invoke(pageId);
+    }
     private void OnDestroy()
     {
-        if (m_bookController != null)
+        if (s_instance != this)
         {
-            // BookControllerのイベントから登録解除
-            m_bookController.OnPageChanged -= OnPageChanged;
-            m_bookController.OnCastRequested -= OnCastRequested;
+            return;
         }
+
+        s_instance = null;
 
         if (!m_driver.IsCreated)
         {
@@ -339,7 +421,6 @@ public class BookNetworkClient : MonoBehaviour
 
         if (m_connection.IsCreated)
         {
-            // 接続が作成されている場合は切断
             m_driver.Disconnect(m_connection);
             m_driver.ScheduleUpdate().Complete();
         }
