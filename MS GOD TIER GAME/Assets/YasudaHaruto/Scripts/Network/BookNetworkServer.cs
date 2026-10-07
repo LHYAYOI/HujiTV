@@ -21,6 +21,10 @@ public class BookNetworkServer : MonoBehaviour
 
     private readonly Dictionary<NetworkConnection, PLAYER_SLOT> m_playerSlots = new();
 
+    [SerializeField] private MagicManager m_magicManager;
+
+    private Vector2 m_cursorPosition;
+
     private void Start()
     {
         m_driver = NetworkDriver.Create();
@@ -66,15 +70,15 @@ public class BookNetworkServer : MonoBehaviour
         AcceptClients();
         ProcessEvents();
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            SendAddPage(PLAYER_SLOT.PLAYER1, 1);
-        }
+        //if (Input.GetKeyDown(KeyCode.Alpha1))
+        //{
+        //    SendAddPage(PLAYER_SLOT.PLAYER1, 1);
+        //}
 
-        if (Input.GetKeyDown(KeyCode.Alpha0))
-        {
-            SendAddPage(PLAYER_SLOT.PLAYER1, 10);
-        }
+        //if (Input.GetKeyDown(KeyCode.Alpha0))
+        //{
+        //    SendAddPage(PLAYER_SLOT.PLAYER1, 10);
+        //}
     }
 
     private void RemoveDisconnectedClients()
@@ -199,6 +203,10 @@ public class BookNetworkServer : MonoBehaviour
                 ReceiveCastMagic(connection, reader);
                 break;
 
+            case BOOK_MESSAGE_TYPE.CURSOR_POSITION:
+                ReceiveVector2(connection, reader);
+                break;
+
             default:
                 Debug.LogWarning($"未対応Message : {messageType}");
                 break;
@@ -255,6 +263,41 @@ public class BookNetworkServer : MonoBehaviour
         }
 
         Debug.Log($"CastSkill受信 : {playerSlot} / SkillId={skillId}");
+
+        m_magicManager.RequestCast(skillId);
+    }
+
+    private void ReceiveVector2(NetworkConnection connection, DataStreamReader reader)
+    {
+        int remainingBytes = reader.Length - reader.GetBytesRead();
+
+        // float × 2 = 8byte
+        if (remainingBytes < 8)
+        {
+            Debug.LogWarning("Vector2Dataのデータが不足しています");
+            return;
+        }
+
+        float x = reader.ReadFloat();
+        float y = reader.ReadFloat();
+
+        Vector2 value = new Vector2(x, y);
+
+        m_cursorPosition = value;
+
+        if (m_playerSlots.TryGetValue(connection, out PLAYER_SLOT playerSlot))
+        {
+            Debug.Log($"{playerSlot} Vector2受信 : {value}");
+        }
+        else
+        {
+            Debug.LogWarning($"未登録ClientからVector2を受信 : {value}");
+        }
+    }
+
+    public Vector2 GetCursorPosition()
+    {
+        return m_cursorPosition;
     }
 
     private void SendTestPong(NetworkConnection connection, int value)

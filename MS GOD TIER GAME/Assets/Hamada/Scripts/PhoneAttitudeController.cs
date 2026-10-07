@@ -40,6 +40,8 @@ public class PhoneAttitudeController : MonoBehaviour
 
         m_normalizedAngles.y = NormalizeAngle(euler.x);
         m_normalizedAngles.x = NormalizeAngle(euler.z);
+
+        BookNetworkClient.Instance.SendVector2(m_normalizedAngles);
     }
 
     public Vector2 GetNormalizedAngles()

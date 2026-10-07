@@ -7,6 +7,9 @@ public class MagicData : ScriptableObject
 
     [SerializeField] private string m_displayName;
 
+    [SerializeField] private MAGIC_TYPE m_magicType;
+
     public byte MagicId => m_magicId;
     public string DisplayName => m_displayName;
+    public MAGIC_TYPE MagicType => m_magicType;
 }
