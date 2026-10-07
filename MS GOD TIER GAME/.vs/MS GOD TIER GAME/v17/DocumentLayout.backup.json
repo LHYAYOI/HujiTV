@@ -3,15 +3,27 @@
   "WorkspaceRootPath": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\magic\\magicmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\network\\booknetworkserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\network\\booknetworkserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\ths30546\\documents\\github\\hujitv\\ms god tier game\\assets\\yasudaharuto\\scripts\\network\\booknetworkclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\network\\booknetworkclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\ths30546\\documents\\github\\hujitv\\ms god tier game\\assets\\yasudaharuto\\scripts\\network\\bookmessagetype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\network\\bookmessagetype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\ths30546\\documents\\github\\hujitv\\ms god tier game\\assets\\yasudaharuto\\scripts\\magic\\magicmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\magic\\magicmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\ths30546\\documents\\github\\hujitv\\ms god tier game\\assets\\yasudaharuto\\scripts\\magic\\magicdatabase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\magic\\magicdatabase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\magic\\magicdatabase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\ths30546\\documents\\github\\hujitv\\ms god tier game\\assets\\yasudaharuto\\scripts\\magic\\magicdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\magic\\magicdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\magic\\magicdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -27,6 +39,45 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "BookNetworkClient.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkClient.cs",
+              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkClient.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkClient.cs",
+              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkClient.cs",
+              "ViewState": "AgIAAC4BAAAAAAAAAAAcwDoBAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-07T05:10:08.502Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "BookMessageType.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Network\\BookMessageType.cs",
+              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Network\\BookMessageType.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Network\\BookMessageType.cs",
+              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Network\\BookMessageType.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-07T05:09:11.33Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "BookNetworkServer.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkServer.cs",
+              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkServer.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkServer.cs",
+              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkServer.cs",
+              "ViewState": "AgIAAAkBAAAAAAAAAAAcwCIBAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-07T04:50:00.737Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "MagicDatabase.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Magic\\MagicDatabase.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Magic\\MagicDatabase.cs",
@@ -34,12 +85,11 @@
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Magic\\MagicDatabase.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-07T04:41:14.474Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-07T04:41:14.474Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 5,
               "Title": "MagicData.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Magic\\MagicData.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Magic\\MagicData.cs",
@@ -47,18 +97,17 @@
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Magic\\MagicData.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAvAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-07T04:39:07.225Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-07T04:39:07.225Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "MagicManager.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Magic\\MagicManager.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Magic\\MagicManager.cs",
               "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Magic\\MagicManager.cs",
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Magic\\MagicManager.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAXAAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAABsAAAAwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-10-07T04:36:11.573Z",
               "EditorCaption": ""

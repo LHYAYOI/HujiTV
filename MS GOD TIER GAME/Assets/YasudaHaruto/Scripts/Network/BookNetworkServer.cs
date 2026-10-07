@@ -201,6 +201,10 @@ public class BookNetworkServer : MonoBehaviour
                 ReceiveCastMagic(connection, reader);
                 break;
 
+            case BOOK_MESSAGE_TYPE.CURSOR_POSITION:
+                ReceiveVector2(connection, reader);
+                break;
+
             default:
                 Debug.LogWarning($"未対応Message : {messageType}");
                 break;
@@ -259,6 +263,32 @@ public class BookNetworkServer : MonoBehaviour
         Debug.Log($"CastSkill受信 : {playerSlot} / SkillId={skillId}");
 
         m_magicManager.RequestCast(skillId);
+    }
+
+    private void ReceiveVector2(NetworkConnection connection, DataStreamReader reader)
+    {
+        int remainingBytes = reader.Length - reader.GetBytesRead();
+
+        // float × 2 = 8byte
+        if (remainingBytes < 8)
+        {
+            Debug.LogWarning("Vector2Dataのデータが不足しています");
+            return;
+        }
+
+        float x = reader.ReadFloat();
+        float y = reader.ReadFloat();
+
+        Vector2 value = new Vector2(x, y);
+
+        if (m_playerSlots.TryGetValue(connection, out PLAYER_SLOT playerSlot))
+        {
+            Debug.Log($"{playerSlot} Vector2受信 : {value}");
+        }
+        else
+        {
+            Debug.LogWarning($"未登録ClientからVector2を受信 : {value}");
+        }
     }
 
     private void SendTestPong(NetworkConnection connection, int value)

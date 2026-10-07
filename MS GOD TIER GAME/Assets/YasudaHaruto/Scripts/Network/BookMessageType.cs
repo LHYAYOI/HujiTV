@@ -10,5 +10,6 @@ public enum BOOK_MESSAGE_TYPE : byte
     TEST_PING,
     TEST_PONG,
     CAST_MAGIC,
-    ADD_PAGE
+    ADD_PAGE,
+    CURSOR_POSITION,
 }
