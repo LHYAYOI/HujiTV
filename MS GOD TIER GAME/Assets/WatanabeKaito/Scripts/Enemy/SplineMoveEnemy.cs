@@ -12,6 +12,9 @@ public class SplineMoveEnemy : EnemyBase
     [Header("移動スピード")]
     [SerializeField] protected float m_moveSpeed = 1f;
 
+    [Header("スプラインに合わせて回転するかしないか")]
+    [SerializeField] protected bool m_rotateWithSplineFlag = true;
+
     protected SplineContainer m_targetSpline; // 移動対象のスプライン
     protected float m_distanceTraveled = 0f;  // スプライン上の移動距離
     protected float m_splineLength;           // スプラインの全長
@@ -85,8 +88,11 @@ public class SplineMoveEnemy : EnemyBase
         // 座標の更新
         transform.position = position;
 
-        // 向きの更新を別メソッドに切り出し
-        UpdateRotation(tangent);
+        if (m_rotateWithSplineFlag)
+        {
+            // 向きの更新
+            UpdateRotation(tangent);
+        }
     }
 
     // 向きの更新処理

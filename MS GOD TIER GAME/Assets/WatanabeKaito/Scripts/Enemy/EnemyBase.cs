@@ -13,6 +13,8 @@ public abstract class EnemyBase : MonoBehaviour
 
     protected int m_currentHealth;  // 現在の体力
 
+    protected Transform m_playerPosition; // プレイヤーの位置
+
     protected virtual void Awake()
     {
         if (m_enemyData != null)
@@ -44,5 +46,11 @@ public abstract class EnemyBase : MonoBehaviour
     public EnemyData GetEnemyData()
     {
         return m_enemyData;
+    }
+
+    // プレイヤーの位置を設定する関数
+    public void SetPlayerPosition(Transform playerTransform)
+    {
+        m_playerPosition = playerTransform;
     }
 }

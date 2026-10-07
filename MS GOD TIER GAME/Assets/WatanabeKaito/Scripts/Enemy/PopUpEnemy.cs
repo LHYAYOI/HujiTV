@@ -2,26 +2,25 @@
 // PopUpEnemy.cs
 // 制作日：2026/09/30
 // 制作者：渡辺開斗
-// 概要：出現・隠れるエネミーのクラス
+// 概要：特定の位置に出現するエネミーのクラス
 //-----------------------------------------------
 using System.Collections;
 using UnityEngine;
 
 public class PopUpEnemy : EnemyBase
 {
-    [Header("出現している時間")]
-    [SerializeField] protected float m_activeTime = 4.0f;
+    [Header("出現時間")]
+    [SerializeField] private float m_popUpDuration = 20.0f; // 出現している時間
 
-    [Header("隠れている時間")]
-    [SerializeField] protected float m_hideTime = 2.0f;
+    [Header("エネミーの弾")]
+    [SerializeField] private GameObject m_enemyBullet; // エネミーの弾
 
-    [Header("レンダラー")]
-    [SerializeField] protected Renderer[] m_renderers;
+    [Header("弾の発射位置")]
+    [SerializeField] private Transform m_bulletShotPosition; // 弾の発射位置
 
-    [Header("当たり判定")]
-    [SerializeField] protected Collider[] m_colliders;
+    private EnemyBulletManager m_enemyBulletManager; // エネミーの弾の管理クラス
 
-    protected bool m_isVisible = false; // 出現状態かどうかのフラグ
+    private float m_time = 0.0f;
 
     protected override void Awake()
     {
@@ -30,45 +29,47 @@ public class PopUpEnemy : EnemyBase
 
     public override void Initialize()
     {
-        SetVisible(false);
-        StartCoroutine(PopRoutine());
+        //m_enemyBulletManager = m_enemyBullet.GetComponent<EnemyBulletManager>();
     }
 
-    // 出現・隠れるをループするコルーチン
-    protected virtual IEnumerator PopRoutine()
+    void Update()
     {
-        while (true)
-        {
-            yield return new WaitForSeconds(m_hideTime);
+        //// 出現している時間をカウントダウン
+        //m_popUpDuration -= Time.deltaTime;
 
-            SetVisible(true);
-            OnAppear(); // 出現
+        //if (m_popUpDuration <= 0f)
+        //{
+        //    // 出現時間が終了したらエネミーを非表示にする
+        //    gameObject.SetActive(false);
+        //}
 
-            yield return new WaitForSeconds(m_activeTime);
+        //// 出現中にプレイヤーに向かって弾を撃つ
+        //if (m_playerPosition != null && m_enemyBullet != null)
+        //{
+            
+        //}
 
-            SetVisible(false);
-            OnHide();   // 隠れる
-        }
+        //m_time += Time.deltaTime;
+
+        //if (m_time >= m_enemyData.m_attackSpeed)
+        //{
+        //    // 弾を生成
+        //    Instantiate(m_enemyBullet, m_bulletShotPosition.position, Quaternion.identity);
+
+        //    // 弾を撃つ処理
+        //    m_enemyBulletManager.Shot(m_playerPosition);
+
+        //    Debug.Log(m_playerPosition);
+
+        //    m_time = 0.0f;
+        //}
     }
 
-    // 表示状態の切り替え処理
-    protected virtual void SetVisible(bool isVisible)
+    private void OnCollisionEnter(Collision collision)
     {
-        m_isVisible = isVisible;
-
-        foreach (var r in m_renderers)
-        {
-            if (r != null) r.enabled = isVisible;
-        }
-        foreach (var c in m_colliders)
-        {
-            if (c != null) c.enabled = isVisible;
-        }
+       
+        Debug.Log("当たった");
+        Destroy(gameObject);
     }
 
-    // 出現した瞬間に呼ばれる（子クラスで拡張用）
-    protected virtual void OnAppear(){}
-
-    /// 隠れた瞬間に呼ばれる（子クラスで拡張用）
-    protected virtual void OnHide(){}
 }

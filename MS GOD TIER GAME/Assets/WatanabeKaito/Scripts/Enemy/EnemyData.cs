@@ -20,4 +20,7 @@ public class EnemyData : ScriptableObject
 
     [Header("エネミーの攻撃力")]
     public int m_attack;
+
+    [Header("エネミーの攻撃速度")]
+    public float m_attackSpeed;
 }

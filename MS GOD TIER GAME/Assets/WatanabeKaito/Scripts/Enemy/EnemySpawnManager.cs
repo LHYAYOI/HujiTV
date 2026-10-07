@@ -17,15 +17,27 @@ public class EnemySpawnManager : MonoBehaviour
         public SplineContainer m_container; // スプラインコンテナ
     }
 
+    [System.Serializable]
+    public struct SpawnPositionData    // 出現位置のデータ構造
+    {
+        public string m_id; // 出現位置の識別子
+        public Transform m_position; // 出現位置のTransform
+    }
+
+
     [Header("エネミーのプレハブ")]
     [SerializeField] private List<EnemyBase> m_enemyPrefabs = new List<EnemyBase>();
 
     [Header("スプラインパスのデータ")]
     [SerializeField] private List<SplinePathData> m_splinePaths = new List<SplinePathData>();
 
-    
+    [Header("出現位置のデータ")]
+    [SerializeField] private List<SpawnPositionData> m_spawnPositions = new List<SpawnPositionData>();
+
+
     private Dictionary<string, EnemyBase> m_enemyDictionary = new Dictionary<string, EnemyBase>();  // エネミーIDをキーにしてエネミープレハブを格納する辞書
     private Dictionary<string, SplineContainer> m_splineDictionary = new Dictionary<string, SplineContainer>(); // スプラインIDをキーにしてスプラインコンテナを格納する辞書
+    private Dictionary<string, Transform> m_spawnPositionDictionary = new Dictionary<string, Transform>();
 
     // 位置を指定するように位置データのリストを作ったほうがいいかも
 
@@ -33,6 +45,7 @@ public class EnemySpawnManager : MonoBehaviour
     {
        InitializeEnemyDictionary();
        InitializeSplineDictionary();
+       InitializeSpawnPositionDictionary();
     }
 
     // エネミーのプレハブを辞書に登録するメソッド
@@ -59,20 +72,30 @@ public class EnemySpawnManager : MonoBehaviour
         }
     }
 
-    // エネミーIDとスプラインID（辞書のキー）を指定してスプラインエネミーを生成
+    // 出現位置を辞書に登録するメソッド
+    private void InitializeSpawnPositionDictionary()
+    {
+        foreach (var positionData in m_spawnPositions)
+        {
+            if (positionData.m_position != null && !string.IsNullOrEmpty(positionData.m_id) && !m_spawnPositionDictionary.ContainsKey(positionData.m_id))
+            {
+                m_spawnPositionDictionary.Add(positionData.m_id, positionData.m_position);
+            }
+        }
+    }
+
+    // エネミーIDとスプラインIDを指定してスプラインエネミーを生成
     public void SpawnEnemy(string enemyId, string splineId)
     {
         // 辞書からエネミーを取得（TryGetValueを使うと安全かつ高速です）
         if (!m_enemyDictionary.TryGetValue(enemyId, out EnemyBase prefab))
         {
-            Debug.LogError($"辞書にエネミーID '{enemyId}' が登録されていません。");
             return;
         }
 
         // 辞書からスプラインを取得
         if (!m_splineDictionary.TryGetValue(splineId, out SplineContainer spline))
         {
-            Debug.LogError($"辞書にスプラインID '{splineId}' が登録されていません。");
             return;
         }
 
@@ -87,14 +110,20 @@ public class EnemySpawnManager : MonoBehaviour
         }
     }
 
-    // エネミーIDと座標を指定して固定位置でエネミーを生成
-    public void SpawnStaticEnemy(string enemyId, Vector3 spawnPosition)
+    // エネミーIDと出現位置IDを指定してエネミーを生成
+    public void SpawnPopUpEnemy(string enemyId, string spawnId)
     {
         if (!m_enemyDictionary.TryGetValue(enemyId, out EnemyBase prefab))
         {
-            Debug.LogError($"辞書にエネミーID '{enemyId}' が登録されていません。");
             return;
         }
+
+        if (!m_spawnPositionDictionary.TryGetValue(spawnId, out Transform spawnTransform))
+        {
+            return;
+        }
+
+        Vector3 spawnPosition = spawnTransform.position;
 
         EnemyBase enemyObj = Instantiate(prefab, spawnPosition, Quaternion.identity);
         enemyObj.Initialize();

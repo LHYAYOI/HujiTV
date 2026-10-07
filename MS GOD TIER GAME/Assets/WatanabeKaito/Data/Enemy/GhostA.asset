@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 677d254473ab5714c83d1e6f95d2af12, type: 3}
-  m_Name: TestEnemy
+  m_Name: GhostA
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  m_id: test
+  m_id: Ghost_A
   m_name: 
-  m_maxHealth: 0
-  m_attack: 0
+  m_maxHealth: 1
+  m_attack: 1
+  m_attackSpeed: 2
