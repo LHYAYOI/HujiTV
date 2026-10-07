@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0348284d6c830c745b43a7bc4bbddec7, type: 3}
+  m_Name: TestObstaclePage
+  m_EditorClassIdentifier: Assembly-CSharp::PageData
+  m_pageId: 10
+  m_insertType: 2
+  m_displayName: TestObstacle
+  m_pageType: 2
+  m_interaction:
+    m_type: 1
+    m_runeData: {fileID: 11400000, guid: 803778e1ac00bca4b868b67ffbc25833, type: 2}
+  m_action:
+    m_type: 1
+    m_magicData: {fileID: 11400000, guid: 969aa2658e05a8f4bbade20cf8808934, type: 2}
+  m_leftVisualData: {fileID: 11400000, guid: f77776490aa6fc24f93eb19393879ccc, type: 2}
+  m_rightVisualData: {fileID: 11400000, guid: 7a1eea5c254fdfb4da586e878b790100, type: 2}
