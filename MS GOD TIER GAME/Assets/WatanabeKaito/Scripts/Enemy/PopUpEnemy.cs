@@ -67,9 +67,11 @@ public class PopUpEnemy : EnemyBase
 
     private void OnCollisionEnter(Collision collision)
     {
-       
-        Debug.Log("“–‚½‚Á‚½");
-        Destroy(gameObject);
+
+        if(collision.gameObject.CompareTag("MagicBullet"))
+        {
+            Destroy(gameObject);
+        }       
     }
 
 }
