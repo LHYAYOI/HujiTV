@@ -18,8 +18,42 @@ public class MagicBulletManager : MonoBehaviour
     }
 
     //’e‚Ì”­Ë
-    public void FireBullet()
+    public void FireBullet(MagicData magicData)
     {
+        foreach (MagicBulletController prefabs in m_magicBulletPrefabList) 
+        {
+            if (prefabs == null) 
+            {
+                continue;
+            }
+
+
+
+            //if(prefabs.GetMagicBulletData==m)
+        }
+
+        //switch (magicData.MagicType)
+        //{
+        //    case MAGIC_TYPE.FIRE:
+        //        {
+        //            //‰Š‚Ì’e‚ğ”­Ë‚·‚éˆ—
+
+        //            MagicBulletController bullet = Instantiate(m_magicBulletPrefabList[0], m_bulletSpawnPoint.position, Quaternion.identity);
+        //            bullet.SetTarget(m_aimScript.GetLockedOnTarget());
+
+        //            break;
+        //        }
+        //    case MAGIC_TYPE.ICE:
+        //        {
+        //            //•X‚Ì’e‚ğ”­Ë‚·‚éˆ—
+
+        //            MagicBulletController bullet = Instantiate(m_magicBulletPrefabList[1], m_bulletSpawnPoint.position, Quaternion.identity);
+        //            bullet.SetTarget(m_aimScript.GetLockedOnTarget());
+
+        //            break;
+        //        }
+        //}
+
         MagicBulletController bullet = Instantiate(m_magicBulletPrefabList[0], m_bulletSpawnPoint.position, Quaternion.identity);
         bullet.SetTarget(m_aimScript.GetLockedOnTarget());
     }

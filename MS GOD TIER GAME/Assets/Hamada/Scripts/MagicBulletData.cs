@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "AttackData", menuName = "ScriptableObject/AttackObjects/AttackData")]
-public class AttackData : ScriptableObject
+[CreateAssetMenu(fileName = "MagicBulletData", menuName = "ScriptableObject/MagicBulletData")]
+public class MagicBulletData : ScriptableObject
 {
     [SerializeField] MAGIC_TYPE m_magicType;
 

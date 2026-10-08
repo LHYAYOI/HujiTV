@@ -137,7 +137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31564cf657255804f982df79cbb6ad05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  m_attackData: {fileID: 11400000, guid: 3a0718ba1d7b25e419911258c4a58717, type: 2}
+  m_magicBulletData: {fileID: 11400000, guid: 3a0718ba1d7b25e419911258c4a58717, type: 2}
 --- !u!1 &1249662005817768199
 GameObject:
   m_ObjectHideFlags: 0
