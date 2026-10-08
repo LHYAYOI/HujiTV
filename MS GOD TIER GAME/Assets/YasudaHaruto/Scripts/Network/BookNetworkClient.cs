@@ -308,6 +308,37 @@ public class BookNetworkClient : MonoBehaviour
 
         return true;
     }
+
+    public void SendVector2(Vector2 value)
+    {
+        if (!CanSend())
+        {
+            return;
+        }
+
+        int beginResult = m_driver.BeginSend(m_connection, out DataStreamWriter writer);
+
+        if (beginResult != 0)
+        {
+            Debug.LogError($"Vector2 BeginSendé∏îs : {beginResult}");
+            return;
+        }
+
+        writer.WriteByte((byte)BOOK_MESSAGE_TYPE.CURSOR_POSITION);
+        writer.WriteFloat(value.x);
+        writer.WriteFloat(value.y);
+
+        int endResult = m_driver.EndSend(writer);
+
+        if (endResult < 0)
+        {
+            Debug.LogError($"Vector2 EndSendé∏îs : {endResult}");
+            return;
+        }
+
+        Debug.Log($"Vector2ëóêM : {value}");
+    }
+
     private bool CanSend()
     {
         // ê⁄ë±èÛë‘Ç™CONNECTEDÇ≈Ç†ÇËÅAê⁄ë±Ç™çÏê¨Ç≥ÇÍÇƒÇ¢ÇÈèÍçáÇ…ëóêMâ¬î\

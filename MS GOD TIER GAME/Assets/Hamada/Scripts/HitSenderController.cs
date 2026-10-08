@@ -98,7 +98,7 @@ public class BulletHitSenderController : MonoBehaviour
     {
         HitData hitData = new HitData();
 
-        AttackData attackData = m_magicBulletController.GetAttackData();
+        MagicBulletData attackData = m_magicBulletController.GetMagicBulletData();
 
         hitData.SetDamage(attackData.GetDamage);
         hitData.SetMagicType(attackData.GetMagicType);

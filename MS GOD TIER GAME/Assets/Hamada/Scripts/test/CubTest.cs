@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CubTest : MonoBehaviour
 {
-    [SerializeField] AttackData m_attackData;
+    [SerializeField] MagicBulletData m_attackData;
 
     private void OnCollisionEnter(Collision other)
     {

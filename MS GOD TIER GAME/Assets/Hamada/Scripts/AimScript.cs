@@ -14,6 +14,8 @@ public class AimScript : MonoBehaviour
 
     [SerializeField] private LayerMask m_lockOnLayerMask;
 
+    [SerializeField] private BookNetworkServer m_bookNetworkServer;
+
     //List<GameObject> m_targets = new List<GameObject>();
 
     GameObject m_target;
@@ -24,11 +26,11 @@ public class AimScript : MonoBehaviour
 
     [SerializeField] private float m_verticalAngleRange = 20.0f;
 
-
-    // Update is called once per frame
-    void Update()
+    public void UpdateAimScript() 
     {
+       // Vector2 normalizedAngle = m_bookNetworkServer.GetCursorPosition();
         Vector2 normalizedAngle = m_phoneAttitudeController.GetNormalizedAngles();
+
         UpdateReticlePosition(-normalizedAngle.x, normalizedAngle.y);
         LockOnTargetProcess();
     }
