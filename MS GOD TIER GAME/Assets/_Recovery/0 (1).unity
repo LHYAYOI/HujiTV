@@ -257,7 +257,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 087a8c512e099f94fbd41c981693ff25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnManager
---- !u!1 &467192068
+--- !u!1 &662120359
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -265,10 +265,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 467192072}
-  - component: {fileID: 467192071}
-  - component: {fileID: 467192070}
-  - component: {fileID: 467192069}
+  - component: {fileID: 662120363}
+  - component: {fileID: 662120362}
+  - component: {fileID: 662120361}
+  - component: {fileID: 662120360}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -276,13 +276,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!136 &467192069
+--- !u!136 &662120360
 CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 467192068}
+  m_GameObject: {fileID: 662120359}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -299,13 +299,13 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &467192070
+--- !u!23 &662120361
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 467192068}
+  m_GameObject: {fileID: 662120359}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -348,24 +348,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &467192071
+--- !u!33 &662120362
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 467192068}
+  m_GameObject: {fileID: 662120359}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &467192072
+--- !u!4 &662120363
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 467192068}
+  m_GameObject: {fileID: 662120359}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.47747, y: 0.1083, z: 0.14841}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -436,7 +436,7 @@ MonoBehaviour:
           w: 1
     - Position:
         x: -0.000000029802322
-        y: 0.29
+        y: 0
         z: 0.49999997
       TangentIn:
         x: -0
@@ -472,7 +472,7 @@ MonoBehaviour:
           w: 0
     - Position:
         x: -0.00000008940697
-        y: 0.38
+        y: 0
         z: -0.4999999
       TangentIn:
         x: -0
@@ -518,7 +518,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 11.723919, y: 11.723919, z: 11.723919}
+  m_LocalScale: {x: 15.397847, y: 15.397847, z: 15.397847}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -806,7 +806,7 @@ Transform:
   m_GameObject: {fileID: 2081397906}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -1.205}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -867,7 +867,7 @@ PrefabInstance:
     - target: {fileID: 5144783666922765827, guid: c6c176f2a4fafc74fa2004a4cbc388e6, type: 3}
       propertyPath: m_playerTransform
       value: 
-      objectReference: {fileID: 467192072}
+      objectReference: {fileID: 662120363}
     - target: {fileID: 5144783666922765827, guid: c6c176f2a4fafc74fa2004a4cbc388e6, type: 3}
       propertyPath: m_splinePaths.Array.size
       value: 1
@@ -907,4 +907,4 @@ SceneRoots:
   - {fileID: 1115028773}
   - {fileID: 900352742}
   - {fileID: 2081397908}
-  - {fileID: 467192072}
+  - {fileID: 662120363}

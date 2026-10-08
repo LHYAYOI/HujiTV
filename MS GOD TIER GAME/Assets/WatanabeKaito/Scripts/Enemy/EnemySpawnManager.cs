@@ -25,6 +25,9 @@ public class EnemySpawnManager : MonoBehaviour
     }
 
 
+    [Header("プレイヤーの位置")]
+    [SerializeField] private Transform m_playerTransform; // プレイヤーの位置を取得するためのTransform
+
     [Header("エネミーのプレハブ")]
     [SerializeField] private List<EnemyBase> m_enemyPrefabs = new List<EnemyBase>();
 
@@ -85,7 +88,7 @@ public class EnemySpawnManager : MonoBehaviour
     }
 
     // エネミーIDとスプラインIDを指定してスプラインエネミーを生成
-    public void SpawnEnemy(string enemyId, string splineId)
+    public void SpawnSplineMoveEnemy(string enemyId, string splineId)
     {
         // 辞書からエネミーを取得（TryGetValueを使うと安全かつ高速です）
         if (!m_enemyDictionary.TryGetValue(enemyId, out EnemyBase prefab))
@@ -102,6 +105,7 @@ public class EnemySpawnManager : MonoBehaviour
         // 生成と初期化
         Vector3 startPos = spline.EvaluatePosition(0f);
         EnemyBase enemyObj = Instantiate(prefab, startPos, Quaternion.identity);
+        enemyObj.SetPlayerPosition(m_playerTransform);
 
         if (enemyObj is SplineMoveEnemy splineMoveEnemy)
         {
@@ -126,6 +130,8 @@ public class EnemySpawnManager : MonoBehaviour
         Vector3 spawnPosition = spawnTransform.position;
 
         EnemyBase enemyObj = Instantiate(prefab, spawnPosition, Quaternion.identity);
+        enemyObj.SetPlayerPosition(m_playerTransform);
         enemyObj.Initialize();
+       
     }
 }
