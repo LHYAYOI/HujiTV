@@ -16,8 +16,6 @@ public class AimScript : MonoBehaviour
 
     [SerializeField] private BookNetworkServer m_bookNetworkServer;
 
-    //List<GameObject> m_targets = new List<GameObject>();
-
     GameObject m_target;
 
     [Header("c‰¡ƒGƒCƒ€‚ÌƒŒƒ“ƒW")]

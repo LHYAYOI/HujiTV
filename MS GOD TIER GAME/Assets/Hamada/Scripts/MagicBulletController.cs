@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class MagicBulletController : MonoBehaviour
 {
-    [SerializeField] MagicBulletData m_magicBulletData;
+    [SerializeField] MagicData m_magicData;
 
     GameObject m_target;
 
@@ -11,9 +11,9 @@ public class MagicBulletController : MonoBehaviour
         MoveProcess();
     }
 
-    public MagicBulletData GetMagicBulletData()
+    public MagicData GetMagicBulletData()
     {
-        return m_magicBulletData;
+        return m_magicData;
     }
 
     public void SetTarget(GameObject target)

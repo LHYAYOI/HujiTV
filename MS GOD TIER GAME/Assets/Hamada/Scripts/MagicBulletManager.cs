@@ -18,7 +18,7 @@ public class MagicBulletManager : MonoBehaviour
     }
 
     //’e‚Ì”­ŽË
-    public void FireBullet(MagicData magicData)
+    public void FireBullet(MagicData magicData,)
     {
         foreach (MagicBulletController prefabs in m_magicBulletPrefabList) 
         {
@@ -27,9 +27,10 @@ public class MagicBulletManager : MonoBehaviour
                 continue;
             }
 
-
-
-            //if(prefabs.GetMagicBulletData==m)
+            if (prefabs.GetMagicBulletData().DisplayName == magicData.DisplayName) 
+            {
+            
+            }
         }
 
         //switch (magicData.MagicType)
