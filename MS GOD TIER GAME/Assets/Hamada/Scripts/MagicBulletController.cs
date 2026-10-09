@@ -11,7 +11,7 @@ public class MagicBulletController : MonoBehaviour
         MoveProcess();
     }
 
-    public MagicData GetMagicBulletData()
+    public MagicData GetMagicData()
     {
         return m_magicData;
     }

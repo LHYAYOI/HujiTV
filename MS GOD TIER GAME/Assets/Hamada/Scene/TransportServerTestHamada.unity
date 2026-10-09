@@ -678,6 +678,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   m_bulletManager: {fileID: 1007278231}
   m_aimScript: {fileID: 1692613820}
+  m_bulletSpawnPoint: {fileID: 607690122}
+  magicData: {fileID: 11400000, guid: 3da60a3eb6bfeb146b9427ebd2ea62c0, type: 2}
+  m_target: {fileID: 568092638}
 --- !u!4 &869726369
 Transform:
   m_ObjectHideFlags: 0
@@ -1240,15 +1243,19 @@ PrefabInstance:
     - target: {fileID: 5573187369139908623, guid: 0d1f3adb34624174f840972388e9be55, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1007278231}
+      objectReference: {fileID: 869726368}
     - target: {fileID: 5573187369139908623, guid: 0d1f3adb34624174f840972388e9be55, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: FireBullet
       objectReference: {fileID: 0}
     - target: {fileID: 5573187369139908623, guid: 0d1f3adb34624174f840972388e9be55, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: PlayerController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 5573187369139908623, guid: 0d1f3adb34624174f840972388e9be55, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
       value: 
-      objectReference: {fileID: 11400000, guid: be3036e9517a54049a1fc18960aa09a5, type: 2}
+      objectReference: {fileID: 11400000, guid: 3da60a3eb6bfeb146b9427ebd2ea62c0, type: 2}
     - target: {fileID: 5573187369139908623, guid: 0d1f3adb34624174f840972388e9be55, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: MagicData, Assembly-CSharp

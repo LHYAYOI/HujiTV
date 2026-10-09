@@ -7,8 +7,6 @@ public class MagicBulletManager : MonoBehaviour
 {
     [SerializeField] List<MagicBulletController> m_magicBulletPrefabList;
 
-    [SerializeField] Transform m_bulletSpawnPoint;
-
     [SerializeField] AimScript m_aimScript;
 
     // Update is called once per frame
@@ -18,44 +16,21 @@ public class MagicBulletManager : MonoBehaviour
     }
 
     //íeÇÃî≠éÀ
-    public void FireBullet(MagicData magicData,)
+    public void FireBullet(MagicData magicData, Vector3 m_bulletSpawnPoint, GameObject target)
     {
-        foreach (MagicBulletController prefabs in m_magicBulletPrefabList) 
+        foreach (MagicBulletController prefab in m_magicBulletPrefabList) 
         {
-            if (prefabs == null) 
+            if (prefab == null) 
             {
                 continue;
             }
 
-            if (prefabs.GetMagicBulletData().DisplayName == magicData.DisplayName) 
+            if (prefab.GetMagicData().DisplayName == magicData.DisplayName) 
             {
-            
+                MagicBulletController bullet = Instantiate(prefab, m_bulletSpawnPoint, Quaternion.identity);
+                bullet.SetTarget(target);
+                break;
             }
         }
-
-        //switch (magicData.MagicType)
-        //{
-        //    case MAGIC_TYPE.FIRE:
-        //        {
-        //            //âäÇÃíeÇî≠éÀÇ∑ÇÈèàóù
-
-        //            MagicBulletController bullet = Instantiate(m_magicBulletPrefabList[0], m_bulletSpawnPoint.position, Quaternion.identity);
-        //            bullet.SetTarget(m_aimScript.GetLockedOnTarget());
-
-        //            break;
-        //        }
-        //    case MAGIC_TYPE.ICE:
-        //        {
-        //            //ïXÇÃíeÇî≠éÀÇ∑ÇÈèàóù
-
-        //            MagicBulletController bullet = Instantiate(m_magicBulletPrefabList[1], m_bulletSpawnPoint.position, Quaternion.identity);
-        //            bullet.SetTarget(m_aimScript.GetLockedOnTarget());
-
-        //            break;
-        //        }
-        //}
-
-        MagicBulletController bullet = Instantiate(m_magicBulletPrefabList[0], m_bulletSpawnPoint.position, Quaternion.identity);
-        bullet.SetTarget(m_aimScript.GetLockedOnTarget());
     }
 }
