@@ -3,11 +3,15 @@
   "WorkspaceRootPath": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|d:\\github\\hujitv\\ms god tier game\\assets\\hamada\\scripts\\aimscript.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\aimscript.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|d:\\github\\hujitv\\ms god tier game\\assets\\hamada\\scripts\\magicbulletmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\magicbulletmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\magicbulletmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -17,10 +21,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\magicbulletcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\magicbulletcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\aimscript.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\aimscript.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\magic\\magicdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -145,23 +145,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 0,
               "Title": "AimScript.cs",
               "DocumentMoniker": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\AimScript.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\AimScript.cs",
               "ToolTip": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\AimScript.cs",
               "RelativeToolTip": "Assets\\Hamada\\Scripts\\AimScript.cs",
-              "ViewState": "AgIAAA8AAAAAAAAAAAAAABsAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFcAAABaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-06T02:32:01.321Z"
+              "WhenOpened": "2026-10-06T02:32:01.321Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "MagicBulletManager.cs",
               "DocumentMoniker": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MagicBulletManager.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\MagicBulletManager.cs",
@@ -169,18 +170,17 @@
               "RelativeToolTip": "Assets\\Hamada\\Scripts\\MagicBulletManager.cs",
               "ViewState": "AgIAAAgAAAAAAAAAAAD4vxMAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-07T04:41:30.011Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-07T04:41:30.011Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "PlayerController.cs",
               "DocumentMoniker": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\PlayerController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\PlayerController.cs",
               "ToolTip": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\PlayerController.cs",
               "RelativeToolTip": "Assets\\Hamada\\Scripts\\PlayerController.cs",
-              "ViewState": "AgIAABIAAAAAAAAAAAAAACoAAAAiAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-10-08T07:17:06.552Z",
               "EditorCaption": ""
@@ -211,7 +211,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "HitSenderController.cs",
               "DocumentMoniker": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\HitSenderController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\HitSenderController.cs",
@@ -223,7 +223,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "MagicBulletController.cs",
               "DocumentMoniker": "D:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MagicBulletController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\MagicBulletController.cs",
