@@ -37,18 +37,17 @@ public class PageNavigationInput
 
         if (Mathf.Abs(delta.x) < SWIPE_THRESHOLD)
         {
+            Debug.Log("Swipe Failed : Distance");
             return false;
         }
 
-        // c•ûŒü‚Ì“®‚«‚ª‰¡•ûŒü‚æ‚è‘å‚«‚¢ê‡‚Í
-        // ƒy[ƒW‚ß‚­‚è‚Æ‚µ‚Äˆµ‚í‚È‚¢
         if (Mathf.Abs(delta.y) > Mathf.Abs(delta.x))
         {
+            Debug.Log("Swipe Failed : Direction");
             return false;
         }
 
         direction = delta.x < 0f ? PAGE_NAVIGATION_DIRECTION.NEXT : PAGE_NAVIGATION_DIRECTION.PREVIOUS;
-
         return true;
     }
 

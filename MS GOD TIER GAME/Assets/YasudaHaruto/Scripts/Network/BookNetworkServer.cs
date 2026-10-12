@@ -12,6 +12,8 @@ using UnityEngine;
 
 public class BookNetworkServer : MonoBehaviour
 {
+    [SerializeField] private MagicManager m_magicManager;
+
     private const ushort Port = 7777;
 
     private NetworkDriver m_driver;
@@ -21,9 +23,9 @@ public class BookNetworkServer : MonoBehaviour
 
     private readonly Dictionary<NetworkConnection, PLAYER_SLOT> m_playerSlots = new();
 
-    [SerializeField] private MagicManager m_magicManager;
-
     private Vector2 m_cursorPosition;
+
+    public event System.Action<PLAYER_SLOT, byte, MAGIC_CAST_DIRECTION> CastMagicReceived;
 
     private void Start()
     {
@@ -69,16 +71,6 @@ public class BookNetworkServer : MonoBehaviour
         RemoveDisconnectedClients();
         AcceptClients();
         ProcessEvents();
-
-        //if (Input.GetKeyDown(KeyCode.Alpha1))
-        //{
-        //    SendAddPage(PLAYER_SLOT.PLAYER1, 1);
-        //}
-
-        //if (Input.GetKeyDown(KeyCode.Alpha0))
-        //{
-        //    SendAddPage(PLAYER_SLOT.PLAYER1, 10);
-        //}
     }
 
     private void RemoveDisconnectedClients()
@@ -238,34 +230,46 @@ public class BookNetworkServer : MonoBehaviour
         SendTestPong(connection, value + 1);
     }
 
+
+    // 受信したCastMagicのデータを処理する
     private void ReceiveCastMagic(NetworkConnection connection, DataStreamReader reader)
     {
+        // CastMagicのデータはSkillId(1byte) + CastDirection(1byte) = 2byte
         int remainingBytes = reader.Length - reader.GetBytesRead();
 
-        if (remainingBytes < 1)
-        {
-            Debug.LogWarning("CastSkillのデータが不足しています");
+        if (remainingBytes != 2)
+        {// 2byte以外は不正データとして無視する
+            Debug.LogWarning($"CastMagicのデータ長が不正です : {remainingBytes}");
             return;
         }
 
         if (!m_playerSlots.TryGetValue(connection, out PLAYER_SLOT playerSlot))
-        {
-            Debug.LogWarning("未登録ControllerからCastSkillを受信しました");
+        {// 未登録ControllerからのCastMagicは無視する
+            Debug.LogWarning("未登録ControllerからCastMagicを受信しました");
             return;
         }
 
+        // SkillIdとCastDirectionを読み取る
         byte skillId = reader.ReadByte();
+        MAGIC_CAST_DIRECTION direction = (MAGIC_CAST_DIRECTION)reader.ReadByte();
 
         if (skillId == 0)
-        {
-            Debug.LogWarning($"{playerSlot}から無効なSkillIdを受信しました");
+        {// SkillId 0は無効な値として無視する
+            Debug.LogWarning("無効なSkillIdを受信しました");
             return;
         }
 
-        Debug.Log($"CastSkill受信 : {playerSlot} / SkillId={skillId}");
+        if (direction != MAGIC_CAST_DIRECTION.NONE && direction != MAGIC_CAST_DIRECTION.LEFT && direction != MAGIC_CAST_DIRECTION.CENTER && direction != MAGIC_CAST_DIRECTION.RIGHT)
+        {// CastDirectionが不正な値の場合は無視する
+            Debug.LogWarning($"不正なCastDirection : {direction}");
+            return;
+        }
 
-        m_magicManager.RequestCast(skillId);
+        // CastMagicの受信を通知する
+        Debug.Log($"CastMagic受信 : {playerSlot} / SkillId={skillId} / Direction={direction}");
+        CastMagicReceived?.Invoke(playerSlot, skillId, direction);
     }
+
 
     private void ReceiveVector2(NetworkConnection connection, DataStreamReader reader)
     {

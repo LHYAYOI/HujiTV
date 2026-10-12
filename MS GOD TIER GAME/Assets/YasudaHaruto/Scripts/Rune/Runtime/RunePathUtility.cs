@@ -176,4 +176,84 @@ public static class RunePathUtility
 
         return result;
     }
+
+
+    public static float CalculatePathLength(IReadOnlyList<Vector2> points)
+    {
+        if (points == null || points.Count < 2) return 0f;
+
+        float length = 0f;
+        for (int i = 1; i < points.Count; i++)
+            length += Vector2.Distance(points[i - 1], points[i]);
+
+        return length;
+    }
+
+    // 指定した位置をパス上に射影し、パス上の距離とパスからの距離を返す
+    public static bool TryProjectOnPath(IReadOnlyList<Vector2> points, Vector2 position, float currentDistance, float backwardAllowance, float forwardAllowance, out float projectedDistance, out float distanceFromPath)
+    {
+        // 初期化
+        projectedDistance = 0f;
+        distanceFromPath = float.PositiveInfinity;
+
+        if (points == null || points.Count < 2)
+        {// パスが無効な場合は失敗
+            return false;
+        }
+
+        // 許容範囲を計算
+        float minDistance = Mathf.Max(0f, currentDistance - backwardAllowance);
+        float maxDistance = currentDistance + forwardAllowance;
+        float accumulated = 0f;
+        bool found = false;
+
+        // パスの各線分に対して処理
+        for (int i = 1; i < points.Count; i++)
+        {
+            // 線分の始点と終点を取得
+            Vector2 start = points[i - 1];
+            Vector2 end = points[i];
+
+            // 線分のベクトルと長さを計算
+            Vector2 segment = end - start;
+            float length = segment.magnitude;
+
+            if (length <= Mathf.Epsilon)
+            {// 線分の長さがほぼゼロの場合はスキップ
+                continue;
+            }
+
+            // 許容範囲内の線分のパラメータ範囲を計算
+            float rangeStart = Mathf.Max(0f, (minDistance - accumulated) / length);
+            float rangeEnd = Mathf.Min(1f, (maxDistance - accumulated) / length);
+
+            if (rangeStart <= rangeEnd)
+            {// 許容範囲内の線分が存在する場合、射影を計算
+
+                // 点から線分への射影を計算
+                float t = Vector2.Dot(position - start, segment) / (length * length);
+                t = Mathf.Clamp(t, rangeStart, rangeEnd);
+
+                // 射影点を計算
+                Vector2 closest = start + segment * t;
+                float distance = Vector2.Distance(position, closest);
+                float pathDistance = accumulated + length * t;
+
+                if (!found || distance < distanceFromPath - 0.000001f || (Mathf.Abs(distance - distanceFromPath) <= 0.000001f &&
+                     Mathf.Abs(pathDistance - currentDistance) < Mathf.Abs(projectedDistance - currentDistance)))
+                {// より近い射影点が見つかった場合、または距離が同じで現在の距離に近い場合、更新
+                    distanceFromPath = distance;
+                    projectedDistance = pathDistance;
+                    found = true;
+                }
+            }
+
+            // 線分の長さを累積距離に加算
+            accumulated += length;
+        }
+
+        // 射影点が見つかったかどうかを返す
+        return found;
+    }
+
 }

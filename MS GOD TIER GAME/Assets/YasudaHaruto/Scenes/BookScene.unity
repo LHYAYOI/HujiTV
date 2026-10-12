@@ -119,6 +119,85 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &116282266
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 116282267}
+  - component: {fileID: 116282270}
+  - component: {fileID: 116282269}
+  - component: {fileID: 116282268}
+  m_Layer: 8
+  m_Name: RuneArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &116282267
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 116282266}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.75, y: 0.75, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2141207595}
+  - {fileID: 1867493237}
+  m_Father: {fileID: 5182695208887015643}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -26}
+  m_SizeDelta: {x: 280, y: 280}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &116282268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 116282266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 208526cc29b14a74bb1f7049b9b8afaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RunePageView
+  m_referenceGraphic: {fileID: 2141207596}
+  m_playerGraphic: {fileID: 1867493238}
+--- !u!114 &116282269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 116282266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff3d5c5eccd29d74090ef45843f34967, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RuneLineGraphic
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_lineWidth: 20
+--- !u!222 &116282270
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 116282266}
+  m_CullTransparentMesh: 1
 --- !u!1 &205009463
 GameObject:
   m_ObjectHideFlags: 0
@@ -252,6 +331,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 205009463}
   m_CullTransparentMesh: 1
+--- !u!1 &244343641
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 244343642}
+  - component: {fileID: 244343643}
+  m_Layer: 0
+  m_Name: BookRuneCoordinateMapper
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &244343642
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 244343641}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1180019022}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &244343643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 244343641}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53bcd8f356ad7fa48b3027191ce99607, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BookRuneCoordinateMapper
+  m_displayArea: {fileID: 126101227519564684}
+  m_topLeft: {x: 0.16, y: 0.72}
+  m_topRight: {x: 0.48, y: 0.72}
+  m_bottomLeft: {x: 0.16, y: 0.14}
+  m_bottomRight: {x: 0.48, y: 0.14}
 --- !u!1 &273783129
 GameObject:
   m_ObjectHideFlags: 0
@@ -267,7 +395,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &273783130
 Transform:
   m_ObjectHideFlags: 0
@@ -282,8 +410,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1954078212}
-  - {fileID: 312348342}
-  - {fileID: 1188077436}
   - {fileID: 374207905}
   - {fileID: 1222890713}
   m_Father: {fileID: 0}
@@ -313,12 +439,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 312348341}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 273783130}
+  m_Father: {fileID: 1180019022}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &312348343
 MonoBehaviour:
@@ -332,7 +458,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dfd9fc056f9b4541849180ac31ad2a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MouseBookPointerInput
-  m_inputArea: {fileID: 1704740268}
+  m_inputArea: {fileID: 126101227519564684}
 --- !u!1 &347050350
 GameObject:
   m_ObjectHideFlags: 0
@@ -472,6 +598,41 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 347050350}
   m_CullTransparentMesh: 1
+--- !u!1 &373800848
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 373800849}
+  m_Layer: 8
+  m_Name: NextPageSwipeArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &373800849
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 373800848}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9188436463895792562}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 310, y: 360}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &374207904
 GameObject:
   m_ObjectHideFlags: 0
@@ -518,6 +679,185 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DebugRuneTraceView
   m_referenceGraphic: {fileID: 2141207596}
   m_playerGraphic: {fileID: 1867493238}
+--- !u!1 &407664051
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 407664052}
+  - component: {fileID: 407664053}
+  m_Layer: 0
+  m_Name: RuneInputArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &407664052
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 407664051}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1180019022}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &407664053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 407664051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 322c29547773d6949abdc9122cac4351, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RuneInputArea
+  m_runeArea: {fileID: 116282267}
+  m_coordinateMapper: {fileID: 244343643}
+--- !u!1 &437924556
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 437924557}
+  - component: {fileID: 437924558}
+  m_Layer: 0
+  m_Name: BookRaycastCoordinateMapper
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &437924557
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 437924556}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1180019022}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &437924558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 437924556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07051923370eea24292244fed01e4cf9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BookRaycastCoordinateMapper
+  m_displayImage: {fileID: 126101227519564684}
+  m_modelCamera: {fileID: 7759019799547609722}
+  m_captureCamera: {fileID: 5420694185018371106}
+  m_bookCollider: {fileID: 7399786344966574138}
+  m_bookRenderer: {fileID: 7399786344966574137}
+--- !u!1 &440292072
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 440292073}
+  m_Layer: 8
+  m_Name: PrevPageSwipeArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &440292073
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 440292072}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5182695208887015643}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 310, y: 360}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &497769027
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 497769028}
+  - component: {fileID: 497769029}
+  m_Layer: 0
+  m_Name: BookPageAreaDetector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &497769028
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 497769027}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1180019022}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &497769029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 497769027}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dc9cdac7a7c2c94495077a9493d1b01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BookPageAreaDetector
+  m_mapper: {fileID: 437924558}
+  m_runeArea: {fileID: 116282267}
+  m_previousPageArea: {fileID: 440292073}
+  m_nextPageArea: {fileID: 373800849}
+  m_bookmarkArea: {fileID: 1366918746}
 --- !u!1 &624196472
 GameObject:
   m_ObjectHideFlags: 0
@@ -940,12 +1280,12 @@ MonoBehaviour:
   m_initialPages:
   - {fileID: 11400000, guid: 82b51d2f4d395d043b7bf8db4b684724, type: 2}
   - {fileID: 11400000, guid: e169de544106c1449a8caaa4eeb864e8, type: 2}
-  - {fileID: 11400000, guid: 82b51d2f4d395d043b7bf8db4b684724, type: 2}
+  - {fileID: 11400000, guid: ebab0ea0eb859a74bb20d81f8629a675, type: 2}
   m_pageDatabase: {fileID: 11400000, guid: 262c5c96532bc7b4aaf8fbc2bbe1eda6, type: 2}
-  m_runeTraceView: {fileID: 374207906}
+  m_runeTraceView: {fileID: 116282268}
   m_inputRouter: {fileID: 1188077437}
   m_mouseInput: {fileID: 312348343}
-  m_runeInputArea: {fileID: 1704740272}
+  m_areaDetector: {fileID: 497769029}
   m_displayController: {fileID: 759180754}
   m_maxPageCount: 10
 --- !u!4 &769174318
@@ -963,6 +1303,41 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &774294232
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 774294233}
+  m_Layer: 8
+  m_Name: BookmarkArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &774294233
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 774294232}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9188436463895792562}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 50, y: -50}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &833945196
 GameObject:
   m_ObjectHideFlags: 0
@@ -987,13 +1362,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 833945196}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 759180753}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 7167751499136779153}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &926470035
 GameObject:
@@ -1156,6 +1531,93 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1043542059}
   m_CullTransparentMesh: 1
+--- !u!1 &1180019021
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1180019022}
+  m_Layer: 0
+  m_Name: BookInput
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1180019022
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1180019021}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 312348342}
+  - {fileID: 1188077436}
+  - {fileID: 407664052}
+  - {fileID: 244343642}
+  - {fileID: 1455741419}
+  - {fileID: 437924557}
+  - {fileID: 497769028}
+  - {fileID: 1180094015}
+  m_Father: {fileID: 7167751499136779153}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1180094014
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1180094015}
+  - component: {fileID: 1180094016}
+  m_Layer: 0
+  m_Name: CastSwipeDetector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1180094015
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1180094014}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1180019022}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1180094016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1180094014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f865b76069bab9245bd567587742be74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CastSwipeDetector
+  m_displayArea: {fileID: 126101227519564684}
+  m_minSwipeDistance: 0.15
+  m_centerAngle: 20
+  m_maxAngle: 65
 --- !u!1 &1188077435
 GameObject:
   m_ObjectHideFlags: 0
@@ -1181,12 +1643,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1188077435}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 273783130}
+  m_Father: {fileID: 1180019022}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1188077437
 MonoBehaviour:
@@ -1200,6 +1662,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 947e50e22982eb2458c5d2b34ff6c724, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BookInputRouter
+  m_castSwipeDetector: {fileID: 1180094016}
 --- !u!1 &1222890712
 GameObject:
   m_ObjectHideFlags: 0
@@ -1302,6 +1765,89 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 1
   m_TargetDisplay: 0
+--- !u!1 &1366918745
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1366918746}
+  m_Layer: 8
+  m_Name: BookmarkArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1366918746
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1366918745}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5182695208887015643}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -50, y: -50}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1455741418
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1455741419}
+  - component: {fileID: 1455741420}
+  m_Layer: 0
+  m_Name: BookRaycastTest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1455741419
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1455741418}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1180019022}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1455741420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1455741418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c64c7ce7c2aedd41bd52df19ad97a1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BookRaycastTest
+  m_displayImage: {fileID: 126101227519564684}
+  m_modelCamera: {fileID: 7759019799547609722}
+  m_bookCollider: {fileID: 7399786344966574138}
+  m_bookRenderer: {fileID: 7399786344966574137}
 --- !u!1 &1704740267
 GameObject:
   m_ObjectHideFlags: 0
@@ -1334,14 +1880,12 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 692917941}
-  - {fileID: 2141207595}
-  - {fileID: 1867493237}
   m_Father: {fileID: 1043542060}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -840.66296, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1704740270
 CanvasRenderer:
@@ -1378,6 +1922,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RuneInputArea
   m_runeArea: {fileID: 1704740268}
+  m_coordinateMapper: {fileID: 0}
 --- !u!1 &1755265168
 GameObject:
   m_ObjectHideFlags: 0
@@ -1469,7 +2014,7 @@ GameObject:
   - component: {fileID: 1867493240}
   - component: {fileID: 1867493239}
   - component: {fileID: 1867493238}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: PlayerRuneGraphic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1483,12 +2028,12 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1867493236}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1704740268}
+  m_Father: {fileID: 116282267}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1853,6 +2398,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1998028844}
   m_CullTransparentMesh: 1
+--- !u!1 &2130867361
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2130867363}
+  - component: {fileID: 2130867362}
+  m_Layer: 0
+  m_Name: RuneRealtimeEvaluationTest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &2130867362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2130867361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c681d1d986b3b664baadb82fbf1b6ba4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RuneRealtimeEvaluationTest
+  m_runeData: {fileID: 11400000, guid: 195a7a19dfd1a9d478b6bdb71bd92270, type: 2}
+  m_strokeIndex: 0
+  m_startTolerance: 0.04
+  m_endTolerance: 0.025
+  m_sampleInterval: 0.005
+--- !u!4 &2130867363
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2130867361}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.49313, y: -0, z: -8.61593}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2141207594
 GameObject:
   m_ObjectHideFlags: 0
@@ -1865,7 +2459,7 @@ GameObject:
   - component: {fileID: 2141207598}
   - component: {fileID: 2141207597}
   - component: {fileID: 2141207596}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: ReferenceRuneGraphic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1879,12 +2473,12 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2141207594}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1704740268}
+  m_Father: {fileID: 116282267}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1907,7 +2501,7 @@ MonoBehaviour:
   m_Color: {r: 0.21698111, g: 0.14021893, b: 0.20101874, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_lineWidth: 10
+  m_lineWidth: 20
 --- !u!114 &2141207597
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2170,7 +2764,7 @@ Transform:
   m_GameObject: {fileID: 2862481529145747211}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 0.02275862, z: 0}
+  m_LocalPosition: {x: 0, y: 0.02275862, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2263,26 +2857,6 @@ MonoBehaviour:
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
   m_PresetInfoIsWorld: 0
---- !u!114 &2082184242121194594
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3084955226253973629}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b38c1bb8173e6e409bcc943606722f8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BookController
-  m_bookData: {fileID: 11400000, guid: 79c8a48d506077c4687389e2a2028b21, type: 2}
-  m_leftPageView: {fileID: 8588903048087274711}
-  m_rightPageView: {fileID: 1359798510443941122}
-  m_captureCamera: {fileID: 5420694185018371106}
-  m_textureA: {fileID: 8400000, guid: 6f15d851b3ea01548b5ec255abb68c5e, type: 2}
-  m_textureB: {fileID: 8400000, guid: 020ec2fa7d10c734586cd795b48df44a, type: 2}
-  m_displayImage: {fileID: 1901305314935653725}
-  m_modelView: {fileID: 0}
 --- !u!224 &2233234456475401688
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2438,6 +3012,7 @@ GameObject:
   - component: {fileID: 1343803443092487538}
   - component: {fileID: 2954054452562032081}
   - component: {fileID: 7399786344966574137}
+  - component: {fileID: 7399786344966574138}
   m_Layer: 8
   m_Name: book
   m_TagString: Untagged
@@ -2462,7 +3037,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2360086410344781445}
-  - component: {fileID: 2082184242121194594}
   m_Layer: 0
   m_Name: BookManager
   m_TagString: Untagged
@@ -2544,7 +3118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c16993a0e23bf94b8da43572125352c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BookSwipeInput
-  m_bookController: {fileID: 2082184242121194594}
+  m_bookController: {fileID: 0}
   m_swipeThresholdRatio: 0.15
 --- !u!1 &4601909458813119386
 GameObject:
@@ -2608,7 +3182,10 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 116282267}
+  - {fileID: 440292073}
+  - {fileID: 1366918746}
   m_Father: {fileID: 2422988962335946702}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -2959,6 +3536,9 @@ Transform:
   - {fileID: 5901553531496915777}
   - {fileID: 2360086410344781445}
   - {fileID: 5038339361951149117}
+  - {fileID: 7372112886406453549}
+  - {fileID: 833945197}
+  - {fileID: 1180019022}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!223 &7228869787352111583
@@ -2992,14 +3572,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6218632589650812849}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 414995855945063683}
   - {fileID: 320978633341855961}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 7167751499136779153}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &7399786344966574137
 MeshRenderer:
@@ -3050,6 +3630,28 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &7399786344966574138
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2862481529145747211}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 381947130776709163, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
 --- !u!20 &7759019799547609722
 Camera:
   m_ObjectHideFlags: 0
@@ -3344,7 +3946,9 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 373800849}
+  - {fileID: 774294233}
   m_Father: {fileID: 2422988962335946702}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -3360,8 +3964,7 @@ SceneRoots:
   - {fileID: 673721464}
   - {fileID: 1755265171}
   - {fileID: 769174318}
-  - {fileID: 926470040}
   - {fileID: 7167751499136779153}
-  - {fileID: 7372112886406453549}
-  - {fileID: 833945197}
   - {fileID: 273783130}
+  - {fileID: 2130867363}
+  - {fileID: 926470040}

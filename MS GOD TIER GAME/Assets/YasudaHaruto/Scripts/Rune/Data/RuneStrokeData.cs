@@ -30,6 +30,12 @@ public class RuneStrokeData
         m_points.Add(point);
     }
 
+    // ルーンのストロークデータを逆順にするメソッド
+    public void Reverse()
+    {
+        m_points.Reverse();
+    }
+
     // ルーンのストロークデータをクリアするメソッド
     public void Clear()
     {

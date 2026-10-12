@@ -19,6 +19,10 @@ public class RuneTraceRule
     [SerializeField, Range(0f, 1f)] private float m_requiredCoverage = 0.95f;
     [SerializeField, Range(0f, 1f)] private float m_requiredAccuracy = 0.90f;
 
+    [SerializeField, Min(0f)] private float m_startTolerance = 0.04f;
+    [SerializeField, Min(0f)] private float m_endTolerance = 0.025f;
+
+
     public int RequiredStrokeCount => m_requiredStrokeCount;
 
     public float DistanceTolerance => m_distanceTolerance;
@@ -26,4 +30,13 @@ public class RuneTraceRule
     public float RequiredCoverage => m_requiredCoverage;
 
     public float RequiredAccuracy => m_requiredAccuracy;
+    public float StartTolerance => m_startTolerance;
+    public float EndTolerance => m_endTolerance;
+
+    public void SetTolerances(float distance, float start, float end)
+    {
+        m_distanceTolerance = Mathf.Max(0f, distance);
+        m_startTolerance = Mathf.Max(0f, start);
+        m_endTolerance = Mathf.Max(0f, end);
+    }
 }
