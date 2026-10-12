@@ -10,8 +10,7 @@ public class BookTestBootstrap : MonoBehaviour
     private PageDatabase m_pageDatabase;
 
     [Header("Rune")]
-    [SerializeField]
-    private DebugRuneTraceView m_runeTraceView;
+    [SerializeField] private RunePageView m_runeTraceView;
 
     [Header("Input")]
     [SerializeField]
@@ -20,8 +19,7 @@ public class BookTestBootstrap : MonoBehaviour
     [SerializeField]
     private MouseBookPointerInput m_mouseInput;
 
-    [SerializeField]
-    private RuneInputArea m_runeInputArea;
+    [SerializeField] private BookPageAreaDetector m_areaDetector;
 
     [Header("Book Display")]
     [SerializeField] private BookDisplayController m_displayController;
@@ -29,6 +27,8 @@ public class BookTestBootstrap : MonoBehaviour
     [Header("Book")]
     [SerializeField]
     private int m_maxPageCount = 10;
+
+    [SerializeField, Min(0f)] private float m_runeCooldownSeconds = 1.0f;
 
     private BookController m_bookController;
     private BookPageService m_pageService;
@@ -41,6 +41,7 @@ public class BookTestBootstrap : MonoBehaviour
 
         // Rune
         RuneTraceController runeTraceController = new RuneTraceController(m_runeTraceView);
+        runeTraceController.SetCooldown(m_runeCooldownSeconds);
 
         // Network
         BookNetworkService networkService = null;
@@ -87,7 +88,7 @@ public class BookTestBootstrap : MonoBehaviour
         m_bookController = new BookController(bookModel, inputController, m_displayController);
 
         // Input Router
-        m_inputRouter.Initialize(m_mouseInput, inputController, runeTraceController, m_runeInputArea);
+        m_inputRouter.Initialize(m_mouseInput, inputController, runeTraceController, m_areaDetector);
         m_inputRouter.PageNavigationRequested += m_bookController.RequestNavigation;
 
         // 最初の見開きを表示してからInteraction開始

@@ -13,18 +13,13 @@ public class BookNetworkService
         m_client = client;
     }
 
-    public bool CastSkill(byte skillId)
+    public bool CastSkill(byte skillId, MAGIC_CAST_DIRECTION direction)
     {
-        if (m_client == null)
+        if (m_client == null || skillId == 0)
         {
             return false;
         }
 
-        if (skillId == 0)
-        {
-            return false;
-        }
-
-        return m_client.SendCastSkill(skillId);
+        return m_client.SendCastSkill(skillId, direction);
     }
 }

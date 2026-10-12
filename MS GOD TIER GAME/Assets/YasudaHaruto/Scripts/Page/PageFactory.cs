@@ -26,9 +26,7 @@ public class PageFactory
         }
 
         IPageCommand command = CreateCommand(data.Action);
-
-        IPageInteraction interaction = CreateInteraction(data.Interaction, command);
-
+        IPageInteraction interaction = CreateInteraction(data.Interaction, data.Action, command);
         return new PageInstance(data, interaction);
     }
 
@@ -56,7 +54,7 @@ public class PageFactory
         }
     }
 
-    private IPageInteraction CreateInteraction(PageInteractionData data, IPageCommand command)
+    private IPageInteraction CreateInteraction(PageInteractionData data, PageActionData action, IPageCommand command)
     {
         if (data == null)
         {
@@ -66,14 +64,12 @@ public class PageFactory
         switch (data.Type)
         {
             case PAGE_INTERACTION_TYPE.RUNE_TRACE:
-
-                if (data.RuneData == null)
+                if (data.RuneData == null || action == null || action.Type != PAGE_ACTION_TYPE.CAST_MAGIC || action.MagicData == null || command is not ICastMagicCommand castCommand)
                 {
                     return null;
                 }
 
-                return new RuneTraceInteraction(data.RuneData, m_runeTraceController, m_inputController,
-                    command);
+                return new RuneTraceInteraction(data.RuneData, m_runeTraceController, m_inputController, castCommand, action.MagicData.AimType);
 
             case PAGE_INTERACTION_TYPE.NONE:
             default:

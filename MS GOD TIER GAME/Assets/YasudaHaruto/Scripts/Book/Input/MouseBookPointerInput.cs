@@ -2,81 +2,120 @@
 // MouseBookPointerInput.cs
 // 制作日：2026/09/20
 // 制作者：安田晴人
-// 概要： マウス入力を本のページめくりのポインタ入力として扱うクラス
+// 概要： マウス入力を本のポインター入力として扱うスクリプト
 //-----------------------------------------------
 using UnityEngine;
+
 
 public class MouseBookPointerInput : MonoBehaviour, IBookPointerInput
 {
     [SerializeField] private RectTransform m_inputArea;
 
+    private bool m_isTracking;
+
     public bool TryGetPointerDown(out BookPointerData data)
     {
-        if (Input.GetMouseButtonDown(0) && TryGetNormalizedPosition(out Vector2 position))
-        {
-            data = new BookPointerData(position, Input.mousePosition);
+        // 初期化
+        data = default;
 
-            return true;
+        if (!Input.GetMouseButtonDown(0) || !IsInsideInputArea(Input.mousePosition))
+        {// マウスの左ボタンが押されていない、または入力エリア外の場合は処理を終了
+            return false;
         }
 
-        data = default;
-        return false;
+        m_isTracking = true;
+        data = CreatePointerData();
+        return true;
     }
 
     public bool TryGetPointer(out BookPointerData data)
     {
-        if (Input.GetMouseButton(0) && TryGetNormalizedPosition(out Vector2 position))
-        {
-            data = new BookPointerData(position, Input.mousePosition);
+        // 初期化
+        data = default;
 
-            return true;
+        if (!m_isTracking || !Input.GetMouseButton(0))
+        {// トラッキング中でない、またはマウスの左ボタンが押されていない場合は処理を終了
+            return false;
         }
 
-        data = default;
-        return false;
+        data = CreatePointerData();
+        return true;
     }
 
     public bool TryGetPointerUp(out BookPointerData data)
     {
-        if (Input.GetMouseButtonUp(0) && TryGetNormalizedPosition(out Vector2 position))
-        {
-            data = new BookPointerData(position, Input.mousePosition);
+        // 初期化
+        data = default;
 
-            return true;
+        if (!m_isTracking || !Input.GetMouseButtonUp(0))
+        {// トラッキング中でない、またはマウスの左ボタンが離されていない場合は処理を終了
+            return false;
         }
 
-        data = default;
-        return false;
+        data = CreatePointerData();
+        m_isTracking = false;
+        return true;
     }
 
-    private bool TryGetNormalizedPosition(out Vector2 normalizedPosition)
+    // マウスのスクリーン座標を正規化された座標に変換し、BookPointerDataを作成する
+    private BookPointerData CreatePointerData()
     {
-        normalizedPosition = default;
+        // マウスのスクリーン座標を取得
+        Vector2 screenPosition = Input.mousePosition;
 
+        // スクリーン座標を正規化された座標に変換
+        Vector2 normalizedPosition = ScreenToNormalized(screenPosition);
+
+        // BookPointerDataを作成して返す
+        return new BookPointerData(normalizedPosition, screenPosition);
+    }
+
+    // 入力エリア内にマウスがあるかどうかを判定する
+    private bool IsInsideInputArea(Vector2 screenPosition)
+    {
         if (m_inputArea == null)
-        {
+        {// 入力エリアが設定されていない場合は無効
             return false;
         }
 
-        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(m_inputArea, Input.mousePosition, null, out Vector2 localPosition))
-        {
-            return false;
+        // 入力エリアの親Canvasを取得し、必要に応じてカメラを取得する
+        Canvas canvas = m_inputArea.GetComponentInParent<Canvas>();
+        Camera camera = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
+
+        // 入力エリア内にマウスがあるかどうかを判定して返す
+        return RectTransformUtility.RectangleContainsScreenPoint(m_inputArea, screenPosition, camera);
+    }
+
+    // スクリーン座標を正規化された座標に変換する
+    private Vector2 ScreenToNormalized(Vector2 screenPosition)
+    {
+        if (m_inputArea == null)
+        {// 入力エリアが設定されていない場合は無効
+            return default;
+        }
+
+        // 入力エリアの親Canvasを取得し、必要に応じてカメラを取得する
+        Canvas canvas = m_inputArea.GetComponentInParent<Canvas>();
+        Camera camera = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
+
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(m_inputArea, screenPosition, camera, out Vector2 localPosition))
+        {// スクリーン座標をローカル座標に変換できない場合は無効
+            return default;
         }
 
         Rect rect = m_inputArea.rect;
 
-        float x = Mathf.InverseLerp(rect.xMin, rect.xMax, localPosition.x);
-
-        float y = Mathf.InverseLerp(rect.yMin, rect.yMax, localPosition.y);
-
-        // TraceArea外なら入力として扱わない
-        if (x < 0f || x > 1f || y < 0f || y > 1f)
-        {
-            return false;
+        if (rect.width <= 0f || rect.height <= 0f)
+        {// 入力エリアのサイズが無効な場合は無効
+            return default;
         }
 
-        normalizedPosition = new Vector2(x, y);
+        // ローカル座標を正規化された座標に変換して返す
+        return new Vector2((localPosition.x - rect.xMin) / rect.width, (localPosition.y - rect.yMin) / rect.height);
+    }
 
-        return true;
+    private void OnDisable()
+    {
+        m_isTracking = false;
     }
 }

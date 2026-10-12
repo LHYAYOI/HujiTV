@@ -33,6 +33,6 @@ public class BookNetworkTestUI : MonoBehaviour
 
         BookNetworkService networkService = new BookNetworkService(client);
 
-        networkService.CastSkill(1);
+        networkService.CastSkill(1, MAGIC_CAST_DIRECTION.NONE);
     }
 }

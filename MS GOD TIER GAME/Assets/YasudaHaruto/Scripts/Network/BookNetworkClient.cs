@@ -270,36 +270,40 @@ public class BookNetworkClient : MonoBehaviour
         Debug.Log($"TestPing送信 : {value}");
     }
 
-    public bool SendCastSkill(byte skillId)
+    // CastSkillメッセージを送信する
+    public bool SendCastSkill(byte skillId, MAGIC_CAST_DIRECTION direction)
     {
         if (!CanSend())
-        {
+        {// 接続状態がCONNECTEDでない場合は送信できない
             Debug.LogWarning("未接続のためSkillを送信できません");
             return false;
         }
 
         if (skillId == 0)
-        {
+        {// SkillIdが0の場合は無効な値として送信しない
             Debug.LogWarning("SkillId 0は無効です");
             return false;
         }
 
+        // CastSkillメッセージの送信を開始
         int beginResult = m_driver.BeginSend(m_reliablePipeline, m_connection, out DataStreamWriter writer);
 
         if (beginResult != 0)
-        {
+        {// 送信開始に失敗した場合はエラーログを出力してfalseを返す
             Debug.LogError($"CastSkill BeginSend失敗 : {beginResult}");
             return false;
         }
 
+        // CastSkillメッセージの送信
         writer.WriteByte((byte)BOOK_MESSAGE_TYPE.CAST_MAGIC);
-
         writer.WriteByte(skillId);
+        writer.WriteByte((byte)direction);
 
+        // 送信を終了
         int endResult = m_driver.EndSend(writer);
 
         if (endResult < 0)
-        {
+        {// 送信終了に失敗した場合はエラーログを出力してfalseを返す
             Debug.LogError($"CastSkill EndSend失敗 : {endResult}");
             return false;
         }
@@ -372,8 +376,7 @@ public class BookNetworkClient : MonoBehaviour
         }
     }
 
-    private void ReceiveTestPong(
-        DataStreamReader reader)
+    private void ReceiveTestPong(DataStreamReader reader)
     {
         int remainingBytes =
             reader.Length - reader.GetBytesRead();
