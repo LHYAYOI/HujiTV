@@ -128,7 +128,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2913496}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Bullet Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6138,11 +6138,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6441386359141413193, guid: c3380b62e0d92924f8bbae1e4e95a7b9, type: 3}
       propertyPath: m_gimmickPoint
-      value: 58.2
+      value: 53.4
       objectReference: {fileID: 0}
     - target: {fileID: 6646241836523440905, guid: c3380b62e0d92924f8bbae1e4e95a7b9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 29.928394
+      value: 25.130634
       objectReference: {fileID: 0}
     - target: {fileID: 6646241836523440905, guid: c3380b62e0d92924f8bbae1e4e95a7b9, type: 3}
       propertyPath: m_LocalPosition.y
@@ -6150,7 +6150,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6646241836523440905, guid: c3380b62e0d92924f8bbae1e4e95a7b9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -6.303646
+      value: -6.341263
       objectReference: {fileID: 0}
     - target: {fileID: 7797711129439574761, guid: c3380b62e0d92924f8bbae1e4e95a7b9, type: 3}
       propertyPath: m_gimmickPoint
@@ -6243,7 +6243,7 @@ GameObject:
   - component: {fileID: 1274862927}
   - component: {fileID: 1274862926}
   - component: {fileID: 1274862929}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -7064,6 +7064,10 @@ PrefabInstance:
     - target: {fileID: 4372441462204169088, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_ConstrainProportionsScale
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4751500374968533690, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6297184031384544411, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_Splines.Array.size
@@ -8849,6 +8853,10 @@ PrefabInstance:
       propertyPath: m_startSplineController
       value: 
       objectReference: {fileID: 1371787356}
+    - target: {fileID: 7616671687159802542, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 7696629017100458149, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_targetSplineController
       value: 
@@ -9206,7 +9214,7 @@ GameObject:
   - component: {fileID: 8456294179493547313}
   - component: {fileID: 8271337596806131899}
   - component: {fileID: 2236847703436060964}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: FPSCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
