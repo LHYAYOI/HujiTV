@@ -176,7 +176,7 @@ public class CartController : MonoBehaviour
     // ------------------------------------------------------------------------
     // Public Event
     // ------------------------------------------------------------------------
-    public void SetSpline(SplineContainer spline , float offsetDistance,bool loopFlag)
+    public void SetSpline(SplineContainer spline , float offsetDistance,bool loopFlag,bool teleport = false)
     {
         // spline1 -------- distance 
         //                |
@@ -191,6 +191,18 @@ public class CartController : MonoBehaviour
         m_spline = spline;
         m_splineAnchor = m_distance - offsetDistance;
         m_loopFlag = loopFlag;
+
+        if(teleport)
+        {
+            // Transform位置更新
+            float value = SplineOffset / m_spline.CalculateLength();
+
+            float3 position, tangent, up;
+            m_spline.Evaluate(0, value, out position, out tangent, out up);
+
+            transform.rotation = Quaternion.LookRotation(tangent, up);
+            transform.position = position;
+        }
 
 
         m_state = CartState.Switch;

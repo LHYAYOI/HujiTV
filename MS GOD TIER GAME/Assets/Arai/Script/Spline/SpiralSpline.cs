@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.Splines;
 
 public class SpiralSpline : MonoBehaviour
@@ -7,18 +7,18 @@ public class SpiralSpline : MonoBehaviour
 
     [SerializeField] private float m_radius;
 
-    // Œv‰ñ‚èƒtƒ‰ƒO
+    // æ™‚è¨ˆå›ã‚Šãƒ•ãƒ©ã‚°
     [SerializeField] private bool m_clockRotFlag;
 
-    // ƒ|ƒCƒ“ƒg‚Ìİ’uî•ñ
-    [Header("—†ùî•ñ")]
+    // ãƒã‚¤ãƒ³ãƒˆã®è¨­ç½®æƒ…å ±
+    [Header("èºæ—‹æƒ…å ±")]
     [SerializeField] private float m_startAngle;
     [SerializeField] private float m_startHeight;
     [SerializeField] private float m_endHeight;
 
-    [Tooltip("’¸“_”")]
+    [Tooltip("é ‚ç‚¹æ•°")]
     [SerializeField] private int m_pointNumber;
-    [Tooltip("ü‰ñ”")]
+    [Tooltip("å‘¨å›æ•°")]
     [SerializeField] private int m_turnNumber;
 
 
@@ -47,39 +47,39 @@ public class SpiralSpline : MonoBehaviour
         }
 
 
-        // Šù‘¶‚ÌSpline‚ğíœ
-        // Spline‚ª‘¶İ‚µ‚È‚¯‚ê‚Î1–{ì‚é
+        // æ—¢å­˜ã®Splineã‚’å‰Šé™¤
+        // SplineãŒå­˜åœ¨ã—ãªã‘ã‚Œã°1æœ¬ä½œã‚‹
         if (m_spline.Splines.Count == 0)
         {
             m_spline.AddSpline(new Spline());
         }
 
-        // Šù‘¶‚ÌSpline‚ğæ“¾
+        // æ—¢å­˜ã®Splineã‚’å–å¾—
         Spline spline = m_spline.Splines[0];
         spline.Clear();
 
-        // ‰ñ“]•ûŒü
-        // ã‚©‚çŒ©‚Ä”½Œv‰ñ‚è = +1
-        // ã‚©‚çŒ©‚ÄŒv‰ñ‚è   = -1
+        // å›è»¢æ–¹å‘
+        // ä¸Šã‹ã‚‰è¦‹ã¦åæ™‚è¨ˆå›ã‚Š = +1
+        // ä¸Šã‹ã‚‰è¦‹ã¦æ™‚è¨ˆå›ã‚Š   = -1
         float direction = m_clockRotFlag ? -1.0f : 1.0f;
 
         for (int i = 0; i < m_pointNumber; i++)
         {
-            // 0 ` 1
+            // 0 ï½ 1
             float t = i / (float)(m_pointNumber - 1);
 
-            // Šp“x
+            // è§’åº¦
             float angleDeg =
                 m_startAngle
                 + 360.0f * m_turnNumber * t * direction;
 
             float angleRad = angleDeg * Mathf.Deg2Rad;
 
-            // XZ•½–Êã‚Å‰~‚ğ•`‚­
+            // XZå¹³é¢ä¸Šã§å††ã‚’æã
             float x = Mathf.Cos(angleRad) * m_radius;
             float z = Mathf.Sin(angleRad) * m_radius;
 
-            // ‚‚³‚ğüŒ`‚É•Ï‰»
+            // é«˜ã•ã‚’ç·šå½¢ã«å¤‰åŒ–
             float y = Mathf.Lerp(
                 m_startHeight,
                 m_endHeight,
@@ -92,10 +92,9 @@ public class SpiralSpline : MonoBehaviour
                 z
             );
 
-            // Spline‚ÌKnot‚ğ’Ç‰Á
+            // Splineã®Knotã‚’è¿½åŠ 
             BezierKnot knot = new BezierKnot(position);
-            spline.Add(knot);
+            spline.Add(knot,TangentMode.AutoSmooth);
         }
-
     }
 }
