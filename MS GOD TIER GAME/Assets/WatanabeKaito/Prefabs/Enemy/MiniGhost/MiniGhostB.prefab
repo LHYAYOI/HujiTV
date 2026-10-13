@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 9170967074312127478}
   m_Layer: 0
   m_Name: MiniGhostB
-  m_TagString: Untagged
+  m_TagString: Target
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -83,6 +83,7 @@ MonoBehaviour:
   m_bulletAngle: 45
   m_bulletDelay: 1
   m_turnDuration: 1
+  m_spawnDuration: 3
 --- !u!136 &9170967074312127478
 CapsuleCollider:
   m_ObjectHideFlags: 0

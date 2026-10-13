@@ -1,4 +1,4 @@
-using NUnit.Framework;
+ï»¿using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,38 +6,38 @@ using UnityEngine.Splines;
 
 public class MiniGhostEnemy : SplineMoveEnemy
 {
-    [Header("’e‚ÌƒvƒŒƒnƒuƒŠƒXƒg")]
+    [Header("å¼¾ã®ãƒ—ãƒ¬ãƒãƒ–ãƒªã‚¹ãƒˆ")]
     [SerializeField] private List<GameObject> m_bulletPrefabs;
 
-    [Header("’e‚Ì”­ËˆÊ’u")]
+    [Header("å¼¾ã®ç™ºå°„ä½ç½®")]
     [SerializeField] private Transform m_firePoint;
 
-    [Header("’e‚Ì”­ËŠÔŠui•bj")]
+    [Header("å¼¾ã®ç™ºå°„é–“éš”ï¼ˆç§’ï¼‰")]
     [SerializeField] private float m_fireInterval = 2.0f;
 
-    [Header("’e‚Ì‘¬“x")]
+    [Header("å¼¾ã®é€Ÿåº¦")]
     [SerializeField] private float m_bulletSpeed = 10.0f;
 
-    [Header("’e‚Ì”­ËŠp“xi“x”j")]
+    [Header("å¼¾ã®ç™ºå°„è§’åº¦ï¼ˆåº¦æ•°ï¼‰")]
     [SerializeField] private float m_bulletAngle = 45.0f;
 
-    [Header("’e‚ª¶¬‚³‚ê‚Ä‚©‚ç”­Ë‚³‚ê‚é‚Ü‚Å‚ÌŠÔi•bj")]
+    [Header("å¼¾ãŒç”Ÿæˆã•ã‚Œã¦ã‹ã‚‰ç™ºå°„ã•ã‚Œã‚‹ã¾ã§ã®æ™‚é–“ï¼ˆç§’ï¼‰")]
     [SerializeField] private float m_bulletDelay = 1.0f;
 
-    [Header("U‚è‚Ş‚­‚Ü‚Å‚É‚©‚©‚éŠÔi•bj")]
+    [Header("æŒ¯ã‚Šã‚€ãã¾ã§ã«ã‹ã‹ã‚‹æ™‚é–“ï¼ˆç§’ï¼‰")]
     [SerializeField] private float m_turnDuration = 1.0f;
 
-    [Header("ƒXƒvƒ‰ƒCƒ“‚Ü‚Å‚ÌˆÚ“®ŠÔ")]
+    [Header("ã‚¹ãƒ—ãƒ©ã‚¤ãƒ³ã¾ã§ã®ç§»å‹•æ™‚é–“")]
     [SerializeField] private float m_spawnDuration = 3.0f;
 
-    private Quaternion m_originalRotation;  // Œ³‚ÌŒü‚«‚ğ•Û‚·‚é•Ï”
-    bool m_isShooting = false; // ËŒ‚’†‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
+    private Quaternion m_originalRotation;  // å…ƒã®å‘ãã‚’ä¿æŒã™ã‚‹å¤‰æ•°
+    bool m_isShooting = false; // å°„æ’ƒä¸­ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
 
-    private float m_fireTimer = 0f; // ’e‚Ì”­Ëƒ^ƒCƒ}[
+    private float m_fireTimer = 0f; // å¼¾ã®ç™ºå°„ã‚¿ã‚¤ãƒãƒ¼
 
-    private bool m_isSpawningFlag = false; // Œ»İoŒ»’†‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
-    private Vector3 m_spawnTargetPos;  // oŒ»–Ú•W’n“_iƒXƒvƒ‰ƒCƒ“‚Ìn“_j
-    private float m_spawnTimer = 0f;   // oŒ»—p‚Ìƒ^ƒCƒ}[
+    private bool m_isSpawningFlag = false; // ç¾åœ¨å‡ºç¾ä¸­ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
+    private Vector3 m_spawnTargetPos;  // å‡ºç¾ç›®æ¨™åœ°ç‚¹ï¼ˆã‚¹ãƒ—ãƒ©ã‚¤ãƒ³ã®å§‹ç‚¹ï¼‰
+    private float m_spawnTimer = 0f;   // å‡ºç¾ç”¨ã®ã‚¿ã‚¤ãƒãƒ¼
 
     public override void Initialize()
     {
@@ -48,20 +48,20 @@ public class MiniGhostEnemy : SplineMoveEnemy
 
     protected override void Update()
     {
-        // ’e‚Ì”­Ëƒ^ƒCƒ}[‚ğXV
+        // å¼¾ã®ç™ºå°„ã‚¿ã‚¤ãƒãƒ¼ã‚’æ›´æ–°
         UpdateShooting();
 
-        // oŒ»’†‚ÍËŒ‚‚àˆÚ“®‚às‚í‚È‚¢
+        // å‡ºç¾ä¸­ã¯å°„æ’ƒã‚‚ç§»å‹•ã‚‚è¡Œã‚ãªã„
         if (m_isSpawningFlag)
         {
             UpdateSpawning();
             return;
         }
 
-        // ËŒ‚’†A‚ÍˆÚ“®ˆ—‚ğs‚í‚È‚¢
+        // å°„æ’ƒä¸­ã€ã¯ç§»å‹•å‡¦ç†ã‚’è¡Œã‚ãªã„
         if (m_isShooting) return;
 
-        // eƒNƒ‰ƒX‚ÌˆÚ“®ˆ—‚ğXV
+        // è¦ªã‚¯ãƒ©ã‚¹ã®ç§»å‹•å‡¦ç†ã‚’æ›´æ–°
         base.Update();
     }
 
@@ -69,10 +69,10 @@ public class MiniGhostEnemy : SplineMoveEnemy
     {
         if (m_targetSpline != null)
         {
-            // ƒXƒvƒ‰ƒCƒ“‚Ìn“_À•W‚ğæ“¾
+            // ã‚¹ãƒ—ãƒ©ã‚¤ãƒ³ã®å§‹ç‚¹åº§æ¨™ã‚’å–å¾—
             m_spawnTargetPos = m_targetSpline.EvaluatePosition(0f);
           
-            // Œü‚«‚Ì’²®
+            // å‘ãã®èª¿æ•´
             Vector3 initialTangent = m_targetSpline.EvaluateTangent(0f);
             if (initialTangent != Vector3.zero)
             {
@@ -80,37 +80,37 @@ public class MiniGhostEnemy : SplineMoveEnemy
             }
 
             m_spawnTimer = 0f;
-            m_isSpawningFlag = true; // oŒ»’†ƒtƒ‰ƒO‚ğON
+            m_isSpawningFlag = true; // å‡ºç¾ä¸­ãƒ•ãƒ©ã‚°ã‚’ON
         }
     }
 
-    // •Ç‚©‚ço‚Ä‚­‚éˆ—
+    // å£ã‹ã‚‰å‡ºã¦ãã‚‹å‡¦ç†
     private void UpdateSpawning()
     {
         m_spawnTimer += Time.deltaTime;
 
-        // 1.0‚ğ’´‚¦‚È‚¢‚æ‚¤‚ÉƒNƒ‰ƒ“ƒviˆÀ‘S‘Îôj
+        // 1.0ã‚’è¶…ãˆãªã„ã‚ˆã†ã«ã‚¯ãƒ©ãƒ³ãƒ—ï¼ˆå®‰å…¨å¯¾ç­–ï¼‰
         float t = Mathf.Clamp01(m_spawnTimer / m_spawnDuration);
 
-        // ©ì‚Ì EaseInSine ‚ğ“K—p
+        // è‡ªä½œã® EaseInSine ã‚’é©ç”¨
         float easeT = Easing.EaseOutSine(t);
 
-        // üŒ`•âŠÔ‚ÅÀ•W‚ğXV
+        // ç·šå½¢è£œé–“ã§åº§æ¨™ã‚’æ›´æ–°
         transform.position = Vector3.Lerp(m_spawnPosition, m_spawnTargetPos, easeT);
 
-        // oŒ»Š®—¹”»’è
+        // å‡ºç¾å®Œäº†åˆ¤å®š
         if (t >= 1.0f)
         {
             transform.position = m_spawnTargetPos;
             m_isSpawningFlag = false;
 
-            // ‚±‚±‚©‚çƒXƒvƒ‰ƒCƒ“ˆÚ“®‚ğŠJn
+            // ã“ã“ã‹ã‚‰ã‚¹ãƒ—ãƒ©ã‚¤ãƒ³ç§»å‹•ã‚’é–‹å§‹
             m_distanceTraveled = 0f;
             m_moveDirection = 1f;
         }
     }
 
-    // ËŒ‚ƒ^ƒCƒ}[ˆ—
+    // å°„æ’ƒã‚¿ã‚¤ãƒãƒ¼å‡¦ç†
     private void UpdateShooting()
     {
         if (m_bulletPrefabs == null) return;
@@ -125,31 +125,31 @@ public class MiniGhostEnemy : SplineMoveEnemy
         }
     }
 
-    // ’e‚Ì¶¬‚Æ”­Ëˆ—
+    // å¼¾ã®ç”Ÿæˆã¨ç™ºå°„å‡¦ç†
     private IEnumerator ShootCoroutine()
     {
         m_isShooting = true;
 
         m_originalRotation = transform.rotation;
 
-        // ƒvƒŒƒCƒ„[‚Ì•ûŒü‚ğŒü‚­
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æ–¹å‘ã‚’å‘ã
         yield return StartCoroutine(TurnRoutine(true));
 
-        // ”­ËŒû‚ÌˆÊ’u‚ğæ“¾
+        // ç™ºå°„å£ã®ä½ç½®ã‚’å–å¾—
         Vector3 spawnPosition = m_firePoint.position;
 
-        // ƒ‰ƒ“ƒ_ƒ€‚É’e‚ÌƒvƒŒƒnƒu‚ğ‘I‘ğ
+        // ãƒ©ãƒ³ãƒ€ãƒ ã«å¼¾ã®ãƒ—ãƒ¬ãƒãƒ–ã‚’é¸æŠ
         GameObject bulletPrefab = GetRandomBulletPrefab();
 
-        // ’e‚ğ¶¬
+        // å¼¾ã‚’ç”Ÿæˆ
         GameObject bulletObj = Instantiate(bulletPrefab, spawnPosition, Quaternion.identity);
 
-        // ­‚µ‘Ò‚Á‚Ä‚©‚ç•ûŒü‚ğİ’è‚·‚é
+        // å°‘ã—å¾…ã£ã¦ã‹ã‚‰æ–¹å‘ã‚’è¨­å®šã™ã‚‹
         yield return new WaitForSeconds(m_bulletDelay);
 
         if (bulletObj == null || m_firePoint == null) yield break;
 
-        // ƒ^[ƒQƒbƒg‚Ö‚Ì•ûŒü‚ğŒvZiƒ^[ƒQƒbƒg‚ª–³‚¢ê‡‚Íis•ûŒü‚Ö”ò‚Î‚·j
+        // ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¸ã®æ–¹å‘ã‚’è¨ˆç®—ï¼ˆã‚¿ãƒ¼ã‚²ãƒƒãƒˆãŒç„¡ã„å ´åˆã¯é€²è¡Œæ–¹å‘ã¸é£›ã°ã™ï¼‰
         Vector3 direction = transform.forward;
         Vector3 targetPosition = m_playerPosition.transform.position;
         if (m_playerPosition != null)
@@ -157,14 +157,14 @@ public class MiniGhostEnemy : SplineMoveEnemy
             direction = (targetPosition - spawnPosition).normalized;
         }
 
-        // ’eƒXƒNƒŠƒvƒg‚É•ûŒü‚Æ‘¬“x‚ğ“K—p
+        // å¼¾ã‚¹ã‚¯ãƒªãƒ—ãƒˆã«æ–¹å‘ã¨é€Ÿåº¦ã‚’é©ç”¨
         MiniGhostEnemyBullet bullet = bulletObj.GetComponent<MiniGhostEnemyBullet>();
         if (bullet != null)
         {
             bullet.SetTarget(targetPosition, m_bulletSpeed, m_bulletAngle);
         }
 
-        // Œ³‚ÌŒü‚«‚É–ß‚é
+        // å…ƒã®å‘ãã«æˆ»ã‚‹
         yield return StartCoroutine(TurnRoutine(false));
 
         yield return new WaitForSeconds(m_bulletDelay);
@@ -175,7 +175,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
 
     }
 
-    // ’e‚ğ1‚Âƒ‰ƒ“ƒ_ƒ€‚ÉŒˆ‚ß‚é
+    // å¼¾ã‚’1ã¤ãƒ©ãƒ³ãƒ€ãƒ ã«æ±ºã‚ã‚‹
     private GameObject GetRandomBulletPrefab()
     {
         if (m_bulletPrefabs == null || m_bulletPrefabs.Count == 0) return null;
@@ -187,7 +187,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
     {
         if (turnToPlayer && m_playerPosition == null) yield break;
 
-        // Œ»İ‚ÌŒü‚«‚ğƒXƒ^[ƒg’n“_‚É‚·‚éi“r’†‚ÅØ‚è‘Ö‚í‚Á‚Ä‚àŠŠ‚ç‚©‚ÉŒq‚ª‚éj
+        // ç¾åœ¨ã®å‘ãã‚’ã‚¹ã‚¿ãƒ¼ãƒˆåœ°ç‚¹ã«ã™ã‚‹ï¼ˆé€”ä¸­ã§åˆ‡ã‚Šæ›¿ã‚ã£ã¦ã‚‚æ»‘ã‚‰ã‹ã«ç¹‹ãŒã‚‹ï¼‰
         Quaternion startRotation = transform.rotation;
         float timeElapsed = 0f;
 
@@ -209,24 +209,24 @@ public class MiniGhostEnemy : SplineMoveEnemy
 
             if (turnToPlayer)
             {
-                // ƒvƒŒƒCƒ„[‚ğŒü‚­
+                // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’å‘ã
                 Vector3 directionToPlayer = (m_playerPosition.position - transform.position).normalized;
                 targetRotation = Quaternion.LookRotation(-directionToPlayer);
             }
             else
             {
-                // Œ³‚É–ß‚é
+                // å…ƒã«æˆ»ã‚‹
                 targetRotation = m_originalRotation;
             }
 
-            // ‰ñ“]‚ğ“K—p
+            // å›è»¢ã‚’é©ç”¨
             transform.rotation = Quaternion.Slerp(startRotation, targetRotation, easedT);
 
             timeElapsed += Time.deltaTime;
             yield return null;
         }
 
-        // ÅŒã‚ÉƒYƒŒ‚ğ–³‚­‚·‚½‚ß‚Ì•â³
+        // æœ€å¾Œã«ã‚ºãƒ¬ã‚’ç„¡ãã™ãŸã‚ã®è£œæ­£
         if (turnToPlayer)
         {
             Vector3 finalDirection = (m_playerPosition.position - transform.position).normalized;
@@ -244,9 +244,9 @@ public class MiniGhostEnemy : SplineMoveEnemy
     private void OnCollisionEnter(Collision collision)
     {
 
-        //if (collision.gameObject.CompareTag("MagicBullet"))
-        //{
-        //    Destroy(gameObject);
-        //}
+        if (collision.gameObject.CompareTag("MagicBullet"))
+        {
+            Destroy(gameObject);
+        }
     }
 }
