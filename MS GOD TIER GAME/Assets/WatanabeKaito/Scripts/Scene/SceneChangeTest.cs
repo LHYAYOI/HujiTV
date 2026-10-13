@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class SceneChangeTest : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class SceneChangeTest : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             SceneController.Instance.ChangeScene(SceneController.SCENE_TYPE.TITLE, SceneTransition.TRANSITION_TYPE.IRIS);
         }
