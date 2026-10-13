@@ -1,11 +1,16 @@
+using NUnit.Framework;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Splines;
 
 public class MiniGhostEnemy : SplineMoveEnemy
 {
+    [Header("弾のプレハブリスト")]
+    [SerializeField] private List<GameObject> m_bulletPrefabs;
 
-    [Header("弾のプレハブ")]
-    [SerializeField] private GameObject m_bulletPrefab;
+    [Header("弾の発射位置")]
+    [SerializeField] private Transform m_firePoint;
 
     [Header("弾の発射間隔（秒）")]
     [SerializeField] private float m_fireInterval = 2.0f;
@@ -13,64 +18,131 @@ public class MiniGhostEnemy : SplineMoveEnemy
     [Header("弾の速度")]
     [SerializeField] private float m_bulletSpeed = 10.0f;
 
-    [Header("弾の発射位置")]
-    [SerializeField] private Transform m_firePoint;
+    [Header("弾の発射角度（度数）")]
+    [SerializeField] private float m_bulletAngle = 45.0f;
 
     [Header("弾が生成されてから発射されるまでの時間（秒）")]
     [SerializeField] private float m_bulletDelay = 1.0f;
 
-    public float turnDuration = 1.0f; // 振り向くのにかける秒数
+    [Header("振りむくまでにかかる時間（秒）")]
+    [SerializeField] private float m_turnDuration = 1.0f;
 
-    private Quaternion m_originalRotation;
-    private Coroutine m_turnCoroutine;
+    [Header("スプラインまでの移動時間")]
+    [SerializeField] private float m_spawnDuration = 3.0f;
+
+    private Quaternion m_originalRotation;  // 元の向きを保持する変数
+    bool m_isShooting = false; // 射撃中かどうかのフラグ
 
     private float m_fireTimer = 0f; // 弾の発射タイマー
+
+    private bool m_isSpawningFlag = false; // 現在出現中かどうかのフラグ
+    private Vector3 m_spawnTargetPos;  // 出現目標地点（スプラインの始点）
+    private float m_spawnTimer = 0f;   // 出現用のタイマー
 
     public override void Initialize()
     {
         base.Initialize();
+        StartSpawn();
         m_fireTimer = 0f;
     }
 
     protected override void Update()
     {
-        // 親クラスの移動処理を更新
-        base.Update();
-
         // 弾の発射タイマーを更新
         UpdateShooting();
+
+        // 出現中は射撃も移動も行わない
+        if (m_isSpawningFlag)
+        {
+            UpdateSpawning();
+            return;
+        }
+
+        // 射撃中、は移動処理を行わない
+        if (m_isShooting) return;
+
+        // 親クラスの移動処理を更新
+        base.Update();
+    }
+
+    private void StartSpawn()
+    {
+        if (m_targetSpline != null)
+        {
+            // スプラインの始点座標を取得
+            m_spawnTargetPos = m_targetSpline.EvaluatePosition(0f);
+          
+            // 向きの調整
+            Vector3 initialTangent = m_targetSpline.EvaluateTangent(0f);
+            if (initialTangent != Vector3.zero)
+            {
+                transform.rotation = Quaternion.LookRotation(initialTangent);
+            }
+
+            m_spawnTimer = 0f;
+            m_isSpawningFlag = true; // 出現中フラグをON
+        }
+    }
+
+    // 壁から出てくる処理
+    private void UpdateSpawning()
+    {
+        m_spawnTimer += Time.deltaTime;
+
+        // 1.0を超えないようにクランプ（安全対策）
+        float t = Mathf.Clamp01(m_spawnTimer / m_spawnDuration);
+
+        // 自作の EaseInSine を適用
+        float easeT = Easing.EaseOutSine(t);
+
+        // 線形補間で座標を更新
+        transform.position = Vector3.Lerp(m_spawnPosition, m_spawnTargetPos, easeT);
+
+        // 出現完了判定
+        if (t >= 1.0f)
+        {
+            transform.position = m_spawnTargetPos;
+            m_isSpawningFlag = false;
+
+            // ここからスプライン移動を開始
+            m_distanceTraveled = 0f;
+            m_moveDirection = 1f;
+        }
     }
 
     // 射撃タイマー処理
     private void UpdateShooting()
     {
-        if (m_bulletPrefab == null) return;
+        if (m_bulletPrefabs == null) return;
 
         m_fireTimer += Time.deltaTime;
         if (m_fireTimer >= m_fireInterval)
         {
-            StartCoroutine(ShootCoroutine());
-            m_fireTimer = 0f;
+            if (!m_isShooting)
+            {
+                StartCoroutine(ShootCoroutine());
+            }
         }
     }
 
     // 弾の生成と発射処理
     private IEnumerator ShootCoroutine()
     {
+        m_isShooting = true;
+
         m_originalRotation = transform.rotation;
-
-        // 発射する時は停止する
-        float originalMoveSpeed = m_moveSpeed;
-        m_moveSpeed = 0f;
-
-        // 発射口が指定されていればその位置、なければエネミー自身の位置を使用
-        Vector3 spawnPosition = m_firePoint.position;
 
         // プレイヤーの方向を向く
         yield return StartCoroutine(TurnRoutine(true));
 
+        // 発射口の位置を取得
+        Vector3 spawnPosition = m_firePoint.position;
+
+        // ランダムに弾のプレハブを選択
+        GameObject bulletPrefab = GetRandomBulletPrefab();
+
         // 弾を生成
-        GameObject bulletObj = Instantiate(m_bulletPrefab, spawnPosition, Quaternion.identity);
+        GameObject bulletObj = Instantiate(bulletPrefab, spawnPosition, Quaternion.identity);
 
         // 少し待ってから方向を設定する
         yield return new WaitForSeconds(m_bulletDelay);
@@ -89,14 +161,26 @@ public class MiniGhostEnemy : SplineMoveEnemy
         MiniGhostEnemyBullet bullet = bulletObj.GetComponent<MiniGhostEnemyBullet>();
         if (bullet != null)
         {
-            bullet.SetDirection(direction, m_bulletSpeed);
+            bullet.SetTarget(targetPosition, m_bulletSpeed, m_bulletAngle);
         }
 
         // 元の向きに戻る
         yield return StartCoroutine(TurnRoutine(false));
 
-        // 移動速度を元に戻す
-        m_moveSpeed = originalMoveSpeed;
+        yield return new WaitForSeconds(m_bulletDelay);
+
+        m_fireTimer = 0f;
+
+        m_isShooting = false;
+
+    }
+
+    // 弾を1つランダムに決める
+    private GameObject GetRandomBulletPrefab()
+    {
+        if (m_bulletPrefabs == null || m_bulletPrefabs.Count == 0) return null;
+        int randomIndex = Random.Range(0, m_bulletPrefabs.Count);
+        return m_bulletPrefabs[randomIndex];
     }
 
     private IEnumerator TurnRoutine(bool turnToPlayer)
@@ -107,9 +191,9 @@ public class MiniGhostEnemy : SplineMoveEnemy
         Quaternion startRotation = transform.rotation;
         float timeElapsed = 0f;
 
-        while (timeElapsed < turnDuration)
+        while (timeElapsed < m_turnDuration)
         {
-            float t = timeElapsed / turnDuration;
+            float t = timeElapsed / m_turnDuration;
 
             float easedT;
             if (turnToPlayer)
@@ -127,7 +211,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
             {
                 // プレイヤーを向く
                 Vector3 directionToPlayer = (m_playerPosition.position - transform.position).normalized;
-                targetRotation = Quaternion.LookRotation(directionToPlayer);
+                targetRotation = Quaternion.LookRotation(-directionToPlayer);
             }
             else
             {
@@ -146,7 +230,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
         if (turnToPlayer)
         {
             Vector3 finalDirection = (m_playerPosition.position - transform.position).normalized;
-            transform.rotation = Quaternion.LookRotation(finalDirection);
+            transform.rotation = Quaternion.LookRotation(-finalDirection);
         }
         else
         {
@@ -160,9 +244,9 @@ public class MiniGhostEnemy : SplineMoveEnemy
     private void OnCollisionEnter(Collision collision)
     {
 
-        if (collision.gameObject.CompareTag("MagicBullet"))
-        {
-            Destroy(gameObject);
-        }
+        //if (collision.gameObject.CompareTag("MagicBullet"))
+        //{
+        //    Destroy(gameObject);
+        //}
     }
 }

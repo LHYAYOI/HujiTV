@@ -24,6 +24,7 @@ public class SplineMoveEnemy : EnemyBase
 
     protected bool m_isClosedSplineFlag = false; // スプラインがループClosedしているかどうか
 
+    protected Vector3 m_spawnPosition;
 
     public override void Initialize()
     {
@@ -43,6 +44,12 @@ public class SplineMoveEnemy : EnemyBase
             m_isClosedSplineFlag = m_targetSpline.Spline.Closed;
         }
     }
+
+    public void SetSpawnPosition(Vector3 spawnPosition)
+    {
+        m_spawnPosition = spawnPosition;
+    }
+
 
     protected virtual void Update()
     {

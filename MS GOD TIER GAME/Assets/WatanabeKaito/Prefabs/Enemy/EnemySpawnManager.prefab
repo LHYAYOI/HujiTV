@@ -46,9 +46,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnManager
   m_playerTransform: {fileID: 0}
   m_enemyPrefabs:
-  - {fileID: 5719271575821741731, guid: ca76923ce1544b5409d8994743dc776f, type: 3}
-  - {fileID: 9165886674134779589, guid: b7503983208177c4b895b3e38f304284, type: 3}
-  m_splinePaths: []
+  - {fileID: 3282884335062489158, guid: f97987e1e1963fd46a1589258920c2a9, type: 3}
+  m_splinePaths:
+  - m_id: test_spline
+    m_container: {fileID: 0}
   m_spawnPositions:
   - m_id: testPosition
     m_position: {fileID: 0}
