@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b80684efe7f23e4db08d6220f2917d4, type: 3}
   m_Name: IceMagic
   m_EditorClassIdentifier: Assembly-CSharp::MagicData
-  m_magicId: 0
+  m_magicId: 1
   m_displayName: IceMagic
   m_magicType: 1
-  m_damage: 0
-  m_attackRange: 0
+  m_aimType: 0
