@@ -1144,6 +1144,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
+      propertyPath: magicData
+      value: 
+      objectReference: {fileID: 11400000, guid: 17ef150f604effd4e91c6dfb9950d6c0, type: 2}
+    - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
       propertyPath: m_bulletManager
       value: 
       objectReference: {fileID: 1007278231}
