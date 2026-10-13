@@ -11,6 +11,7 @@ public class GimmickSplineSwitchPoint : GimmickSpline
     [SerializeField] private SplineController2 m_targetSplineController;
 
     [SerializeField] private float m_switchOffset;
+    [SerializeField] private bool m_teleport = false;
 
     // ―――――――――――――――――――――――――――――――――――――
     // Public Propaty
@@ -36,7 +37,7 @@ public class GimmickSplineSwitchPoint : GimmickSpline
             Debug.Log("null");
             return;
         }
-        cart.SetSpline(m_targetSplineController.Spline, m_switchOffset, m_targetSplineController.LoopFlag);
+        cart.SetSpline(m_targetSplineController.Spline, m_switchOffset, m_targetSplineController.LoopFlag,m_teleport);
     }
 
     // ―――――――――――――――――――――――――――――――――――――
