@@ -100,7 +100,7 @@ public class BulletHitSenderController : MonoBehaviour
 
         MagicData attackData = m_magicBulletController.GetMagicData();
 
-        hitData.SetDamage(attackData.GetDamage);
+        //hitData.SetDamage(attackData.GetDamage);
         hitData.SetMagicType(attackData.MagicType);
         hitData.SetTag(gameObject.tag);
 

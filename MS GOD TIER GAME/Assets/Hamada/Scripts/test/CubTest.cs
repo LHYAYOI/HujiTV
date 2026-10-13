@@ -15,7 +15,7 @@ public class CubTest : MonoBehaviour
 
         HitData hitData = new HitData();
 
-        hitData.SetDamage(m_attackData.GetDamage);
+        //hitData.SetDamage(m_attackData.GetDamage);
         hitData.SetMagicType(m_attackData.MagicType);
         hitData.SetTag(gameObject.tag);
 

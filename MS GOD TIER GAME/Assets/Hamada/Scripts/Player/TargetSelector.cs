@@ -1,4 +1,4 @@
-using NUnit.Framework;
+ï»¿using NUnit.Framework;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -17,11 +17,9 @@ public class TargetSelector : MonoBehaviour
         }
     }
 
-    [Header("QÆ")]
+    [Header("å‚ç…§")]
 
     [SerializeField] private float m_targetRange = 10.0f;
-
-    [SerializeField] private BookNetworkServer m_bookNetworkServer;
 
     List<TargetInfo> m_targetList = new List<TargetInfo>();
 
@@ -31,13 +29,13 @@ public class TargetSelector : MonoBehaviour
     {
         m_targetList.Clear();
 
-        //“G‚ÌƒŠƒXƒgì¬
+        //æ•µã®ãƒªã‚¹ãƒˆä½œæˆ
         GameObject[] targets = GameObject.FindGameObjectsWithTag("Target");
 
-        //”ÍˆÍ‚É“ü‚Á‚½“G‚ğƒŠƒXƒg‚É•ÛŠÇ
+        //ç¯„å›²ã«å…¥ã£ãŸæ•µã‚’ãƒªã‚¹ãƒˆã«ä¿ç®¡
         CheckIfAddToTargetList(targets);
 
-        //ƒ^[ƒQƒbƒg‚ğ”z—ñ‚ÉŠ„‚è“–‚Ä‚é
+        //ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’é…åˆ—ã«å‰²ã‚Šå½“ã¦ã‚‹
         AssignTarget();
     }
 
@@ -50,7 +48,7 @@ public class TargetSelector : MonoBehaviour
             return;
         }
 
-        //Šî€“_
+        //åŸºæº–ç‚¹
         float[] distanceX =
         {
             1.0f / 6.0f,
@@ -62,7 +60,7 @@ public class TargetSelector : MonoBehaviour
         {
             float nearestDistance = float.MaxValue;
 
-            //Šî€“_‚ÉÅ‚à‹ß‚¢ƒ^[ƒQƒbƒg‚ğ’T‚·
+            //åŸºæº–ç‚¹ã«æœ€ã‚‚è¿‘ã„ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’æ¢ã™
             foreach (TargetInfo target in m_targetList)
             {
                 float distance = Mathf.Abs(target.m_screenPos.x - distanceX[i]);    
@@ -87,7 +85,7 @@ public class TargetSelector : MonoBehaviour
 
             Vector3 viewPos = Camera.main.WorldToViewportPoint(target.transform.position);
 
-            //”ÍˆÍ“à‚©
+            //ç¯„å›²å†…ã‹
             if (IsInsideScreen(viewPos) && IsTargetInRange(target))
             {
                 m_targetList.Add(new TargetInfo(target, viewPos));
@@ -102,7 +100,7 @@ public class TargetSelector : MonoBehaviour
         return distance <= m_targetRange;
     }
 
-    //‰æ–Ê‚È‚¢‚©‚Ç‚¤‚©’²‚×‚éŠÖ”
+    //ç”»é¢ãªã„ã‹ã©ã†ã‹èª¿ã¹ã‚‹é–¢æ•°
     private bool IsInsideScreen(Vector3 targetViewPos) 
     {
         if (targetViewPos.x > 0 && targetViewPos.x <= 1 &&
@@ -115,14 +113,16 @@ public class TargetSelector : MonoBehaviour
         return false;
     }
 
-    public GameObject GetSelectedTarget(int index) 
+    public GameObject GetSelectedTarget(MAGIC_CAST_DIRECTION index) 
     {
-        if (index < 0 || index >= m_targetArray.Length) 
+        int intIndex = (int)index;
+
+        if (intIndex < 0 || intIndex >= m_targetArray.Length) 
         {
             return null;
         }
 
-        GameObject target = m_targetArray[index].m_target;
+        GameObject target = m_targetArray[intIndex].m_target;
 
         if (target == null) 
         {

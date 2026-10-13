@@ -46,7 +46,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   m_bulletManager: {fileID: 0}
+  m_magicDatabase: {fileID: 11400000, guid: 79b1f032ed3a57542a6da4c73d1f4111, type: 2}
   m_targetSelector: {fileID: 1715315696896216547}
+  m_bookNetworkServer: {fileID: 0}
   m_bulletSpawnPoint: {fileID: 0}
   magicData: {fileID: 11400000, guid: 3da60a3eb6bfeb146b9427ebd2ea62c0, type: 2}
 --- !u!114 &1715315696896216547
@@ -62,4 +64,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AimScript
   m_targetRange: 10
-  m_bookNetworkServer: {fileID: 0}
