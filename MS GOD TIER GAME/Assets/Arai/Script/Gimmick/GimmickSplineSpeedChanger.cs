@@ -7,6 +7,9 @@ public class GimmickSpeedChanger : GimmickSpline
 
 
 
+    [SerializeField] private bool m_useBaseSpeed = true;
+    [SerializeField] private float m_normalSpeed;
+
     [SerializeField] private float m_targetSpeed;
 
 
@@ -32,7 +35,7 @@ public class GimmickSpeedChanger : GimmickSpline
     {
         float sign = Mathf.Sign(cart.Speed);
 
-        float from = cart.BaseSpeed * sign;
+        float from = (m_useBaseSpeed ? cart.BaseSpeed : m_normalSpeed )* sign;
         float to = m_targetSpeed * sign;
         float spd = Mathf.Lerp(from, to, rate);
         cart.SetSpeed(spd);
@@ -42,7 +45,7 @@ public class GimmickSpeedChanger : GimmickSpline
         float sign = Mathf.Sign(cart.Speed);
 
         float from = m_targetSpeed * sign;
-        float to = cart.BaseSpeed * sign;
+        float to = (m_useBaseSpeed ? cart.BaseSpeed : m_normalSpeed) * sign;
         float spd = Mathf.Lerp(from, to, rate);
         cart.SetSpeed(spd);
     }
