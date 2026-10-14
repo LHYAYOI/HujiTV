@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 3
   tags:
   - FADE
+  - MagicBullet
+  - Target
   layers:
   - Default
   - TransparentFX
@@ -15,8 +17,8 @@ TagManager:
   - 
   - 
   - BookModel
-  - 
-  - 
+  - MagicBullet
+  - Player
   - 
   - 
   - 
