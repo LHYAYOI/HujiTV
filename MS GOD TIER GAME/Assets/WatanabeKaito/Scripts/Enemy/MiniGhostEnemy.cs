@@ -238,15 +238,11 @@ public class MiniGhostEnemy : SplineMoveEnemy
         }
     }
 
-
-
-
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-
-        //if (collision.gameObject.CompareTag("MagicBullet"))
-        //{
-        //    Destroy(gameObject);
-        //}
+        if (other.gameObject.CompareTag("MagicBullet"))
+        {
+            Destroy(gameObject);
+        }
     }
 }

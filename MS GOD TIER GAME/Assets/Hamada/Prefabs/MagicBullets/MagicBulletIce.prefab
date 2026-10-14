@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6210517776881821410}
   - component: {fileID: 3265171827667249412}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Ball(Blue)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8962476768535423735}
   - component: {fileID: 7678089287139935553}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: MagicBulletIce
   m_TagString: MagicBullet
   m_Icon: {fileID: 0}
@@ -151,9 +151,9 @@ GameObject:
   - component: {fileID: 5260777087622495879}
   - component: {fileID: 8843914305584252394}
   - component: {fileID: 3732144037487599591}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: HitCollider
-  m_TagString: Untagged
+  m_TagString: MagicBullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -265,7 +265,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1904313102801415148}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
