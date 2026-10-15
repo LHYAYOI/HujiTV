@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
-public class BattleEnemyData : MonoBehaviour
+[System.Serializable]
+public class BattleEnemyData
 {
     public enum SPAWN_TYPE
     {
@@ -22,7 +23,6 @@ public class BattleEnemyData : MonoBehaviour
 
     [Header("----------")]
     [SerializeField] private SPAWN_TYPE m_spawnType;
-    // 前の敵がスポーンしてからスポーンするまでの時間
     [SerializeField] private float m_spawnTime;
 
     [SerializeField] private string m_enemyId;

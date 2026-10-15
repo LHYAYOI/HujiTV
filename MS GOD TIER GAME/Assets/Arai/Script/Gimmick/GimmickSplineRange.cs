@@ -111,8 +111,8 @@ public class GimmickSplineRange : GimmickSpline
 
 
         Gizmos.color = Color.forestGreen;
-        Gizmos.DrawSphere(mySpline.EvaluatePosition(start), 0.5f);
-        Gizmos.DrawSphere(mySpline.EvaluatePosition(start - range01), 0.5f);
+        Gizmos.DrawSphere(mySpline.EvaluatePosition(start), 0.1f);
+        Gizmos.DrawSphere(mySpline.EvaluatePosition(start - range01), 0.1f);
 
     }
 }
