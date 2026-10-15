@@ -397,7 +397,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6362957621724478253, guid: c3380b62e0d92924f8bbae1e4e95a7b9, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6441386359141413193, guid: c3380b62e0d92924f8bbae1e4e95a7b9, type: 3}
       propertyPath: m_gimmickPoint
@@ -803,7 +803,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GimmickSplineCameraLookTargetSpline
   m_gimmickPoint: 41.09
-  m_splineController: {fileID: 814161760}
+  m_targetSplineController: {fileID: 0}
   m_range: {fileID: 1332993601}
 --- !u!114 &483766351
 MonoBehaviour:
@@ -1369,17 +1369,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7782454354869500046, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
   m_PrefabInstance: {fileID: 1077925059}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &814161760 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 111196645449119932, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
-  m_PrefabInstance: {fileID: 1077925059}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9cb05fac2f1bb648accdb5d6724626e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SplineController2
 --- !u!4 &884224880 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1867198336154488999, guid: 266f0216aebc6ce4b97cc07a72b76fde, type: 3}
