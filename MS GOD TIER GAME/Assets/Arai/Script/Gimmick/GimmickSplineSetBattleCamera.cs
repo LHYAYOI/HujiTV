@@ -50,4 +50,19 @@ public class GimmickSplineSetBattleCamera : GimmickSpline
         CameraManager.Instance.SwitchCamera("FPSCamera");
     }
 
+
+
+
+    private void OnDrawGizmos()
+    {
+        OnGizmosMyPosition();
+
+        if(m_lookTarget == null)
+        {
+            return;
+        }
+
+        Gizmos.color = Color.skyBlue;
+        Gizmos.DrawLine( m_range.transform.position, m_lookTarget.transform.position);
+    }
 }
