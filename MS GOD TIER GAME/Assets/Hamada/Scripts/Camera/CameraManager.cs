@@ -225,14 +225,21 @@ public class CameraManager : MonoBehaviour
 
     public void SetLookTarget(GameObject lookTarget) 
     {
-        CinemachineCamera currentCamera = m_currentCamera.GetCamera();
+        CinemachineCamera targetCamera = GetCameraByName("BattleCamera").GetCamera();
 
-        if (currentCamera == null)
+        if (targetCamera == null) 
         {
             return;
         }
 
-        currentCamera.LookAt = lookTarget != null ? lookTarget.transform : null;
+        CameraLookTargetChanger lookTargetChanger = targetCamera.GetComponent<CameraLookTargetChanger>();
+
+        if (lookTargetChanger == null) 
+        {
+            return;
+        }
+
+        lookTargetChanger.SetLookTarget(lookTarget);
     }
 
     public CAMERA_DATA GetCameraByName(string cameraName)
