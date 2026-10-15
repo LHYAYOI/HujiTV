@@ -1,37 +1,38 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Runtime.CompilerServices;
+using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.PlayerLoop;
 
 public class CameraShake : MonoBehaviour
 {
+    [SerializeField] CinemachineBasicMultiChannelPerlin m_multiChannelPerlin;
     [SerializeField] CinemachineRotationExtension m_cinemachineRotationExtension;
+
+    [Header("ãƒˆãƒ­ãƒƒã‚³ã®æºã‚Œå‘¨ã‚Š")]
+    [SerializeField] float m_amplitudeGain;
+    [SerializeField] float m_frequencyGain;
 
     private Vector3 m_totalShakeOffset;
 
-    void Update()
+    private void Start()
     {
-        if(Keyboard.current.pKey.wasPressedThisFrame)
-        {
-            VHShake(0.5f, 0.5f,3.5f);
-        }
-
-        if (Keyboard.current.oKey.wasPressedThisFrame)
-        {
-            ShakeCamera(3, 1.5f);
-        }
+        m_multiChannelPerlin.AmplitudeGain = m_amplitudeGain;
+        m_multiChannelPerlin.FrequencyGain = m_frequencyGain;
     }
 
     IEnumerator ShakeRoutine(float duration, float horizontalIntensity, float verticalIntensity, Vector2 frequencyRange)
     {
         float elapsedTime = 0.0f;
 
-        // ƒ‰ƒ“ƒ_ƒ€ˆÊ‘Š
+        // ãƒ©ãƒ³ãƒ€ãƒ ä½ç›¸
         float phaseX = Random.Range(0f, Mathf.PI * 2f);
         float phaseY = Random.Range(0f, Mathf.PI * 2f);
         float phaseZ = Random.Range(0f, Mathf.PI * 2f);
 
-        // ƒ‰ƒ“ƒ_ƒ€ü”g”
+        // ãƒ©ãƒ³ãƒ€ãƒ å‘¨æ³¢æ•°
          float frequency = Random.Range(frequencyRange.x, frequencyRange.y);
 
         Vector3 previousShake = Vector3.zero;
@@ -42,28 +43,28 @@ public class CameraShake : MonoBehaviour
 
             float rate = elapsedTime / duration;
 
-            // Œ¸Š
+            // æ¸›è¡°
             float damper = 1.0f - Easing.EaseOutCubic(rate);
 
-            // Še²‚Ì‰ñ“]—Ê‚ğŒvZ
+            // å„è»¸ã®å›è»¢é‡ã‚’è¨ˆç®—
             float xRotation = Mathf.Sin(elapsedTime * frequency + phaseX) * verticalIntensity * damper;
             float yRotation = Mathf.Cos(elapsedTime * frequency + phaseY) * horizontalIntensity * damper;
 
             Vector3 currentOffset = new Vector3(xRotation, yRotation, 0);
 
-            m_totalShakeOffset -= previousShake; // ‘O‰ñ‚ÌƒIƒtƒZƒbƒg‚ğ‘Å‚¿Á‚·
+            m_totalShakeOffset -= previousShake; // å‰å›ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’æ‰“ã¡æ¶ˆã™
 
-            m_totalShakeOffset += currentOffset; // V‚µ‚¢ƒIƒtƒZƒbƒg‚ğ‰Á‚¦‚é
+            m_totalShakeOffset += currentOffset; // æ–°ã—ã„ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’åŠ ãˆã‚‹
 
-            //‰ñ“]‚ğ“K—p
+            //å›è»¢ã‚’é©ç”¨
             m_cinemachineRotationExtension.SetShakeRotationOffset(m_totalShakeOffset);
 
-            previousShake = currentOffset; // ¡‰ñ‚ÌƒIƒtƒZƒbƒg‚ğ•Û‘¶
+            previousShake = currentOffset; // ä»Šå›ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’ä¿å­˜
 
             yield return null;
         }
 
-        m_totalShakeOffset -= previousShake; // ÅŒã‚ÌƒIƒtƒZƒbƒg‚ğ‘Å‚¿Á‚·
+        m_totalShakeOffset -= previousShake; // æœ€å¾Œã®ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’æ‰“ã¡æ¶ˆã™
 
         m_cinemachineRotationExtension.SetShakeRotationOffset(m_totalShakeOffset);
     }
@@ -76,5 +77,12 @@ public class CameraShake : MonoBehaviour
     public void ShakeCamera(float intensity, float duration)
     {
         StartCoroutine(ShakeRoutine(duration, intensity, intensity, new Vector2(25f, 40f)));
+    }
+
+    public void SetRateOnTrolleyShake(float rate) 
+    {
+        rate = Mathf.Clamp01(rate);
+        m_multiChannelPerlin.AmplitudeGain = m_amplitudeGain * rate;
+        m_multiChannelPerlin.FrequencyGain = m_frequencyGain * rate;
     }
 }

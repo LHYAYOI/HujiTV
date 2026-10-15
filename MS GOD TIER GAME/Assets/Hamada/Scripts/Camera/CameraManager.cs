@@ -1,6 +1,6 @@
-//
-//ƒJƒƒ‰ƒ}ƒl[ƒWƒƒ[
-//à_“cƒ‹ƒCƒX
+ï»¿//
+//ã‚«ãƒ¡ãƒ©ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼
+//æ¿±ç”°ãƒ«ã‚¤ã‚¹
 //
 
 using System;
@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Cinemachine;
 
-//ƒV[ƒ“‚Ég—p‚·‚éƒJƒƒ‰‚Ì\‘¢‘Ì
+//ã‚·ãƒ¼ãƒ³ã«ä½¿ç”¨ã™ã‚‹ã‚«ãƒ¡ãƒ©ã®æ§‹é€ ä½“
 [Serializable]
 public struct CAMERA_DATA
 {
@@ -36,43 +36,6 @@ public class CameraManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.I)) 
-        {
-            Debug.Log("FPS");
-            SwitchCamera("FPSCamera");
-        }
-
-        if (Input.GetKeyDown(KeyCode.U))
-        {
-            Debug.Log("TPS");
-            SwitchCamera("TPSCamera");
-        }
-
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            TiltCamera(.4f, -20);
-        }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            TiltCamera(.4f, 20);
-        }
-        else if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            TiltCamera(.4f, 0);
-        }
-
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            ChangeCameraFOV(.4f, 80);
-        }
-        else if (Input.GetKeyDown(KeyCode.K))
-        {
-            ChangeCameraFOV(.4f, 20);
-        }
-        else if (Input.GetKeyDown(KeyCode.J))
-        {
-            ChangeCameraFOV(.4f, 60);
-        }
     }
 
     public void SwitchCamera(string cameraName)
@@ -92,7 +55,7 @@ public class CameraManager : MonoBehaviour
                 continue;
             }
 
-            //Œ»İ‚ÌƒJƒƒ‰‚ğØ‚è‘Ö‚¦
+            //ç¾åœ¨ã®ã‚«ãƒ¡ãƒ©ã‚’åˆ‡ã‚Šæ›¿ãˆ
             ChangeCurrentCamera(camera);
         }
     }
@@ -111,12 +74,12 @@ public class CameraManager : MonoBehaviour
 
     public IEnumerator ChangeCameraRoutine(string cameraName)
     {
-        //ƒJƒƒ‰Ø‚è‘Ö‚¦ŒÄ‚Ño‚µ
+        //ã‚«ãƒ¡ãƒ©åˆ‡ã‚Šæ›¿ãˆå‘¼ã³å‡ºã—
         SwitchCamera(cameraName);
 
         float waitTime = 0.1f;
 
-        //“à•”‚Å‚ÌƒJƒƒ‰‚Ì—Dæ“xØ‚è‘Ö‚¦‚ªI‚í‚é‚Ü‚Å‘Ò‚Â
+        //å†…éƒ¨ã§ã®ã‚«ãƒ¡ãƒ©ã®å„ªå…ˆåº¦åˆ‡ã‚Šæ›¿ãˆãŒçµ‚ã‚ã‚‹ã¾ã§å¾…ã¤
         while (!IsCameraBlending() && waitTime > 0)
         {
             waitTime -= Time.deltaTime;
@@ -124,14 +87,14 @@ public class CameraManager : MonoBehaviour
             yield return null;
         }
 
-        //ƒJƒƒ‰‚ÌØ‚è‘Ö‚¦‚ªI‚í‚é‚Ü‚Å‘Ò‚Â
+        //ã‚«ãƒ¡ãƒ©ã®åˆ‡ã‚Šæ›¿ãˆãŒçµ‚ã‚ã‚‹ã¾ã§å¾…ã¤
         while (IsCameraBlending())
         {
             yield return null;
         }
     }
 
-    //c‚Æ‰¡‚Ì‹­‚³‚ğw’è‚Å‚«‚éƒJƒƒ‰ƒVƒFƒCƒN
+    //ç¸¦ã¨æ¨ªã®å¼·ã•ã‚’æŒ‡å®šã§ãã‚‹ã‚«ãƒ¡ãƒ©ã‚·ã‚§ã‚¤ã‚¯
     public void ShakeCameraInVH(float duration, float horizontalIntensity, float verticalIntensity) 
     {
         CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
@@ -151,7 +114,7 @@ public class CameraManager : MonoBehaviour
         shake.VHShake(duration, horizontalIntensity, verticalIntensity);
     }
 
-    //ƒJƒƒ‰ƒVƒFƒCƒN
+    //ã‚«ãƒ¡ãƒ©ã‚·ã‚§ã‚¤ã‚¯
     public void ShakeCamera(float duration, float intensity)
     {
         CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
@@ -171,7 +134,27 @@ public class CameraManager : MonoBehaviour
         shake.ShakeCamera(intensity, duration);
     }
 
-    //ŒX‚¯‚é
+    //ãƒˆãƒ­ãƒƒã‚³ã®ã‚·ã‚§ã‚¤ã‚¯èª¿æ•´
+    public void SetRateOnTrolleyShake(float rate) 
+    {
+        CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
+
+        if (currentVirtualCamera == null)
+        {
+            return;
+        }
+
+        CameraShake shake = currentVirtualCamera.GetComponent<CameraShake>();
+
+        if (shake == null)
+        {
+            return;
+        }
+
+        shake.SetRateOnTrolleyShake(rate);
+    }
+
+    //Zè»¸ã‚’å‚¾ã‘ã‚‹
     public void TiltCamera(float duration, float tiltDegree)
     {
         CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
@@ -191,7 +174,7 @@ public class CameraManager : MonoBehaviour
         tilt.Tilt(duration, tiltDegree);
     }
 
-    //  ƒJƒƒ‰‚ÌFOV‚ğ•ÏX‚·‚é
+    //ã‚«ãƒ¡ãƒ©ã®FOVã‚’å¤‰æ›´ã™ã‚‹
     public void ChangeCameraFOV(float duration, float FOV)
     {
         CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
@@ -211,6 +194,24 @@ public class CameraManager : MonoBehaviour
         zoom.ChangeFOV(duration, FOV);
     }
 
+    public void SetLookTarget(GameObject lookTarget) 
+    {
+        CinemachineCamera targetCamera = GetCameraByName("BattleCamera").GetCamera();
+
+        if (targetCamera == null) 
+        {
+            return;
+        }
+
+        CameraLookTargetChanger lookTargetChanger = targetCamera.GetComponent<CameraLookTargetChanger>();
+
+        if (lookTargetChanger == null) 
+        {
+            return;
+        }
+
+        lookTargetChanger.SetLookTarget(lookTarget);
+    }
 
     public CAMERA_DATA GetCameraByName(string cameraName)
     {
@@ -227,6 +228,6 @@ public class CameraManager : MonoBehaviour
 
     public CAMERA_DATA GetCurrentCamera() => m_currentCamera;
 
-    //ƒuƒŒƒ“ƒh’†‚©‚Ç‚¤‚©
+    //ãƒ–ãƒ¬ãƒ³ãƒ‰ä¸­ã‹ã©ã†ã‹
     public bool IsCameraBlending() => m_brain.IsBlending;
 }
