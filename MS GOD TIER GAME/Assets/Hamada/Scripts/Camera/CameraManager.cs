@@ -24,7 +24,6 @@ public class CameraManager : MonoBehaviour
 {
     [SerializeField] CinemachineBrain m_brain;
     [SerializeField] List<CAMERA_DATA> m_cameraList;
-    [SerializeField] GameObject m_lookTarget;
 
     CAMERA_DATA m_currentCamera;
 
@@ -37,34 +36,6 @@ public class CameraManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.I)) 
-        {
-            Debug.Log("FPS");
-            SwitchCamera("FPSCamera");
-        }
-
-        if (Input.GetKeyDown(KeyCode.U))
-        {
-            Debug.Log("TPS");
-            SwitchCamera("TPSCamera");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Y))
-        {
-            Debug.Log("Lock");
-            SwitchCamera("BattleCamera");
-        }
-
-
-        if (Input.GetKeyDown(KeyCode.P)) 
-        {
-            SetLookTarget(m_lookTarget);
-        }
-
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            SetLookTarget(null);
-        }
     }
 
     public void SwitchCamera(string cameraName)
