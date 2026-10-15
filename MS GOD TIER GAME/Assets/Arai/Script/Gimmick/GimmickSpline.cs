@@ -39,7 +39,7 @@ public abstract class GimmickSpline : Gimmick
     // ―――――――――――――――――――――――――――――――――――――
     // Private Event
     // ―――――――――――――――――――――――――――――――――――――
-    private void FindSplineController()
+    protected void FindSplineController()
     {
         if (m_splineController == null)
         {

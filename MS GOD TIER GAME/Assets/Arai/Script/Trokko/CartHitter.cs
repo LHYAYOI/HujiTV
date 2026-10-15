@@ -14,7 +14,7 @@ public class CartHitter : MonoBehaviour
 
         HitData hitData = new HitData();
 
-        hitData.SetHitObject(other.gameObject);
+        hitData.SetHitObject(this.gameObject);
 
         hitReceiver.OnHit(hitData);
     }

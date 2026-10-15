@@ -4,6 +4,7 @@
 TagManager:
   serializedVersion: 3
   tags:
+  - FADE
   - MagicBullet
   - Target
   layers:
@@ -16,8 +17,8 @@ TagManager:
   - 
   - 
   - BookModel
-  - LockOnTarget
-  - 
+  - Trolley
+  - MagicBullet
   - 
   - 
   - 

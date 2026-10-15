@@ -27,7 +27,7 @@ public class CartController : MonoBehaviour
     [SerializeField] private float m_distance; // 全体の進んだ距離
 
 
-    private SplineContainer m_spline;
+    [SerializeField]private SplineContainer m_spline;
     
     private float m_splineAnchor = 0.0f; // 進んだ距離 - アンカーポイント
     
@@ -48,6 +48,19 @@ public class CartController : MonoBehaviour
         if(m_distance < 0.0f)
         {
             m_distance = 0.0f;
+        }
+
+
+        if(m_spline != null)
+        {
+            // Transform位置更新
+            float value = SplineOffset / m_spline.CalculateLength();
+
+            float3 position, tangent, up;
+            m_spline.Evaluate(0, value, out position, out tangent, out up);
+
+            transform.rotation = Quaternion.LookRotation(tangent, up);
+            transform.position = position;
         }
     }
 
@@ -163,7 +176,7 @@ public class CartController : MonoBehaviour
     // ------------------------------------------------------------------------
     // Public Event
     // ------------------------------------------------------------------------
-    public void SetSpline(SplineContainer spline , float offsetDistance,bool loopFlag)
+    public void SetSpline(SplineContainer spline , float offsetDistance,bool loopFlag,bool teleport = false)
     {
         // spline1 -------- distance 
         //                |
@@ -179,19 +192,29 @@ public class CartController : MonoBehaviour
         m_splineAnchor = m_distance - offsetDistance;
         m_loopFlag = loopFlag;
 
+        if(teleport)
+        {
+            // Transform位置更新
+            float value = SplineOffset / m_spline.CalculateLength();
+
+            float3 position, tangent, up;
+            m_spline.Evaluate(0, value, out position, out tangent, out up);
+
+            transform.rotation = Quaternion.LookRotation(tangent, up);
+            transform.position = position;
+        }
+
 
         m_state = CartState.Switch;
     }
     
     public float SplineOffset => m_distance - m_splineAnchor;
-    
-    public IEnumerator SetSpeed(float speed, float time)
+
+    public float BaseSpeed => m_baseSpeed;
+    public float Speed => m_speed;
+    public void SetSpeed(float speed)
     {
         m_speed = speed;
-
-        yield return new WaitForSeconds(time);
-
-        ResetSpeed();
     }
 
     public void ResetSpeed()

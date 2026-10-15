@@ -1,0 +1,27 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class EnemySpawnTest : MonoBehaviour
+{
+    [SerializeField] private EnemySpawnManager m_enemySpawnManager;
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+        //m_enemySpawnManager.SpawnSplineMoveEnemy("MiniGhost_A", "test_spline", "testPosition");
+
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+       
+    }
+
+    public void OnSpawnEnemy()
+    {
+        m_enemySpawnManager.SpawnSplineMoveEnemy("MiniGhost_A", "test_spline", "testPosition");
+
+    }
+}

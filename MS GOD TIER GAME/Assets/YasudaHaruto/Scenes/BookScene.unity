@@ -1278,9 +1278,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BookTestBootstrap
   m_initialPages:
-  - {fileID: 11400000, guid: 82b51d2f4d395d043b7bf8db4b684724, type: 2}
-  - {fileID: 11400000, guid: e169de544106c1449a8caaa4eeb864e8, type: 2}
-  - {fileID: 11400000, guid: ebab0ea0eb859a74bb20d81f8629a675, type: 2}
+  - {fileID: 11400000, guid: a20ef9d774043e844a1606179b63f096, type: 2}
+  - {fileID: 11400000, guid: 45ba07eb8d1192145bc513df592c55bf, type: 2}
+  - {fileID: 11400000, guid: db87baf7c5fe808489ccceb30c994698, type: 2}
+  - {fileID: 11400000, guid: 4b2373ead7ba72c4bb031c0a0826e418, type: 2}
   m_pageDatabase: {fileID: 11400000, guid: 262c5c96532bc7b4aaf8fbc2bbe1eda6, type: 2}
   m_runeTraceView: {fileID: 116282268}
   m_inputRouter: {fileID: 1188077437}
@@ -1288,6 +1289,7 @@ MonoBehaviour:
   m_areaDetector: {fileID: 497769029}
   m_displayController: {fileID: 759180754}
   m_maxPageCount: 10
+  m_runeCooldownSeconds: 1
 --- !u!4 &769174318
 Transform:
   m_ObjectHideFlags: 0
