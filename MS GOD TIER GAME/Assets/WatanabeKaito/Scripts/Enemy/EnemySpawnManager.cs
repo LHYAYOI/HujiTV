@@ -42,7 +42,7 @@ public class EnemySpawnManager : MonoBehaviour
     private Dictionary<string, SplineContainer> m_splineDictionary = new Dictionary<string, SplineContainer>(); // スプラインIDをキーにしてスプラインコンテナを格納する辞書
     private Dictionary<string, Transform> m_spawnPositionDictionary = new Dictionary<string, Transform>();
 
-    // 位置を指定するように位置データのリストを作ったほうがいいかも
+    private List<EnemyBase> m_activeEnemies = new List<EnemyBase>(); // 現在アクティブなエネミーのリスト
 
     private void Awake()
     {
@@ -112,6 +112,10 @@ public class EnemySpawnManager : MonoBehaviour
         Vector3 spawnPosition = spawnTransform.position;
         EnemyBase enemyObj = Instantiate(prefab, spawnPosition, Quaternion.identity);
         enemyObj.SetPlayerPosition(m_playerTransform);
+        enemyObj.SetSpawnManager(this);
+
+        // アクティブなエネミーリストに追加
+        AddActiveEnemy(enemyObj);
 
         if (enemyObj is SplineMoveEnemy splineMoveEnemy)
         {
@@ -138,7 +142,49 @@ public class EnemySpawnManager : MonoBehaviour
 
         EnemyBase enemyObj = Instantiate(prefab, spawnPosition, Quaternion.identity);
         enemyObj.SetPlayerPosition(m_playerTransform);
+        enemyObj.SetSpawnManager(this);
         enemyObj.Initialize();
-       
+
+        // アクティブなエネミーリストに追加
+        AddActiveEnemy(enemyObj);
     }
+
+    // 現在アクティブなエネミーリストを取得
+    public List<EnemyBase> GetActiveEnemies()
+    {
+        return m_activeEnemies;
+    }
+
+    // エネミーをアクティブリストに追加
+    public void AddActiveEnemy(EnemyBase enemy)
+    {
+        if (!m_activeEnemies.Contains(enemy))
+        {
+            m_activeEnemies.Add(enemy);
+        }
+    }
+
+    // エネミーをアクティブリストから削除
+    public void RemoveActiveEnemy(EnemyBase enemy)
+    {
+        if (m_activeEnemies.Contains(enemy))
+        {
+            m_activeEnemies.Remove(enemy);
+        }
+    }
+
+    // エネミーをすべて削除
+    public void RemoveAllActiveEnemies()
+    {
+        foreach (var enemy in m_activeEnemies)
+        {
+            if (enemy != null)
+            {
+                Destroy(enemy.gameObject);
+            }
+        }
+        m_activeEnemies.Clear();
+    }
+
+
 }
