@@ -102,8 +102,8 @@ MonoBehaviour:
       - {x: 0.8868458, y: 0.5131397}
   m_rule:
     m_requiredStrokeCount: 1
-    m_distanceTolerance: 0.05
+    m_distanceTolerance: 0.4
     m_requiredCoverage: 0.95
     m_requiredAccuracy: 0.9
-    m_startTolerance: 0.04
-    m_endTolerance: 0.025
+    m_startTolerance: 0.4
+    m_endTolerance: 0.1

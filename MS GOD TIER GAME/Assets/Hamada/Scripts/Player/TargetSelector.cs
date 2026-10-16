@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Unity.Cinemachine;
 
 public class TargetSelector : MonoBehaviour
 {
@@ -9,17 +10,24 @@ public class TargetSelector : MonoBehaviour
     {
         public GameObject m_target;
         public Vector3 m_screenPos;
+        public bool m_isSelectedFlag;
+
 
         public TargetInfo(GameObject target, Vector3 screenPos) 
         {
             m_target = target;
             m_screenPos = screenPos;
+            m_isSelectedFlag = false;
         }
     }
 
     [Header("参照")]
 
     [SerializeField] private float m_targetRange = 10.0f;
+
+    [SerializeField] private float m_centerAreaWidth = 0.6f;
+
+    [SerializeField] private bool m_drawDebugArea = false;
 
     List<TargetInfo> m_targetList = new List<TargetInfo>();
 
@@ -29,11 +37,8 @@ public class TargetSelector : MonoBehaviour
     {
         m_targetList.Clear();
 
-        //敵のリスト作成
-        GameObject[] targets = GameObject.FindGameObjectsWithTag("Target");
-
         //範囲に入った敵をリストに保管
-        CheckIfAddToTargetList(targets);
+        CheckIfAddToTargetList();
 
         //ターゲットを配列に割り当てる
         AssignTarget();
@@ -43,40 +48,66 @@ public class TargetSelector : MonoBehaviour
     {
         m_targetArray = new TargetInfo[3];
 
-        if (m_targetList.Count == 0) 
-        {
+        if (m_targetList.Count == 0)
             return;
-        }
 
-        //基準点
-        float[] distanceX =
+        // 左右エリアの幅
+        float sideWidth = (1.0f - m_centerAreaWidth) * 0.5f;
+
+        // 各エリアの基準点
+        float[] centerX =
         {
-            1.0f / 6.0f,
-            0.5f,
-            5.0f / 6.0f
-        };
+        sideWidth * 0.5f,
+        0.5f,
+        1.0f - sideWidth * 0.5f
+    };
 
         for (int i = 0; i < m_targetArray.Length; i++)
         {
             float nearestDistance = float.MaxValue;
 
-            //基準点に最も近いターゲットを探す
             foreach (TargetInfo target in m_targetList)
             {
-                float distance = Mathf.Abs(target.m_screenPos.x - distanceX[i]);    
+                float x = target.m_screenPos.x;
+
+                // エリアを判定
+                int areaIndex;
+
+                if (x < sideWidth)
+                {
+                    areaIndex = 0; // 左
+                }
+                else if (x < 1.0f - sideWidth)
+                {
+                    areaIndex = 1; // 中央
+                }
+                else
+                {
+                    areaIndex = 2; // 右
+                }
+
+                // 対象エリア以外ならスキップ
+                if (areaIndex != i)
+                    continue;
+
+                float distance = Mathf.Abs(x - centerX[i]);
 
                 if (distance < nearestDistance)
                 {
                     nearestDistance = distance;
+
                     m_targetArray[i] = target;
+                    m_targetArray[i].m_isSelectedFlag = true;
                 }
             }
         }
     }
 
-    private void CheckIfAddToTargetList(GameObject[] array) 
+    private void CheckIfAddToTargetList() 
     {
-        foreach (GameObject target in array)
+        GameObject[] targets = GameObject.FindGameObjectsWithTag("Target");
+
+        foreach (GameObject target in targets)
         {
             if (target == null)
             {
@@ -130,5 +161,36 @@ public class TargetSelector : MonoBehaviour
         }
 
         return target;
+    }
+
+    private void OnGUI()
+    {
+        if (!m_drawDebugArea)
+            return;
+
+        float sideWidth = (1.0f - m_centerAreaWidth) * 0.5f;
+
+        float screenWidth = Screen.width;
+        float screenHeight = Screen.height;
+
+        Rect leftRect = new Rect(0, 0, screenWidth * sideWidth, screenHeight);
+        Rect centerRect = new Rect(screenWidth * sideWidth, 0, screenWidth * m_centerAreaWidth, screenHeight);
+        Rect rightRect = new Rect(screenWidth * (1.0f - sideWidth), 0, screenWidth * sideWidth, screenHeight);
+
+        DrawArea(leftRect, new Color(0f, 0.5f, 1f, 0.2f), "LEFT");
+        DrawArea(centerRect, new Color(0f, 1f, 0f, 0.2f), "CENTER");
+        DrawArea(rightRect, new Color(1f, 0.5f, 0f, 0.2f), "RIGHT");
+    }
+
+    private void DrawArea(Rect rect, Color color, string label)
+    {
+        Color oldColor = GUI.color;
+        GUI.color = color;
+        GUI.DrawTexture(rect, Texture2D.whiteTexture);
+
+        GUI.color = Color.white;
+        GUI.Label(new Rect(rect.x + 10, rect.y + 10, 100, 30), label);
+
+        GUI.color = oldColor;
     }
 }
