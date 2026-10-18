@@ -3,124 +3,222 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "NewMiniGhostAttackState", menuName = "States/MiniGhostStates/MiniGhostAttackState")]
-public class MiniGhostAttackState : StateBase
+public class MiniGhostAttackState : MiniGhostState
 {
+
     [Header("弾のプレハブリスト")]
-    [SerializeField] private List<GameObject> m_bulletPrefabs;
+    [SerializeField] private List<GameObject> m_bulletPrefabs = new List<GameObject>();
 
     [Header("弾の速度")]
-    [SerializeField] private float m_bulletSpeed = 10.0f;
+    [SerializeField] private float m_bulletSpeed = 10f;
 
     [Header("弾の発射角度（度数）")]
-    [SerializeField] private float m_bulletAngle = 45.0f;
+    [SerializeField] private float m_bulletAngle = 45f;
 
-    [Header("弾が生成されてから発射されるまでの時間（秒）")]
-    [SerializeField] private float m_bulletDelay = 1.0f;
+    [Header("照準位置の補正")]
+    [SerializeField] private float m_targetHeightOffset = -0.1f;
 
-    [Header("振りむくまでにかかる時間（秒）")]
-    [SerializeField] private float m_turnDuration = 1.0f;
+    [Header("高さの差に応じた補正率")]
+    [SerializeField] private float m_heightCorrectionRate = 0.1f;
 
+    [Header("蹴りの弾を生成してから発射するまでの時間（秒）")]
+    [SerializeField] private float m_kickBulletDelay = 2f;
+
+    [Header("投げの弾を生成してから発射するまでの時間（秒）")]
+    [SerializeField] private float m_throwBulletDelay = 1.7f;
+
+    [Header("発射後から移動までの待ち時間（秒）")]
+    [SerializeField] private float m_postShootDelay = 2.0f;
+
+    [Header("振り向きにかかる時間（秒）")]
+    [SerializeField] private float m_turnDuration = 1f;
+
+    private Animator m_animator;    // Animatorコンポーネント
     private Quaternion m_originalRotation;  // 元の向きを保持する変数
+    private Coroutine m_attackCoroutine;    // 実行中の攻撃コルーチン
+    private readonly List<GameObject> m_spawnedBullets = new List<GameObject>();    // 生成された弾のリスト
 
-
-
-    MiniGhostEnemy m_miniGhostEnemy;
-    public override void Awake()
+    public override void InitializeState(MiniGhostEnemy owner)
     {
-       
-    }
-
-    public override void Start()
-    {
-        m_miniGhostEnemy = m_stateOwner.GetComponent<MiniGhostEnemy>();
-        //CoroutineRunner.Instance.StartCoroutine(ShootCoroutine());
+        base.InitializeState(owner);
+        m_animator = owner.GetComponentInChildren<Animator>();
     }
 
     public override void EnterState()
     {
-        //StartCoroutine(ShootCoroutine());
-    }
+        if (m_owner.GetIsDying())
+        {
+            return;
+        }
 
-    public override void UpdateState()
-    {
+        if (m_bulletPrefabs == null || m_bulletPrefabs.Count == 0)
+        {
+            m_owner.ChangeState(MINI_GHOST_STATE_TYPE.MOVE);
+            return;
+        }
+
+        m_attackCoroutine = StartCoroutine(AttackRoutine());
     }
 
     public override void ExitState()
     {
-
-    }
-
-   
-
-    // 弾の生成と発射処理
-    private IEnumerator ShootCoroutine()
-    {
-        Vector3 playerPosition = m_miniGhostEnemy.GetPlayerPosition();
-
-        Vector3 firePosition = m_miniGhostEnemy.GetFirePosition();
-
-        m_originalRotation = m_stateOwner.transform.rotation;
-
-        // プレイヤーの方向を向く
-        //yield return StartCoroutine(TurnRoutine(true));
-
-        // 発射口の位置を取得
-        Vector3 spawnPosition = firePosition;
-
-        // ランダムに弾のプレハブを選択
-        GameObject bulletPrefab = GetRandomBulletPrefab();
-
-        // 弾を生成
-        GameObject bulletObj = Instantiate(bulletPrefab, spawnPosition, Quaternion.identity);
-
-        // 少し待ってから方向を設定する
-        yield return new WaitForSeconds(m_bulletDelay);
-
-        if (bulletObj == null || firePosition == null) yield break;
-
-        // ターゲットへの方向を計算（ターゲットが無い場合は進行方向へ飛ばす）
-        Vector3 direction = m_stateOwner.transform.forward;
-        Vector3 targetPosition = playerPosition;
-        if (playerPosition != null)
+        // 状態を抜けた場合は攻撃のコルーチンを停止
+        if (m_attackCoroutine != null)
         {
-            direction = (targetPosition - spawnPosition).normalized;
+            StopCoroutine(m_attackCoroutine);
+            m_attackCoroutine = null;
         }
 
-        // 弾スクリプトに方向と速度を適用
-        MiniGhostEnemyBullet bullet = bulletObj.GetComponent<MiniGhostEnemyBullet>();
+        // 死亡した場合は生成した弾を削除
+        if (m_owner != null && m_owner.GetIsDying())
+        {
+            DestroySpawnedBullets();
+        }
+    }
+
+    private IEnumerator AttackRoutine()
+    {
+        bool isKick = Random.Range(0, 2) == 0;
+        m_originalRotation = m_owner.transform.rotation;
+
+        yield return TurnRoutine(true);
+        if (m_owner.GetIsDying())
+        {
+            yield break;
+        }
+
+        if (m_animator != null)
+        {
+            if (isKick)
+            {
+                m_animator.SetTrigger("tKick");
+            }
+            else
+            {
+                m_animator.SetTrigger("tThrow");
+            }
+        }
+
+        Transform firePoint;
+
+        if (isKick)
+        {
+            firePoint = m_owner.GetKickFirePoint();
+        }
+        else
+        {
+            firePoint = m_owner.GetThrowFirePoint();
+        }
+
+        if (firePoint == null)
+        {
+            FinishAttack();
+            yield break;
+        }
+
+        GameObject bulletPrefab = GetRandomBulletPrefab();
+        if (bulletPrefab == null)
+        {
+            FinishAttack();
+            yield break;
+        }
+
+        GameObject bulletObject = null;
+
+        if (isKick)
+        {
+            // 蹴りでは先に弾を生成し、指定時間後に発射方向を設定する。
+            bulletObject = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+            m_spawnedBullets.Add(bulletObject);
+            yield return new WaitForSeconds(m_kickBulletDelay);
+        }
+        else
+        {
+            // 投げでは指定時間待ってから弾を生成する。
+            yield return new WaitForSeconds(m_throwBulletDelay);
+            if (m_owner.GetIsDying())
+            {
+                yield break;
+            }
+
+            bulletObject = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+            m_spawnedBullets.Add(bulletObject);
+        }
+
+        if (m_owner.GetIsDying() || bulletObject == null)
+        {
+            yield break;
+        }
+
+        Vector3 spawnPosition = firePoint.position;
+        Vector3 targetPosition = m_owner.GetPlayerPosition();
+
+        MiniGhostEnemyBullet bullet = bulletObject.GetComponent<MiniGhostEnemyBullet>();
         if (bullet != null)
         {
-            bullet.SetTarget(targetPosition, m_bulletSpeed, m_bulletAngle);
+            Vector3 correctedTargetPosition = GetCorrectedTargetPosition(targetPosition, spawnPosition);
+
+            bullet.SetTarget(correctedTargetPosition, m_bulletSpeed, m_bulletAngle);
         }
 
-        // 元の向きに戻る
-        //yield return StartCoroutine(TurnRoutine(false));
+        yield return new WaitForSeconds(m_postShootDelay);
+        if (m_owner.GetIsDying())
+        {
+            yield break;
+        }
 
-        yield return new WaitForSeconds(m_bulletDelay);
+        yield return TurnRoutine(false);
+        if (m_owner.GetIsDying())
+        {
+            yield break;
+        }
+
+        FinishAttack();
     }
 
-    // 弾を1つランダムに決める
+    private void FinishAttack()
+    {
+        m_attackCoroutine = null;
+
+        if (m_owner != null && !m_owner.GetIsDying())
+        {
+            m_owner.ChangeState(MINI_GHOST_STATE_TYPE.MOVE);
+        }
+    }
+
     private GameObject GetRandomBulletPrefab()
     {
-        if (m_bulletPrefabs == null || m_bulletPrefabs.Count == 0) return null;
+        if (m_bulletPrefabs == null || m_bulletPrefabs.Count == 0)
+        {
+            return null;
+        }
+
         int randomIndex = Random.Range(0, m_bulletPrefabs.Count);
         return m_bulletPrefabs[randomIndex];
     }
 
     private IEnumerator TurnRoutine(bool turnToPlayer)
     {
-        Vector3 playerPosition = m_miniGhostEnemy.GetPlayerPosition();
+        Vector3 playerPosition = m_owner.GetPlayerPosition();
+        Quaternion startRotation = m_owner.transform.rotation;
+        float elapsed = 0f;
 
-        if (turnToPlayer && m_miniGhostEnemy.GetPlayerPosition() == null) yield break;
-
-        // 現在の向きをスタート地点にする（途中で切り替わっても滑らかに繋がる）
-        Quaternion startRotation = m_stateOwner.transform.rotation;
-        float timeElapsed = 0f;
-
-        while (timeElapsed < m_turnDuration)
+        while (elapsed < m_turnDuration)
         {
-            float t = timeElapsed / m_turnDuration;
+            if (m_owner.GetIsDying())
+            {
+                yield break;
+            }
+
+            float t;
+            if (m_turnDuration <= 0f)
+            {
+                t = 1f;
+            }
+            else
+            {
+                t = Mathf.Clamp01(elapsed / m_turnDuration);
+            }
 
             float easedT;
             if (turnToPlayer)
@@ -133,35 +231,71 @@ public class MiniGhostAttackState : StateBase
             }
 
             Quaternion targetRotation;
-
             if (turnToPlayer)
             {
-                // プレイヤーを向く
-                Vector3 directionToPlayer = (playerPosition - m_stateOwner.transform.position).normalized;
-                targetRotation = Quaternion.LookRotation(-directionToPlayer);
+                Vector3 direction = playerPosition - m_owner.transform.position;
+                if (direction.sqrMagnitude > 0.0001f)
+                {
+                    targetRotation = Quaternion.LookRotation(-direction.normalized);
+                }
+                else
+                {
+                    targetRotation = m_owner.transform.rotation;
+                }
             }
             else
             {
-                // 元に戻る
                 targetRotation = m_originalRotation;
             }
 
-            // 回転を適用
-            m_stateOwner.transform.rotation = Quaternion.Slerp(startRotation, targetRotation, easedT);
-
-            timeElapsed += Time.deltaTime;
+            m_owner.transform.rotation = Quaternion.Slerp(startRotation, targetRotation, easedT);
+            elapsed += Time.deltaTime;
             yield return null;
         }
 
-        // 最後にズレを無くすための補正
         if (turnToPlayer)
         {
-            Vector3 finalDirection = (playerPosition - m_stateOwner.transform.position).normalized;
-            m_stateOwner.transform.rotation = Quaternion.LookRotation(-finalDirection);
+            Vector3 direction = playerPosition - m_owner.transform.position;
+            if (direction.sqrMagnitude > 0.0001f)
+            {
+                m_owner.transform.rotation = Quaternion.LookRotation(-direction.normalized);
+            }
         }
         else
         {
-            m_stateOwner.transform.rotation = m_originalRotation;
+            m_owner.transform.rotation = m_originalRotation;
         }
     }
+
+    private Vector3 GetCorrectedTargetPosition(
+     Vector3 targetPosition,
+     Vector3 spawnPosition)
+    {
+        // 発射位置から見た目標位置の高さの差
+        float heightDifference =
+            targetPosition.y - spawnPosition.y;
+
+        // 高さの差に応じて補正する
+        float correction =
+            m_targetHeightOffset
+            + heightDifference * m_heightCorrectionRate;
+
+        targetPosition.y += correction;
+
+        return targetPosition;
+    }
+
+    private void DestroySpawnedBullets()
+    {
+        foreach (GameObject bullet in m_spawnedBullets)
+        {
+            if (bullet != null)
+            {
+                Destroy(bullet);
+            }
+        }
+
+        m_spawnedBullets.Clear();
+    }
+
 }

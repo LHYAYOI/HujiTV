@@ -42,7 +42,7 @@ public class EnemySpawnManager : MonoBehaviour
     private Dictionary<string, SplineContainer> m_splineDictionary = new Dictionary<string, SplineContainer>(); // スプラインIDをキーにしてスプラインコンテナを格納する辞書
     private Dictionary<string, Transform> m_spawnPositionDictionary = new Dictionary<string, Transform>();
 
-    private List<EnemyBase> m_activeEnemies = new List<EnemyBase>(); // 現在アクティブなエネミーのリスト
+    public List<EnemyBase> m_activeEnemies = new List<EnemyBase>(); // 現在アクティブなエネミーのリスト
 
     private void Awake()
     {
@@ -180,7 +180,15 @@ public class EnemySpawnManager : MonoBehaviour
         {
             if (enemy != null)
             {
-                Destroy(enemy.gameObject);
+                MiniGhostEnemy miniGhostEnemy = enemy as MiniGhostEnemy;
+                if (miniGhostEnemy != null)
+                {
+                    miniGhostEnemy.ChangeState(MINI_GHOST_STATE_TYPE.DYING);
+                }
+                else
+                {
+                    Destroy(enemy.gameObject);
+                }
             }
         }
         m_activeEnemies.Clear();

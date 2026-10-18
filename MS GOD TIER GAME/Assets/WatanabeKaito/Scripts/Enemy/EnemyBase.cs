@@ -15,7 +15,7 @@ public abstract class EnemyBase : MonoBehaviour
 
     protected Transform m_playerPosition; // プレイヤーの位置
 
-    private EnemySpawnManager m_spawnManager; // スポーンマネージャーの参照
+    protected EnemySpawnManager m_spawnManager; // スポーンマネージャーの参照
 
     protected virtual void Awake()
     {

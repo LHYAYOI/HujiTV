@@ -3,52 +3,72 @@
   "WorkspaceRootPath": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\ths31021\\documents\\github\\hujitv\\ms god tier game\\assets\\watanabekaito\\scripts\\enemy\\swarmminighosttest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\swarmminighosttest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\ths31021\\documents\\github\\hujitv\\ms god tier game\\assets\\watanabekaito\\scripts\\enemy\\enemyspawntest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\enemyspawntest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\ths31021\\documents\\github\\hujitv\\ms god tier game\\assets\\watanabekaito\\scripts\\enemy\\state\\minighostspawnstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\state\\minighostspawnstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\watanabekaito\\scripts\\enemy\\state\\minighostmovestate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\state\\minighostmovestate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\watanabekaito\\scripts\\enemy\\state\\minighostdyingstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\state\\minighostdyingstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\watanabekaito\\scripts\\enemy\\state\\minighostidlestate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\state\\minighostidlestate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\watanabekaito\\scripts\\enemy\\state\\minighostattackstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\state\\minighostattackstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\watanabekaito\\scripts\\enemy\\minighostenemy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\minighostenemy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\common\\statemachine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\common\\statemachine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\common\\statebase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\common\\statebase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\watanabekaito\\scripts\\enemy\\minighostenemybullet.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\minighostenemybullet.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\watanabekaito\\scripts\\enemy\\enemyspawnmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\enemyspawnmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\watanabekaito\\scripts\\enemy\\enemybase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\enemybase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\watanabekaito\\scripts\\enemy\\minighostenemy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\minighostenemy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\watanabekaito\\scripts\\enemy\\state\\minighostattackstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\state\\minighostattackstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\watanabekaito\\scripts\\enemy\\state\\minighostmovestate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\state\\minighostmovestate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\watanabekaito\\scripts\\enemy\\state\\minighoststate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\state\\minighoststate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\watanabekaito\\scripts\\enemy\\state\\minighostdyingstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\state\\minighostdyingstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\watanabekaito\\scripts\\enemy\\state\\minighostspawnstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\state\\minighostspawnstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\common\\statemachine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\common\\statemachine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\hitsendercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\hitsendercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\watanabekaito\\scripts\\enemy\\splinemoveenemy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\splinemoveenemy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\watanabekaito\\scripts\\enemy\\enemybase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\enemybase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\common\\routinerunner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\common\\routinerunner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\common\\easing.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\common\\easing.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\common\\statebase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\common\\statebase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\watanabekaito\\scripts\\enemy\\swarmminighosttest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\watanabekaito\\scripts\\enemy\\swarmminighosttest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\magicbullet\\magicbulletmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -69,10 +89,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\rune\\runtime\\runetracecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\rune\\runtime\\runetracecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\hitsendercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\hitsendercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\player\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -114,99 +130,75 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 3,
               "Title": "MiniGhostEnemy.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhostEnemy.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhostEnemy.cs",
               "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhostEnemy.cs",
               "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhostEnemy.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAA2AAAAAAAAAA==",
+              "ViewState": "AgIAAFYAAAAAAAAAAAA0wK0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-10-15T06:57:09.466Z",
-              "IsPinned": true
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "MiniGhostSpawnState.cs",
-              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostSpawnState.cs",
-              "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostSpawnState.cs",
-              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostSpawnState.cs",
-              "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostSpawnState.cs",
-              "ViewState": "AgIAAAUAAAAAAAAAAADwvxYAAABHAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-15T10:02:04.275Z",
               "IsPinned": true,
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "MiniGhostMoveState.cs",
-              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostMoveState.cs",
-              "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostMoveState.cs",
-              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostMoveState.cs",
-              "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostMoveState.cs",
-              "ViewState": "AgIAAA4AAAAAAAAAAADwvx4AAABJAAAAAAAAAA==",
+              "DocumentIndex": 8,
+              "Title": "MiniGhostSpawnState.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostSpawnState.cs",
+              "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostSpawnState.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostSpawnState.cs",
+              "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostSpawnState.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACEAAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-15T10:02:55.171Z",
+              "WhenOpened": "2026-10-15T10:02:04.275Z",
               "IsPinned": true
             },
             {
               "$type": "Document",
               "DocumentIndex": 5,
+              "Title": "MiniGhostMoveState.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostMoveState.cs",
+              "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostMoveState.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostMoveState.cs",
+              "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostMoveState.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-15T10:02:55.171Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "MiniGhostAttackState.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostAttackState.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostAttackState.cs",
               "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostAttackState.cs",
               "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostAttackState.cs",
-              "ViewState": "AgIAAAgAAAAAAAAAAADwvyMAAABHAAAAAAAAAA==",
+              "ViewState": "AgIAAAMBAAAAAAAAAAAgwB0BAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-10-15T10:01:48.433Z",
-              "IsPinned": true
+              "IsPinned": true,
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "MiniGhostIdleState.cs",
-              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostIdleState.cs",
-              "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostIdleState.cs",
-              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostIdleState.cs",
-              "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostIdleState.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAgAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-15T10:03:37.212Z",
-              "IsPinned": true
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 7,
               "Title": "MiniGhostDyingState.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostDyingState.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostDyingState.cs",
               "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostDyingState.cs",
               "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostDyingState.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAsAAAAAAAAAA==",
+              "ViewState": "AgIAACEAAAAAAAAAAAAIwEEAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-10-15T10:04:02.517Z",
               "IsPinned": true
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "SwarmMiniGhostTest.cs",
-              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmMiniGhostTest.cs",
-              "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmMiniGhostTest.cs",
-              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmMiniGhostTest.cs",
-              "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmMiniGhostTest.cs",
-              "ViewState": "AgIAAGgAAAAAAAAAAAAcwHcAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-16T05:42:16.268Z",
-              "EditorCaption": ""
             },
             {
               "$type": "Bookmark",
@@ -218,139 +210,70 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "StateMachine.cs",
-              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\StateMachine.cs",
-              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Common\\StateMachine.cs",
-              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\StateMachine.cs",
-              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Common\\StateMachine.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAB4AAAAJAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "EnemySpawnTest.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemySpawnTest.cs",
+              "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemySpawnTest.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemySpawnTest.cs",
+              "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemySpawnTest.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAADwvxgAAAA5AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-15T07:05:54.018Z"
+              "WhenOpened": "2026-10-16T08:01:10.343Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "StateBase.cs",
-              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\StateBase.cs",
-              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Common\\StateBase.cs",
-              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\StateBase.cs",
-              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Common\\StateBase.cs",
-              "ViewState": "AgIAAAsAAAAAAAAAAADwvw0AAAApAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "MiniGhostEnemyBullet.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhostEnemyBullet.cs",
+              "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhostEnemyBullet.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhostEnemyBullet.cs",
+              "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhostEnemyBullet.cs",
+              "ViewState": "AgIAAB0AAAAAAAAAAAAgwEMAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-15T07:05:08.592Z"
+              "WhenOpened": "2026-10-17T06:23:48.057Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "EnemyBase.cs",
-              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemyBase.cs",
-              "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemyBase.cs",
-              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemyBase.cs",
-              "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemyBase.cs",
-              "ViewState": "AgIAAA0AAAAAAAAAAAAlwBwAAAAZAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-15T09:06:25.535Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 2,
               "Title": "EnemySpawnManager.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemySpawnManager.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemySpawnManager.cs",
               "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemySpawnManager.cs",
               "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemySpawnManager.cs",
-              "ViewState": "AgIAAGQAAAAAAAAAAAAgwHUAAAAhAAAAAAAAAA==",
+              "ViewState": "AgIAAKkAAAAAAAAAAAAEwLAAAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-15T08:15:51.825Z"
+              "WhenOpened": "2026-10-15T08:15:51.825Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "SplineMoveEnemy.cs",
-              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\SplineMoveEnemy.cs",
-              "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\SplineMoveEnemy.cs",
-              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\SplineMoveEnemy.cs",
-              "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\SplineMoveEnemy.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAkAAAAoAAAAAAAAAA==",
+              "DocumentIndex": 9,
+              "Title": "StateMachine.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\StateMachine.cs",
+              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Common\\StateMachine.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\StateMachine.cs",
+              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Common\\StateMachine.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-15T08:13:10.171Z"
+              "WhenOpened": "2026-10-15T07:05:54.018Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "MagicBulletController.cs",
-              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletController.cs",
-              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletController.cs",
-              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletController.cs",
-              "RelativeToolTip": "Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 6,
+              "Title": "MiniGhostState.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostState.cs",
+              "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostState.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostState.cs",
+              "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostState.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAA9AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-13T02:56:54.87Z"
+              "WhenOpened": "2026-10-17T13:58:17.612Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "CameraManager.cs",
-              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
-              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
-              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
-              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
-              "ViewState": "AgIAABIAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-13T02:45:37.922Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "MagicBulletManager.cs",
-              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletManager.cs",
-              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletManager.cs",
-              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletManager.cs",
-              "RelativeToolTip": "Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletManager.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-13T02:39:13.445Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "TargetSelector.cs",
-              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Player\\TargetSelector.cs",
-              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Player\\TargetSelector.cs",
-              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Player\\TargetSelector.cs",
-              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Player\\TargetSelector.cs",
-              "ViewState": "AgIAAF0AAAAAAAAAAADwv3QAAAAFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-13T01:27:08.926Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 18,
-              "Title": "PlayerController.cs",
-              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Player\\PlayerController.cs",
-              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Player\\PlayerController.cs",
-              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Player\\PlayerController.cs",
-              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Player\\PlayerController.cs",
-              "ViewState": "AgIAABsAAAAAAAAAAAAAABMAAAAFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-13T01:27:05.81Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 19,
-              "Title": "BookNetworkServer.cs",
-              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkServer.cs",
-              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkServer.cs",
-              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkServer.cs",
-              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkServer.cs",
-              "ViewState": "AgIAAPIAAAAAAAAAAADwv+oAAAAdAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-13T01:23:27.443Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 10,
               "Title": "HitSenderController.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\HitSenderController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\HitSenderController.cs",
@@ -362,7 +285,151 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "SplineMoveEnemy.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\SplineMoveEnemy.cs",
+              "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\SplineMoveEnemy.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\SplineMoveEnemy.cs",
+              "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\SplineMoveEnemy.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAA7AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-15T08:13:10.171Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "EnemyBase.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemyBase.cs",
+              "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemyBase.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemyBase.cs",
+              "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemyBase.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-15T09:06:25.535Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "RoutineRunner.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\RoutineRunner.cs",
+              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Common\\RoutineRunner.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\RoutineRunner.cs",
+              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Common\\RoutineRunner.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-16T07:53:21.585Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "Easing.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\Easing.cs",
+              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Common\\Easing.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\Easing.cs",
+              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Common\\Easing.cs",
+              "ViewState": "AgIAAAEAAAAAAAAAAAApwA0AAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-16T08:17:23.215Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "StateBase.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\StateBase.cs",
+              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Common\\StateBase.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\StateBase.cs",
+              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Common\\StateBase.cs",
+              "ViewState": "AgIAAEkAAAAAAAAAAAAmwAgAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-15T07:05:08.592Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "SwarmMiniGhostTest.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmMiniGhostTest.cs",
+              "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmMiniGhostTest.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmMiniGhostTest.cs",
+              "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmMiniGhostTest.cs",
+              "ViewState": "AgIAAGgAAAAAAAAAAAAcwHYAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-16T05:42:16.268Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "MagicBulletController.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletController.cs",
+              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletController.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletController.cs",
+              "RelativeToolTip": "Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-13T02:56:54.87Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "CameraManager.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
+              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
+              "ViewState": "AgIAABIAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-13T02:45:37.922Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "MagicBulletManager.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletManager.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletManager.cs",
+              "RelativeToolTip": "Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-13T02:39:13.445Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 20,
+              "Title": "TargetSelector.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Player\\TargetSelector.cs",
+              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Player\\TargetSelector.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Player\\TargetSelector.cs",
+              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Player\\TargetSelector.cs",
+              "ViewState": "AgIAAF0AAAAAAAAAAADwv3QAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-13T01:27:08.926Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "PlayerController.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Player\\PlayerController.cs",
+              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Player\\PlayerController.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Player\\PlayerController.cs",
+              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Player\\PlayerController.cs",
+              "ViewState": "AgIAABsAAAAAAAAAAAAAABMAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-13T01:27:05.81Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "BookNetworkServer.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkServer.cs",
+              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkServer.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkServer.cs",
+              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkServer.cs",
+              "ViewState": "AgIAAPIAAAAAAAAAAADwv+oAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-13T01:23:27.443Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
               "Title": "CubTest.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\test\\CubTest.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\test\\CubTest.cs",
@@ -374,7 +441,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 21,
               "Title": "RuneTraceController.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceController.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceController.cs",
@@ -386,7 +453,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 27,
               "Title": "RuneTraceRule.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneTraceRule.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneTraceRule.cs",
@@ -398,7 +465,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 29,
               "Title": "RuneTraceData.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneTraceData.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneTraceData.cs",
@@ -410,7 +477,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 28,
               "Title": "RuneStrokeData.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneStrokeData.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneStrokeData.cs",
@@ -422,7 +489,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 26,
               "Title": "RuneAuthoringData.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneAuthoringData.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneAuthoringData.cs",
@@ -434,7 +501,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 25,
               "Title": "RuneEditorWindow.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Editor\\RuneEditorWindow.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Editor\\RuneEditorWindow.cs",
