@@ -1,43 +1,70 @@
+ï»¿using System.Collections;
 using UnityEngine;
 
 public class MagicBulletController : MonoBehaviour
 {
     [SerializeField] MagicData m_magicData;
 
+    [SerializeField] float m_moveSpeed;
+
+    [SerializeField] float m_curveHeight;
+
     GameObject m_target;
 
-    private void Update()
-    {
-        MoveProcess();
-    }
+    Vector3 m_controlPoint;
 
     public MagicData GetMagicData()
     {
         return m_magicData;
     }
 
-    public void SetTarget(GameObject target)
+    public void FireBullet(GameObject target)
     {
         m_target = target;
+
+        Vector3 centerPoint = Vector3.Lerp(transform.position, m_target.transform.position, 0.5f);
+
+        m_controlPoint = centerPoint + Vector3.up * m_curveHeight;
+
+        StartCoroutine(HomingRoutine(.5f));
     }
 
-    private void MoveProcess() 
+    private IEnumerator HomingRoutine(float duration)
     {
-        if (m_target == null) 
-        {
-            return;
-        }
+        Vector3 startPosition = transform.position;
 
-        gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, m_target.transform.position, 10 * Time.deltaTime);
+        float deltaTime = 0;
+
+        while (deltaTime < duration)
+        {
+            deltaTime += Time.deltaTime;
+
+            float rate = deltaTime / duration;
+
+            rate = Mathf.Clamp01(rate);
+
+            Vector3 position = Vector3.Lerp(startPosition, m_target.transform.position, rate);
+
+            transform.position = CalculateBezier(startPosition, m_controlPoint, m_target.transform.position, rate);
+
+            yield return null;
+        }
     }
 
-    //”­ŽËˆ—
+    private Vector3 CalculateBezier(Vector3 start, Vector3 controlPoint, Vector3 end, float rate) 
+    {
+        float u = 1.0f - rate;
 
-    //”­ŽË‰¹Ä¶ 
+        return u * u * start + 2f * u * rate * controlPoint + rate * rate * end;
+    }
 
-    //---‰½‚©“–‚½‚Á‚½Žž‚ÉŒÄ‚Ño‚µ‚Ä‚Ù‚µ‚¢ˆ—---//
+    //ç™ºå°„å‡¦ç†
 
-    //ƒGƒtƒFƒNƒgÄ¶
+    //ç™ºå°„éŸ³å†ç”Ÿ 
 
-    //ƒqƒbƒgŽž‚Ì‰¹Ä¶
+    //---ä½•ã‹å½“ãŸã£ãŸæ™‚ã«å‘¼ã³å‡ºã—ã¦ã»ã—ã„å‡¦ç†---//
+
+    //ã‚¨ãƒ•ã‚§ã‚¯ãƒˆå†ç”Ÿ
+
+    //ãƒ’ãƒƒãƒˆæ™‚ã®éŸ³å†ç”Ÿ
 }

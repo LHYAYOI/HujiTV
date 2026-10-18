@@ -53,6 +53,11 @@ public class PlayerController : MonoBehaviour
         m_targetSelector.SortTargets();
         GameObject target = m_targetSelector.GetSelectedTarget(direction);
 
+        if (target == null) 
+        {
+            return;
+        }
+
         m_bulletManager.FireBullet(magicData, m_bulletSpawnPoint.position, target);
     }
 }

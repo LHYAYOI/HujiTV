@@ -137,7 +137,75 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31564cf657255804f982df79cbb6ad05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  m_horizontalCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.01259565
+      value: 0.0023498535
+      inSlope: 2.8596976
+      outSlope: 2.8596976
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.1850791
+      value: 0.49560034
+      inSlope: 1.5785356
+      outSlope: 1.5785356
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.25017416
+      outWeight: 0.24026328
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -0.6081576
+      outSlope: -0.6081576
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_verticalCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.01259565
+      value: 0.0023498535
+      inSlope: 6.411321
+      outSlope: 6.411321
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.16671753
+      value: 0.9904747
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.2594458
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1.1886421
+      outSlope: -1.1886421
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   m_magicData: {fileID: 11400000, guid: 17ef150f604effd4e91c6dfb9950d6c0, type: 2}
+  m_moveSpeed: 0
+  m_curveHeight: 3
 --- !u!1 &1249662005817768199
 GameObject:
   m_ObjectHideFlags: 0
