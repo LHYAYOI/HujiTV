@@ -80,6 +80,6 @@ public abstract class GimmickSpline : Gimmick
         Vector3 position = spline.EvaluatePosition(value);
 
         Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(position, 0.5f);
+        Gizmos.DrawSphere(position, 0.1f);
     }
 }
