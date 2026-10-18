@@ -1,17 +1,35 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class BattleManager : MonoBehaviour
 {
+
+
+    private EnemySpawnManager m_spawnManager;
     private BattleData m_currentBattleData;
+    private UnityEvent m_onFinishEvent;
     
+    public static BattleManager Instance {  get; private set; }
 
 
 
-    public void StartBattle(BattleData battleData)
+    private void Awake()
     {
+        m_spawnManager = FindAnyObjectByType<EnemySpawnManager>();
+        Instance = this; 
+    }
+
+    public void StartBattle(BattleData battleData,UnityEvent onFinishEvent)
+    {
+        if(m_spawnManager == null)
+        {
+            return; 
+        }
+
         m_currentBattleData = battleData;
+        m_onFinishEvent = onFinishEvent;
 
         StartCoroutine(BattleCoroutine());
     }
@@ -32,9 +50,7 @@ public class BattleManager : MonoBehaviour
 
 
         //        List<EnemyBase> enemyList = EnemySpawnManager.getEnemyList();
-
-
-
+        /*
         foreach (BattleEnemyData data in enemyData)
         {
             switch (data.SpawnType)
@@ -53,6 +69,18 @@ public class BattleManager : MonoBehaviour
             //        yield return new WaitUntil(() => enemyList.Count == 0);
 
         }
+        */
+
+
+        foreach(BattleEnemyData data in  enemyData)
+        {
+            m_spawnManager.SpawnSplineMoveEnemy(data.EnemyId, data.SplineId, data.SpawnId);
+        }
+
+
+        yield return new WaitForSeconds(m_currentBattleData.BattleTime);
+
+        m_onFinishEvent?.Invoke();
 
         yield return null;
     }

@@ -71,7 +71,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostEnemy
   m_enemyData: {fileID: 11400000, guid: d57e1e492585fd34a91c0444e1e44935, type: 2}
-  m_moveSpeed: 3
+  m_moveSpeed: 0.5
   m_rotateWithSplineFlag: 0
   m_bulletPrefabs:
   - {fileID: 8444880630598191031, guid: 07e84809798d77d4f8916add96b1b76c, type: 3}
