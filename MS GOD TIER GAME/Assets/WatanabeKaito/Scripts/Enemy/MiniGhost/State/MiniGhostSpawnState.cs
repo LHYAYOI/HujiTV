@@ -57,8 +57,8 @@ public class MiniGhostSpawnState : MiniGhostState
         {
             m_owner.transform.position = m_spawnTargetPos;
             m_owner.SetDistanceTraveled(0f);
-            m_owner.StartTimeLimit();
-            m_owner.ChangeState(MINI_GHOST_STATE_TYPE.MOVE);
+            //m_owner.StartTimeLimit();
+            m_owner.ChangeState(MINI_GHOST_STATE_TYPE.IDLE);
         }
 
     }

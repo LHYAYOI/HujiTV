@@ -4,6 +4,7 @@ using UnityEngine.Splines;
 public enum MINI_GHOST_STATE_TYPE // ミニお化けのステートタイプ
 {
     NONE,
+    IDLE,   // 待機
     SPAWN,  // 出現
     MOVE,   // 移動
     ATTACK, // 攻撃
@@ -21,6 +22,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
     [Header("投げの弾の発射位置")]
     [SerializeField] private Transform m_throwFirePoint;
 
+    private MiniGhostIdleState m_idleState;     // 待機ステート
     private MiniGhostSpawnState m_spawnState;   // 出現ステート
     private MiniGhostMoveState m_moveState;     // 移動ステート
     private MiniGhostAttackState m_attackState; // 攻撃ステート
@@ -70,6 +72,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
     // 各状態コンポーネントを取得する。
     private void ResolveStateComponents()
     {
+        m_idleState = GetComponent<MiniGhostIdleState>();
         m_spawnState = GetComponent<MiniGhostSpawnState>();
         m_moveState = GetComponent<MiniGhostMoveState>();
         m_attackState = GetComponent<MiniGhostAttackState>();
@@ -79,6 +82,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
     // 各状態コンポーネントを初期化する。
     private void InitializeStateComponents()
     {
+        InitializeComponent(m_idleState);
         InitializeComponent(m_spawnState);
         InitializeComponent(m_moveState);
         InitializeComponent(m_attackState);
@@ -129,6 +133,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
     {
         switch (stateType)
         {
+            case MINI_GHOST_STATE_TYPE.IDLE: return m_idleState;
             case MINI_GHOST_STATE_TYPE.SPAWN: return m_spawnState;
             case MINI_GHOST_STATE_TYPE.MOVE: return m_moveState;
             case MINI_GHOST_STATE_TYPE.ATTACK: return m_attackState;
@@ -148,9 +153,9 @@ public class MiniGhostEnemy : SplineMoveEnemy
         m_isDying = true;
         m_timeLimitStarted = false;
 
-        if (m_spawnManager != null)
+        if (m_activeEnemyManager != null)
         {
-            m_spawnManager.RemoveActiveEnemy(this);
+            m_activeEnemyManager.RemoveActiveEnemy(this);
         }
 
         ChangeState(MINI_GHOST_STATE_TYPE.DYING);

@@ -101,6 +101,7 @@ GameObject:
   - component: {fileID: 7850703199708027995}
   - component: {fileID: 7927228099763986070}
   - component: {fileID: 3282884335062489158}
+  - component: {fileID: 1651294565247797093}
   - component: {fileID: 2702416843714358507}
   - component: {fileID: 2846553606419501028}
   - component: {fileID: 4122682875455443804}
@@ -170,6 +171,18 @@ MonoBehaviour:
   m_timeLimit: 25
   m_kickFirePoint: {fileID: 4230615318380201651}
   m_throwFirePoint: {fileID: 1847888665569345119}
+--- !u!114 &1651294565247797093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309553552582454145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8a470f822ec9f540a9148b8f6aa0292, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniGhostIdleState
 --- !u!114 &2702416843714358507
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217,7 +230,7 @@ MonoBehaviour:
   - {fileID: 8444880630598191031, guid: 5d3280a2480b9214a9e32b192dbc6bd1, type: 3}
   - {fileID: 8444880630598191031, guid: 2a71e4f3b6995d6448c21dcc15371515, type: 3}
   - {fileID: 8444880630598191031, guid: 60146a51dd7ece44eb63508a7dd742ac, type: 3}
-  m_bulletSpeed: 10
+  m_bulletSpeed: 5
   m_bulletAngle: 30
   m_targetHeightOffset: -0.1
   m_heightCorrectionRate: 0.1

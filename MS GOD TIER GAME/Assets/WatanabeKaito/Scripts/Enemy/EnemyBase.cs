@@ -15,7 +15,7 @@ public abstract class EnemyBase : MonoBehaviour
 
     protected Transform m_playerPosition; // プレイヤーの位置
 
-    protected EnemySpawnManager m_spawnManager; // スポーンマネージャーの参照
+    protected ActiveEnemyManager m_activeEnemyManager; // アクティブなエネミーを管理するマネージャー
 
     protected virtual void Awake()
     {
@@ -57,8 +57,8 @@ public abstract class EnemyBase : MonoBehaviour
     }
 
     // スポーンマネージャーの参照を設定する関数
-    public void SetSpawnManager(EnemySpawnManager spawnManager)
+    public void SetActiveEnemyManager(ActiveEnemyManager activeEnemyManager)
     {
-        m_spawnManager = spawnManager;
+        m_activeEnemyManager = activeEnemyManager;
     }
 }

@@ -5,6 +5,8 @@ public class EnemySpawnTest : MonoBehaviour
 {
     [SerializeField] private EnemySpawnManager m_enemySpawnManager;
 
+    [SerializeField] private ActiveEnemyManager m_activeEnemyManager;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -22,7 +24,8 @@ public class EnemySpawnTest : MonoBehaviour
     {
        if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
-            m_enemySpawnManager.RemoveAllActiveEnemies();
+            //m_activeEnemyManager.RemoveAllActiveEnemies();
+            m_activeEnemyManager.SetAllMiniGhostsToBattleStart();
         }
 
 

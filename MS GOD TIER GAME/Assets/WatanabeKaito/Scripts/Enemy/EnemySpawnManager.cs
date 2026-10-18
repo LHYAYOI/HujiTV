@@ -24,6 +24,8 @@ public class EnemySpawnManager : MonoBehaviour
         public Transform m_position; // 出現位置のTransform
     }
 
+    [Header("アクティブなエネミー管理マネージャー")]
+    [SerializeField] private ActiveEnemyManager m_activeEnemyManager; // アクティブなエネミーを管理するマネージャー
 
     [Header("プレイヤーの位置")]
     [SerializeField] private Transform m_playerTransform; // プレイヤーの位置を取得するためのTransform
@@ -41,8 +43,6 @@ public class EnemySpawnManager : MonoBehaviour
     private Dictionary<string, EnemyBase> m_enemyDictionary = new Dictionary<string, EnemyBase>();  // エネミーIDをキーにしてエネミープレハブを格納する辞書
     private Dictionary<string, SplineContainer> m_splineDictionary = new Dictionary<string, SplineContainer>(); // スプラインIDをキーにしてスプラインコンテナを格納する辞書
     private Dictionary<string, Transform> m_spawnPositionDictionary = new Dictionary<string, Transform>();
-
-    public List<EnemyBase> m_activeEnemies = new List<EnemyBase>(); // 現在アクティブなエネミーのリスト
 
     private void Awake()
     {
@@ -112,10 +112,10 @@ public class EnemySpawnManager : MonoBehaviour
         Vector3 spawnPosition = spawnTransform.position;
         EnemyBase enemyObj = Instantiate(prefab, spawnPosition, Quaternion.identity);
         enemyObj.SetPlayerPosition(m_playerTransform);
-        enemyObj.SetSpawnManager(this);
+        enemyObj.SetActiveEnemyManager(m_activeEnemyManager);
 
         // アクティブなエネミーリストに追加
-        AddActiveEnemy(enemyObj);
+        m_activeEnemyManager.AddActiveEnemy(enemyObj);
 
         if (enemyObj is SplineMoveEnemy splineMoveEnemy)
         {
@@ -142,57 +142,14 @@ public class EnemySpawnManager : MonoBehaviour
 
         EnemyBase enemyObj = Instantiate(prefab, spawnPosition, Quaternion.identity);
         enemyObj.SetPlayerPosition(m_playerTransform);
-        enemyObj.SetSpawnManager(this);
+        enemyObj.SetActiveEnemyManager(m_activeEnemyManager);
         enemyObj.Initialize();
 
         // アクティブなエネミーリストに追加
-        AddActiveEnemy(enemyObj);
+        m_activeEnemyManager.AddActiveEnemy(enemyObj);
     }
 
-    // 現在アクティブなエネミーリストを取得
-    public List<EnemyBase> GetActiveEnemies()
-    {
-        return m_activeEnemies;
-    }
-
-    // エネミーをアクティブリストに追加
-    public void AddActiveEnemy(EnemyBase enemy)
-    {
-        if (!m_activeEnemies.Contains(enemy))
-        {
-            m_activeEnemies.Add(enemy);
-        }
-    }
-
-    // エネミーをアクティブリストから削除
-    public void RemoveActiveEnemy(EnemyBase enemy)
-    {
-        if (m_activeEnemies.Contains(enemy))
-        {
-            m_activeEnemies.Remove(enemy);
-        }
-    }
-
-    // エネミーをすべて削除
-    public void RemoveAllActiveEnemies()
-    {
-        foreach (var enemy in m_activeEnemies)
-        {
-            if (enemy != null)
-            {
-                MiniGhostEnemy miniGhostEnemy = enemy as MiniGhostEnemy;
-                if (miniGhostEnemy != null)
-                {
-                    miniGhostEnemy.ChangeState(MINI_GHOST_STATE_TYPE.DYING);
-                }
-                else
-                {
-                    Destroy(enemy.gameObject);
-                }
-            }
-        }
-        m_activeEnemies.Clear();
-    }
+ 
 
 
 }
