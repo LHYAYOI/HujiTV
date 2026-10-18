@@ -1,13 +1,13 @@
 using UnityEngine;
 using UnityEngine.Splines;
 
-public enum MINI_GHOST_STATE_TYPE
+public enum MINI_GHOST_STATE_TYPE // ミニお化けのステートタイプ
 {
     NONE,
-    SPAWN,
-    MOVE,
-    ATTACK,
-    DYING
+    SPAWN,  // 出現
+    MOVE,   // 移動
+    ATTACK, // 攻撃
+    DYING   // 死亡
 }
 
 public class MiniGhostEnemy : SplineMoveEnemy
@@ -21,19 +21,18 @@ public class MiniGhostEnemy : SplineMoveEnemy
     [Header("投げの弾の発射位置")]
     [SerializeField] private Transform m_throwFirePoint;
 
-    private MiniGhostSpawnState m_spawnState;
-    private MiniGhostMoveState m_moveState;
-    private MiniGhostAttackState m_attackState;
-    private MiniGhostDyingState m_dyingState;
+    private MiniGhostSpawnState m_spawnState;   // 出現ステート
+    private MiniGhostMoveState m_moveState;     // 移動ステート
+    private MiniGhostAttackState m_attackState; // 攻撃ステート
+    private MiniGhostDyingState m_dyingState;   // 死亡ステート
 
-    private MINI_GHOST_STATE_TYPE m_currentStateType = MINI_GHOST_STATE_TYPE.NONE;
-    private MiniGhostState m_currentState;
+    private MINI_GHOST_STATE_TYPE m_currentStateType = MINI_GHOST_STATE_TYPE.NONE; // 現在のステートタイプ
+    private MiniGhostState m_currentState;  // 現在のステートコンポーネント
 
-    private bool m_isInitialized;
-    private bool m_timeLimitStarted;
-    private bool m_isDying;
+    private bool m_isInitialized;       // 初期化済みフラグ
+    private bool m_timeLimitStarted;    // 制限時間開始フラグ
+    private bool m_isDying;             // 死亡中フラグ
 
-  
 
     public override void Initialize()
     {
@@ -68,6 +67,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
         }
     }
 
+    // 各状態コンポーネントを取得する。
     private void ResolveStateComponents()
     {
         m_spawnState = GetComponent<MiniGhostSpawnState>();
@@ -76,6 +76,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
         m_dyingState = GetComponent<MiniGhostDyingState>();
     }
 
+    // 各状態コンポーネントを初期化する。
     private void InitializeStateComponents()
     {
         InitializeComponent(m_spawnState);
@@ -84,6 +85,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
         InitializeComponent(m_dyingState);
     }
 
+    // 各状態コンポーネントを初期化する。
     private void InitializeComponent(MiniGhostState state)
     {
         if (state != null)
@@ -92,6 +94,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
         }
     }
 
+    // ステートを変更
     public void ChangeState(MINI_GHOST_STATE_TYPE nextStateType)
     {
         // 死亡後にほかの状態へ戻ることを防ぐ。
@@ -121,6 +124,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
         m_currentState.EnterState();
     }
 
+    // 各ステートを取得
     private MiniGhostState GetStateComponent(MINI_GHOST_STATE_TYPE stateType)
     {
         switch (stateType)
@@ -133,7 +137,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
         }
     }
 
-    /// <summary>制限時間や被弾から呼び出し、死亡処理を一度だけ開始する。</summary>
+    // 死亡処理を開始する
     public void BeginDying()
     {
         if (m_isDying)
@@ -152,82 +156,75 @@ public class MiniGhostEnemy : SplineMoveEnemy
         ChangeState(MINI_GHOST_STATE_TYPE.DYING);
     }
 
+    // 現在のステートタイプを取得する
     public MINI_GHOST_STATE_TYPE GetCurrentStateType()
     {
         return m_currentStateType;
     }
 
+    // 死亡中かどうかを取得する
     public bool GetIsDying()
     {
         return m_isDying;
     }
 
+    // 蹴りの弾の発射位置を取得する
     public Transform GetKickFirePoint()
     {
         return m_kickFirePoint;
     }
 
+    // 投げの弾の発射位置を取得する
     public Transform GetThrowFirePoint()
     {
         return m_throwFirePoint;
     }
 
-    // SplineMoveEnemyの移動更新をMove状態から呼び出す。
+    // SplineMoveEnemyの移動更新
     public void UpdateSplineMove()
     {
         base.Update();
     }
+
+    // スプラインのターゲットを取得する
     public SplineContainer GetTargetSpline()
     {
         return m_targetSpline;
     }
 
+    // スポーン位置を取得する
     public Vector3 GetSpawnPosition()
     {
         return m_spawnPosition;
     }
 
+    // プレイヤーの位置を取得する
     public Vector3 GetPlayerPosition()
     {
-        // プレイヤーの位置の少し手前の位置を返す
         return m_playerPosition.position;
     }
 
-    public float GetDistanceTraveled()
-    {
-        return m_distanceTraveled;
-    }
 
-    public Vector3 GetKickFirePosition()
-    {
-        return m_kickFirePoint.position;
-    }
-
-    public Vector3 GetThrowFirePosition()
-    {
-        return m_throwFirePoint.position;
-    }
-
+    // 移動速度を設定する
     public void SetMoveSpeed(float speed)
     {
         m_moveSpeed = speed;
     }
 
+    // スプラインに合わせて回転するかのフラグを設定する
     public void SetRotateWithSplineFlag(bool flag)
     {
         m_rotateWithSplineFlag = flag;
     }
 
+    // 移動距離を設定する
     public void SetDistanceTraveled(float distance)
     {
         m_distanceTraveled = distance;
     }
 
-    public void SetMoveDirection(float direction)
-    {
-        m_moveDirection = direction;
-    }
 
+    // 制限時間を開始する
     public void StartTimeLimit()
     {
         if (!m_timeLimitStarted && !m_isDying)
@@ -235,9 +232,6 @@ public class MiniGhostEnemy : SplineMoveEnemy
             m_timeLimitStarted = true;
         }
     }
-
-    // 旧コードとの互換用。新しいコードでは IsDying を使用する。
-    public bool GgtIsDyingFlag() => m_isDying;
 
     private void OnTriggerEnter(Collider collision)
     {

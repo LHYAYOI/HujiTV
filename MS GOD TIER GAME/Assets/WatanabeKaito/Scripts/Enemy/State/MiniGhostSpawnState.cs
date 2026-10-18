@@ -6,15 +6,12 @@ public class MiniGhostSpawnState : MiniGhostState
     [Header("スプラインまでの移動時間")]
     [SerializeField] private float m_spawnDuration = 3.0f;
 
-    private Vector3 m_spawnTargetPos;
-    private float m_spawnTimer;
-    private bool m_hasSpawnTarget;
+    private Vector3 m_spawnTargetPos;   // スプライン上の出現位置
+    private float m_spawnTimer;         // スプラインまでの移動時間の経過時間
 
     public override void EnterState()
     {
         m_spawnTimer = 0f;
-        m_hasSpawnTarget = false;
-
         SplineContainer targetSpline = m_owner.GetTargetSpline();
         if (targetSpline == null)
         {
@@ -28,12 +25,11 @@ public class MiniGhostSpawnState : MiniGhostState
             m_owner.transform.rotation = Quaternion.LookRotation(initialTangent);
         }
 
-        m_hasSpawnTarget = true;
     }
 
     public override void UpdateState()
     {
-        if (!m_hasSpawnTarget || m_owner.GetIsDying())
+        if (m_owner.GetIsDying())
         {
             return;
         }
@@ -61,7 +57,6 @@ public class MiniGhostSpawnState : MiniGhostState
         {
             m_owner.transform.position = m_spawnTargetPos;
             m_owner.SetDistanceTraveled(0f);
-            m_owner.SetMoveDirection(1f);
             m_owner.StartTimeLimit();
             m_owner.ChangeState(MINI_GHOST_STATE_TYPE.MOVE);
         }
@@ -70,7 +65,9 @@ public class MiniGhostSpawnState : MiniGhostState
 
     public override void ExitState()
     {
-        m_hasSpawnTarget = false;
+       
     }
+
+
 
 }

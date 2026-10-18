@@ -1230,8 +1230,8 @@ MonoBehaviour:
         y: 0
         z: 0
       TangentIn:
-        x: -0
-        y: -0
+        x: 0
+        y: 0
         z: -0.27614236
       TangentOut:
         x: 0
@@ -1298,7 +1298,7 @@ MonoBehaviour:
           z: 0
           w: -0.7071067
     m_MetaData:
-    - Mode: 4
+    - Mode: 2
       Tension: 0.5
     - Mode: 4
       Tension: 0.5

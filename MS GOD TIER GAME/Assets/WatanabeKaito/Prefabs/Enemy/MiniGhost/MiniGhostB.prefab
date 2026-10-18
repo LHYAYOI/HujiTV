@@ -166,6 +166,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostEnemy
   m_enemyData: {fileID: 11400000, guid: d57e1e492585fd34a91c0444e1e44935, type: 2}
+  m_moveDirection: -1
   m_timeLimit: 20
   m_kickFirePoint: {fileID: 4230615318380201651}
   m_throwFirePoint: {fileID: 1847888665569345119}
@@ -218,6 +219,8 @@ MonoBehaviour:
   - {fileID: 8444880630598191031, guid: 60146a51dd7ece44eb63508a7dd742ac, type: 3}
   m_bulletSpeed: 10
   m_bulletAngle: 30
+  m_targetHeightOffset: -0.1
+  m_heightCorrectionRate: 0.1
   m_kickBulletDelay: 2
   m_throwBulletDelay: 1.7
   m_postShootDelay: 2
@@ -234,7 +237,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdc09a0965b5f644ca86461f2aa85aac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostDyingState
-  m_shrinkDuration: 2
+  m_shrinkDuration: 1
+  m_deathParticle: {fileID: 4058022614410997813, guid: 40c0fe6424d75b946927c08badf4e2a8, type: 3}
 --- !u!136 &9170967074312127478
 CapsuleCollider:
   m_ObjectHideFlags: 0

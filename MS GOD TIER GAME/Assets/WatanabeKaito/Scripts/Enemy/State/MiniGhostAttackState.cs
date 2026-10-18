@@ -76,6 +76,7 @@ public class MiniGhostAttackState : MiniGhostState
         }
     }
 
+    // 攻撃のコルーチン
     private IEnumerator AttackRoutine()
     {
         bool isKick = Random.Range(0, 2) == 0;
@@ -176,6 +177,7 @@ public class MiniGhostAttackState : MiniGhostState
         FinishAttack();
     }
 
+    // 攻撃終了処理
     private void FinishAttack()
     {
         m_attackCoroutine = null;
@@ -186,6 +188,7 @@ public class MiniGhostAttackState : MiniGhostState
         }
     }
 
+    // ランダムに弾のプレハブを取得する
     private GameObject GetRandomBulletPrefab()
     {
         if (m_bulletPrefabs == null || m_bulletPrefabs.Count == 0)
@@ -197,6 +200,7 @@ public class MiniGhostAttackState : MiniGhostState
         return m_bulletPrefabs[randomIndex];
     }
 
+    // プレイヤーの方向に振り向くコルーチン
     private IEnumerator TurnRoutine(bool turnToPlayer)
     {
         Vector3 playerPosition = m_owner.GetPlayerPosition();
@@ -267,24 +271,21 @@ public class MiniGhostAttackState : MiniGhostState
         }
     }
 
-    private Vector3 GetCorrectedTargetPosition(
-     Vector3 targetPosition,
-     Vector3 spawnPosition)
+    // 目標位置の高さを補正する
+    private Vector3 GetCorrectedTargetPosition(Vector3 targetPosition, Vector3 spawnPosition)
     {
         // 発射位置から見た目標位置の高さの差
-        float heightDifference =
-            targetPosition.y - spawnPosition.y;
+        float heightDifference = targetPosition.y - spawnPosition.y;
 
         // 高さの差に応じて補正する
-        float correction =
-            m_targetHeightOffset
-            + heightDifference * m_heightCorrectionRate;
+        float correction = m_targetHeightOffset + heightDifference * m_heightCorrectionRate;
 
         targetPosition.y += correction;
 
         return targetPosition;
     }
 
+    // 生成した弾を削除する
     private void DestroySpawnedBullets()
     {
         foreach (GameObject bullet in m_spawnedBullets)

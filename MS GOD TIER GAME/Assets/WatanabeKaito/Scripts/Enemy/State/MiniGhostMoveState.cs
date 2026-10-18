@@ -13,7 +13,7 @@ public class MiniGhostMoveState : MiniGhostState
     [Header("UŒ‚ŠÔŠui•bj")]
     [SerializeField] private float m_fireInterval = 2.0f;
 
-    private float m_fireTimer;
+    private float m_fireTimer;  // UŒ‚ŠÔŠu‚Ìƒ^ƒCƒ}[
 
     public override void EnterState()
     {

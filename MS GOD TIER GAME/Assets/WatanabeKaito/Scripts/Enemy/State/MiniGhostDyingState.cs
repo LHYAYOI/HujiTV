@@ -7,8 +7,13 @@ public class MiniGhostDyingState : MiniGhostState
     [Header("縮小にかかる時間（秒）")]
     [SerializeField] private float m_shrinkDuration = 2.0f;
 
-    private Animator m_animator;
-    private Coroutine m_shrinkCoroutine;
+    [Header("パーティクル")]
+    [SerializeField] private GameObject m_deathParticle;
+
+    private GameObject m_spawnedDeathParticle;  // 生成されたパーティクルの参照
+
+    private Animator m_animator;    // Animatorコンポーネント
+    private Coroutine m_shrinkCoroutine;    // 実行中の縮小コルーチン
 
     public override void InitializeState(MiniGhostEnemy owner)
     {
@@ -29,6 +34,9 @@ public class MiniGhostDyingState : MiniGhostState
         }
 
         m_shrinkCoroutine = StartCoroutine(ShrinkCoroutine());
+
+        // パーティクルを再生
+        PlayDeathEffect(m_owner.transform.position);
     }
 
     public override void ExitState()
@@ -36,10 +44,11 @@ public class MiniGhostDyingState : MiniGhostState
         if (m_shrinkCoroutine != null)
         {
             StopCoroutine(m_shrinkCoroutine);
-            m_shrinkCoroutine = null;
+            m_shrinkCoroutine = null;   
         }
     }
 
+    // 縮小のコルーチン
     private IEnumerator ShrinkCoroutine()
     {
         Vector3 originalScale = m_owner.transform.localScale;
@@ -62,6 +71,14 @@ public class MiniGhostDyingState : MiniGhostState
         }
 
         m_owner.transform.localScale = Vector3.zero;
+
+        Destroy(m_spawnedDeathParticle);
         Destroy(m_owner.gameObject);
+    }
+
+    // パーティクルを再生する
+    private void PlayDeathEffect(Vector3 position)
+    {
+        m_spawnedDeathParticle = Instantiate(m_deathParticle, position, Quaternion.identity);
     }
 }
