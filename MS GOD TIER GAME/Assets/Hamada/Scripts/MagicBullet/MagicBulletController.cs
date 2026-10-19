@@ -26,7 +26,11 @@ public class MagicBulletController : MonoBehaviour
 
         m_controlPoint = centerPoint + Vector3.up * m_curveHeight;
 
-        StartCoroutine(HomingRoutine(.5f));
+        float distance = (m_target.transform.position - transform.position).magnitude;
+
+        float duration = distance / m_moveSpeed;
+
+        StartCoroutine(HomingRoutine(duration));
     }
 
     private IEnumerator HomingRoutine(float duration)

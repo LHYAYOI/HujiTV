@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using Unity.Cinemachine;
 using UnityEngine;
 
+[ExecuteAlways]
 public class TargetSelector : MonoBehaviour
 {
     private struct TargetInfo 
