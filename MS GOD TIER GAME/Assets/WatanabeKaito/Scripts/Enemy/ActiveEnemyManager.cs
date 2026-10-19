@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ActiveEnemyManager : MonoBehaviour
 {
-    public List<EnemyBase> m_activeEnemies = new List<EnemyBase>(); // 現在アクティブなエネミーのリスト
+    private List<EnemyBase> m_activeEnemies = new List<EnemyBase>(); // 現在アクティブなエネミーのリスト
 
     // 現在アクティブなエネミーリストを取得
     public List<EnemyBase> GetActiveEnemies()
