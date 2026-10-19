@@ -1,0 +1,67 @@
+#pragma kernel Clear
+#pragma kernel Step
+
+RWTexture3D<float4> _ClearTarget;
+Texture3D<float4> _VelocityRead, _DisplacementRead;
+RWTexture3D<float4> _VelocityWrite, _DisplacementWrite;
+SamplerState sampler_LinearClamp;
+int _Resolution, _InteractorCount;
+float3 _DomainMin, _DomainSize, _DomainWind;
+float4 _Parameters;
+float4 _InteractorA[16], _InteractorB[16], _InteractorSweep[16], _InteractorVelocity[16], _InteractorAngular[16];
+float4x4 _InteractorBox[16];
+
+// 点から線分（segmentStart～segmentEnd）までの距離を返す。
+float GetSegmentDistance(float3 position, float3 segmentStart, float3 segmentEnd)
+{
+    float3 segment=segmentEnd-segmentStart; return length(position-segmentStart-segment*saturate(dot(position-segmentStart,segment)/max(dot(segment,segment),1e-7)));
+}
+// 対象テクスチャを 0 で初期化する。
+[numthreads(4,4,4)]
+void Clear(uint3 threadId : SV_DispatchThreadID) { if(any(threadId>=(uint)_Resolution))return; _ClearTarget[threadId]=0; }
+
+// 速度を移流・減衰させ、インタラクターからの流れと風を加えて変位を更新する。
+[numthreads(4,4,4)]
+void Step(uint3 threadId : SV_DispatchThreadID)
+{
+    if(any(threadId>=(uint)_Resolution))return;
+    float deltaTime=_Parameters.x;
+    float3 uv=(float3(threadId)+.5)/_Resolution;
+    float3 position=_DomainMin+uv*_DomainSize;
+    float3 oldVelocity=_VelocityRead.SampleLevel(sampler_LinearClamp,uv,0).xyz;
+    float3 departure=saturate(uv-oldVelocity*deltaTime/_DomainSize);
+    float3 velocity=_VelocityRead.SampleLevel(sampler_LinearClamp,departure,0).xyz*exp(-_Parameters.w*deltaTime);
+    float4 displacement=_DisplacementRead.SampleLevel(sampler_LinearClamp,departure,0);
+    float obstacle=0;
+    [loop] for(int i=0;i<_InteractorCount;i++)
+    {
+        float radius=_InteractorA[i].w, influence=max(.01,_InteractorB[i].w);
+        float signedDistance=GetSegmentDistance(position,_InteractorA[i].xyz,_InteractorB[i].xyz)-radius;
+        if(_InteractorAngular[i].w>.5)
+        {
+            float3 localPosition=abs(mul(_InteractorBox[i],float4(position,1)).xyz)-.5;
+            // 保守的な OBB 距離を、最短辺の長さを使ってワールド単位に戻す。
+            signedDistance=max(localPosition.x,max(localPosition.y,localPosition.z))*_InteractorSweep[i].w;
+        }
+        float currentWeight=1-smoothstep(0,influence,signedDistance);
+        float3 center=(_InteractorA[i].xyz+_InteractorB[i].xyz)*.5;
+        float wakeDistance=GetSegmentDistance(position,_InteractorSweep[i].xyz,center)-radius;
+        float sweepWeight=1-smoothstep(0,influence,wakeDistance);
+        float weight=max(currentWeight,sweepWeight*.6)*_InteractorVelocity[i].w;
+        float3 pointVelocity=_InteractorVelocity[i].xyz+cross(_InteractorAngular[i].xyz,position-center);
+        float3 relativePosition=position-center;
+        float3 wake=cross(pointVelocity,relativePosition)/max(.1,length(relativePosition));
+        velocity+=(pointVelocity+cross(wake,pointVelocity)*.03)*weight*deltaTime*5;
+        obstacle=max(obstacle,1-smoothstep(-influence*.15,influence*.15,signedDistance));
+    }
+    velocity+=_DomainWind*deltaTime*_Parameters.w;
+    velocity*=min(1,20/max(length(velocity),1e-5));
+    // 端の 2 セルでフェードする。カリング用の境界が保守的なままになるよう変位をクランプする。
+    float3 edgeCells=min(uv,1-uv)*_Resolution;
+    float boundary=smoothstep(0,2,min(edgeCells.x,min(edgeCells.y,edgeCells.z)));
+    displacement.xyz=(displacement.xyz+velocity*deltaTime)*exp(-_Parameters.z*deltaTime)*boundary;
+    displacement.xyz*=min(1,_Parameters.y/max(length(displacement.xyz),1e-5));
+    displacement.w=max(displacement.w*exp(-_Parameters.z*deltaTime),obstacle)*boundary;
+    _VelocityWrite[threadId]=float4(velocity*boundary,0);
+    _DisplacementWrite[threadId]=displacement;
+}

@@ -51,9 +51,9 @@ namespace LightShaftLab.Editor
                 EditorGUILayout.Space(); EditorGUILayout.LabelField("品質", EditorStyles.boldLabel);
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    Preset("軽量", ShaftQualityPreset.Performance, settings);
-                    Preset("標準", ShaftQualityPreset.Balanced, settings);
-                    Preset("高品質", ShaftQualityPreset.NearDetail, settings);
+                    Preset("軽量", SHAFT_QUALITY_PRESET.PERFORMANCE, settings);
+                    Preset("標準", SHAFT_QUALITY_PRESET.BALANCED, settings);
+                    Preset("高品質", SHAFT_QUALITY_PRESET.NEAR_DETAIL, settings);
                 }
                 if (GUILayout.Button("調整したProfileを保存")) AssetDatabase.SaveAssetIfDirty(m_volume.sharedProfile);
             }
@@ -62,7 +62,7 @@ namespace LightShaftLab.Editor
             if (EditorApplication.isPlaying) EditorGUILayout.HelpBox("この画面は停止中に調整します。Play中はデモUIを使って比較してください。", MessageType.Info);
             EditorGUILayout.HelpBox("最初は霧の濃さ0.012・標準品質がおすすめです。見えない場合はライトの向き・明るさ・照射距離と、カメラの位置を確認してください。", MessageType.None);
         }
-        void Preset(string label, ShaftQualityPreset preset, LightShaftVolume settings)
+        void Preset(string label, SHAFT_QUALITY_PRESET preset, LightShaftVolume settings)
         {
             if (!GUILayout.Button(label)) return;
             Undo.RecordObject(settings, "LightShaft 品質を調整"); ShaftQualityPresets.Apply(settings, preset);

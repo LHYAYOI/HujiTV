@@ -106,7 +106,7 @@ namespace LightShaftLab.Editor
                 settings = profile.Add<LightShaftVolume>(true); AssetDatabase.AddObjectToAsset(settings, profile);
                 settings.m_enableFlag.Override(true); settings.m_enableSpatialGodRaysFlag.Override(true);
                 settings.m_density.Override(.012f); settings.m_spatialGodRayIntensity.Override(.7f);
-                ShaftQualityPresets.Apply(settings, ShaftQualityPreset.Balanced);
+                ShaftQualityPresets.Apply(settings, SHAFT_QUALITY_PRESET.BALANCED);
                 volume = Undo.AddComponent<Volume>(Create("LightShaft シーン設定"));
                 volume.isGlobal = true; volume.sharedProfile = profile;
                 EditorUtility.SetDirty(settings); EditorUtility.SetDirty(profile); AssetDatabase.SaveAssetIfDirty(profile);
