@@ -15,6 +15,8 @@ public abstract class EnemyBase : MonoBehaviour
 
     protected Transform m_playerPosition; // プレイヤーの位置
 
+    protected ActiveEnemyManager m_activeEnemyManager; // アクティブなエネミーを管理するマネージャー
+
     protected virtual void Awake()
     {
         if (m_enemyData != null)
@@ -32,12 +34,12 @@ public abstract class EnemyBase : MonoBehaviour
         m_currentHealth -= damage;
         if (m_currentHealth <= 0)
         {
-            Die();
+            OnDestroy();
         }
     }
 
     // エネミーが死亡する関数
-    protected virtual void Die()
+    protected virtual void OnDestroy()
     {
         Destroy(gameObject);
     }
@@ -52,5 +54,11 @@ public abstract class EnemyBase : MonoBehaviour
     public void SetPlayerPosition(Transform playerTransform)
     {
         m_playerPosition = playerTransform;
+    }
+
+    // スポーンマネージャーの参照を設定する関数
+    public void SetActiveEnemyManager(ActiveEnemyManager activeEnemyManager)
+    {
+        m_activeEnemyManager = activeEnemyManager;
     }
 }

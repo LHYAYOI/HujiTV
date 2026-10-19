@@ -24,6 +24,8 @@ public class EnemySpawnManager : MonoBehaviour
         public Transform m_position; // 出現位置のTransform
     }
 
+    [Header("アクティブなエネミー管理マネージャー")]
+    [SerializeField] private ActiveEnemyManager m_activeEnemyManager; // アクティブなエネミーを管理するマネージャー
 
     [Header("プレイヤーの位置")]
     [SerializeField] private Transform m_playerTransform; // プレイヤーの位置を取得するためのTransform
@@ -41,8 +43,6 @@ public class EnemySpawnManager : MonoBehaviour
     private Dictionary<string, EnemyBase> m_enemyDictionary = new Dictionary<string, EnemyBase>();  // エネミーIDをキーにしてエネミープレハブを格納する辞書
     private Dictionary<string, SplineContainer> m_splineDictionary = new Dictionary<string, SplineContainer>(); // スプラインIDをキーにしてスプラインコンテナを格納する辞書
     private Dictionary<string, Transform> m_spawnPositionDictionary = new Dictionary<string, Transform>();
-
-    // 位置を指定するように位置データのリストを作ったほうがいいかも
 
     private void Awake()
     {
@@ -112,6 +112,10 @@ public class EnemySpawnManager : MonoBehaviour
         Vector3 spawnPosition = spawnTransform.position;
         EnemyBase enemyObj = Instantiate(prefab, spawnPosition, Quaternion.identity);
         enemyObj.SetPlayerPosition(m_playerTransform);
+        enemyObj.SetActiveEnemyManager(m_activeEnemyManager);
+
+        // アクティブなエネミーリストに追加
+        m_activeEnemyManager.AddActiveEnemy(enemyObj);
 
         if (enemyObj is SplineMoveEnemy splineMoveEnemy)
         {
@@ -138,7 +142,14 @@ public class EnemySpawnManager : MonoBehaviour
 
         EnemyBase enemyObj = Instantiate(prefab, spawnPosition, Quaternion.identity);
         enemyObj.SetPlayerPosition(m_playerTransform);
+        enemyObj.SetActiveEnemyManager(m_activeEnemyManager);
         enemyObj.Initialize();
-       
+
+        // アクティブなエネミーリストに追加
+        m_activeEnemyManager.AddActiveEnemy(enemyObj);
     }
+
+ 
+
+
 }

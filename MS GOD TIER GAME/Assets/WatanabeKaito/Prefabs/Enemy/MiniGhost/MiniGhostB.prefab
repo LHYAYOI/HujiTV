@@ -1,5 +1,95 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &633493212303973747
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1847888665569345119}
+  - component: {fileID: 4276259441129297171}
+  - component: {fileID: 3089196670125642435}
+  m_Layer: 0
+  m_Name: 'ThrowFirePoint '
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1847888665569345119
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 633493212303973747}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.324, y: 0.634, z: -0.064}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7850703199708027995}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &4276259441129297171
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 633493212303973747}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &3089196670125642435
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 633493212303973747}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &1309553552582454145
 GameObject:
   m_ObjectHideFlags: 0
@@ -11,6 +101,11 @@ GameObject:
   - component: {fileID: 7850703199708027995}
   - component: {fileID: 7927228099763986070}
   - component: {fileID: 3282884335062489158}
+  - component: {fileID: -1878883125415085335}
+  - component: {fileID: 2702416843714358507}
+  - component: {fileID: 2846553606419501028}
+  - component: {fileID: 4122682875455443804}
+  - component: {fileID: 1547004853171550175}
   - component: {fileID: 9170967074312127478}
   m_Layer: 0
   m_Name: MiniGhostB
@@ -34,6 +129,7 @@ Transform:
   m_Children:
   - {fileID: 8018822348592657025}
   - {fileID: 4230615318380201651}
+  - {fileID: 1847888665569345119}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &7927228099763986070
@@ -71,19 +167,96 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostEnemy
   m_enemyData: {fileID: 11400000, guid: d57e1e492585fd34a91c0444e1e44935, type: 2}
+<<<<<<< HEAD
   m_moveSpeed: 0.5
   m_rotateWithSplineFlag: 0
+=======
+  m_moveDirection: -1
+  m_timeLimit: 20
+  m_kickFirePoint: {fileID: 4230615318380201651}
+  m_throwFirePoint: {fileID: 1847888665569345119}
+--- !u!114 &-1878883125415085335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309553552582454145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8a470f822ec9f540a9148b8f6aa0292, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniGhostIdleState
+--- !u!114 &2702416843714358507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309553552582454145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b80031c5a7d74545a61cd4367bc6853, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniGhostSpawnState
+  m_spawnDuration: 3
+--- !u!114 &2846553606419501028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309553552582454145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 816a2d45fa02b7d438810c4545eed225, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniGhostMoveState
+  m_moveSpeed: 1.5
+  m_rotateWithSplineFlag: 1
+  m_fireInterval: 3
+--- !u!114 &4122682875455443804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309553552582454145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d2bfe32f9df4964ea4840b1c8c44d8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniGhostAttackState
+>>>>>>> origin/MS-55/Feature/MiniGhost
   m_bulletPrefabs:
   - {fileID: 8444880630598191031, guid: 07e84809798d77d4f8916add96b1b76c, type: 3}
+  - {fileID: 8444880630598191031, guid: 32dbe2bee691c65459ee5f3fabccb2a8, type: 3}
   - {fileID: 8444880630598191031, guid: 0f390c877f00b0e4686c0d13015b8c86, type: 3}
+  - {fileID: 8444880630598191031, guid: 5d3280a2480b9214a9e32b192dbc6bd1, type: 3}
   - {fileID: 8444880630598191031, guid: 2a71e4f3b6995d6448c21dcc15371515, type: 3}
-  m_firePoint: {fileID: 4230615318380201651}
-  m_fireInterval: 5
+  - {fileID: 8444880630598191031, guid: 60146a51dd7ece44eb63508a7dd742ac, type: 3}
   m_bulletSpeed: 5
-  m_bulletAngle: 45
-  m_bulletDelay: 1
+  m_bulletAngle: 30
+  m_targetHeightOffset: -0.1
+  m_heightCorrectionRate: 0.1
+  m_kickBulletDelay: 2
+  m_throwBulletDelay: 1.7
+  m_postShootDelay: 2
   m_turnDuration: 1
-  m_spawnDuration: 3
+--- !u!114 &1547004853171550175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309553552582454145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdc09a0965b5f644ca86461f2aa85aac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniGhostDyingState
+  m_shrinkDuration: 1
+  m_deathParticle: {fileID: 4058022614410997813, guid: 40c0fe6424d75b946927c08badf4e2a8, type: 3}
 --- !u!136 &9170967074312127478
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -119,7 +292,7 @@ GameObject:
   - component: {fileID: 5516155845668305878}
   - component: {fileID: 84599910659163363}
   m_Layer: 0
-  m_Name: FirePoint
+  m_Name: KickFirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -134,7 +307,7 @@ Transform:
   m_GameObject: {fileID: 5747816450418076520}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.035, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0.312}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -248,7 +421,11 @@ PrefabInstance:
     - target: {fileID: -2922892357548988066, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 05510b609de88804ba50b9dc375d8738, type: 2}
+      objectReference: {fileID: 2100000, guid: 01b9a7381070f6744b387acdf4892b77, type: 2}
+    - target: {fileID: 831494197622570841, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.256
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: m_Name
       value: ghost_mini_mdl
@@ -256,11 +433,15 @@ PrefabInstance:
     - target: {fileID: 2788675242186676951, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 05510b609de88804ba50b9dc375d8738, type: 2}
+      objectReference: {fileID: 2100000, guid: 01b9a7381070f6744b387acdf4892b77, type: 2}
     - target: {fileID: 6851099186128873815, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 05510b609de88804ba50b9dc375d8738, type: 2}
+      objectReference: {fileID: 2100000, guid: 01b9a7381070f6744b387acdf4892b77, type: 2}
+    - target: {fileID: 9222650964280752047, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.052
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

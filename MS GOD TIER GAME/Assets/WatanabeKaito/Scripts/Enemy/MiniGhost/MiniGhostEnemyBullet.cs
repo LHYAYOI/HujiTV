@@ -59,7 +59,7 @@ public class MiniGhostEnemyBullet : MonoBehaviour
         m_gravity = 2f * (m_verticalVelocity * timeToReach - heightDiff) / (timeToReach * timeToReach);
 
         m_isInitializedFlag = true;
-        Destroy(gameObject, 15.0f);
+        Destroy(gameObject, 10.0f);
 
         // ‰ñ“]‚ğ‰Šú‰»
         InitializeRotation();
