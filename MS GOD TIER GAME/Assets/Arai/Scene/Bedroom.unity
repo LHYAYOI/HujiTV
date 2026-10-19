@@ -143,7 +143,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BattleData
   m_battleTime: 12
   m_enemyData:
-  - m_enemyId: MiniGhost_A
+  - m_spawnType: 0
+    m_enemyId: MiniGhost_C
     m_splineId: 1_1
     m_spawnId: 1_1
 --- !u!114 &14647525
@@ -752,7 +753,7 @@ Transform:
   m_GameObject: {fileID: 283345060}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 79.03574, y: 50.21124, z: -48.42901}
+  m_LocalPosition: {x: 79.03574, y: 50.21124, z: -47.68}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1361,118 +1362,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8450414562296173851, guid: 26e78924a1e52d2439343c6042d253fa, type: 3}
   m_PrefabInstance: {fileID: 7719668017493359095}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &719661898
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 719661900}
-  - component: {fileID: 719661899}
-  m_Layer: 0
-  m_Name: B3_E1_SPL
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &719661899
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 719661898}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dab5c7d4c32e743048dfca98e2d5914f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Splines::UnityEngine.Splines.SplineContainer
-  m_Spline:
-    m_EditModeType: 1
-    m_Knots: []
-    m_MetaData: []
-    m_Closed: 0
-    m_IntData:
-      m_Data: []
-    m_FloatData:
-      m_Data: []
-    m_Float4Data:
-      m_Data: []
-    m_ObjectData:
-      m_Data: []
-  m_Splines:
-  - m_EditModeType: 1
-    m_Knots:
-    - Position:
-        x: 0
-        y: 0
-        z: 0
-      TangentIn:
-        x: -0
-        y: -0
-        z: -0
-      TangentOut:
-        x: 0
-        y: 0
-        z: 0
-      Rotation:
-        value:
-          x: 0.02092995
-          y: 1.1718013e-10
-          z: 0.112129316
-          w: 0.9934732
-    - Position:
-        x: 0
-        y: 0.16
-        z: 0
-      TangentIn:
-        x: -0
-        y: -0
-        z: -0
-      TangentOut:
-        x: 0
-        y: 0
-        z: 0
-      Rotation:
-        value:
-          x: 0.1297474
-          y: 0.000000005268355
-          z: 0.69510114
-          w: 0.7071067
-    m_MetaData:
-    - Mode: 0
-      Tension: 0.5
-    - Mode: 0
-      Tension: 0.5
-    m_Closed: 1
-    m_IntData:
-      m_Data: []
-    m_FloatData:
-      m_Data: []
-    m_Float4Data:
-      m_Data: []
-    m_ObjectData:
-      m_Data: []
-  m_Knots:
-    m_KnotsLink: []
---- !u!4 &719661900
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 719661898}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.08774012, y: -0.63472724, z: 0.07288784, w: 0.76427114}
-  m_LocalPosition: {x: 70.78574, y: 50.46124, z: -49.92901}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 910996770}
-  m_LocalEulerAnglesHint: {x: 44.277, y: -140.292, z: -2.78}
 --- !u!4 &745020354 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1729876261110722614, guid: 678548b3d50bffb41aa03eae839b749a, type: 3}
@@ -2072,7 +1961,7 @@ PrefabInstance:
     - target: {fileID: 5144783666922765827, guid: c6c176f2a4fafc74fa2004a4cbc388e6, type: 3}
       propertyPath: m_splinePaths.Array.data[1].m_container
       value: 
-      objectReference: {fileID: 1078498702}
+      objectReference: {fileID: 0}
     - target: {fileID: 5144783666922765827, guid: c6c176f2a4fafc74fa2004a4cbc388e6, type: 3}
       propertyPath: m_splinePaths.Array.data[2].m_container
       value: 
@@ -2080,7 +1969,7 @@ PrefabInstance:
     - target: {fileID: 5144783666922765827, guid: c6c176f2a4fafc74fa2004a4cbc388e6, type: 3}
       propertyPath: m_splinePaths.Array.data[3].m_container
       value: 
-      objectReference: {fileID: 719661899}
+      objectReference: {fileID: 0}
     - target: {fileID: 5144783666922765827, guid: c6c176f2a4fafc74fa2004a4cbc388e6, type: 3}
       propertyPath: m_splinePaths.Array.data[4].m_container
       value: 
@@ -2127,9 +2016,6 @@ PrefabInstance:
       addedObject: {fileID: 283345061}
     - targetCorrespondingSourceObject: {fileID: 4750356895678125814, guid: c6c176f2a4fafc74fa2004a4cbc388e6, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1078498703}
-    - targetCorrespondingSourceObject: {fileID: 4750356895678125814, guid: c6c176f2a4fafc74fa2004a4cbc388e6, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1972872931}
     - targetCorrespondingSourceObject: {fileID: 4750356895678125814, guid: c6c176f2a4fafc74fa2004a4cbc388e6, type: 3}
       insertIndex: -1
@@ -2137,9 +2023,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4750356895678125814, guid: c6c176f2a4fafc74fa2004a4cbc388e6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1725773763}
-    - targetCorrespondingSourceObject: {fileID: 4750356895678125814, guid: c6c176f2a4fafc74fa2004a4cbc388e6, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 719661900}
     - targetCorrespondingSourceObject: {fileID: 4750356895678125814, guid: c6c176f2a4fafc74fa2004a4cbc388e6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1871859116}
@@ -2519,118 +2402,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 910996770}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1078498701
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1078498703}
-  - component: {fileID: 1078498702}
-  m_Layer: 0
-  m_Name: B2_E1_SPL
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1078498702
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1078498701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dab5c7d4c32e743048dfca98e2d5914f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Splines::UnityEngine.Splines.SplineContainer
-  m_Spline:
-    m_EditModeType: 1
-    m_Knots: []
-    m_MetaData: []
-    m_Closed: 0
-    m_IntData:
-      m_Data: []
-    m_FloatData:
-      m_Data: []
-    m_Float4Data:
-      m_Data: []
-    m_ObjectData:
-      m_Data: []
-  m_Splines:
-  - m_EditModeType: 1
-    m_Knots:
-    - Position:
-        x: 0
-        y: 0
-        z: 0
-      TangentIn:
-        x: -0
-        y: -0
-        z: -0
-      TangentOut:
-        x: 0
-        y: 0
-        z: 0
-      Rotation:
-        value:
-          x: 0.02092995
-          y: 1.1718013e-10
-          z: 0.112129316
-          w: 0.9934732
-    - Position:
-        x: 0
-        y: 0.16
-        z: 0
-      TangentIn:
-        x: -0
-        y: -0
-        z: -0
-      TangentOut:
-        x: 0
-        y: 0
-        z: 0
-      Rotation:
-        value:
-          x: 0.1297474
-          y: 0.000000005268355
-          z: 0.69510114
-          w: 0.7071067
-    m_MetaData:
-    - Mode: 0
-      Tension: 0.5
-    - Mode: 0
-      Tension: 0.5
-    m_Closed: 1
-    m_IntData:
-      m_Data: []
-    m_FloatData:
-      m_Data: []
-    m_Float4Data:
-      m_Data: []
-    m_ObjectData:
-      m_Data: []
-  m_Knots:
-    m_KnotsLink: []
---- !u!4 &1078498703
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1078498701}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.08774012, y: -0.63472724, z: 0.07288784, w: 0.76427114}
-  m_LocalPosition: {x: 77.78574, y: 51.21124, z: -46.67901}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 910996770}
-  m_LocalEulerAnglesHint: {x: 44.277, y: -140.292, z: -2.78}
 --- !u!4 &1111268558 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8450414562296173851, guid: 26e78924a1e52d2439343c6042d253fa, type: 3}
@@ -3529,13 +3300,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BattleData
   m_battleTime: 12
   m_enemyData:
-  - m_enemyId: MiniGhost_A
+  - m_spawnType: 1
+    m_enemyId: MiniGhost_A
     m_splineId: 3_1
     m_spawnId: 3_1
-  - m_enemyId: MiniGhost_B
+  - m_spawnType: 0
+    m_enemyId: MiniGhost_B
     m_splineId: 3_2
     m_spawnId: 3_2
-  - m_enemyId: MiniGhost_A
+  - m_spawnType: 0
+    m_enemyId: MiniGhost_A
     m_splineId: 3_3
     m_spawnId: 3_3
 --- !u!114 &1380671917
@@ -4383,7 +4157,7 @@ Transform:
   m_GameObject: {fileID: 1725773762}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 69.53574, y: 50.21124, z: -47.67901}
+  m_LocalPosition: {x: 69.53574, y: 50.21124, z: -49.53}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4890,10 +4664,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BattleData
   m_battleTime: 12
   m_enemyData:
-  - m_enemyId: MiniGhost_C
+  - m_spawnType: 1
+    m_enemyId: MiniGhost_C
     m_splineId: 2_1
     m_spawnId: 2_1
-  - m_enemyId: MiniGhost_B
+  - m_spawnType: 0
+    m_enemyId: MiniGhost_B
     m_splineId: 2_2
     m_spawnId: 2_2
 --- !u!114 &1983691970

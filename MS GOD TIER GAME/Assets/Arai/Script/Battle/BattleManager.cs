@@ -74,7 +74,16 @@ public class BattleManager : MonoBehaviour
 
         foreach(BattleEnemyData data in  enemyData)
         {
-            m_spawnManager.SpawnSplineMoveEnemy(data.EnemyId, data.SplineId, data.SpawnId);
+            switch(data.SpawnType)
+            {
+                case BattleEnemyData.SPAWN_TYPE.SPLINE:
+                    m_spawnManager.SpawnSplineMoveEnemy(data.EnemyId, data.SplineId, data.SpawnId);
+                    break;
+                case BattleEnemyData.SPAWN_TYPE.POPUP:
+                    m_spawnManager.SpawnPopUpEnemy(data.EnemyId,data.SpawnId);
+                    break;
+            }
+
         }
 
 

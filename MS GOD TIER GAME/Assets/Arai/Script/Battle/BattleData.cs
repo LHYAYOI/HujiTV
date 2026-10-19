@@ -13,6 +13,7 @@ public class BattleData : MonoBehaviour
 
     private void OnValidate()
     {
+        /*
         foreach (var data in m_enemyData)
         {
             float time = data.SpawnTime + data.DestroyTime;
@@ -22,5 +23,6 @@ public class BattleData : MonoBehaviour
                 m_battleTime = time;
             }
         }
+        */
     }
 }
