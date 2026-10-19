@@ -22,16 +22,16 @@ public class BattleEnemyData
 
 
     [Header("----------")]
-    [SerializeField] private SPAWN_TYPE m_spawnType;
-    [SerializeField] private float m_spawnTime;
+    private SPAWN_TYPE m_spawnType;
+    private float m_spawnTime;
 
     [SerializeField] private string m_enemyId;
     [SerializeField] private string m_splineId;
     [SerializeField] private string m_spawnId;
 
     [Header("----------")]
-    [SerializeField] private DESTROY_TYPE m_destroyType;
-    [SerializeField] private float m_destroyTime;
+    private DESTROY_TYPE m_destroyType;
+    private float m_destroyTime;
 
     // 生まれた時間を Time.timeでいれとく
     // これをもとにdestroytime spawntimeを求める
