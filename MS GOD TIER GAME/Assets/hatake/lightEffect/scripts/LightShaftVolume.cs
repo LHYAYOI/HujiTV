@@ -5,6 +5,7 @@ using UnityEngine.Rendering.Universal;
 
 namespace LightShaftLab
 {
+    /// <summary>光柱・大気の霧・ゴッドレイの全体設定（Volumeで調整）。</summary>
     [Serializable, VolumeComponentMenu("Light Shaft/Volumetric Atmosphere")]
     public sealed class LightShaftVolume : VolumeComponent, IPostProcessComponent
     {

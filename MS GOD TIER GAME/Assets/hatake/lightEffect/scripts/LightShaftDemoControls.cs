@@ -123,9 +123,9 @@ namespace LightShaftLab
         {
             GUILayout.Label("Quality");
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Near detail")) ShaftQualityPresets.Apply(m_settings,ShaftQualityPreset.NearDetail);
-            if (GUILayout.Button("Balanced")) ShaftQualityPresets.Apply(m_settings,ShaftQualityPreset.Balanced);
-            if (GUILayout.Button("Performance")) ShaftQualityPresets.Apply(m_settings,ShaftQualityPreset.Performance);
+            if (GUILayout.Button("Near detail")) ShaftQualityPresets.Apply(m_settings, SHAFT_QUALITY_PRESET.NEAR_DETAIL);
+            if (GUILayout.Button("Balanced")) ShaftQualityPresets.Apply(m_settings, SHAFT_QUALITY_PRESET.BALANCED);
+            if (GUILayout.Button("Performance")) ShaftQualityPresets.Apply(m_settings, SHAFT_QUALITY_PRESET.PERFORMANCE);
             GUILayout.EndHorizontal();
             m_settings.m_refineRootsFlag.Override(GUILayout.Toggle(m_settings.m_refineRootsFlag.value,"Refine thin roots"));
             m_settings.m_refineDepthEdgesFlag.Override(GUILayout.Toggle(m_settings.m_refineDepthEdgesFlag.value,"Refine depth edges"));

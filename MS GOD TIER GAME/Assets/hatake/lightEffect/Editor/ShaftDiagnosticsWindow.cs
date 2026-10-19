@@ -28,19 +28,19 @@ namespace LightShaftLab.Editor
         public static void Open() => GetWindow<ShaftDiagnosticsWindow>("Shaft Diagnostics");
         void OnEnable()
         {
-            m_previousRecording = ShaftProfiling.Enabled;
-            LightShaftFeature.SelectionUpdated += Selection;
-            LightShaftFeature.SelectedSource += Source;
-            LightShaftFeature.HistoryUpdated += History;
+            m_previousRecording = ShaftProfiling.IsEnabled;
+            LightShaftFeature.g_selectionUpdated += Selection;
+            LightShaftFeature.g_selectedSource += Source;
+            LightShaftFeature.g_historyUpdated += History;
             SceneView.duringSceneGui += DrawScene;
             EditorApplication.update += Tick;
         }
 
         void OnDisable()
         {
-            LightShaftFeature.SelectionUpdated-=Selection;
-            LightShaftFeature.SelectedSource-=Source;
-            LightShaftFeature.HistoryUpdated-=History;
+            LightShaftFeature.g_selectionUpdated -= Selection;
+            LightShaftFeature.g_selectedSource -= Source;
+            LightShaftFeature.g_historyUpdated -= History;
             SceneView.duringSceneGui-=DrawScene;
             EditorApplication.update-=Tick;
             if(m_recording)ShaftProfiling.SetEnabled(m_previousRecording);
@@ -70,7 +70,7 @@ namespace LightShaftLab.Editor
             if(EditorApplication.timeSinceStartup<m_nextUpdate)return;
             m_nextUpdate=EditorApplication.timeSinceStartup+.1;
             float total=0;bool valid=false;
-            foreach(ShaftProfiling.Pass pass in Enum.GetValues(typeof(ShaftProfiling.Pass)))
+            foreach(ShaftProfiling.PASS pass in Enum.GetValues(typeof(ShaftProfiling.PASS)))
             {float value=ShaftProfiling.GpuMilliseconds(pass);if(!float.IsNaN(value)){total+=value;valid=true;}}
             if(m_recording&&valid){m_samples.Enqueue(total);while(m_samples.Count>120)m_samples.Dequeue();}
             Repaint();
@@ -85,27 +85,27 @@ namespace LightShaftLab.Editor
 
             if (m_volume&&m_volume.sharedProfile&&m_volume.sharedProfile.TryGet<LightShaftVolume>(out var settings))
             {
-                using(new EditorGUILayout.HorizontalScope())foreach(ShaftQualityPreset preset in Enum.GetValues(typeof(ShaftQualityPreset)))
+                using(new EditorGUILayout.HorizontalScope())foreach(SHAFT_QUALITY_PRESET preset in Enum.GetValues(typeof(SHAFT_QUALITY_PRESET)))
                     if(GUILayout.Button(preset.ToString())){Undo.RecordObject(settings,"Shaft quality preset");ShaftQualityPresets.Apply(settings,preset);EditorUtility.SetDirty(settings);}
                 EditorGUILayout.HelpBox("Presets change quality only. Temporal and tile culling are optional in the Volume inspector.",MessageType.Info);
             }
             EditorGUILayout.LabelField(m_selection);
             EditorGUILayout.LabelField(m_history,EditorStyles.wordWrappedLabel);
             EditorGUI.BeginChangeCheck();
-            var tileMode=(ShaftTileDebugMode)EditorGUILayout.EnumPopup("Tile debug",ShaftTileDebug.Mode);
-            float opacity=EditorGUILayout.Slider("Tile overlay opacity",ShaftTileDebug.Opacity,0,1);
+            var tileMode=(SHAFT_TILE_DEBUG_MODE)EditorGUILayout.EnumPopup("Tile debug",ShaftTileDebug.g_mode);
+            float opacity=EditorGUILayout.Slider("Tile overlay opacity",ShaftTileDebug.g_opacity,0,1);
 
 
 
-            if(EditorGUI.EndChangeCheck() || ShaftTileDebug.Camera!=m_camera)
+            if(EditorGUI.EndChangeCheck() || ShaftTileDebug.g_camera!=m_camera)
             {
-                ShaftTileDebug.Camera=m_camera;ShaftTileDebug.Mode=tileMode;ShaftTileDebug.Opacity=opacity;
+                ShaftTileDebug.g_camera=m_camera;ShaftTileDebug.g_mode=tileMode;ShaftTileDebug.g_opacity = opacity;
                 SceneView.RepaintAll();EditorApplication.QueuePlayerLoopUpdate();
             }
 
 
 
-            if(tileMode!=ShaftTileDebugMode.Off)
+            if(tileMode!= SHAFT_TILE_DEBUG_MODE.OFF)
                 EditorGUILayout.HelpBox("Tile grid: 8×8 low-resolution pixels. Numbers = candidate count, not GPU time. Purple 1 / blue 2 / green 3 / yellow 4–5 / orange 6–9 / red 10+. Forces tile generation for this camera; does not save to the Profile. Requires active volumetric fog. XR / unsupported formats fall back without overlay.",MessageType.Info);
 
 
@@ -119,7 +119,8 @@ namespace LightShaftLab.Editor
             EditorGUILayout.HelpBox("GPU counters require a supported graphics backend and GPU profiling. N/A is not zero. Timings aggregate rendered cameras; isolate one camera for comparison. Root/edge refinement is included in Composite.",MessageType.Info);
 
 
-            foreach(ShaftProfiling.Pass pass in Enum.GetValues(typeof(ShaftProfiling.Pass)))
+
+            foreach(ShaftProfiling.PASS pass in Enum.GetValues(typeof(ShaftProfiling.PASS)))
             {
                 float value=ShaftProfiling.GpuMilliseconds(pass);
                 EditorGUILayout.LabelField(pass.ToString(),float.IsNaN(value)?"N/A":$"{value:F3} ms / invocation");

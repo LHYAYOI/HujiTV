@@ -1,20 +1,20 @@
 namespace LightShaftLab
 {
-    public enum ShaftQualityPreset { Performance, Balanced, NearDetail }
+    public enum SHAFT_QUALITY_PRESET { PERFORMANCE, BALANCED, NEAR_DETAIL }
     public static class ShaftQualityPresets
     {
-        // Shared by runtime controls and editor. Preserve artistic atmosphere settings.
-        public static void Apply(LightShaftVolume volume, ShaftQualityPreset preset)
+        // ランタイムの操作 UI とエディタで共用する。見た目（大気の芸術的な設定）は変更しない。
+        public static void Apply(LightShaftVolume volume, SHAFT_QUALITY_PRESET preset)
         {
-            bool fast = preset == ShaftQualityPreset.Performance, detail = preset == ShaftQualityPreset.NearDetail;
-            volume.m_resolutionDivisor.Override(fast ? 4 : detail ? 1 : 2);
-            volume.m_steps.Override(fast ? 32 : detail ? 64 : 48);
-            volume.m_spotMinimumSamples.Override(fast ? 4 : detail ? 12 : 8);
-            volume.m_localFogMinimumSamples.Override(fast ? 2 : detail ? 4 : 3);
-            volume.m_godRaySamples.Override(fast ? 16 : detail ? 48 : 32);
+            bool fastFlag = preset == SHAFT_QUALITY_PRESET.PERFORMANCE, detailFlag = preset == SHAFT_QUALITY_PRESET.NEAR_DETAIL;
+            volume.m_resolutionDivisor.Override(fastFlag ? 4 : detailFlag ? 1 : 2);
+            volume.m_steps.Override(fastFlag ? 32 : detailFlag ? 64 : 48);
+            volume.m_spotMinimumSamples.Override(fastFlag ? 4 : detailFlag ? 12 : 8);
+            volume.m_localFogMinimumSamples.Override(fastFlag ? 2 : detailFlag ? 4 : 3);
+            volume.m_godRaySamples.Override(fastFlag ? 16 : detailFlag ? 48 : 32);
             volume.m_refineRootsFlag.Override(true);
             volume.m_refineDepthEdgesFlag.Override(true);
-            // Optional techniques need scene-specific comparisons; presets remain predictable.
+            // オプションの手法はシーンごとの比較検証が必要なため、プリセットでは無効にして結果を予測しやすくする。
             volume.m_temporalFlag.Override(false);
             volume.m_tileCullingFlag.Override(false);
         }

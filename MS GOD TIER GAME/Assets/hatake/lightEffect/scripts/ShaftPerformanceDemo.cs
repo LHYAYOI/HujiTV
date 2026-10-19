@@ -23,8 +23,8 @@ namespace LightShaftLab
         string m_status = "Ready";
         readonly List<string> m_rows = new List<string>();
         static readonly int[] g_counts = { 0, 1, 5, 10, 20, 30, 40, 50 };
-        void OnEnable() => LightShaftFeature.SelectionUpdated += OnSelection;
-        void OnDisable() { LightShaftFeature.SelectionUpdated -= OnSelection; StopAllCoroutines(); RestoreCamera(); m_running = false; }
+        void OnEnable() => LightShaftFeature.g_selectionUpdated += OnSelection;
+        void OnDisable() { LightShaftFeature.g_selectionUpdated -= OnSelection; StopAllCoroutines(); RestoreCamera(); m_running = false; }
         void Start() { var volume=UnityEngine.Object.FindFirstObjectByType<UnityEngine.Rendering.Volume>(); if(volume)volume.profile.TryGet(out m_settings); SetCount(m_count); if (m_autoRun) StartCoroutine(Measure()); }
         void Update() { if (m_applied != m_count) SetCount(m_count); }
         void OnSelection(Camera camera, int spots, int renderedSpots, int fog, int renderedFog)
@@ -49,7 +49,7 @@ namespace LightShaftLab
         IEnumerator Measure()
         {
             m_savedPosition=transform.position;m_savedRotation=transform.rotation;
-            m_savedProfiling=ShaftProfiling.Enabled;ShaftProfiling.SetEnabled(true);
+            m_savedProfiling=ShaftProfiling.IsEnabled; ShaftProfiling.SetEnabled(true);
             m_running = true; m_rows.Clear();
             m_flyCamera = GetComponent<LightShaftFlyCamera>();
             m_restoreFlyCamera = m_flyCamera && m_flyCamera.enabled;
@@ -70,7 +70,7 @@ namespace LightShaftLab
                 {
                     ShaftBenchmarkPath.Apply(GetComponent<Camera>(),i,180);
                     yield return null;samples.Add(Time.unscaledDeltaTime*1000);
-                    foreach(ShaftProfiling.Pass pass in System.Enum.GetValues(typeof(ShaftProfiling.Pass)))
+                    foreach(ShaftProfiling.PASS pass in System.Enum.GetValues(typeof(ShaftProfiling.PASS)))
                     {
                         float gpu=ShaftProfiling.GpuMilliseconds(pass),cpu=ShaftProfiling.CpuMilliseconds(pass);
                         gpuRows.Add($"{count},{round},{i},{pass},{Number(gpu)},{Number(cpu)}");
@@ -99,7 +99,7 @@ namespace LightShaftLab
             if(m_settings)
             {
                 GUILayout.BeginHorizontal();
-                foreach(ShaftQualityPreset preset in System.Enum.GetValues(typeof(ShaftQualityPreset)))
+                foreach(SHAFT_QUALITY_PRESET preset in System.Enum.GetValues(typeof(SHAFT_QUALITY_PRESET)))
                     if(GUILayout.Button(preset.ToString()))ShaftQualityPresets.Apply(m_settings,preset);
                 GUILayout.EndHorizontal();
                 m_settings.m_temporalFlag.Override(GUILayout.Toggle(m_settings.m_temporalFlag.value,"Temporal reuse"));
