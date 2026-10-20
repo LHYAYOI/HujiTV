@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -8,6 +9,18 @@ using UnityEngine;
 [ExecuteAlways]
 public class TargetSelector : MonoBehaviour
 {
+    [Serializable]
+    private struct SelectAreaData 
+    {
+       public bool m_hasDualityFlag;
+       [UnityEngine.Range(0, 1)] public float m_positionX;
+       public List<int> m_directionIndexList; 
+       public float m_maxTargetDistance;
+       public Color m_areaColor;
+       public string m_AreaName;
+       public float m_labelHeight;
+    }
+
     private struct TargetInfo 
     {
         public GameObject m_target;
@@ -24,7 +37,7 @@ public class TargetSelector : MonoBehaviour
 
     [SerializeField] private float m_targetRange = 10.0f;
 
-    [SerializeField] private float m_maxTargetDistance = 0.17f;
+    [SerializeField] List<SelectAreaData> m_selectAreaDataList; 
 
     [SerializeField] private bool m_drawDebugArea = false;
 
@@ -40,38 +53,57 @@ public class TargetSelector : MonoBehaviour
         CheckIfAddToTargetList();
 
         //ターゲットを配列に割り当てる
-        AssignTarget();
+
+        bool assignAllFlag = m_targetList.Count == 3;
+
+        if (assignAllFlag)
+        {
+            Debug.Log("simple");
+            AssignTargetSimple();
+        }
+        else
+        {
+            Debug.Log("complex");
+            AssignTarget();
+        }
+    }
+
+    private void AssignTargetSimple() 
+    {
+        List<TargetInfo> sortList = m_targetList;
+
+        sortList.Sort((a, b) => a.m_screenPos.x.CompareTo(b.m_screenPos.x));
+
+        for (int i = 0; i < m_targetList.Count; i++) 
+        {
+            m_targetArray[i] = sortList[i];
+        }
     }
 
     private void AssignTarget()
     {
+        // 左・上・右の3方向
         m_targetArray = new TargetInfo[3];
 
-        if (m_targetList.Count == 0) 
+        //候補ターゲットリスト
+        var candidates = new List<(float distance, int areaIndex, TargetInfo target)>();
+
+        //各方向エリアの候補となるターゲットを洗い出す
+        for (int i = 0; i < m_selectAreaDataList.Count; i++)
         {
-            return;
-        }
+            SelectAreaData area = m_selectAreaDataList[i];
 
-        // 各エリアの基準点
-        float[] centerX =
-        {
-        1.0f / 6.0f,
-        0.5f,
-        5.0f / 6.0f
-        };
-
-        var candidates = new List<(float distance, int index, TargetInfo target)>();
-
-        bool assignAllFlag = m_targetList.Count == 3;
-
-        for (int i = 0; i < centerX.Length; i++)
-        {
-            foreach (TargetInfo target in m_targetList) 
+            if (area.m_directionIndexList == null || area.m_directionIndexList.Count == 0)
             {
-                float distance = Mathf.Abs(target.m_screenPos.x - centerX[i]);
-                
-                //基準点の範囲内か
-                if (!assignAllFlag && distance > m_maxTargetDistance) 
+                continue;
+            }
+
+            //各方向エリアの範囲内にターゲットがいるかどうかを見る
+            foreach (TargetInfo target in m_targetList)
+            {
+                float distance = Mathf.Abs(target.m_screenPos.x - area.m_positionX);
+
+                if (distance > area.m_maxTargetDistance)
                 {
                     continue;
                 }
@@ -80,30 +112,63 @@ public class TargetSelector : MonoBehaviour
             }
         }
 
-        //距離が近い順に処理
-        candidates.Sort((a, b) => a.distance.CompareTo(b.distance));
-
-        HashSet<GameObject> selectedTargets = new HashSet<GameObject>();
-
-        foreach (var candidate in candidates) 
+        candidates.Sort((a, b) =>
         {
-            //既にこの方向配列に登録されてるならスキップ
-            if (m_targetArray[candidate.index].m_target != null) 
+            //N面性をチェックし1面性エリアにいるターゲットを優先する
+            bool aIsDual = m_selectAreaDataList[a.areaIndex].m_hasDualityFlag;
+            bool bIsDual = m_selectAreaDataList[b.areaIndex].m_hasDualityFlag;
+
+            if (aIsDual && !bIsDual) 
+            {//bを先に
+                return 1;
+            }
+
+            if (!aIsDual && bIsDual)
+            {//aを先に
+                return -1;
+            }
+
+            //同じN面性方向タイプならそれぞれ持ってる基準点までの距離で並べ替え
+            return a.distance.CompareTo(b.distance);
+        });
+
+        //既に割り当ててるターゲットを保持するリスト
+        var selectedTargets = new HashSet<GameObject>();
+
+        foreach (var candidate in candidates)
+        {
+            SelectAreaData area = m_selectAreaDataList[candidate.areaIndex];
+
+            // 同じ敵を別のエリアから重複して割り当てない
+            if (selectedTargets.Contains(candidate.target.m_target))
             {
                 continue;
             }
 
-            //別の方向に割り当てられてるか
-            if (selectedTargets.Contains(candidate.target.m_target)) 
+            bool assigned = false;
+
+            //方向配列にターゲットを割り当てる
+            foreach (int directionIndex in area.m_directionIndexList)
             {
-                continue;
+                if (directionIndex < 0 || directionIndex >= m_targetArray.Length)
+                {
+                    continue;
+                }
+
+                // この方向に先に選ばれたターゲットがいればここはスキップ
+                if (m_targetArray[directionIndex].m_target != null)
+                {
+                    continue;
+                }
+
+                m_targetArray[directionIndex] = candidate.target;
+                assigned = true;
             }
 
-            TargetInfo selectedTarget = candidate.target;
-
-            m_targetArray[candidate.index] = selectedTarget;
-
-            selectedTargets.Add(selectedTarget.m_target);
+            if (assigned)
+            {
+                selectedTargets.Add(candidate.target.m_target);
+            }
         }
     }
 
@@ -174,20 +239,15 @@ public class TargetSelector : MonoBehaviour
             return;
         }
 
-        // 各エリアの基準点
-        float[] centerX =
+        for(int i = 0; i < m_selectAreaDataList.Count; i++) 
         {
-        0.5f / 6.0f,
-        0.5f,
-        5.5f / 6.0f
-        };
+            SelectAreaData area = m_selectAreaDataList[i];
 
-        DrawTargetRange(centerX[0], m_maxTargetDistance, new Color(0f, 0.5f, 1f, 0.25f), "LEFT");
-        DrawTargetRange(centerX[1], m_maxTargetDistance, new Color(0f, 1f, 0f, 0.25f), "CENTER");
-        DrawTargetRange(centerX[2], m_maxTargetDistance, new Color(1f, 0.5f, 0f, 0.25f), "RIGHT");
+            DrawTargetRange(area.m_positionX, area.m_maxTargetDistance, area.m_areaColor, area.m_AreaName, area.m_labelHeight);
+        }
     }
 
-    private void DrawTargetRange(float centerViewportX, float range, Color color, string label)
+    private void DrawTargetRange(float centerViewportX, float range, Color color, string label, float labelHeight = 0)
     {
         float minX = Mathf.Clamp01(centerViewportX - range);
         float maxX = Mathf.Clamp01(centerViewportX + range);
@@ -210,7 +270,7 @@ public class TargetSelector : MonoBehaviour
         GUI.DrawTexture(lineRect, Texture2D.whiteTexture);
 
         // ラベル
-        GUI.Label(new Rect(screenMinX + 8f, 8f, 120f, 25f), label);
+        GUI.Label(new Rect(screenMinX + 8f, 8f + labelHeight, 120f, 25f), label);
 
         GUI.color = oldColor;
     }

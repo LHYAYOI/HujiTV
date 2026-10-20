@@ -430,7 +430,7 @@ Transform:
   m_GameObject: {fileID: 568092638}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.65, y: -1.92, z: 3.34}
+  m_LocalPosition: {x: 8.87, y: -1.92, z: 2.33}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -564,7 +564,7 @@ Transform:
   m_GameObject: {fileID: 1035992086}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.072, y: -0.02, z: 4.82}
+  m_LocalPosition: {x: -4, y: -0.02, z: 4.82}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -755,7 +755,7 @@ Transform:
   m_GameObject: {fileID: 1078199873}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.3, y: 2.09, z: 3}
+  m_LocalPosition: {x: 3.71, y: 2.09, z: 2.04}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1230,25 +1230,13 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1715315696896216547, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
-      propertyPath: m_targetRange
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 1715315696896216547, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
-      propertyPath: m_drawDebugArea
+      propertyPath: m_selectAreaDataList.Array.data[1].m_hasDualityFlag
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1715315696896216547, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
-      propertyPath: m_centerAreaWidth
-      value: 0.5
+      propertyPath: m_selectAreaDataList.Array.data[3].m_hasDualityFlag
+      value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1715315696896216547, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
-      propertyPath: m_maxTargetDistance
-      value: 0.21
-      objectReference: {fileID: 0}
-    - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
-      propertyPath: magicData
-      value: 
-      objectReference: {fileID: 11400000, guid: 17ef150f604effd4e91c6dfb9950d6c0, type: 2}
     - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
       propertyPath: m_bulletManager
       value: 
@@ -1435,8 +1423,8 @@ SceneRoots:
   - {fileID: 1982035046}
   - {fileID: 3979107388270854282}
   - {fileID: 568092642}
-  - {fileID: 1035992090}
   - {fileID: 1078199877}
+  - {fileID: 1035992090}
   - {fileID: 93516745}
   - {fileID: 73597852}
   - {fileID: 3026711819331224642}

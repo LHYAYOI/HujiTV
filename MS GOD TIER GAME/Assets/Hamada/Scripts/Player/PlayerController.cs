@@ -58,7 +58,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        CameraManager.Instance.SetLookTarget(target);
+        //CameraManager.Instance.SetLookTarget(target);
 
         CameraManager.Instance.ShakeCamera(.5f, 3);
 
