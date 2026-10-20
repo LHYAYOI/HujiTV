@@ -148,7 +148,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 562989454}
   m_Father: {fileID: 709126503}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &297934280
@@ -170,17 +171,117 @@ MonoBehaviour:
   m_textureA: {fileID: 8400000, guid: 6f15d851b3ea01548b5ec255abb68c5e, type: 2}
   m_textureB: {fileID: 8400000, guid: 020ec2fa7d10c734586cd795b48df44a, type: 2}
   m_displayImage: {fileID: 2107318352}
-  m_modelView: {fileID: 855384874}
---- !u!4 &433444698 stripped
+  m_modelView: {fileID: 0}
+  m_flipView: {fileID: 562989455}
+  m_useCovers: 1
+  m_startClosed: 1
+  m_coverInsides: 1
+  m_autoCloseAtEnds: 0
+  m_liveTurningPages: 1
+--- !u!1 &562989453
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 562989454}
+  - component: {fileID: 562989455}
+  m_Layer: 0
+  m_Name: Book Flip View
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &562989454
 Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-  m_PrefabInstance: {fileID: 2084411004}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &433444699 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-  m_PrefabInstance: {fileID: 2084411004}
+  m_GameObject: {fileID: 562989453}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 297934279}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &562989455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 562989453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba59462d3f4b6b04e98b6e6de3de7099, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::hatake.BookFlipView
+  m_shader: {fileID: 4800000, guid: ad04cfc886e4c5e469445ae7c780b92f, type: 3}
+  m_material: {fileID: 2100000, guid: bd5c91c8d1fd2034e801decb2967b9c9, type: 2}
+  m_outputTexture: {fileID: 0}
+  m_display: {fileID: 0}
+  m_outputSize: {x: 1600, y: 1000}
+  m_hdrOutput: 0
+  m_postShader: {fileID: 4800000, guid: 5578288a7a21cc74e94534d3c228798e, type: 3}
+  m_bloomIntensity: 0.9
+  m_bloomThreshold: 0.95
+  m_bloomKnee: 0.5
+  m_bloomScatter: 0.7
+  m_bloomIterations: 6
+  m_bloomClamp: 40
+  m_bloomTint: {r: 1, g: 1, b: 1, a: 1}
+  m_exposure: 1
+  m_tonemap: 1
+  m_dimBlur: 0.85
+  m_bookArea: {x: 0.06, y: 0.08, z: 0.94, w: 0.92}
+  m_leftCrop: {x: 0.1125, y: 0.1, z: 0.3875, w: 0.8}
+  m_rightCrop: {x: 0.5, y: 0.1, z: 0.3875, w: 0.8}
+  m_pageAspectOverride: 0
+  m_turnDuration: 0.75
+  m_turnCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_autoCorner: 0
+  m_autoLift: 0.12
+  m_releaseSpeed: 4
+  m_flickSpeed: 2.5
+  m_frontCover: {fileID: 0}
+  m_backCover: {fileID: 0}
+  m_rigidCovers: 1
+  m_burnDuration: 1.9
+  m_reviveDuration: 1.7
+  m_turnGlow: 0.8
+  m_stackThickness: 0.035
+  m_minStackThickness: 0.006
+  m_stackLayers: 14
+  m_stackDrop: 0.6
 --- !u!1 &657471367
 GameObject:
   m_ObjectHideFlags: 0
@@ -435,72 +536,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &855384873
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 855384875}
-  - component: {fileID: 855384874}
-  m_Layer: 8
-  m_Name: BookModelStage
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &855384874
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 855384873}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ce10a723257c4c4f9eee859367249ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BookModelView
-  m_animator: {fileID: 433444699}
-  m_pageClip: {fileID: 1827226128182048838, guid: ae175b7bcef45a3488601760020d7cd5, type: 3}
-  m_bookRenderer: {fileID: 961644873}
-  m_pageRenderer: {fileID: 1728936399}
-  m_modelCamera: {fileID: 1373757546}
-  m_modelTexture: {fileID: 8400000, guid: 3b4b30f5c855c9146b5f51bf7da502b5, type: 2}
-  m_turnDuration: 0.65
-  m_forwardFlag: 1
-  m_jointOffsets:
-  - joint: {fileID: 1732010175}
-    startOffset: {x: 0, y: 0, z: 0}
-    endOffset: {x: 0, y: -0.0027, z: 0}
-  - joint: {fileID: 1546542767}
-    startOffset: {x: 0, y: 0, z: 0}
-    endOffset: {x: 0, y: -0.0024, z: 0}
---- !u!4 &855384875
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 855384873}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.0027, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 433444698}
-  - {fileID: 1373757547}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &961644873 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 7276048487733848785, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-  m_PrefabInstance: {fileID: 2084411004}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1085153536
 GameObject:
   m_ObjectHideFlags: 0
@@ -586,8 +621,8 @@ Camera:
   m_GameObject: {fileID: 1150570626}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -771,94 +806,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!1 &1373757545
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1373757547}
-  - component: {fileID: 1373757546}
-  m_Layer: 0
-  m_Name: BookModelCamera
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!20 &1373757546
-Camera:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1373757545}
-  m_Enabled: 0
-  serializedVersion: 2
-  m_ClearFlags: 2
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
-  m_projectionMatrixMode: 1
-  m_GateFitMode: 2
-  m_FOVAxisMode: 0
-  m_Iso: 200
-  m_ShutterSpeed: 0.005
-  m_Aperture: 16
-  m_FocusDistance: 10
-  m_FocalLength: 50
-  m_BladeCount: 5
-  m_Curvature: {x: 2, y: 11}
-  m_BarrelClipping: 0.25
-  m_Anamorphism: 0
-  m_SensorSize: {x: 36, y: 24}
-  m_LensShift: {x: 0, y: 0}
-  m_NormalizedViewPortRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
-  near clip plane: 0.001
-  far clip plane: 3.1968606
-  field of view: 60
-  orthographic: 1
-  orthographic size: 0.112
-  m_Depth: -20
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 256
-  m_RenderingPath: -1
-  m_TargetTexture: {fileID: 8400000, guid: 3b4b30f5c855c9146b5f51bf7da502b5, type: 2}
-  m_TargetDisplay: 0
-  m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
-  m_AllowDynamicResolution: 0
-  m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
-  m_StereoConvergence: 10
-  m_StereoSeparation: 0.022
---- !u!4 &1373757547
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1373757545}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.013470068, y: -0.70697844, z: 0.7069785, w: 0.013470046}
-  m_LocalPosition: {x: 0.040591776, y: 1.0876055, z: -4.8715588e-17}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 855384875}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &1546542767 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -1241058847572682039, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-  m_PrefabInstance: {fileID: 2084411004}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1690980302
 GameObject:
   m_ObjectHideFlags: 0
@@ -962,16 +909,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1690980302}
   m_CullTransparentMesh: 1
---- !u!137 &1728936399 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 6587067101442947938, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-  m_PrefabInstance: {fileID: 2084411004}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &1732010175 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4918753458281921464, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-  m_PrefabInstance: {fileID: 2084411004}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1735693173
 GameObject:
   m_ObjectHideFlags: 0
@@ -1329,219 +1266,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!1001 &2084411004
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 855384875}
-    m_Modifications:
-    - target: {fileID: -8965811294570246362, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -0.0000152393495
-      objectReference: {fileID: 0}
-    - target: {fileID: -8965811294570246362, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: -0.000025822876
-      objectReference: {fileID: 0}
-    - target: {fileID: -8965811294570246362, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: -123.080345
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8411312414656605097, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: -8159412932280508937, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: -5107054126005254486, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0.35004345
-      objectReference: {fileID: 0}
-    - target: {fileID: -5107054126005254486, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0.37926713
-      objectReference: {fileID: 0}
-    - target: {fileID: -5107054126005254486, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: -23.00746
-      objectReference: {fileID: 0}
-    - target: {fileID: -3441741364759053172, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: -3385604430752132528, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: -2797864980895152918, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: -2240151287705473546, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: -1241058847572682039, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -0.0000022869497
-      objectReference: {fileID: 0}
-    - target: {fileID: -1241058847572682039, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0.000027963362
-      objectReference: {fileID: 0}
-    - target: {fileID: -1241058847572682039, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: -7.7720375
-      objectReference: {fileID: 0}
-    - target: {fileID: -412989040442181847, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_Name
-      value: book_mdl
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 2726568780636716469, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0.0000025266327
-      objectReference: {fileID: 0}
-    - target: {fileID: 2726568780636716469, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: -0.000018849785
-      objectReference: {fileID: 0}
-    - target: {fileID: 2726568780636716469, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: -19.542734
-      objectReference: {fileID: 0}
-    - target: {fileID: 2734096456892374499, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 2823340429344771396, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 4140668533725440856, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 4918753458281921464, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -0.000012757659
-      objectReference: {fileID: 0}
-    - target: {fileID: 4918753458281921464, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0.000058977286
-      objectReference: {fileID: 0}
-    - target: {fileID: 4918753458281921464, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: -24.213476
-      objectReference: {fileID: 0}
-    - target: {fileID: 6587067101442947938, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6587067101442947938, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_UpdateWhenOffscreen
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6587067101442947938, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: aca271d825beefb40aaddd1eb48caca7, type: 2}
-    - target: {fileID: 7178581637816246140, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -0.0000000023656235
-      objectReference: {fileID: 0}
-    - target: {fileID: 7178581637816246140, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0.00000029272687
-      objectReference: {fileID: 0}
-    - target: {fileID: 7178581637816246140, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: -2.26448
-      objectReference: {fileID: 0}
-    - target: {fileID: 7276048487733848785, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 7067640537e6dcd4da74f70b41b1bc62, type: 2}
-    - target: {fileID: 8001793519699034412, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -0.044673316
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001793519699034412, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: -0.09465824
-      objectReference: {fileID: 0}
-    - target: {fileID: 8001793519699034412, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: -3.7158434
-      objectReference: {fileID: 0}
-    - target: {fileID: 8611018209262909408, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -0.000004688271
-      objectReference: {fileID: 0}
-    - target: {fileID: 8611018209262909408, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: -0.0000061777346
-      objectReference: {fileID: 0}
-    - target: {fileID: 8611018209262909408, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: -30.946178
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 77c5fdb27a59e9d4d8f3a6c981979c6c, type: 3}
 --- !u!1 &2107318350
 GameObject:
   m_ObjectHideFlags: 0
@@ -1554,6 +1278,8 @@ GameObject:
   - component: {fileID: 2107318353}
   - component: {fileID: 2107318352}
   - component: {fileID: 2107318354}
+  - component: {fileID: 2107318356}
+  - component: {fileID: 2107318355}
   m_Layer: 0
   m_Name: 'BookDisplayImage '
   m_TagString: Untagged
@@ -1622,13 +1348,65 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2107318350}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1c16993a0e23bf94b8da43572125352c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BookSwipeInput
   m_bookController: {fileID: 297934280}
   m_swipeThresholdRatio: 0.15
+--- !u!114 &2107318355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107318350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51c4a5af582ddd048bb9948dd794cab9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::hatake.BookFlipKeyboardActions
+  m_bookController: {fileID: 297934280}
+  m_flipView: {fileID: 562989455}
+  m_useKeys: 1
+  m_useSpot: 1
+  m_useBurn: 1
+  m_useRevive: 1
+  m_useOpenClose: 1
+  m_spotKey: 29
+  m_burnKey: 26
+  m_reviveKey: 23
+  m_openCloseKey: 17
+  m_dimAmount: 0.85
+  m_spotRadius: 0.22
+  m_spotFeather: 0.07
+  m_spotShape: 0
+  m_spotFollow: 18
+  m_fadeDuration: 0.3
+  m_spotSlot: 0
+  m_editUnit: 0
+  m_reviveSpread: {fileID: 11400000, guid: fd2ea4d585320f746908b5f45b9c8650, type: 2}
+  m_revivePage: {fileID: 11400000, guid: ec9ee33f1dd87b741af4c870eac5ed96, type: 2}
+  m_reviveBackPage: {fileID: 0}
+--- !u!114 &2107318356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107318350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52c901622c46e9441b67d73c4cc45a4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::hatake.BookFlipDragInput
+  m_bookController: {fileID: 297934280}
+  m_flipView: {fileID: 562989455}
+  m_grabSide: 0
+  m_grabCorner: 0
+  m_closeAtEnds: 1
+  m_grabZone: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1637,5 +1415,4 @@ SceneRoots:
   - {fileID: 1966737867}
   - {fileID: 711980062}
   - {fileID: 709126503}
-  - {fileID: 855384875}
   - {fileID: 1085153538}

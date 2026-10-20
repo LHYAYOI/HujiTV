@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
@@ -22,8 +21,38 @@ public sealed class BookModelView : MonoBehaviour
     private AnimationClipPlayable m_clipPlayable;
     private MaterialPropertyBlock m_bookProperties;
     private MaterialPropertyBlock m_pageProperties;
+    private Texture m_leftTexture, m_rightTexture, m_frontTexture, m_backTexture;
 
     public RenderTexture OutputTexture => m_modelTexture;
+    public Camera ModelCamera => m_modelCamera;
+    public Renderer BookRenderer => m_bookRenderer;
+    public void SetPageDissolve(int side, float progress, Color edge)
+    {
+        if (!Initialize()) return;
+        m_bookProperties.SetFloat(side == 0 ? "_DissolveLeft" : "_DissolveRight", Mathf.Clamp01(progress));
+        m_bookProperties.SetColor("_DissolveEdgeColor", edge);
+        m_bookRenderer.SetPropertyBlock(m_bookProperties);
+    }
+
+    public void ResetPageDissolve()
+    {
+        if (m_bookProperties == null || m_bookRenderer == null) return;
+        m_bookProperties.SetFloat("_DissolveLeft", 0);
+        m_bookProperties.SetFloat("_DissolveRight", 0);
+        m_bookRenderer.SetPropertyBlock(m_bookProperties);
+    }
+    public void SetMagicStyle(Color primary, Color paper, float strength)
+    {
+        if (!Initialize()) return;
+        foreach (MaterialPropertyBlock properties in new[] { m_bookProperties, m_pageProperties })
+        {
+            properties.SetColor("_MagicColor", primary);
+            properties.SetColor("_PaperTint", paper);
+            properties.SetFloat("_MagicStrength", strength);
+        }
+        m_bookRenderer.SetPropertyBlock(m_bookProperties);
+        m_pageRenderer.SetPropertyBlock(m_pageProperties);
+    }
 
     [System.Serializable]
     private sealed class JointPositionOffset
@@ -103,8 +132,10 @@ public sealed class BookModelView : MonoBehaviour
             advanceFlag ? nextTexture : currentTexture);
 
 
-        m_pageProperties.SetTexture("_FrontTex", advanceFlag ? currentTexture : nextTexture);
-        m_pageProperties.SetTexture("_BackTex", advanceFlag ? nextTexture : currentTexture);
+        m_frontTexture = advanceFlag ? currentTexture : nextTexture;
+        m_backTexture = advanceFlag ? nextTexture : currentTexture;
+        m_pageProperties.SetTexture("_FrontTex", m_frontTexture);
+        m_pageProperties.SetTexture("_BackTex", m_backTexture);
         m_pageRenderer.SetPropertyBlock(m_pageProperties);
 
         bool playForwardFlag = advanceFlag == m_forwardFlag;
@@ -149,9 +180,29 @@ public sealed class BookModelView : MonoBehaviour
 
     private void SetBookTextures(Texture leftTexture, Texture rightTexture)
     {
+        m_leftTexture = leftTexture;
+        m_rightTexture = rightTexture;
         m_bookProperties.SetTexture("_LeftTex", leftTexture);
         m_bookProperties.SetTexture("_RightTex", rightTexture);
         m_bookRenderer.SetPropertyBlock(m_bookProperties);
+    }
+
+    private void LateUpdate()
+    {
+        // Keep strong references and refresh native texture bindings after RenderTexture
+        // resource creation/recreation, including the first rendered Play-mode frames.
+        if (m_bookProperties != null && m_bookRenderer != null)
+        {
+            if (m_leftTexture != null) m_bookProperties.SetTexture("_LeftTex", m_leftTexture);
+            if (m_rightTexture != null) m_bookProperties.SetTexture("_RightTex", m_rightTexture);
+            m_bookRenderer.SetPropertyBlock(m_bookProperties);
+        }
+        if (m_pageProperties != null && m_pageRenderer != null)
+        {
+            if (m_frontTexture != null) m_pageProperties.SetTexture("_FrontTex", m_frontTexture);
+            if (m_backTexture != null) m_pageProperties.SetTexture("_BackTex", m_backTexture);
+            m_pageRenderer.SetPropertyBlock(m_pageProperties);
+        }
     }
 
     private void OnDisable()

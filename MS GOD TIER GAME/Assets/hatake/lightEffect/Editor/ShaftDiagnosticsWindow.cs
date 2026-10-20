@@ -24,7 +24,7 @@ namespace LightShaftLab.Editor
         Vector2 m_scroll;
 
 
-        [MenuItem("Tools/Light Shaft/Quality Diagnostics")]
+        [MenuItem("Tools/Light Shaft(programmer)/Quality Diagnostics")]
         public static void Open() => GetWindow<ShaftDiagnosticsWindow>("Shaft Diagnostics");
         void OnEnable()
         {

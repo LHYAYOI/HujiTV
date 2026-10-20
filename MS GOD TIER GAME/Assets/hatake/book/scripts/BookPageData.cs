@@ -37,6 +37,15 @@ public sealed class BookImageData
     menuName = "Book/Page Data")]
 public sealed class BookPageData : ScriptableObject
 {
+    public enum PageCategory { Guide, Attack, Assist, Noise }
+    [Header("ゲーム内の分類")]
+    [SerializeField] private PageCategory m_category = PageCategory.Guide;
+    public PageCategory Category => m_category;
+    public bool IsSkill => m_category == PageCategory.Attack || m_category == PageCategory.Assist;
+    [SerializeField] private Material m_backgroundMaterial;
+    [SerializeField] private bool m_manuscriptHeading;
+    public Material BackgroundMaterial => m_backgroundMaterial;
+    public bool ManuscriptHeading => m_manuscriptHeading;
     [Header("管理用")]
 
     [SerializeField]
