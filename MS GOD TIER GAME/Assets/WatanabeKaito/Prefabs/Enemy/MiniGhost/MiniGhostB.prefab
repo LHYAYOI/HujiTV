@@ -168,7 +168,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostEnemy
   m_enemyData: {fileID: 11400000, guid: d57e1e492585fd34a91c0444e1e44935, type: 2}
   m_moveDirection: -1
-  m_timeLimit: 20
+  m_timeLimit: 15
   m_kickFirePoint: {fileID: 4230615318380201651}
   m_throwFirePoint: {fileID: 1847888665569345119}
 --- !u!114 &-1878883125415085335
@@ -208,8 +208,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 816a2d45fa02b7d438810c4545eed225, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostMoveState
-  m_moveSpeed: 1.5
-  m_rotateWithSplineFlag: 1
+  m_moveSpeed: 1
+  m_rotateWithSplineFlag: 0
   m_fireInterval: 3
 --- !u!114 &4122682875455443804
 MonoBehaviour:
@@ -230,7 +230,7 @@ MonoBehaviour:
   - {fileID: 8444880630598191031, guid: 5d3280a2480b9214a9e32b192dbc6bd1, type: 3}
   - {fileID: 8444880630598191031, guid: 2a71e4f3b6995d6448c21dcc15371515, type: 3}
   - {fileID: 8444880630598191031, guid: 60146a51dd7ece44eb63508a7dd742ac, type: 3}
-  m_bulletSpeed: 5
+  m_bulletSpeed: 3
   m_bulletAngle: 30
   m_targetHeightOffset: -0.1
   m_heightCorrectionRate: 0.1
@@ -432,7 +432,7 @@ PrefabInstance:
     - target: {fileID: 6851099186128873815, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 01b9a7381070f6744b387acdf4892b77, type: 2}
+      objectReference: {fileID: 2100000, guid: 178f964934ac9a141a2efa372f1d5e7c, type: 2}
     - target: {fileID: 9222650964280752047, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: m_LocalPosition.z
       value: -0.052

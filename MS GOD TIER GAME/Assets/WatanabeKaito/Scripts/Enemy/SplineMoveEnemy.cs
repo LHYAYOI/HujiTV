@@ -21,6 +21,7 @@ public class SplineMoveEnemy : EnemyBase
     protected bool m_isClosedSplineFlag = false; // スプラインがループClosedしているかどうか
     protected Vector3 m_spawnPosition;
 
+
     public override void Initialize()
     {
         // 初期化処理
@@ -87,6 +88,8 @@ public class SplineMoveEnemy : EnemyBase
         // 座標の更新
         transform.position = position;
 
+        //TurnToPlayer();
+
         if (m_rotateWithSplineFlag)
         {
             // 向きの更新
@@ -102,4 +105,6 @@ public class SplineMoveEnemy : EnemyBase
             transform.rotation = Quaternion.LookRotation(tangent);
         }
     }
+
+    
 }

@@ -15,9 +15,14 @@ public class GimmickSplineBattle : GimmickSpline
     // Public Event
     // ―――――――――――――――――――――――――――――――――――――  
 
+    public void SpawnStart()
+    {
+        BattleManager.Instance.StartSpawn(m_battleData);
+    }
+
     public void BattleStart()
     {
-        BattleManager.Instance.StartBattle(m_battleData,m_onFinishBattle);
+        BattleManager.Instance.StartBattle(m_onFinishBattle);
     }
 
     // ―――――――――――――――――――――――――――――――――――――

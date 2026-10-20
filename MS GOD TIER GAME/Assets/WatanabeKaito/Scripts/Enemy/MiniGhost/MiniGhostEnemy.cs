@@ -22,6 +22,12 @@ public class MiniGhostEnemy : SplineMoveEnemy
     [Header("投げの弾の発射位置")]
     [SerializeField] private Transform m_throwFirePoint;
 
+    [Header("カメラを向く高さの補正")]
+    [SerializeField] private float m_cameraHeightOffset = 1.5f;
+
+    [Header("毎フレームプレイヤーに向く角度")]
+    [SerializeField] private float m_turnSpeed = 60f;
+
     private MiniGhostIdleState m_idleState;     // 待機ステート
     private MiniGhostSpawnState m_spawnState;   // 出現ステート
     private MiniGhostMoveState m_moveState;     // 移動ステート
@@ -67,8 +73,37 @@ public class MiniGhostEnemy : SplineMoveEnemy
         {
             m_currentState.UpdateState();
         }
+
+        // プレイヤーの方向を向く
+        TurnToPlayer();
     }
 
+    // プレイヤーの方向を向く
+    private void TurnToPlayer()
+    {
+        Vector3 playerPosition = m_playerPosition.position;
+
+        // プレイヤーの狙う位置を調整
+        playerPosition.y -= m_cameraHeightOffset;
+
+        Vector3 direction = playerPosition - transform.position;
+
+        // 方向ベクトルがほぼゼロなら回転しない
+        if (direction.sqrMagnitude <= 0.0001f)
+        {
+            return;
+        }
+
+        // プレイヤーの方向を向く回転
+        Quaternion targetRotation = Quaternion.LookRotation(-direction.normalized, Vector3.up);
+
+        // 毎フレーム少しずつ回転する
+        transform.rotation = Quaternion.RotateTowards(
+            transform.rotation,
+            targetRotation,
+            m_turnSpeed * Time.deltaTime
+        );
+    }
     // 各状態コンポーネントを取得する。
     private void ResolveStateComponents()
     {
@@ -207,6 +242,12 @@ public class MiniGhostEnemy : SplineMoveEnemy
     public Vector3 GetPlayerPosition()
     {
         return m_playerPosition.position;
+    }
+
+    // 移動速度を取得する
+    public float GetMoveSpeed()
+    {
+        return m_moveSpeed;
     }
 
 
