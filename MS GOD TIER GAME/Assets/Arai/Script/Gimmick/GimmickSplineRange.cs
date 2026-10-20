@@ -9,6 +9,7 @@ public class GimmickSplineRange : GimmickSpline
     // ―――――――――――――――――――――――――――――――――――――
 
     [SerializeField] private GimmickSplineRange m_pair;
+    [SerializeField] private Color m_rangeColor = Color.green;
     private CartController m_cart;
     private float m_startDistance;
 
@@ -19,6 +20,7 @@ public class GimmickSplineRange : GimmickSpline
     // ―――――――――――――――――――――――――――――――――――――
 
     public event Action<CartController,float> OnInRange;
+    public event Action OnOutRange;
 
 
     // ―――――――――――――――――――――――――――――――――――――
@@ -56,6 +58,12 @@ public class GimmickSplineRange : GimmickSpline
         if (Mathf.Abs(max) < Mathf.Abs(rate) ||
             Mathf.Abs(dist) > Mathf.Abs(max))
         {
+
+            // 正しい方向で抜けないと発動しません
+            if(Mathf.Abs(max) < Mathf.Abs(rate))
+            {
+            }
+            OnOutRange?.Invoke();
             m_cart = null;
         }
 
@@ -98,7 +106,7 @@ public class GimmickSplineRange : GimmickSpline
         float range01 = (GimmickPoint - m_pair.GimmickPoint)  / myLength;
 
 
-        Gizmos.color = Color.green;
+        Gizmos.color = m_rangeColor;
         int step = 20;
         float start = gimmickPoint01;
         float delta = range01 / step;
@@ -110,9 +118,9 @@ public class GimmickSplineRange : GimmickSpline
         }
 
 
-        Gizmos.color = Color.forestGreen;
-        Gizmos.DrawSphere(mySpline.EvaluatePosition(start), 0.5f);
-        Gizmos.DrawSphere(mySpline.EvaluatePosition(start - range01), 0.5f);
+        Gizmos.color = m_rangeColor * 0.8f;
+        Gizmos.DrawSphere(mySpline.EvaluatePosition(start), 0.1f);
+        Gizmos.DrawSphere(mySpline.EvaluatePosition(start - range01), 0.1f);
 
     }
 }

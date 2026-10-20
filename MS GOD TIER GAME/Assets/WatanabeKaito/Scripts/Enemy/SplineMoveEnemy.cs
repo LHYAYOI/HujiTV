@@ -9,21 +9,16 @@ using UnityEngine.Splines;
 
 public class SplineMoveEnemy : EnemyBase
 {
-    [Header("移動スピード")]
-    [SerializeField] protected float m_moveSpeed = 1f;
+    [Header("進行方向(1 = 始点→終点, -1 = 終点→始点)")]
+    [SerializeField] private float m_moveDirection = -1f;
 
-    [Header("スプラインに合わせて回転するかしないか")]
-    [SerializeField] protected bool m_rotateWithSplineFlag = true;
 
+    protected float m_moveSpeed = 1f; // 移動スピード
+    protected bool m_rotateWithSplineFlag = true;// スプラインに合わせて回転するかどうか
     protected SplineContainer m_targetSpline; // 移動対象のスプライン
     protected float m_distanceTraveled = 0f;  // スプライン上の移動距離
     protected float m_splineLength;           // スプラインの全長
-
-    protected float m_moveDirection = 1f; // 進行方向 (1f = 始点→終点, -1f = 終点→始点)
-
-
     protected bool m_isClosedSplineFlag = false; // スプラインがループClosedしているかどうか
-
     protected Vector3 m_spawnPosition;
 
     public override void Initialize()
@@ -38,7 +33,6 @@ public class SplineMoveEnemy : EnemyBase
         {
             m_splineLength = m_targetSpline.CalculateLength();
             m_distanceTraveled = 0f;
-            m_moveDirection = 1f;
 
             // Closedかどうかを取得しておく
             m_isClosedSplineFlag = m_targetSpline.Spline.Closed;
@@ -79,12 +73,10 @@ public class SplineMoveEnemy : EnemyBase
             if (m_distanceTraveled >= m_splineLength)
             {
                 m_distanceTraveled = m_splineLength;
-                m_moveDirection = -1f;
             }
             else if (m_distanceTraveled <= 0f)
             {
                 m_distanceTraveled = 0f;
-                m_moveDirection = 1f;
             }
         }
 
@@ -107,10 +99,6 @@ public class SplineMoveEnemy : EnemyBase
     {
         if (tangent != Vector3.zero)
         {
-            if (m_moveDirection < 0)
-            {
-                tangent = -tangent;
-            }
             transform.rotation = Quaternion.LookRotation(tangent);
         }
     }

@@ -12,8 +12,16 @@ public class RoutineRunner : MonoBehaviour
         instance = this;
     }
 
-    public void RunRoutine(IEnumerator routine)
+    public Coroutine RunRoutine(IEnumerator routine)
     {
-        StartCoroutine(routine);
+        return StartCoroutine(routine);
+    }
+
+    public void StopRoutine(Coroutine routine)
+    {
+        if (routine != null)
+        {
+            StopCoroutine(routine);
+        }
     }
 }
