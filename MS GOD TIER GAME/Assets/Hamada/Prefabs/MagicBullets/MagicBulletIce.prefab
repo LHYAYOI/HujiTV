@@ -139,7 +139,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   m_magicData: {fileID: 11400000, guid: 17ef150f604effd4e91c6dfb9950d6c0, type: 2}
   m_moveSpeed: 30
-  m_curveHeight: 1
+  m_bezierControlPoints:
+  - m_curveHeight: {x: 1, y: 3}
+    m_curveWidth: {x: 1, y: 4}
+  - m_curveHeight: {x: 0.5, y: 2}
+    m_curveWidth: {x: -2, y: 2}
+  - m_curveHeight: {x: 1, y: 3}
+    m_curveWidth: {x: -1, y: -3}
 --- !u!1 &1249662005817768199
 GameObject:
   m_ObjectHideFlags: 0

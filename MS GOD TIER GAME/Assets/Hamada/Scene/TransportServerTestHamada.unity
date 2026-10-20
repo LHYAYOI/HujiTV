@@ -206,7 +206,7 @@ PrefabInstance:
     - target: {fileID: 2723047527836766935, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
       propertyPath: m_bulletSpawnPoint
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1881704420}
     - target: {fileID: 7078241854969815186, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
       propertyPath: m_Name
       value: MagicBulletManager
@@ -1229,6 +1229,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1715315696896216547, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
+      propertyPath: m_drawDebugArea
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1715315696896216547, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
       propertyPath: m_selectAreaDataList.Array.data[1].m_hasDualityFlag
       value: 1

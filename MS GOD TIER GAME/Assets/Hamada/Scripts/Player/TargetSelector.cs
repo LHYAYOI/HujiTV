@@ -37,9 +37,9 @@ public class TargetSelector : MonoBehaviour
 
     [SerializeField] private float m_targetRange = 10.0f;
 
-    [SerializeField] List<SelectAreaData> m_selectAreaDataList; 
-
     [SerializeField] private bool m_drawDebugArea = false;
+
+    [SerializeField] List<SelectAreaData> m_selectAreaDataList; 
 
     List<TargetInfo> m_targetList = new List<TargetInfo>();
 

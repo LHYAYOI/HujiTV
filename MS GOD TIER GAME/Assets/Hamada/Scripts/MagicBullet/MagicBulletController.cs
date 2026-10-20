@@ -1,13 +1,23 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class MagicBulletController : MonoBehaviour
 {
+    [Serializable]
+    private struct BezierControlPoint
+    {
+        public Vector2 m_curveHeight;
+        public Vector2 m_curveWidth;
+    }
+
     [SerializeField] MagicData m_magicData;
 
     [SerializeField] float m_moveSpeed;
 
-    [SerializeField] float m_curveHeight;
+    [SerializeField] List<BezierControlPoint> m_bezierControlPoints;
 
     GameObject m_target;
 
@@ -18,19 +28,29 @@ public class MagicBulletController : MonoBehaviour
         return m_magicData;
     }
 
-    public void FireBullet(GameObject target)
+    public void FireBullet(GameObject target, MAGIC_CAST_DIRECTION direction)
     {
         m_target = target;
 
         Vector3 centerPoint = Vector3.Lerp(transform.position, m_target.transform.position, 0.5f);
 
-        m_controlPoint = centerPoint + Vector3.up * m_curveHeight;
+        CalculateControlPoint(centerPoint, direction);
 
         float distance = (m_target.transform.position - transform.position).magnitude;
 
         float duration = distance / m_moveSpeed;
 
         StartCoroutine(HomingRoutine(duration));
+    }
+
+    private void CalculateControlPoint(Vector3 centerPoint,MAGIC_CAST_DIRECTION direction) 
+    {
+        BezierControlPoint controlPoint = m_bezierControlPoints[(int)direction];
+
+        float curveHeight = UnityEngine.Random.Range(controlPoint.m_curveHeight.x, controlPoint.m_curveHeight.y);
+        float curveWidth = UnityEngine.Random.Range(controlPoint.m_curveWidth.x, controlPoint.m_curveWidth.y);
+
+        m_controlPoint = centerPoint + Vector3.up * curveHeight + Vector3.right * curveWidth;
     }
 
     private IEnumerator HomingRoutine(float duration)
@@ -61,8 +81,6 @@ public class MagicBulletController : MonoBehaviour
 
         return u * u * start + 2f * u * rate * controlPoint + rate * rate * end;
     }
-
-    //発射処理
 
     //発射音再生 
 

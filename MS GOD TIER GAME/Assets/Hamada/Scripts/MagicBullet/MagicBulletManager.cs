@@ -7,8 +7,10 @@ public class MagicBulletManager : MonoBehaviour
 {
     [SerializeField] List<MagicBulletController> m_magicBulletPrefabList;
 
+    [SerializeField] private Transform m_bulletSpawnPoint;
+
     //弾の発射
-    public void FireBullet(MagicData magicData, Vector3 m_bulletSpawnPoint, GameObject target)
+    public void FireBullet(MagicData magicData, MAGIC_CAST_DIRECTION direction, GameObject target)
     {
         foreach (MagicBulletController prefab in m_magicBulletPrefabList) 
         {
@@ -19,8 +21,8 @@ public class MagicBulletManager : MonoBehaviour
 
             if (prefab.GetMagicData().DisplayName == magicData.DisplayName) 
             {
-                MagicBulletController bullet = Instantiate(prefab, m_bulletSpawnPoint, Quaternion.identity);
-                bullet.FireBullet(target);
+                MagicBulletController bullet = Instantiate(prefab, m_bulletSpawnPoint.position, Quaternion.identity);
+                bullet.FireBullet(target, direction);
                 break;
             }
         }
