@@ -22,7 +22,7 @@ public class BattleEnemyData
 
 
     [Header("----------")]
-    private SPAWN_TYPE m_spawnType;
+    [SerializeField] private SPAWN_TYPE m_spawnType;
     private float m_spawnTime;
 
     [SerializeField] private string m_enemyId;

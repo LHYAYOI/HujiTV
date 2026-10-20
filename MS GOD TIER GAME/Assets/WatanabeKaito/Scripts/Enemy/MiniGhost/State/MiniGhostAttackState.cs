@@ -128,10 +128,15 @@ public class MiniGhostAttackState : MiniGhostState
 
         if (isKick)
         {
-            // R‚è‚Å‚Íæ‚É’e‚ğ¶¬‚µAw’èŠÔŒã‚É”­Ë•ûŒü‚ğİ’è‚·‚éB
+            yield return new WaitForSeconds(m_kickBulletDelay);
+            if (m_owner.GetIsDying())
+            {
+                yield break;
+            }
+
             bulletObject = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
             m_spawnedBullets.Add(bulletObject);
-            yield return new WaitForSeconds(m_kickBulletDelay);
+            
         }
         else
         {
@@ -204,6 +209,7 @@ public class MiniGhostAttackState : MiniGhostState
     private IEnumerator TurnRoutine(bool turnToPlayer)
     {
         Vector3 playerPosition = m_owner.GetPlayerPosition();
+        playerPosition.y -= 1.5f;
         Quaternion startRotation = m_owner.transform.rotation;
         float elapsed = 0f;
 
