@@ -1,23 +1,35 @@
 ﻿using NUnit.Framework;
-using UnityEngine;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Unity.Cinemachine;
+using UnityEngine;
 
+[ExecuteAlways]
 public class TargetSelector : MonoBehaviour
 {
+    [Serializable]
+    private struct SelectAreaData 
+    {
+       public bool m_hasDualityFlag;
+       [UnityEngine.Range(0, 1)] public float m_positionX;
+       public List<int> m_directionIndexList; 
+       public float m_maxTargetDistance;
+       public Color m_areaColor;
+       public string m_AreaName;
+       public float m_labelHeight;
+    }
+
     private struct TargetInfo 
     {
         public GameObject m_target;
         public Vector3 m_screenPos;
-        public bool m_isSelectedFlag;
-
 
         public TargetInfo(GameObject target, Vector3 screenPos) 
         {
             m_target = target;
             m_screenPos = screenPos;
-            m_isSelectedFlag = false;
         }
     }
 
@@ -25,9 +37,9 @@ public class TargetSelector : MonoBehaviour
 
     [SerializeField] private float m_targetRange = 10.0f;
 
-    [SerializeField] private float m_centerAreaWidth = 0.6f;
-
     [SerializeField] private bool m_drawDebugArea = false;
+
+    [SerializeField] List<SelectAreaData> m_selectAreaDataList; 
 
     List<TargetInfo> m_targetList = new List<TargetInfo>();
 
@@ -41,64 +53,121 @@ public class TargetSelector : MonoBehaviour
         CheckIfAddToTargetList();
 
         //ターゲットを配列に割り当てる
-        AssignTarget();
+
+        bool assignAllFlag = m_targetList.Count == 3;
+
+        if (assignAllFlag)
+        {
+            Debug.Log("simple");
+            AssignTargetSimple();
+        }
+        else
+        {
+            Debug.Log("complex");
+            AssignTarget();
+        }
+    }
+
+    private void AssignTargetSimple() 
+    {
+        List<TargetInfo> sortList = m_targetList;
+
+        sortList.Sort((a, b) => a.m_screenPos.x.CompareTo(b.m_screenPos.x));
+
+        for (int i = 0; i < m_targetList.Count; i++) 
+        {
+            m_targetArray[i] = sortList[i];
+        }
     }
 
     private void AssignTarget()
     {
+        // 左・上・右の3方向
         m_targetArray = new TargetInfo[3];
 
-        if (m_targetList.Count == 0)
-            return;
+        //候補ターゲットリスト
+        var candidates = new List<(float distance, int areaIndex, TargetInfo target)>();
 
-        // 左右エリアの幅
-        float sideWidth = (1.0f - m_centerAreaWidth) * 0.5f;
-
-        // 各エリアの基準点
-        float[] centerX =
+        //各方向エリアの候補となるターゲットを洗い出す
+        for (int i = 0; i < m_selectAreaDataList.Count; i++)
         {
-        sideWidth * 0.5f,
-        0.5f,
-        1.0f - sideWidth * 0.5f
-    };
+            SelectAreaData area = m_selectAreaDataList[i];
 
-        for (int i = 0; i < m_targetArray.Length; i++)
-        {
-            float nearestDistance = float.MaxValue;
+            if (area.m_directionIndexList == null || area.m_directionIndexList.Count == 0)
+            {
+                continue;
+            }
 
+            //各方向エリアの範囲内にターゲットがいるかどうかを見る
             foreach (TargetInfo target in m_targetList)
             {
-                float x = target.m_screenPos.x;
+                float distance = Mathf.Abs(target.m_screenPos.x - area.m_positionX);
 
-                // エリアを判定
-                int areaIndex;
-
-                if (x < sideWidth)
+                if (distance > area.m_maxTargetDistance)
                 {
-                    areaIndex = 0; // 左
-                }
-                else if (x < 1.0f - sideWidth)
-                {
-                    areaIndex = 1; // 中央
-                }
-                else
-                {
-                    areaIndex = 2; // 右
-                }
-
-                // 対象エリア以外ならスキップ
-                if (areaIndex != i)
                     continue;
-
-                float distance = Mathf.Abs(x - centerX[i]);
-
-                if (distance < nearestDistance)
-                {
-                    nearestDistance = distance;
-
-                    m_targetArray[i] = target;
-                    m_targetArray[i].m_isSelectedFlag = true;
                 }
+
+                candidates.Add((distance, i, target));
+            }
+        }
+
+        candidates.Sort((a, b) =>
+        {
+            //N面性をチェックし1面性エリアにいるターゲットを優先する
+            bool aIsDual = m_selectAreaDataList[a.areaIndex].m_hasDualityFlag;
+            bool bIsDual = m_selectAreaDataList[b.areaIndex].m_hasDualityFlag;
+
+            if (aIsDual && !bIsDual) 
+            {//bを先に
+                return 1;
+            }
+
+            if (!aIsDual && bIsDual)
+            {//aを先に
+                return -1;
+            }
+
+            //同じN面性方向タイプならそれぞれ持ってる基準点までの距離で並べ替え
+            return a.distance.CompareTo(b.distance);
+        });
+
+        //既に割り当ててるターゲットを保持するリスト
+        var selectedTargets = new HashSet<GameObject>();
+
+        foreach (var candidate in candidates)
+        {
+            SelectAreaData area = m_selectAreaDataList[candidate.areaIndex];
+
+            // 同じ敵を別のエリアから重複して割り当てない
+            if (selectedTargets.Contains(candidate.target.m_target))
+            {
+                continue;
+            }
+
+            bool assigned = false;
+
+            //方向配列にターゲットを割り当てる
+            foreach (int directionIndex in area.m_directionIndexList)
+            {
+                if (directionIndex < 0 || directionIndex >= m_targetArray.Length)
+                {
+                    continue;
+                }
+
+                // この方向に先に選ばれたターゲットがいればここはスキップ
+                if (m_targetArray[directionIndex].m_target != null)
+                {
+                    continue;
+                }
+
+                m_targetArray[directionIndex] = candidate.target;
+                assigned = true;
+            }
+
+            if (assigned)
+            {
+                selectedTargets.Add(candidate.target.m_target);
             }
         }
     }
@@ -166,30 +235,42 @@ public class TargetSelector : MonoBehaviour
     private void OnGUI()
     {
         if (!m_drawDebugArea)
+        {
             return;
+        }
 
-        float sideWidth = (1.0f - m_centerAreaWidth) * 0.5f;
+        for(int i = 0; i < m_selectAreaDataList.Count; i++) 
+        {
+            SelectAreaData area = m_selectAreaDataList[i];
 
-        float screenWidth = Screen.width;
-        float screenHeight = Screen.height;
-
-        Rect leftRect = new Rect(0, 0, screenWidth * sideWidth, screenHeight);
-        Rect centerRect = new Rect(screenWidth * sideWidth, 0, screenWidth * m_centerAreaWidth, screenHeight);
-        Rect rightRect = new Rect(screenWidth * (1.0f - sideWidth), 0, screenWidth * sideWidth, screenHeight);
-
-        DrawArea(leftRect, new Color(0f, 0.5f, 1f, 0.2f), "LEFT");
-        DrawArea(centerRect, new Color(0f, 1f, 0f, 0.2f), "CENTER");
-        DrawArea(rightRect, new Color(1f, 0.5f, 0f, 0.2f), "RIGHT");
+            DrawTargetRange(area.m_positionX, area.m_maxTargetDistance, area.m_areaColor, area.m_AreaName, area.m_labelHeight);
+        }
     }
 
-    private void DrawArea(Rect rect, Color color, string label)
+    private void DrawTargetRange(float centerViewportX, float range, Color color, string label, float labelHeight = 0)
     {
-        Color oldColor = GUI.color;
-        GUI.color = color;
-        GUI.DrawTexture(rect, Texture2D.whiteTexture);
+        float minX = Mathf.Clamp01(centerViewportX - range);
+        float maxX = Mathf.Clamp01(centerViewportX + range);
 
+        float screenMinX = minX * Screen.width;
+        float screenWidth = (maxX - minX) * Screen.width;
+
+        Rect areaRect = new Rect(screenMinX, 0f, screenWidth, Screen.height);
+
+        Color oldColor = GUI.color;
+
+        // 範囲の帯
+        GUI.color = color;
+        GUI.DrawTexture(areaRect, Texture2D.whiteTexture);
+
+        // 基準点の線
+        float centerScreenX = centerViewportX * Screen.width;
+        Rect lineRect = new Rect(centerScreenX - 1f, 0f, 2f, Screen.height);
         GUI.color = Color.white;
-        GUI.Label(new Rect(rect.x + 10, rect.y + 10, 100, 30), label);
+        GUI.DrawTexture(lineRect, Texture2D.whiteTexture);
+
+        // ラベル
+        GUI.Label(new Rect(screenMinX + 8f, 8f + labelHeight, 120f, 25f), label);
 
         GUI.color = oldColor;
     }

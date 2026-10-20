@@ -1,4 +1,4 @@
-using NUnit.Framework;
+Ôªøusing NUnit.Framework;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -7,8 +7,10 @@ public class MagicBulletManager : MonoBehaviour
 {
     [SerializeField] List<MagicBulletController> m_magicBulletPrefabList;
 
-    //íeÇÃî≠éÀ
-    public void FireBullet(MagicData magicData, Vector3 m_bulletSpawnPoint, GameObject target)
+    [SerializeField] private Transform m_bulletSpawnPoint;
+
+    //Âºæ„ÅÆÁô∫Â∞Ñ
+    public void FireBullet(MagicData magicData, MAGIC_CAST_DIRECTION direction, GameObject target)
     {
         foreach (MagicBulletController prefab in m_magicBulletPrefabList) 
         {
@@ -19,8 +21,8 @@ public class MagicBulletManager : MonoBehaviour
 
             if (prefab.GetMagicData().DisplayName == magicData.DisplayName) 
             {
-                MagicBulletController bullet = Instantiate(prefab, m_bulletSpawnPoint, Quaternion.identity);
-                bullet.SetTarget(target);
+                MagicBulletController bullet = Instantiate(prefab, m_bulletSpawnPoint.position, Quaternion.identity);
+                bullet.FireBullet(target, direction);
                 break;
             }
         }

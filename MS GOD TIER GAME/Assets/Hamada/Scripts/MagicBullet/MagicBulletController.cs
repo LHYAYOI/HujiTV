@@ -1,43 +1,92 @@
+Ôªøusing System;
+using System.Collections;
+using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class MagicBulletController : MonoBehaviour
 {
+    [Serializable]
+    private struct BezierControlPoint
+    {
+        public Vector2 m_curveHeight;
+        public Vector2 m_curveWidth;
+    }
+
     [SerializeField] MagicData m_magicData;
+
+    [SerializeField] float m_moveSpeed;
+
+    [SerializeField] List<BezierControlPoint> m_bezierControlPoints;
 
     GameObject m_target;
 
-    private void Update()
-    {
-        MoveProcess();
-    }
+    Vector3 m_controlPoint;
 
     public MagicData GetMagicData()
     {
         return m_magicData;
     }
 
-    public void SetTarget(GameObject target)
+    public void FireBullet(GameObject target, MAGIC_CAST_DIRECTION direction)
     {
         m_target = target;
+
+        Vector3 centerPoint = Vector3.Lerp(transform.position, m_target.transform.position, 0.5f);
+
+        CalculateControlPoint(centerPoint, direction);
+
+        float distance = (m_target.transform.position - transform.position).magnitude;
+
+        float duration = distance / m_moveSpeed;
+
+        StartCoroutine(HomingRoutine(duration));
     }
 
-    private void MoveProcess() 
+    private void CalculateControlPoint(Vector3 centerPoint,MAGIC_CAST_DIRECTION direction) 
     {
-        if (m_target == null) 
-        {
-            return;
-        }
+        BezierControlPoint controlPoint = m_bezierControlPoints[(int)direction];
 
-        gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, m_target.transform.position, 10 * Time.deltaTime);
+        float curveHeight = UnityEngine.Random.Range(controlPoint.m_curveHeight.x, controlPoint.m_curveHeight.y);
+        float curveWidth = UnityEngine.Random.Range(controlPoint.m_curveWidth.x, controlPoint.m_curveWidth.y);
+
+        m_controlPoint = centerPoint + Vector3.up * curveHeight + Vector3.right * curveWidth;
     }
 
-    //î≠éÀèàóù
+    private IEnumerator HomingRoutine(float duration)
+    {
+        Vector3 startPosition = transform.position;
 
-    //î≠éÀâπçƒê∂ 
+        float deltaTime = 0;
 
-    //---âΩÇ©ìñÇΩÇ¡ÇΩéûÇ…åƒÇ—èoÇµÇƒÇŸÇµÇ¢èàóù---//
+        while (deltaTime < duration)
+        {
+            deltaTime += Time.deltaTime;
 
-    //ÉGÉtÉFÉNÉgçƒê∂
+            float rate = deltaTime / duration;
 
-    //ÉqÉbÉgéûÇÃâπçƒê∂
+            rate = Mathf.Clamp01(rate);
+
+            Vector3 position = Vector3.Lerp(startPosition, m_target.transform.position, rate);
+
+            transform.position = CalculateBezier(startPosition, m_controlPoint, m_target.transform.position, rate);
+
+            yield return null;
+        }
+    }
+
+    private Vector3 CalculateBezier(Vector3 start, Vector3 controlPoint, Vector3 end, float rate) 
+    {
+        float u = 1.0f - rate;
+
+        return u * u * start + 2f * u * rate * controlPoint + rate * rate * end;
+    }
+
+    //Áô∫Â∞ÑÈü≥ÂÜçÁîü 
+
+    //---‰Ωï„ÅãÂΩì„Åü„Å£„ÅüÊôÇ„Å´Âëº„Å≥Âá∫„Åó„Å¶„Åª„Åó„ÅÑÂá¶ÁêÜ---//
+
+    //„Ç®„Éï„Çß„ÇØ„ÉàÂÜçÁîü
+
+    //„Éí„ÉÉ„ÉàÊôÇ„ÅÆÈü≥ÂÜçÁîü
 }

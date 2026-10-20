@@ -36,6 +36,10 @@ public class CameraManager : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.P)) 
+        {
+            SwitchCamera("BattleCamera");
+        }
     }
 
     public void SwitchCamera(string cameraName)

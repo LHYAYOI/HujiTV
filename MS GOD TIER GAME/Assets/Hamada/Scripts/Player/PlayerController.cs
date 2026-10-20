@@ -7,8 +7,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private TargetSelector m_targetSelector;
     [SerializeField] private BookNetworkServer m_bookNetworkServer;
 
-    [SerializeField] private Transform m_bulletSpawnPoint;
-
     [SerializeField] private MagicData magicData;
 
     private void OnEnable()
@@ -53,6 +51,15 @@ public class PlayerController : MonoBehaviour
         m_targetSelector.SortTargets();
         GameObject target = m_targetSelector.GetSelectedTarget(direction);
 
-        m_bulletManager.FireBullet(magicData, m_bulletSpawnPoint.position, target);
+        if (target == null) 
+        {
+            return;
+        }
+
+        //CameraManager.Instance.SetLookTarget(target);
+
+        CameraManager.Instance.ShakeCamera(.5f, 1.0f);
+
+        m_bulletManager.FireBullet(magicData, direction, target);
     }
 }
