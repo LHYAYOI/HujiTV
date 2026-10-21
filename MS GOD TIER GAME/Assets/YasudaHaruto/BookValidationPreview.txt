@@ -1,0 +1,77 @@
+Verifying existing dedicated scene.
+PASS: Selection panel starts hidden
+PASS: Dedicated controllers instantiated
+PASS: Initial render texture captured
+PASS: Open at game spread accepted
+PASS: Game spread active after opening
+PASS: Rune interaction ready for pointer input
+PASS: Last fixed spread has no game interaction
+PASS: Previous spread restores game interaction
+PASS: Close accepted
+PASS: Closing ends interaction
+PASS: Reopen accepted
+PASS: Reopening restores interaction
+PASS: Null page rejected
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Fixed pages preserved
+PASS: Duplicate page accepted below limit
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Fixed pages preserved
+PASS: Duplicate page accepted below limit
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Fixed pages preserved
+PASS: Duplicate page accepted below limit
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Visual pair matches instance 3
+PASS: Fixed pages preserved
+PASS: Duplicate page accepted below limit
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Visual pair matches instance 3
+PASS: Visual pair matches instance 4
+PASS: Fixed pages preserved
+PASS: Duplicate page accepted below limit
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Visual pair matches instance 3
+PASS: Visual pair matches instance 4
+PASS: Visual pair matches instance 5
+PASS: Fixed pages preserved
+PASS: Duplicate page accepted below limit
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Visual pair matches instance 3
+PASS: Visual pair matches instance 4
+PASS: Visual pair matches instance 5
+PASS: Visual pair matches instance 6
+PASS: Fixed pages preserved
+PASS: Duplicate page accepted below limit
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Visual pair matches instance 3
+PASS: Visual pair matches instance 4
+PASS: Visual pair matches instance 5
+PASS: Visual pair matches instance 6
+PASS: Visual pair matches instance 7
+PASS: Fixed pages preserved
+PASS: Duplicate definitions have distinct instances
+PASS: Full inventory requests selection
+PASS: Selection preserves inventory and blocks input
+PASS: Selection opens without a default destructive choice

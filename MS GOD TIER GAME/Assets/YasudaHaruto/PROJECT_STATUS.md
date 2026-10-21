@@ -6,8 +6,8 @@
 ※動作確認の根拠は下記記録を参照。魔法通信はユーザーがテスト済みで問題なしと再確認しており、追加の再テストは不要。
 
 ## 現在の作業
-ページ追加・削除の統合方針を整理。
-実装前の設計案を下記に記録。ゲームロジックの変更・削除は未実施。
+既存BookSceneへの専用Controller・上限設定・選択UIの反映完了。不要コードの参照調査と整理順序の検討を実施。
+承認済みの未使用3スクリプトと各.metaを削除済み。参照中の旧Book系はHamada側移行後に整理する。末尾の最新記録を参照。
 
 ## 次のタスク
 - ページ追加・削除の統合
@@ -58,9 +58,9 @@
 
 ## 最終作業
 日付：2026-10-21
-変更内容：hatake原本を保持しControllerを担当側へ複製する構成案、必要API、満杯時のページ選択画面と入れ替え処理を具体化。ユーザーの複製・変更相談方針をAGENTS.mdにも記録。
-確認結果：作業開始時のstatus・fetch・追跡先差分確認を実施し、コミット差分なし。今回は管理資料のみ更新し、コード・Scene・Prefab・データは未変更。
-未完了事項：下記の具体案の実装と専用Scene / Prefabへの配線。共有Scene / Prefabやhatake原本を変更する場合は事前相談。お邪魔ページの削除条件は引き続き未定。閲覧位置・キャンセル挙動は下記推奨案で未確定。
+変更内容：承認済みの未使用3スクリプトと各.metaを削除。AGENTSと本資料へ承認条件・Hamada側の未移行状態を記録。
+確認結果：Assets内のC#参照、Scene・Prefab・asset等のGUID参照、実行時ロード記述、Build Settingsを照合。旧Book系の一部はHamadaのSceneから参照されており、削除不可と判断。git status・fetch・追跡先とのコミット差分確認を実施し、コミット差分なし。今回Play Mode検証は未実施。
+未完了事項：削除後のUnityコンパイル確認はバッチ起動終了コード1のため未完了。Hamada側の移行と旧Book系の参照整理後に残りの削除を行う。入手・削除演出、日本語フォント指定、お邪魔ページの削除条件は引き続き未完了。
 
 ## 動作確認記録（2026-10-21）
 - 起動中のUnity 6000.3.23f1のBookSceneでPlay Modeへ進め、本の見開き表示を確認。新規バッチコンパイルや実機ビルドは未実施。
@@ -210,3 +210,114 @@
 3. 上限時の選択UIと一括入れ替え、受取辞退を接続する。
 4. 通常追加、満杯、同種複数、連続入手、入れ替え中断を確認する。ゲームコード実装・Scene作成は今回未実施。
 5. 結果と移行差分を提示し、本番Sceneへの配線変更を相談する。hatake原本が必要になった場合も変更前に相談する。
+
+# Controller複製の出自（2026-10-21）
+
+複製時HEADはc9ffca30221316fe8de7a36a84ea500346cda915、作業開始時はクリーン。以前の調査時に存在した変更はユーザー側で確定済みの状態だった。UTF-8以外の元コードはCP932で読み、新規コピーだけUTF-8へ変換。
+- Assets/hatake/book/scripts/BookController.cs → Assets/YasudaHaruto/Scripts/Book/Validation/YasudaBookViewController.cs / 元SHA256: 6F10FB222E2CCAF422C2C71265927544FDA5DD6F8117DD1338180779E5C58FC7 / 元文字コード: UTF-8
+- Assets/YasudaHaruto/Scripts/Book/BookGameController.cs → Assets/YasudaHaruto/Scripts/Book/Validation/BookGameController.cs / 元SHA256: 84D4EF19332F20E9B8331418988787170963A30EB4CD0FEA20B8D84F45C83815 / 元文字コード: CP932
+- Assets/YasudaHaruto/Scripts/Book/BookGameBootstrap.cs → Assets/YasudaHaruto/Scripts/Book/Validation/BookGameBootstrap.cs / 元SHA256: 51E4D21701AEA505823ECDD401912BD49A1B3FDE1C2AB1ECF5CE17D15587620A / 元文字コード: CP932
+- Assets/YasudaHaruto/Scripts/Book/Input/BookGameDragInput.cs → Assets/YasudaHaruto/Scripts/Book/Validation/BookGameDragInput.cs / 元SHA256: ABE1B7344410CEC9F52712B00B98018F444F1BEFE96353E32ADA4300962CAC38 / 元文字コード: CP932
+- Assets/YasudaHaruto/Scripts/Book/Input/BookFlipCoordinateMapper.cs → Assets/YasudaHaruto/Scripts/Book/Validation/BookFlipCoordinateMapper.cs / 元SHA256: 6030D72C00E531DCBAD0511DF537980DD9A6C220B318B54022872B20C0FA93BA / 元文字コード: CP932
+- Assets/YasudaHaruto/Scripts/Book/Input/BookPageAreaDetector.cs → Assets/YasudaHaruto/Scripts/Book/Validation/BookPageAreaDetector.cs / 元SHA256: 16580CBB6FC557F5314127508D90035CB464FD503D8903F4F511E66B4BBB5F27 / 元文字コード: CP932
+- Assets/YasudaHaruto/Scripts/Book/Input/BookFlipCoordinateTest.cs → Assets/YasudaHaruto/Scripts/Book/Validation/BookFlipCoordinateTest.cs / 元SHA256: 3222691F8AE8F280A3F0358714664CF7CBC9557C90304A239F086161D18343D9 / 元文字コード: UTF-8
+
+## 専用構成の作成結果（2026-10-21）
+- 実体はAssets/YasudaHaruto/Scripts/Book/Validation。名前空間はYasudaHaruto.BookValidation。YasudaBookViewControllerはhatake版を複製し、型名・名前空間・usingだけを調整した。表示アルゴリズムは維持。
+- BookGameController / BookGameBootstrap / BookGameDragInput / BookFlipCoordinateMapper / BookPageAreaDetector / BookFlipCoordinateTestも同じ名前空間へ複製。元Sceneの型参照を壊さないため、今回は担当側の元スクリプトも変更していない。恒久的な全コード二重管理を目的とせず、本番移行時に必要な整理範囲を判断する。
+- BookValidation.prefabは検証に必要なカメラ・EventSystem・本のCanvas・起動処理を含む、Scene全体相当の検証用セット。本単体の汎用Prefabではない。別Sceneへ入れる場合はカメラ・EventSystemの重複に注意する。
+- hatake.BookFlipView / BookPageView / BookModelView / データ・Material・Shaderを共有参照。元のhatake.BookFlipKeyboardActionsとBookFlipDragInputは専用コピー内で無効化し、旧Controller参照を解除。C/L/I等の旧キーボード操作は専用版では未接続。
+- Unityメニュー Tools > YasudaHaruto > Verify Existing Book Validation で再確認可能。Sceneを再生成せず専用Sceneを開いてPlay Mode検証し、終了する。未保存Sceneがあれば処理を拒否する。Prepare and Verify Book Validationは初回専用で、既存Prefabを上書きしない。
+- 検証PASS：専用Controller生成、初期RenderTexture、開く要求、通常見開きの選択、ルーンCanBeginStroke、末尾固定ページでCurrentPageなし、前へ戻ると操作復帰、閉じる要求、閉じると操作終了、再度開く要求、再開時に操作復帰（計11項目）。
+- 実際のマウスなぞり・ドラッグや方向発動をこの検証で再現したわけではない。通信はユーザー確認済みのため再テストしていない。Build Settings・Packages・ProjectSettingsは変更していない。
+- 初回コンパイル時のnamespaceとRequireComponent属性の配置誤りは修正済み。その後Unityが専用コードをコンパイルし、検証完了まで実行した。
+
+## 所持一覧・追加削除の実装（2026-10-21）
+- 対象はScripts/Book/Validationと専用Prefabのみ。hatake原本・既存BookScene・元のBookGame系は変更していない。
+- BookInventorySettings.assetでMax Game Page CountとMax Pending Requestsを管理する。初期値は仮に8見開き／待機16件。Inspectorで変更し、次回開始時に反映する。固定ページは上限に含めない。設定未接続・初期所持数の上限超過は初期化を拒否する。
+- BookGameController.Pagesは読取専用の個体一覧。RequestAdd(PageData)、Remove(PageInstance)、ReplacePending(PageInstance)、DeclinePending()が操作入口。満杯時はPAGE_ADD_RESULT.NEEDS_SELECTIONを返し、PendingPageを保持してReplacementRequestedを通知する。
+- ENDとAFTER_CURRENTだけを受理する。共有PageDataのenumにあるRANDOMは既存Scene互換のため残したが、専用構成ではInvalidとして拒否する。旧アセットの指定変更は行っていない。
+- 同じPageDataでもPageInstanceを都度生成する。所持していない古い個体による削除は拒否する。追加時は閲覧中の個体を維持し、その個体を入れ替えた場合だけ新しい個体を表示する。現在の次への入れ替えでは削除によるindex移動を補正する。
+- 表示側TryApplyInventoryが変更後の一覧をコピーして別RenderTextureへ撮影し、その後に表示一覧と論理一覧をyieldなしで確定する。入れ替えは削除→追加の2操作ではなく、所持件数を保った一操作。演出を待つ処理は現段階では追加しておらず、表示は撮影完了時に切り替わる。
+- 表示側を確定前に無効化した場合は未確定変更を取り消す。再有効化時に旧一覧を再撮影する。InventoryEditFinished(bool)は成功・取消を通知する。ゲーム側を無効化している間はInteractionを開始しない。
+- 通常操作中・閉じた本・描画やチャージ中の受信はBootstrapの有界FIFOで待機する。満杯の保留1件を解決するまで次の要求は進めない。上限を超える待機要求は警告付きで拒否する。通信プロトコル・送受信パケットは変更せず、既存ADD_PAGEイベントの購読・解除を接続した。通信実行の再検証は行っていない。
+- 選択中・編集処理中は専用BookGameDragInputからの新しい操作を止める。現在の選択入口はAPI／Editor検証から利用できるが、実ユーザー向けの選択画面はまだない。現段階の専用Sceneでは満杯になった場合、APIで入れ替えか辞退を呼ぶ必要がある。
+- 次は専用Canvasへ所持ページ選択・確定・受取辞退のUIを接続する。お邪魔ページのアクション条件は仮定せず、将来Removeを呼べる構造だけ用意した。
+- 最終Play Mode検証はCOMPLETEで終了。通常操作に加え、重複追加、上限到達、辞退、表示中／非表示個体の入れ替え、古い個体の拒否、中断取消し、全削除、空からの追加、END追加、RANDOM拒否を検証。各段階で件数・左右表示・固定ページを照合し、合計181回のassertionがPASSした（181種類の独立テストという意味ではない）。結果はBookValidationResults.txt。git diff --checkも問題なし。
+
+## 簡易ページ選択UI（2026-10-21）
+- ユーザー指定：画面案が未確定なので軽く分かりやすく、後から変更しやすくする。独立したBookPageReplacementUI.prefabを専用BookValidation.prefabへ接続した。既存BookSceneとhatake原本は変更していない。
+- 構成：入手ページ名・種類、所持数／上限、スクロール可能な所持一覧、選択内容、「このページと入れ替える」「今回は受け取らない」。画像・演出・追加パッケージは使っていない。
+- 所持一覧の行は同種でも1個体ずつ表示し、所持順の番号を付ける。未選択では確定不可。行選択だけでは削除せず、確定後は二重操作を止め、成功後に画面を閉じる。辞退では既存所持を維持する。
+- UI/BookPageReplacementPanel.csは画面の状態とController呼出し、UI/BookPageChoiceRow.csは行表示のみを担当。実際の入れ替えは既存のBookGameControllerに集約。UIを差し替えても所持管理の変更は不要。
+- レイアウト・文言・文字サイズ・色・余白はBookPageReplacementUI.prefab上の通常uGUIで編集できる。RowTemplateの色・Text・LayoutElementで一覧の見た目を変更する。コードでのUI生成はEditor初回作成だけで、既存Prefabがある場合は再生成しない。
+- 選択UIは撮影用Canvasの外に独立したScreen Space Overlay Canvasを置き、背景を暗くして操作を遮る。ページのRenderTextureやLive Rigには含めない。
+- 仮フォントはOSの日本語フォントを起動時に使用し、Windows Editorで日本語表示を確認。配布先のOSに依存しない表示にする場合は、PanelコンポーネントのFontへプロジェクトの日本語Fontを指定する。OSフォント自体はリポジトリへコピーしていない。
+- Unityメニュー Tools > YasudaHaruto > Preview Page Selection で専用Sceneを起動し、所持を満杯にして選択画面を表示できる。プレビューはPlay Modeのまま停止するため、確認後はPlayを止める。実データや設定値は変更しない。
+- 再有効化時は保留があれば表示し直す。Controllerから直接辞退した場合もReplacementDismissed通知で閉じる。イベントとボタンの購読は有効化／無効化に合わせて解除する。
+- 最終UI検証はCOMPLETE。表示前の未描画フレームにRaycastを検証していた初回の失敗は、描画を待ってから検証するよう修正して解消した。実際のEventSystem.RaycastAllで最前面が所持行であること、行と確定／辞退ボタンのイベントから所持管理までつながることを確認した。OSの物理マウス入力の独立再現とは区別する。Play Modeは終了済み。
+
+## 既存BookSceneへの組み込み準備（2026-10-21）
+- ユーザーが選択UIの確認完了を報告し、次段階へ進むよう指示。UI確認は完了扱いとする。
+- 元BookSceneを別名のBookIntegrationCandidate.unityとして複製し、7スクリプトを専用名前空間版へ差し替え、上限設定・PageDatabase・独立UI Prefabを接続した。元のカメラ・本・Canvas・オブジェクト配置をそのまま基準にし、検証Scene全体のPrefabで置き換える構成にはしない。
+- 候補Sceneでは旧hatake.BookFlipDragInput / BookFlipKeyboardActionsを無効化して型の異なるController参照を解除。座標確認用BookFlipCoordinateTestも無効化。非アクティブの旧検証オブジェクトと既存コードファイルは削除していない。
+- 生成用メニュー：Tools > YasudaHaruto > Prepare Integration Candidate。既存候補の上書きや未保存Sceneの破棄はしない。検証用メニュー：Verify Integration Candidate。
+- 元BookSceneの生成前後SHA256は889C979BFEB26C0498336CDA0EAB28FAAE71426E514176A7D0704D0C21219E46で同一。hatake原本・TransportClientTest・Build Settings・Packagesは未変更。
+- 本反映の予定範囲はAssets/YasudaHaruto/Scenes/BookScene.unityのみ。候補と同じ参照変更・UI追加・検証入力無効化を、元SceneのGUIDを維持して反映する。Assets/YasudaHaruto/Scenes/BookScene.unity.metaは変更しない。
+- TransportClientTestは現在BookSceneを名前指定でロードするため、Scene名とGUIDを維持すれば接続コードやBuild Settingsの変更は不要。候補Scene自体はビルド一覧へ登録していない。既存の通信テストはユーザー確認済みで再要求しない。
+- 既存Scene変更はAGENTS.mdの事前相談ルールに従い、検証結果と変更範囲を示してユーザーへ確認してから実施する。まだ反映していない。
+
+## BookSceneへの反映（2026-10-21）
+- ユーザーが「命名規則が元のコードと一致してれば反映して大丈夫」と承認。クラス・メソッド・プロパティのPascalCase、インスタンスフィールドm_、staticフィールドs_を照合した。
+- 専用版の追加結果enumは既存のPAGE_TYPE等へ合わせ、PageAddResult.csにPAGE_ADD_RESULT（ACCEPTED / NEEDS_SELECTION / BUSY / INVALID）を定義。Bootstrapと検証コードの参照も統一した。複製版を元コードから区別する名前空間とYasudaBookViewControllerのクラス名は維持し、既存のSerializeField名は変更していない。
+- 候補Sceneで確認した構成をBookScene.unityへ反映。専用Controller・入力・座標変換・起動処理へ参照を切り替え、上限設定とPageDatabase、独立選択UIを接続した。
+- 旧hatakeのキーボード編集・ドラッグ入力はScene内で無効のまま保持し、型が異なるControllerへの参照を解除。座標ログ用の確認コンポーネントも無効化。非アクティブの旧BookTestBootstrapと旧AreaDetectorの接続は元の型・参照を保持した。既存コードやオブジェクトの削除は行っていない。
+- BookScene.unity.metaは未変更。GUIDはc3904b8ed0c72474b9dc8ae4925a86c9。接続Sceneは引き続きBookSceneをロードする。TransportClientTest・EditorBuildSettings・元7スクリプトのハッシュも変わっていない。
+- Tools > YasudaHaruto > Verify Integrated Book Sceneで反映後のBookSceneを検証できる。Apply Reviewed Book Integrationは元Sceneの既知ハッシュを確認する一回限りの移行補助で、反映済みSceneには再適用できない。
+- Validationフォルダ／BookValidation名前空間は移行元の名称として残っているが、本番BookSceneはそこにある専用版を使用する。元のグローバル名前空間版は他Sceneとの互換性のため保持する。
+- 最終版のBookSceneでも検証はCOMPLETE、Play Mode終了済み。既存の開閉・ページ移動・ルーン待ち状態、追加・個体指定削除・重複所持・上限・選択UI・入れ替え・辞退・中断取消し・全削除・再追加を確認。通信再テストと物理ポインターなぞりは含めていない。Unityが追加したUI参照の空value行の末尾空白のみ整形した（意味上の変更なし）。
+
+## 不要コードの整理調査（2026-10-21）
+
+今回は静的調査と記録のみ。削除、ゲームロジック変更、Scene・Prefabの再保存は行っていない。以下のパスはAssets/YasudaHaruto/基準。
+
+### 最初の削除候補（Scene変更を伴わない3ファイル）
+| 対象 | 根拠・注意 |
+| --- | --- |
+| Scripts/Page/DebugPageInteraction.cs | 型名の呼出し・GUID参照が見つからない旧デバッグ用IPageInteraction実装。 |
+| Scripts/Network/TransportClientTest.cs | 型名の呼出し・GUID参照が見つからない旧通信サンプル。実際の接続はBookNetworkClientを使用。 |
+| Scripts/Network/TransportServerTest.cs | 型名の呼出し・GUID参照が見つからない旧通信サンプル。実際のサーバーはBookNetworkServerを使用。 |
+
+同名のScenes/TransportClientTest.unity、Scenes/TransportServerTest.unityは削除対象ではない。前者はBuild Settingsの起点、後者はユーザーのEditorサーバーテストに利用する。削除時は各.csに対応する.metaも一緒に扱う。
+
+### 次の整理候補（依存する移行補助もまとめて調整）
+- 旧グローバル版のScripts/Book/BookGameBootstrap.cs、BookGameController.cs、Input/BookGameDragInput.cs、Input/BookFlipCoordinateTest.csはScene・PrefabからのGUID参照なし。旧Bootstrapから旧Controller・旧Dragへの参照はあるため、一群として扱う。Validation配下の同名専用版は本番で使用中のため残す。
+- Validation/Editor/BookIntegrationPreparation.csには上記旧ファイルのパスと候補生成・一回限りの反映処理が残る。旧4ファイルを削除する際は、この移行補助とBookValidationSetupの候補専用メニューも併せて整理する。
+- Scenes/BookIntegrationCandidate.unityは本反映前の候補。AssetsのGUID参照はないが、Editorメニューに明示パス参照があるため、その処理と一緒に整理する。
+- Prefabs/OldBook.prefabはGUID参照が見つからない。手動配置用の保管物かどうかは静的参照だけでは確定しないため、旧モデルを保存する意図がないことを確認してから削除する候補。
+
+### 残すもの・事前相談が必要なもの
+- Scripts/Book/Validation配下の専用Controller・入力・設定・選択UIは現在のBookSceneが使用する。フォルダ名だけで削除しない。
+- Scenes/BookValidation.unity、Prefabs/BookValidation.prefab、Editorの統合済みScene検証・UI生成処理は回帰確認用として当面残す。検証結果txtも直近の確認証跡として残す。
+- 旧BookTestBootstrap、BookDisplayController、BookInputRouter、BookNetworkTestUI、RuneTraceTestBootstrap（ファイル名RuneTestBootstrap.cs）、DebugRuneTraceViewはAssets/Hamada/Scene/BookSceneHamada.unityから参照される。担当フォルダ内でも無断削除しない。関連するBookController、BookModel等も依存関係があるため保留。
+- 旧Input/BookFlipCoordinateMapper.csも旧BookPageAreaDetectorから型参照されるため、単独削除しない。BookSceneに残した非アクティブな旧構成は別段階で整理する。
+- Input/BookInputState.csはBOOK_INPUT_STATE enumを定義し、専用版でも使用中。MonoBehaviourのGUID参照だけで不要と判断しない。
+- Validation/BookFlipCoordinateTest.csは無効化済みでもScene・Prefabにコンポーネント参照がある。削除する場合は参照を先に除く必要がある。
+- Magic/MagicSystem.csは全体がコメント化されているが、TransportServerTest.unityにGUIDが残る。サーバーSceneの古いコンポーネント整理と併せて別途確認する。
+- hatake原本は整理対象外。共有PAGE_INSERT_TYPE.RANDOMも既存アセット互換のため残し、専用版で拒否する現在の実装を維持する。
+
+### 推奨順序と検証
+1. 上記3ファイルと各.metaを最初の小さな削除単位にする（ユーザー承認後）。
+2. UnityコンパイルとVerify Integrated Book Sceneを確認する。通信コードの変更はなく、通信再テストは現時点では要求しない。
+3. 旧4ファイル・候補Scene・一回限りの移行メニューをまとめて整理し、統合済みSceneの検証機能は残す。
+4. OldBookの保管意図を確認する。他メンバーの参照を含む旧Book系は、影響範囲を相談してから整理する。
+
+調査の限界：テキストとして保存された参照とC#記述を調べた結果であり、未保存のEditor状態・外部ツールからの利用までは保証しない。今回の調査だけを新たな実行確認とは扱わない。
+
+## 承認済み3ファイルの削除（2026-10-21）
+- ユーザー承認に基づきScripts/Page/DebugPageInteraction.cs、Scripts/Network/TransportClientTest.cs、Scripts/Network/TransportServerTest.csと各.metaを削除した。同名の通信Sceneは維持。
+- 削除直前のGUID検索と削除後の型名・GUID検索で、AssetsのC#・Scene・Prefab・assetに残存参照がないことを確認。
+- 旧Book系の削除も新構成への切り替え完了を条件に了承された。ただしAssets/Hamada/Scene/BookSceneHamada.unityでは旧BookTestBootstrapがm_IsActive: 1で、旧BookDisplayController等への接続も残る。Yasuda側の新BookSceneの動作確認はHamada側の移行完了を意味しないため、参照中の旧Book系とHamada Sceneは今回変更していない。
+- 次の順序：Hamada側を新構成へ切り替え、動作確認後、Yasuda側の非アクティブな旧構成と検証Prefabの参照を整理してから旧コードを削除する。BOOK_INPUT_STATE等の共用型は残す。
+- Unity 6000.3.23f1のバッチコンパイルを試みたが、プロジェクトパス確認直後にreturn code 1で終了し、コンパイル完了を確認できなかった。ログに具体的な原因の記載なし。Play Mode再検証は未実施。次回Editorでのコンパイル確認が必要。
+- Gitのstatus・fetch・追跡先差分を確認し、コミット差分なし。禁止されたGit操作は行っていない。

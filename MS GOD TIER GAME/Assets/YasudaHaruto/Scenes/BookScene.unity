@@ -160,13 +160,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 70671157}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca215a6bdd7b4704abc1fb47afa88e19, type: 3}
+  m_Script: {fileID: 11500000, guid: 0094bc232cbd4e88bdfd8fbb98c6f496, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BookGameBootstrap
+  m_EditorClassIdentifier: Assembly-CSharp::YasudaHaruto.BookValidation.BookGameBootstrap
   m_gameController: {fileID: 1832026887}
   m_runeTraceView: {fileID: 1457169296}
   m_runeCooldownSeconds: 1
   m_gameDragInput: {fileID: 8271864336177666055}
+  m_pageDatabase: {fileID: 11400000, guid: 262c5c96532bc7b4aaf8fbc2bbe1eda6, type: 2}
 --- !u!1 &92516299
 GameObject:
   m_ObjectHideFlags: 0
@@ -208,9 +209,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 92516299}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2dc9cdac7a7c2c94495077a9493d1b01, type: 3}
+  m_Script: {fileID: 11500000, guid: 0d615109c7bf48a0bce9540df0af0c74, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BookPageAreaDetector
+  m_EditorClassIdentifier: Assembly-CSharp::YasudaHaruto.BookValidation.BookPageAreaDetector
   m_mapper: {fileID: 1399091363}
   m_runeArea: {fileID: 1457169297}
   m_previousPageArea: {fileID: 0}
@@ -2098,11 +2099,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1255363097}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cba38240452acfe4cb7dea422e3337b3, type: 3}
+  m_Script: {fileID: 11500000, guid: 0e3833fefa624cc6b6b49d8ec4ef2f9d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BookFlipCoordinateTest
+  m_EditorClassIdentifier: Assembly-CSharp::YasudaHaruto.BookValidation.BookFlipCoordinateTest
   m_mapper: {fileID: 1399091363}
   m_areaDetector: {fileID: 92516301}
 --- !u!1 &1342395338
@@ -2218,9 +2219,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1399091361}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ef5d0c5ce7d8ca48a78ff299b727e33, type: 3}
+  m_Script: {fileID: 11500000, guid: ba5d962bb91f4357ad932cd6db882b5d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BookFlipCoordinateMapper
+  m_EditorClassIdentifier: Assembly-CSharp::YasudaHaruto.BookValidation.BookFlipCoordinateMapper
   m_bookController: {fileID: 3849966887241617961}
   m_flipView: {fileID: 5785403608221589184}
   m_displayImage: {fileID: 7634853186058932829}
@@ -2352,6 +2353,107 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1457169295}
   m_CullTransparentMesh: 1
+--- !u!1001 &1470159281
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1430136643281866481, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_Name
+      value: BookPageReplacementUI
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8226527358566461841, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8616479938544289879, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_controller
+      value:
+      objectReference: {fileID: 1832026887}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
 --- !u!1 &1704740267
 GameObject:
   m_ObjectHideFlags: 0
@@ -2547,14 +2649,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1832026885}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9cf610b1e6c78a4a9ed8f753f847257, type: 3}
+  m_Script: {fileID: 11500000, guid: d93088fa4603478fb2f62a0de6ff6528, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BookGameController
+  m_EditorClassIdentifier: Assembly-CSharp::YasudaHaruto.BookValidation.BookGameController
   m_bookController: {fileID: 3849966887241617961}
   m_firstFixedPage: {fileID: 11400000, guid: ec9ee33f1dd87b741af4c870eac5ed96, type: 2}
   m_lastFixedPage: {fileID: 11400000, guid: 7a1eea5c254fdfb4da586e878b790100, type: 2}
   m_initialPages:
   - {fileID: 11400000, guid: a20ef9d774043e844a1606179b63f096, type: 2}
+  m_inventorySettings: {fileID: 11400000, guid: 3734ec477f6e93a428f87450c7a2f0f8, type: 2}
 --- !u!1 &1867493236
 GameObject:
   m_ObjectHideFlags: 0
@@ -3877,7 +3980,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52c901622c46e9441b67d73c4cc45a4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::hatake.BookFlipDragInput
-  m_bookController: {fileID: 3849966887241617961}
+  m_bookController: {fileID: 0}
   m_flipView: {fileID: 5785403608221589184}
   m_grabSide: 0
   m_grabCorner: 0
@@ -3892,9 +3995,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6893433121657027949}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b38c1bb8173e6e409bcc943606722f8, type: 3}
+  m_Script: {fileID: 11500000, guid: 81094a86de454abeb100ecc8447431fd, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BookController
+  m_EditorClassIdentifier: Assembly-CSharp::YasudaHaruto.BookValidation.YasudaBookViewController
   m_bookData: {fileID: 11400000, guid: 79c8a48d506077c4687389e2a2028b21, type: 2}
   m_leftPageView: {fileID: 7635606618658084902}
   m_rightPageView: {fileID: 4345863370804085185}
@@ -4491,12 +4594,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8271864336177666054}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 51c4a5af582ddd048bb9948dd794cab9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::hatake.BookFlipKeyboardActions
-  m_bookController: {fileID: 3849966887241617961}
+  m_bookController: {fileID: 0}
   m_flipView: {fileID: 5785403608221589184}
   m_useKeys: 1
   m_useSpot: 1
@@ -5256,9 +5359,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 8271864336177666054}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abf66887e3f7a0247b9510ccd9ca8c93, type: 3}
+  m_Script: {fileID: 11500000, guid: 5922fe67ef004e2b902e589a055eb7fa, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BookGameDragInput
+  m_EditorClassIdentifier: Assembly-CSharp::YasudaHaruto.BookValidation.BookGameDragInput
   m_bookController: {fileID: 3849966887241617961}
   m_flipView: {fileID: 5785403608221589184}
   m_areaDetector: {fileID: 92516301}
@@ -5509,3 +5612,4 @@ SceneRoots:
   - {fileID: 2130867363}
   - {fileID: 926470040}
   - {fileID: 9056438328261477198}
+  - {fileID: 1470159281}
