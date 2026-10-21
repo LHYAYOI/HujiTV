@@ -517,6 +517,31 @@ MonoBehaviour:
   tint:
     m_OverrideState: 1
     m_Value: 0
+--- !u!114 &-849353310441436724
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 478e410a961c8834696b2741753d181b, type: 3}
+  m_Name: BlackLightVolume
+  m_EditorClassIdentifier: Assembly-CSharp::LightShaftLab.BlackLightVolume
+  active: 1
+  m_darkAdaptation:
+    m_OverrideState: 1
+    m_Value: 0.5
+  m_fluorescenceGain:
+    m_OverrideState: 1
+    m_Value: 1
+  m_fogFluorescence:
+    m_OverrideState: 1
+    m_Value: 0.01
+  m_fogFluorescenceColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.55, g: 0.7, b: 1, a: 1}
 --- !u!114 &-581120513425526550
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -572,6 +597,7 @@ MonoBehaviour:
   - {fileID: 7518938298396184218}
   - {fileID: -1410297666881709256}
   - {fileID: 4046174863986525841}
+  - {fileID: -849353310441436724}
 --- !u!114 &853819529557874667
 MonoBehaviour:
   m_ObjectHideFlags: 3

@@ -244,6 +244,10 @@ namespace hatake
         public float PageAspect => m_pageAspect;
         public float Dim => m_dim;
 
+        /// <summary>見開きページを置ける最大範囲 (xMin, yMin, xMax, yMax)。ページの縦横比に合わせて中央に収める</summary>
+        public Vector4 LeftCrop => m_leftCrop;
+        public Vector4 RightCrop => m_rightCrop;
+
         // ------------------------------------------------------------------
         // 初期化と表示
         // ------------------------------------------------------------------
