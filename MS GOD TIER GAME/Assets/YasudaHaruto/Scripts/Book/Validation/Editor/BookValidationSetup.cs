@@ -125,18 +125,6 @@ namespace YasudaHaruto.BookValidation.Editor
             EditorApplication.EnterPlaymode();
         }
 
-        [MenuItem("Tools/YasudaHaruto/Verify Integration Candidate")]
-        public static void VerifyCandidate()
-        {
-            if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Exit Play Mode first.");
-            for (int i = 0; i < SceneManager.sceneCount; i++)
-                if (SceneManager.GetSceneAt(i).isDirty) throw new InvalidOperationException("An open scene has unsaved changes.");
-            SessionState.SetBool(Preview, false);
-            EditorSceneManager.OpenScene(BookIntegrationPreparation.Candidate, OpenSceneMode.Single);
-            File.WriteAllText(ReportPath, "Verifying integration candidate; source BookScene untouched.\n");
-            StartSmokeCheck();
-        }
-
         [MenuItem("Tools/YasudaHaruto/Verify Integrated Book Scene")]
         public static void VerifyIntegratedBookScene()
         {

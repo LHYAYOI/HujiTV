@@ -6,8 +6,8 @@
 ※動作確認の根拠は下記記録を参照。魔法通信はユーザーがテスト済みで問題なしと再確認しており、追加の再テストは不要。
 
 ## 現在の作業
-既存BookSceneへの専用Controller・上限設定・選択UIの反映完了。不要コードの参照調査と整理順序の検討を実施。
-承認済みの未使用3スクリプトと各.metaを削除済み。参照中の旧Book系はHamada側移行後に整理する。末尾の最新記録を参照。
+旧Book構成の整理を実施。Hamada側BookSceneが無いことを確認し、不要な旧16スクリプト・移行補助・候補Sceneを削除。
+MagicDataの着弾ルーン画像について、魔法ごとの固定画像を一か所で設定する設計を整理。画像機能はまだ実装していない。
 
 ## 次のタスク
 - ページ追加・削除の統合
@@ -58,9 +58,9 @@
 
 ## 最終作業
 日付：2026-10-21
-変更内容：承認済みの未使用3スクリプトと各.metaを削除。AGENTSと本資料へ承認条件・Hamada側の未移行状態を記録。
-確認結果：Assets内のC#参照、Scene・Prefab・asset等のGUID参照、実行時ロード記述、Build Settingsを照合。旧Book系の一部はHamadaのSceneから参照されており、削除不可と判断。git status・fetch・追跡先とのコミット差分確認を実施し、コミット差分なし。今回Play Mode検証は未実施。
-未完了事項：削除後のUnityコンパイル確認はバッチ起動終了コード1のため未完了。Hamada側の移行と旧Book系の参照整理後に残りの削除を行う。入手・削除演出、日本語フォント指定、お邪魔ページの削除条件は引き続き未完了。
+変更内容：旧Book構成16スクリプトと各.meta、候補Scene、一回限りの移行補助を削除。BookScene・検証Prefabの旧コンポーネント参照と候補専用メニューを除去。着弾画像の設計を記録。
+確認結果：Hamada側BookSceneが無く、削除対象への外部GUID参照がないことを確認。除去コンポーネントはすべて非アクティブな階層内。Unity 6000.3.23f1のバッチコンパイルは終了コード0、C#コンパイルエラーなし。git status・fetch・追跡先のコミット差分なし。今回Play Mode再検証は未実施。
+未完了事項：BookSceneのPlay Mode回帰確認。MagicDataへの画像フィールド追加とアセット設定、担当間相談後の着弾エフェクト接続。入手・削除演出、日本語フォント指定、お邪魔ページの削除条件。
 
 ## 動作確認記録（2026-10-21）
 - 起動中のUnity 6000.3.23f1のBookSceneでPlay Modeへ進め、本の見開き表示を確認。新規バッチコンパイルや実機ビルドは未実施。
@@ -321,3 +321,44 @@
 - 次の順序：Hamada側を新構成へ切り替え、動作確認後、Yasuda側の非アクティブな旧構成と検証Prefabの参照を整理してから旧コードを削除する。BOOK_INPUT_STATE等の共用型は残す。
 - Unity 6000.3.23f1のバッチコンパイルを試みたが、プロジェクトパス確認直後にreturn code 1で終了し、コンパイル完了を確認できなかった。ログに具体的な原因の記載なし。Play Mode再検証は未実施。次回Editorでのコンパイル確認が必要。
 - Gitのstatus・fetch・追跡先差分を確認し、コミット差分なし。禁止されたGit操作は行っていない。
+
+## 旧Book構成の削除（2026-10-21）
+- 現在のブランチはMS-73/Fix/DeleteOldBook。開始時クリーン、fetch後の追跡先とのコミット差分なし。前節のHamada側参照は過去の状態で、今回Assets全体を再調査するとBookSceneHamadaは存在しなかった。
+- 削除した16スクリプト（すべてScripts/基準、各.metaも削除）：Book/BookTestBootstrap.cs、Book/BookController.cs、Book/BookModel.cs、Book/BookDisplayController.cs、Book/BookGameBootstrap.cs、Book/BookGameController.cs、Book/Input/BookInputRouter.cs、Book/Input/MouseBookPointerInput.cs、Book/Input/IBookPointerInput.cs、Book/Input/BookPointerData.cs、Book/Input/BookGameDragInput.cs、Book/Input/BookFlipCoordinateTest.cs、Book/Input/BookFlipCoordinateMapper.cs、Book/Input/BookPageAreaDetector.cs、Page/BookPageService.cs、Rune/Runtime/RuneTestBootstrap.cs。
+- これらを参照するコンポーネントはBookScene内の6件、BookValidation.prefab内の5件を除去。階層を辿って非アクティブであることを確認した。コンポーネント一覧からも除き、残存するローカル参照はnull化。ゲームオブジェクトやTransformは配置維持のため残した。
+- 移行済みのScenes/BookIntegrationCandidate.unityとValidation/Editor/BookIntegrationPreparation.csも各.metaと共に削除。BookValidationSetupのVerifyCandidateメニューを除去。統合済みBookSceneの検証・専用検証Scene・選択UIプレビューは維持。
+- 現在使われるValidation配下の専用ランタイム、共用BookInputController・BOOK_INPUT_STATE・CastSwipeDetector・PageFactory等は維持。hatake・HamadaのコードとBuild Settingsは変更していない。
+- Unityバッチコンパイル成功（終了コード0）。今回Play Modeは実施していない。前回のバッチ起動失敗とは別の最新結果。
+
+## MagicDataの着弾ルーン画像設計（2026-10-21）
+
+### 確定した要件と現在の構成
+- ユーザー確定：着弾形状は「魔法ごとに決まったルーン画像、MagicDataに1枚」。実際になぞった軌跡を再現する仕様ではない。
+- 現在PageDataはInteraction.RuneDataとAction.MagicDataを別に参照する。同一MagicDataに異なるRuneDataを使う既存ページがある。この構成は維持し、MagicDataから特定RuneDataへの参照を強制しない。
+- RuneDataは編集・判定用の線とルールを管理する。本のRunePageViewもTraceDataの線を描画する。RuneDataには画像参照はない。RuneEditorWindowの取り込み画像はEditor側の作業用フィールド。
+- HamadaのMagicBulletControllerはMagicData参照を既に保持する。HitSenderControllerも弾から同じMagicDataを取得するが、現在のHitDataへはMagicType等しか渡していない。着弾エフェクト本体はコメント段階。
+
+### 推奨する保存場所とAPI（未実装）
+- Assets/YasudaHaruto/Scripts/Magic/MagicData.csへ[SerializeField] private Texture2D m_impactRuneTextureと読取専用ImpactRuneTextureプロパティを追加する案。
+- 魔法ごとのMagicDataアセット上で1回だけ画像を指定する。PNG等の実体はAssets/YasudaHaruto/Data/Runes/Images等に置き、参照として設定する。画像の実ファイルは複製しない。
+- Texture2Dを推奨するのは、着弾用のMaterial・Particle・Decalへテクスチャとして渡しやすく、Sprite AtlasのUV切り出しに依存しないため。白い形状＋透明背景を基本にし、色や発光・拡大・フェードはエフェクト側で扱う。
+- PageData、RuneData、弾Prefab、個別Materialへ同じ画像のInspector設定を追加しない。他の画面でも必要ならMagicData.ImpactRuneTextureを読み、RawImage等へ一時的に反映する。画像の唯一の設定元はMagicData。
+- ルーンの判定用線データと着弾画像は用途の異なる情報。今の要件では別々に編集できる。ただし線を変えると画像も自動で変わる仕組みではない。将来一致を自動保証したい場合は、指定したRuneDataからEditorで画像を生成する機能を別途検討する。
+
+### 着弾時の利用経路
+1. MagicId受信 → 既存MagicDatabase.Find → MagicData。
+2. 発射時に、そのMagicDataを弾へ参照として渡す。
+3. 衝突・命中成立時に、MagicDataと命中位置・面の向きを汎用エフェクト表示処理へ渡す。
+4. 表示側がImpactRuneTextureを読み、表示インスタンスのMaterialPropertyBlock等で設定して再生する。共有Materialのテクスチャを直接上書きしない。プール利用時は画像・表示状態を毎回更新する。
+- 現在MagicBulletManagerはDisplayNameでPrefabを探し、弾はPrefab側のMagicDataを読む。接続時はMagicIdまたはアセット参照で対応を確認し、発射要求のMagicDataを確実に渡す案を相談する。現状の文字列照合のまま画像だけ追加すると取り違えの余地がある。
+- 画像そのものを通信しない。クライアント／サーバーが同じMagicId→MagicData対応を持ち、既存MagicIdで解決する。受信側にも該当画像アセットが含まれる必要がある。
+- 未設定時はルーン画像の演出だけを省略し、通常の命中処理は継続。設定漏れはEditor検証で検出する案。連続OnStayで何度も生成しないよう、命中イベントで1回再生する。
+- Hamada側の弾・命中コードは今回未変更。実装時は他メンバー変更のルールに従い、上記の変更範囲を相談する。
+
+### 実装の推奨順序
+1. MagicDataに画像フィールドを追加し、対象MagicDataへ1枚ずつ設定。既存の魔法ID・ルーン判定・通信形式は維持する。
+2. 担当フォルダ内に、MagicData・位置・向きを受け取る汎用ルーン着弾表示を作る。
+3. Hamada側との接続範囲を相談し、発射時のMagicDataの引き渡しと命中イベントへ接続する。
+4. 魔法A/Bの切り替え、同じ魔法を異なるルーンページから発動、画像未設定、連続命中・プール再利用を確認する。
+
+追加確認：Assets・Packages・Library/PackageCacheのGUIDを照合し、BookSceneの73件、BookValidation.prefabの74件のスクリプト参照がすべて解決することを確認。git diff --checkも問題なし。

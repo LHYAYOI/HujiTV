@@ -1029,7 +1029,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 12126920637564745}
-  - component: {fileID: 1574298597314939808}
   m_Layer: 0
   m_Name: BookInputRouter
   m_TagString: Untagged
@@ -1052,19 +1051,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1021928544637640624}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1574298597314939808
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2195199781597835472}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 947e50e22982eb2458c5d2b34ff6c724, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BookInputRouter
-  m_castSwipeDetector: {fileID: 7526480578084261133}
 --- !u!1 &2594597252357105632
 GameObject:
   m_ObjectHideFlags: 0
@@ -1234,7 +1220,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4294753783544072147}
-  - component: {fileID: 6939830808361906069}
   m_Layer: 0
   m_Name: MouseBookPointerInput
   m_TagString: Untagged
@@ -1257,19 +1242,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1021928544637640624}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6939830808361906069
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2869015982053694254}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2dfd9fc056f9b4541849180ac31ad2a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MouseBookPointerInput
-  m_inputArea: {fileID: 2990939275004216309}
 --- !u!1 &3045257812815987904
 GameObject:
   m_ObjectHideFlags: 0
@@ -1490,7 +1462,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2131881119637285403}
-  - component: {fileID: 1773434747451376936}
   m_Layer: 0
   m_Name: BookDisplayController
   m_TagString: Untagged
@@ -1513,25 +1484,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1350735310541229931}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1773434747451376936
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3417685969023499583}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 05f69dc1bb6fe0941b4b7804d25b8b49, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BookDisplayController
-  m_leftPageView: {fileID: 2009631378338041508}
-  m_rightPageView: {fileID: 5512018822340720266}
-  m_captureCamera: {fileID: 2269719080187787441}
-  m_textureA: {fileID: 8400000, guid: 6f15d851b3ea01548b5ec255abb68c5e, type: 2}
-  m_textureB: {fileID: 8400000, guid: 020ec2fa7d10c734586cd795b48df44a, type: 2}
-  m_displayImage: {fileID: 52300725809913714}
-  m_modelView: {fileID: 4134108926948192025}
 --- !u!1 &3498559980108153087
 GameObject:
   m_ObjectHideFlags: 0
@@ -3239,7 +3191,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3346877342454173389}
-  - component: {fileID: 100011908386184802}
   m_Layer: 0
   m_Name: RuneTraceTestBootstrap
   m_TagString: Untagged
@@ -3262,23 +3213,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2003256414376933321}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &100011908386184802
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6030804278111268421}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffe2d5a68424d1647b48df934bdc43df, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RuneTraceTestBootstrap
-  m_pageData: {fileID: 11400000, guid: 82b51d2f4d395d043b7bf8db4b684724, type: 2}
-  m_runeData: {fileID: 11400000, guid: 195a7a19dfd1a9d478b6bdb71bd92270, type: 2}
-  m_view: {fileID: 3503641621146525126}
-  m_mouseInput: {fileID: 6939830808361906069}
-  m_inputRouter: {fileID: 1574298597314939808}
 --- !u!1 &6048942491382042983
 GameObject:
   m_ObjectHideFlags: 0
@@ -3288,7 +3222,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8506932492639043828}
-  - component: {fileID: 361169982694934273}
   m_Layer: 0
   m_Name: BookTestBootstrap
   m_TagString: Untagged
@@ -3311,31 +3244,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6730837796276129434}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &361169982694934273
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6048942491382042983}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 843f5a728391414439a3ef552482d1f8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BookTestBootstrap
-  m_initialPages:
-  - {fileID: 11400000, guid: a20ef9d774043e844a1606179b63f096, type: 2}
-  - {fileID: 11400000, guid: 45ba07eb8d1192145bc513df592c55bf, type: 2}
-  - {fileID: 11400000, guid: db87baf7c5fe808489ccceb30c994698, type: 2}
-  - {fileID: 11400000, guid: 4b2373ead7ba72c4bb031c0a0826e418, type: 2}
-  m_pageDatabase: {fileID: 11400000, guid: 262c5c96532bc7b4aaf8fbc2bbe1eda6, type: 2}
-  m_runeTraceView: {fileID: 7474903671065881670}
-  m_inputRouter: {fileID: 1574298597314939808}
-  m_mouseInput: {fileID: 6939830808361906069}
-  m_areaDetector: {fileID: 0}
-  m_displayController: {fileID: 1773434747451376936}
-  m_maxPageCount: 10
-  m_runeCooldownSeconds: 1
 --- !u!1 &6394122204038074595
 GameObject:
   m_ObjectHideFlags: 0
