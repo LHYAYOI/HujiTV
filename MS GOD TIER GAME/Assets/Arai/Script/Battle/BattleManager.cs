@@ -14,6 +14,9 @@ public class BattleManager : MonoBehaviour
     
     public static BattleManager Instance {  get; private set; }
 
+    private bool m_isBattleFlag;
+    public static bool IsBattleFlag => Instance?.m_isBattleFlag ?? false;
+
 
 
     private void Awake()
@@ -22,16 +25,16 @@ public class BattleManager : MonoBehaviour
         Instance = this; 
     }
 
-    public void StartSpawn(BattleData battleData)
+    public static void StartSpawn(BattleData battleData)
     {
-        if (m_spawnManager == null)
+        if (Instance.m_spawnManager == null)
         {
             return;
         }
 
-        m_currentBattleData = battleData;
+        Instance.m_currentBattleData = battleData;
 
-        StartCoroutine(SpawnEnemyCoroutine());
+        Instance.StartCoroutine(Instance.SpawnEnemyCoroutine());
     }
 
 
@@ -50,16 +53,17 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public void StartBattle(UnityEvent onFinishEvent)
+    public static void StartBattle(UnityEvent onFinishEvent)
     {
-        if(m_spawnManager == null)
+        if(Instance.m_spawnManager == null)
         {
             return; 
         }
 
-        m_onFinishEvent = onFinishEvent;
+        Instance.m_isBattleFlag = true;
+        Instance.m_onFinishEvent = onFinishEvent;
 
-        StartCoroutine(BattleCoroutine());
+        Instance.StartCoroutine(Instance.BattleCoroutine());
     }
 
   
@@ -111,6 +115,7 @@ public class BattleManager : MonoBehaviour
         
 
         m_onFinishEvent?.Invoke();
+        m_isBattleFlag = false;
 
         yield return null;
     }

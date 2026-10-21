@@ -19,8 +19,6 @@ public class MagicBulletController : MonoBehaviour
 
     [SerializeField] List<BezierControlPoint> m_bezierControlPoints;
 
-    GameObject m_target;
-
     Vector3 m_controlPoint;
 
     public MagicData GetMagicData()
@@ -30,17 +28,20 @@ public class MagicBulletController : MonoBehaviour
 
     public void FireBullet(GameObject target, MAGIC_CAST_DIRECTION direction)
     {
-        m_target = target;
+        if (target == null) 
+        {
+            return;
+        }
 
-        Vector3 centerPoint = Vector3.Lerp(transform.position, m_target.transform.position, 0.5f);
+        Vector3 centerPoint = Vector3.Lerp(transform.position, target.transform.position, 0.5f);
 
         CalculateControlPoint(centerPoint, direction);
 
-        float distance = (m_target.transform.position - transform.position).magnitude;
+        float distance = (target.transform.position - transform.position).magnitude;
 
         float duration = distance / m_moveSpeed;
 
-        StartCoroutine(HomingRoutine(duration));
+        StartCoroutine(HomingRoutine(target, duration));
     }
 
     private void CalculateControlPoint(Vector3 centerPoint,MAGIC_CAST_DIRECTION direction) 
@@ -53,9 +54,11 @@ public class MagicBulletController : MonoBehaviour
         m_controlPoint = centerPoint + Vector3.up * curveHeight + Vector3.right * curveWidth;
     }
 
-    private IEnumerator HomingRoutine(float duration)
+    private IEnumerator HomingRoutine(GameObject target, float duration)
     {
         Vector3 startPosition = transform.position;
+
+        Vector3 endPosition = target.transform.position;
 
         float deltaTime = 0;
 
@@ -67,9 +70,9 @@ public class MagicBulletController : MonoBehaviour
 
             rate = Mathf.Clamp01(rate);
 
-            Vector3 position = Vector3.Lerp(startPosition, m_target.transform.position, rate);
+            Vector3 position = Vector3.Lerp(startPosition, endPosition, rate);
 
-            transform.position = CalculateBezier(startPosition, m_controlPoint, m_target.transform.position, rate);
+            transform.position = CalculateBezier(startPosition, m_controlPoint, endPosition, rate);
 
             yield return null;
         }

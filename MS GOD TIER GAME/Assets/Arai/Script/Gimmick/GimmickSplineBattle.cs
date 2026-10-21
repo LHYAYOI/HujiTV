@@ -17,12 +17,12 @@ public class GimmickSplineBattle : GimmickSpline
 
     public void SpawnStart()
     {
-        BattleManager.Instance.StartSpawn(m_battleData);
+        BattleManager.StartSpawn(m_battleData);
     }
 
     public void BattleStart()
     {
-        BattleManager.Instance.StartBattle(m_onFinishBattle);
+        BattleManager.StartBattle(m_onFinishBattle);
     }
 
     // ―――――――――――――――――――――――――――――――――――――

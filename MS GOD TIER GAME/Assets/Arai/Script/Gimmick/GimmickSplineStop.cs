@@ -44,7 +44,7 @@ public class GimmickSplineStop : GimmickSpline
 
     public void Move()
     {
-        m_cart.SetSpeed(m_enterSpeed);
+        m_cart?.SetSpeed(m_enterSpeed);
 
         m_lastTime = Time.time;
     }
