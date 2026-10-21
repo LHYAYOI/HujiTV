@@ -18,7 +18,7 @@ public enum BOOK_AREA_TYPE
 public class BookPageAreaDetector : MonoBehaviour
 {
     [Header("Coordinate Mapper")]
-    [SerializeField] private BookRaycastCoordinateMapper m_mapper;
+    [SerializeField] private BookFlipCoordinateMapper m_mapper;
 
     [Header("Left Page")]
     [SerializeField] private RectTransform m_runeArea;

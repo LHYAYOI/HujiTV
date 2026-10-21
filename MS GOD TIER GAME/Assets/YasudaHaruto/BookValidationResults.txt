@@ -1,0 +1,196 @@
+Verifying integrated BookScene.
+PASS: Selection panel starts hidden
+PASS: Dedicated controllers instantiated
+PASS: Initial render texture captured
+PASS: Open at game spread accepted
+PASS: Game spread active after opening
+PASS: Rune interaction ready for pointer input
+PASS: Last fixed spread has no game interaction
+PASS: Previous spread restores game interaction
+PASS: Close accepted
+PASS: Closing ends interaction
+PASS: Reopen accepted
+PASS: Reopening restores interaction
+PASS: Null page rejected
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Fixed pages preserved
+PASS: Duplicate page accepted below limit
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Fixed pages preserved
+PASS: Duplicate page accepted below limit
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Fixed pages preserved
+PASS: Duplicate page accepted below limit
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Visual pair matches instance 3
+PASS: Fixed pages preserved
+PASS: Duplicate page accepted below limit
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Visual pair matches instance 3
+PASS: Visual pair matches instance 4
+PASS: Fixed pages preserved
+PASS: Duplicate page accepted below limit
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Visual pair matches instance 3
+PASS: Visual pair matches instance 4
+PASS: Visual pair matches instance 5
+PASS: Fixed pages preserved
+PASS: Duplicate page accepted below limit
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Visual pair matches instance 3
+PASS: Visual pair matches instance 4
+PASS: Visual pair matches instance 5
+PASS: Visual pair matches instance 6
+PASS: Fixed pages preserved
+PASS: Duplicate page accepted below limit
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Visual pair matches instance 3
+PASS: Visual pair matches instance 4
+PASS: Visual pair matches instance 5
+PASS: Visual pair matches instance 6
+PASS: Visual pair matches instance 7
+PASS: Fixed pages preserved
+PASS: Duplicate definitions have distinct instances
+PASS: Full inventory requests selection
+PASS: Selection preserves inventory and blocks input
+PASS: Selection opens without a default destructive choice
+PASS: Decline button closes selection
+PASS: Decline preserves viewed instance
+PASS: Selection can reopen
+PASS: Each duplicate has its own selection row
+UI raycast at (960.00, 694.50), screen 1920x1080, hits=5
+Hit: RowTemplate(Clone) / Rows
+Hit: Viewport / Panel
+Hit: Panel / Overlay
+Hit: Overlay / BookPageReplacementUI
+Hit: BookDisplayImage  / Display
+PASS: Visible row receives UI raycasts above the book
+PASS: Row button selects the exact owned instance
+PASS: Selecting a row does not edit inventory
+PASS: Confirm button starts edit and blocks repeated confirmation
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Visual pair matches instance 3
+PASS: Visual pair matches instance 4
+PASS: Visual pair matches instance 5
+PASS: Visual pair matches instance 6
+PASS: Visual pair matches instance 7
+PASS: Fixed pages preserved
+PASS: Atomic replacement preserves count and viewed instance
+PASS: Selection closes after successful replacement
+PASS: Viewed replacement requested
+PASS: Viewed instance replacement accepted
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Visual pair matches instance 3
+PASS: Visual pair matches instance 4
+PASS: Visual pair matches instance 5
+PASS: Visual pair matches instance 6
+PASS: Visual pair matches instance 7
+PASS: Fixed pages preserved
+PASS: Replacing viewed page selects new instance
+PASS: Stale instance cannot remove a duplicate
+PASS: Last game spread removed
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Visual pair matches instance 3
+PASS: Visual pair matches instance 4
+PASS: Visual pair matches instance 5
+PASS: Visual pair matches instance 6
+PASS: Fixed pages preserved
+PASS: Edit accepted before interruption
+PASS: Disable cancels uncommitted edit
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Visual pair matches instance 3
+PASS: Visual pair matches instance 4
+PASS: Visual pair matches instance 5
+PASS: Visual pair matches instance 6
+PASS: Fixed pages preserved
+PASS: First game spread removed
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Visual pair matches instance 3
+PASS: Visual pair matches instance 4
+PASS: Visual pair matches instance 5
+PASS: Fixed pages preserved
+PASS: First game spread removed
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Visual pair matches instance 3
+PASS: Visual pair matches instance 4
+PASS: Fixed pages preserved
+PASS: First game spread removed
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Visual pair matches instance 3
+PASS: Fixed pages preserved
+PASS: First game spread removed
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Visual pair matches instance 2
+PASS: Fixed pages preserved
+PASS: First game spread removed
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Fixed pages preserved
+PASS: First game spread removed
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Fixed pages preserved
+PASS: First game spread removed
+PASS: Display count matches logical inventory
+PASS: Fixed pages preserved
+PASS: Display count matches logical inventory
+PASS: Fixed pages preserved
+PASS: Empty inventory shows first fixed spread
+PASS: First page can be added to empty inventory
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Fixed pages preserved
+PASS: Empty-to-one addition completed
+PASS: Legacy RANDOM is rejected
+PASS: END insertion accepted
+PASS: Display count matches logical inventory
+PASS: Visual pair matches instance 0
+PASS: Visual pair matches instance 1
+PASS: Fixed pages preserved
+PASS: END insertion preserves viewed instance and precedes fixed page
+COMPLETE: Inventory and controller checks passed. Pointer tracing and networking were not exercised.

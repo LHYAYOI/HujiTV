@@ -11,11 +11,19 @@ using UnityEngine.UI;
 
 public sealed class BookPageView : MonoBehaviour
 {
+    [SerializeField] private RectTransform m_pageContent;
+
     private readonly List<GameObject> m_imageObjects =
         new List<GameObject>();
 
     public void ShowPage(BookPageData pageData)
     {
+        if (m_pageContent == null)
+        {
+            Debug.LogError("BookPageView : PageContentが未設定です", this);
+            return;
+        }
+
         ClearImages();
 
         RectTransform pageTransform = (RectTransform)transform;
@@ -55,7 +63,7 @@ public sealed class BookPageView : MonoBehaviour
                 typeof(CanvasRenderer),
                 typeof(Image));
 
-            imageObject.transform.SetParent(transform, false);
+            imageObject.transform.SetParent(m_pageContent, false);
 
             // 撮影Cameraの対象Layerに揃えます。
             imageObject.layer = gameObject.layer;
