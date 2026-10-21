@@ -76,45 +76,39 @@ public class BattleManager : MonoBehaviour
         float lastSpawnTime = startTime;
 
 
-        List<BattleEnemyData> enemyData = m_currentBattleData.EnemyData;
+        // ミニオバケをバトル開始状態にする
+        m_activeEnemyManager.SetAllMiniGhostsToBattleStart();
 
-        foreach (BattleEnemyData data in enemyData)
+
+
+
+        // バトル始まります
+        float time = 0.0f;
+        time = Time.time;
+
+        while(true)
         {
-            switch (data.SpawnType)
+            // 全ての敵が倒された場合はバトル終了イベントを呼び出す
+            if (m_activeEnemyManager.GetActiveEnemies().Count() == 0)
             {
-                case BattleEnemyData.SPAWN_TYPE.TIME_SPLINE:
-
-                    // ミニオバケをバトル開始状態にする
-                    m_activeEnemyManager.SetAllMiniGhostsToBattleStart();
-
-                    break;
-                case BattleEnemyData.SPAWN_TYPE.TIME_PUPUP:
-                    break;
-                case BattleEnemyData.SPAWN_TYPE.WAIT_TIME_SPLINE:
-                    //yield return new WaitUntil();
-                    break;
-                case BattleEnemyData.SPAWN_TYPE.WAIT_TIME_PUPUP:
-                    break;
+                break;
             }
+
+            // バトル時間が経過するまで待機する
+            if ( Time.time - time > m_currentBattleData.BattleTime)
+            {
+                // アクティブな敵が残っている場合は全て削除する
+                if (m_activeEnemyManager.GetActiveEnemies().Count() != 0)
+                {
+                    // バトル終了時に全ての敵を削除する
+                    m_activeEnemyManager.RemoveAllActiveEnemies();
+                }
+                break;
+            }
+
+            yield return null;
         }
-
-        // 全ての敵が倒された場合はバトル終了イベントを呼び出す
-        if (m_activeEnemyManager.GetActiveEnemies().Count() == 0)
-        {
-            m_onFinishEvent?.Invoke();
-
-            yield break;
-        }
-
-        // バトル時間が経過するまで待機する
-        yield return new WaitForSeconds(m_currentBattleData.BattleTime);
-
-        // アクティブな敵が残っている場合は全て削除する
-        if (m_activeEnemyManager.GetActiveEnemies().Count() != 0)
-        {
-            // バトル終了時に全ての敵を削除する
-            m_activeEnemyManager.RemoveAllActiveEnemies();
-        }
+        
 
         m_onFinishEvent?.Invoke();
 

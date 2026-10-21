@@ -11,16 +11,4 @@ public class BattleData : MonoBehaviour
 
 
 
-    private void OnValidate()
-    {
-        foreach (var data in m_enemyData)
-        {
-            float time = data.SpawnTime + data.DestroyTime;
-
-            if(m_battleTime < time)
-            {
-                m_battleTime = time;
-            }
-        }
-    }
 }
