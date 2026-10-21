@@ -138,7 +138,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   m_magicData: {fileID: 11400000, guid: 17ef150f604effd4e91c6dfb9950d6c0, type: 2}
-  m_moveSpeed: 30
+  m_moveSpeed: 15
   m_bezierControlPoints:
   - m_curveHeight: {x: 1, y: 3}
     m_curveWidth: {x: 1, y: 4}
