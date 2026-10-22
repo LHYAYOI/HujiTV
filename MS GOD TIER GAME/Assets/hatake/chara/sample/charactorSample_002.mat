@@ -12,25 +12,26 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - _TOON_RECEIVE_SHADOWS_OFF
-  - _TOON_SHADE_UNLIT
+  - _TOON_DEFORM
+  - _TOON_RIM
+  - _TOON_TRANSPARENT
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
+  m_CustomRenderQueue: 3000
+  stringTagMap:
+    RenderType: Transparent
   disabledShaderPasses:
   - MOTIONVECTORS
   - TeamToonHairMask
   - TeamToonReveal
-  - TeamToonOutline
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: 51dd8594337300a4bb3c2c20f68a05ad, type: 3}
+        m_Texture: {fileID: 2800000, guid: 9fcdbc54401b6c945979caf5acc7e60f, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -116,10 +117,11 @@ Material:
     m_Ints: []
     m_Floats:
     - _AddPrecomputedVelocity: 0
-    - _AdditionalStrength: 1
+    - _AdditionalStrength: 0.5
+    - _AdditiveBlend: 0.5
     - _AlphaClip: 0
     - _AlphaToMask: 0
-    - _AmbientStrength: 1
+    - _AmbientStrength: 2
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
@@ -128,20 +130,31 @@ Material:
     - _ClearCoatSmoothness: 0
     - _ColorPreservation: 0
     - _ControlEnabled: 0
+    - _CoreAlpha: 0.35
     - _Cull: 2
     - _Cutoff: 0.5
     - _DeepSoftness: 0.035
     - _DeepThreshold: -0.3
+    - _DeformCurve: 1.5
+    - _DeformEnabled: 1
+    - _DeformWaveCount: 1
+    - _DepthPrepass: 1
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DstBlend: 0
+    - _DstBlend: 10
     - _DstBlendAlpha: 0
+    - _EdgeAlpha: 1
+    - _EdgePower: 1.5
     - _EmissionEnabled: 0
     - _EmissionMapEnabled: 0
     - _EnvironmentReflections: 1
     - _FaceBlend: 0.65
     - _FaceMode: 0
     - _FaceSDFEnabled: 0
+    - _GhostGlowEnabled: 1
+    - _GhostGlowFalloff: 0.32
+    - _GhostGlowWidth: 0.022
+    - _GhostRimPower: 3
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
@@ -157,29 +170,30 @@ Material:
     - _LightColorInfluence: 1
     - _LightIntensityInfluence: 1
     - _Metallic: 0
+    - _MulAlpha: 1
     - _NormalEnabled: 0
     - _NormalScale: 1
     - _Occlusion: 1
     - _OcclusionStrength: 1
-    - _OutlineEnabled: 0
+    - _OutlineEnabled: 1
     - _OutlineMaskEnabled: 0
-    - _OutlineWidth: 3.52
+    - _OutlineWidth: 3
     - _Parallax: 0.005
     - _QueueOffset: 0
     - _ReceiveShadowStrength: 1
-    - _ReceiveShadows: 0
+    - _ReceiveShadows: 1
     - _ReflectionEnabled: 0
     - _ReflectionStrength: 1
     - _RevealEnabled: 0
     - _RevealMaxDepth: 0.1
     - _RevealOpacity: 0.5
-    - _RimEnabled: 0
+    - _RimEnabled: 1
     - _RimLightAlignment: 0
-    - _RimPower: 4
-    - _RimStrength: 1.635
+    - _RimPower: 5.45
+    - _RimStrength: 1.961
     - _Roughness: 0.5
     - _SSAOReceive: 1
-    - _ShadeMode: 3
+    - _ShadeMode: 0
     - _ShadowSoftness: 0.035
     - _ShadowThreshold: 0.1
     - _Smoothness: 0.5
@@ -193,19 +207,29 @@ Material:
     - _SrcBlendAlpha: 1
     - _Surface: 0
     - _SurfaceEnabled: 0
+    - _SurfaceType: 1
     - _ThresholdMaskStrength: 0
+    - _Visibility: 1
     - _WorkflowMode: 1
     - _XRMotionVectorsPass: 1
-    - _ZWrite: 1
+    - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BaseColor: {r: 1, g: 0.4669811, b: 0.4669811, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DeepShadowColor: {r: 0.34999993, g: 0.3199999, b: 0.47999996, a: 1}
+    - _DeformAnchor: {r: 0, g: 0, b: 0, a: 1}
+    - _DeformAxis: {r: 0, g: -1, b: 0, a: 0}
+    - _DeformCenter: {r: 0, g: 0, b: 0, a: 0}
+    - _DeformDrag: {r: 0, g: 0, b: 0, a: 0}
+    - _DeformStretch: {r: 0, g: 1, b: 0, a: 1}
+    - _DeformWave: {r: 0, g: 0, b: 0, a: 0}
     - _EmissionColor: {r: 0.3915094, g: 1, b: 0.7341048, a: 1}
     - _FaceForward: {r: 0, g: 0, b: 1, a: 0}
     - _FaceRight: {r: 1, g: 0, b: 0, a: 0}
+    - _GhostGlowColor: {r: 3.9999995, g: 0, b: 0.48246378, a: 1}
+    - _GhostRimColor: {r: 2, g: 0, b: 0.093091965, a: 1}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
-    - _RimColor: {r: 0.2981043, g: 0.8207547, b: 0.74607694, a: 1}
+    - _RimColor: {r: 1, g: 0.019583989, b: 0, a: 1}
     - _ShadowColor: {r: 0.62, g: 0.56999993, b: 0.72, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
