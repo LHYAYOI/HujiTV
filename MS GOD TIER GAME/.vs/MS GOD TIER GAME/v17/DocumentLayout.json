@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\aeito\\desktop\\hujitv\\ms god tier game\\assets\\arai\\script\\trokko\\stagespline.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\arai\\script\\trokko\\stagespline.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\aeito\\desktop\\hujitv\\ms god tier game\\assets\\arai\\script\\battle\\battlemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\arai\\script\\battle\\battlemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -152,11 +156,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "BattleEnemyData.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Battle\\BattleEnemyData.cs",
               "RelativeDocumentMoniker": "Assets\\Arai\\Script\\Battle\\BattleEnemyData.cs",
@@ -169,7 +173,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "GimmickSplineBattle.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Gimmick\\GimmickSplineBattle.cs",
               "RelativeDocumentMoniker": "Assets\\Arai\\Script\\Gimmick\\GimmickSplineBattle.cs",
@@ -182,7 +186,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "BattleManager.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Battle\\BattleManager.cs",
               "RelativeDocumentMoniker": "Assets\\Arai\\Script\\Battle\\BattleManager.cs",
@@ -200,7 +204,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 0,
+              "Title": "StageSpline.cs",
+              "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Trokko\\StageSpline.cs",
+              "RelativeDocumentMoniker": "Assets\\Arai\\Script\\Trokko\\StageSpline.cs",
+              "ToolTip": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Trokko\\StageSpline.cs",
+              "RelativeToolTip": "Assets\\Arai\\Script\\Trokko\\StageSpline.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAABtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-22T08:18:51.577Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
               "Title": "MiniGhostMoveState.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostMoveState.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostMoveState.cs",
@@ -212,7 +229,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "EnemySpawnManager.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemySpawnManager.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemySpawnManager.cs",
@@ -224,7 +241,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "SplineMoveEnemy.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\SplineMoveEnemy.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\SplineMoveEnemy.cs",
@@ -236,7 +253,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "BattleData.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Battle\\BattleData.cs",
               "RelativeDocumentMoniker": "Assets\\Arai\\Script\\Battle\\BattleData.cs",
@@ -248,7 +265,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "EnemySpawnTest.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemySpawnTest.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemySpawnTest.cs",
@@ -260,7 +277,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "ActiveEnemyManager.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\ActiveEnemyManager.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\ActiveEnemyManager.cs",
@@ -272,7 +289,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "MiniGhostAttackState.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostAttackState.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostAttackState.cs",
@@ -284,7 +301,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "MiniGhostEnemy.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\MiniGhostEnemy.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\MiniGhostEnemy.cs",
@@ -296,7 +313,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "HitReceiverController.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\HitReceiverController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\HitReceiverController.cs",
@@ -308,7 +325,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 31,
+              "DocumentIndex": 32,
               "Title": "MiniGhostAttackState.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostAttackState.cs",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostAttackState.cs",
@@ -320,7 +337,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 32,
+              "DocumentIndex": 33,
               "Title": "MiniGhostDyingState.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostDyingState.cs",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostDyingState.cs",
@@ -332,7 +349,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 35,
+              "DocumentIndex": 36,
               "Title": "MiniGhostEnemyBullet.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhostEnemyBullet.cs",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhostEnemyBullet.cs",
@@ -344,7 +361,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 33,
+              "DocumentIndex": 34,
               "Title": "MiniGhostIdleState.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostIdleState.cs",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostIdleState.cs",
@@ -356,7 +373,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 34,
+              "DocumentIndex": 35,
               "Title": "MiniGhostState.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostState.cs",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\State\\MiniGhostState.cs",
@@ -368,7 +385,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "StateMachine.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\StateMachine.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Common\\StateMachine.cs",
@@ -380,7 +397,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "HitSenderController.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\HitSenderController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\HitSenderController.cs",
@@ -392,7 +409,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "EnemyBase.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemyBase.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemyBase.cs",
@@ -404,7 +421,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "RoutineRunner.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\RoutineRunner.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Common\\RoutineRunner.cs",
@@ -416,7 +433,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 17,
               "Title": "Easing.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\Easing.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Common\\Easing.cs",
@@ -428,7 +445,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 18,
               "Title": "StateBase.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\StateBase.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Common\\StateBase.cs",
@@ -440,7 +457,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 36,
+              "DocumentIndex": 37,
               "Title": "SwarmMiniGhostTest.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmMiniGhostTest.cs",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmMiniGhostTest.cs",
@@ -452,7 +469,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 20,
               "Title": "MagicBulletController.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletController.cs",
@@ -464,7 +481,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 21,
               "Title": "CameraManager.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
@@ -476,7 +493,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 19,
               "Title": "MagicBulletManager.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletManager.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletManager.cs",
@@ -488,7 +505,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 22,
               "Title": "TargetSelector.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Player\\TargetSelector.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Player\\TargetSelector.cs",
@@ -500,7 +517,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 24,
               "Title": "PlayerController.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Player\\PlayerController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Player\\PlayerController.cs",
@@ -512,7 +529,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 25,
               "Title": "BookNetworkServer.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkServer.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Network\\BookNetworkServer.cs",
@@ -524,7 +541,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 26,
               "Title": "CubTest.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\test\\CubTest.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\test\\CubTest.cs",
@@ -536,7 +553,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 23,
               "Title": "RuneTraceController.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceController.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceController.cs",
@@ -548,7 +565,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
+              "DocumentIndex": 29,
               "Title": "RuneTraceRule.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneTraceRule.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneTraceRule.cs",
@@ -560,7 +577,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 31,
               "Title": "RuneTraceData.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneTraceData.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneTraceData.cs",
@@ -572,7 +589,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 30,
               "Title": "RuneStrokeData.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneStrokeData.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneStrokeData.cs",
@@ -584,7 +601,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 28,
               "Title": "RuneAuthoringData.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneAuthoringData.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Data\\RuneAuthoringData.cs",
@@ -596,7 +613,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 27,
               "Title": "RuneEditorWindow.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Editor\\RuneEditorWindow.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Editor\\RuneEditorWindow.cs",
