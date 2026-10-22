@@ -98,6 +98,8 @@ public class BattleManager : MonoBehaviour
             }
         }
 
+
+
         // 全ての敵が倒された場合はバトル終了イベントを呼び出す
         if (m_activeEnemyManager.GetActiveEnemies().Count() == 0)
         {

@@ -52,7 +52,7 @@ public class SwarmMiniGhostTest : MonoBehaviour
 
     private void Start()
     {
-        StartCharge();
+        //StartCharge();
     }
 
     private void Update()
@@ -150,5 +150,10 @@ public class SwarmMiniGhostTest : MonoBehaviour
         }
 
         m_chargeCoroutine = null;
+    }
+
+    public void SetTargetCamera(Transform targetCamera)
+    {
+        m_targetCamera = targetCamera;
     }
 }
