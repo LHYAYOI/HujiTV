@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40becaa338aa4cf4999eb52eb12cfc1b, type: 3}
+  m_Name: Book_Test
+  m_EditorClassIdentifier: Assembly-CSharp::BookData
+  m_bookTitle: Test
+  m_pages:
+  - {fileID: 11400000, guid: ec9ee33f1dd87b741af4c870eac5ed96, type: 2}
+  - {fileID: 11400000, guid: 683600d286d803d44939ef252003ba97, type: 2}
+  - {fileID: 11400000, guid: f2cb3b18a6f51424aaffb62791fb2aab, type: 2}
+  - {fileID: 11400000, guid: 894714eb044f13043acc81d9d22753c3, type: 2}
+  - {fileID: 11400000, guid: f2c98c0adebc28e4790dd24ebd6e692b, type: 2}
+  - {fileID: 11400000, guid: 2501a984eb7f02f40a71f7525e738758, type: 2}
+  - {fileID: 11400000, guid: 8a96f6982deee924bb41291a50aa4ae0, type: 2}
+  - {fileID: 11400000, guid: 7a1eea5c254fdfb4da586e878b790100, type: 2}
+  m_contents: []

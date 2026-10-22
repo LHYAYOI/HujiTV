@@ -6,8 +6,8 @@
 ※動作確認の根拠は下記記録を参照。魔法通信はユーザーがテスト済みで問題なしと再確認しており、追加の再テストは不要。
 
 ## 現在の作業
-旧Book構成の整理を実施。Hamada側BookSceneが無いことを確認し、不要な旧16スクリプト・移行補助・候補Sceneを削除。
-MagicDataの着弾ルーン画像について、魔法ごとの固定画像を一か所で設定する設計を整理。画像機能はまだ実装していない。
+太くしたなぞり線の描画を改善。接続されたメッシュ、丸い端、透明な輪郭でギザギザを軽減。入力点・判定は維持。
+既存UnityでコンパイルとVerify Rune Feedbackを完了。実際になぞったときの見た目・手触りは未確認。
 
 ## 次のタスク
 - ページ追加・削除の統合
@@ -57,10 +57,10 @@ MagicDataの着弾ルーン画像について、魔法ごとの固定画像を�
 6. ルーン描画中エフェクト、射出方向選択演出を追加する。
 
 ## 最終作業
-日付：2026-10-21
-変更内容：旧Book構成16スクリプトと各.meta、候補Scene、一回限りの移行補助を削除。BookScene・検証Prefabの旧コンポーネント参照と候補専用メニューを除去。着弾画像の設計を記録。
-確認結果：Hamada側BookSceneが無く、削除対象への外部GUID参照がないことを確認。除去コンポーネントはすべて非アクティブな階層内。Unity 6000.3.23f1のバッチコンパイルは終了コード0、C#コンパイルエラーなし。git status・fetch・追跡先のコミット差分なし。今回Play Mode再検証は未実施。
-未完了事項：BookSceneのPlay Mode回帰確認。MagicDataへの画像フィールド追加とアセット設定、担当間相談後の着弾エフェクト接続。入手・削除演出、日本語フォント指定、お邪魔ページの削除条件。
+日付：2026-10-22
+変更内容：RuneLineGraphicを独立した四角形から連続メッシュへ変更。丸い端と透明な輪郭を追加。太線・重複点・折り返しの回帰検証を追加。
+確認結果：既存Unityでコンパイル後、Verify Rune FeedbackがCOMPLETE。全線のRGB色同期、輪郭の透明度、有限座標、入力点の保持、既存の失敗・完成・発動処理を検証。Sceneを保存・再読込していない。
+未完了事項：実際になぞる際の見た目・操作感の確認。旧デバッグ5件のScene参照整理、MagicData着弾画像は継続課題。
 
 ## 動作確認記録（2026-10-21）
 - 起動中のUnity 6000.3.23f1のBookSceneでPlay Modeへ進め、本の見開き表示を確認。新規バッチコンパイルや実機ビルドは未実施。
@@ -362,3 +362,79 @@ MagicDataの着弾ルーン画像について、魔法ごとの固定画像を�
 4. 魔法A/Bの切り替え、同じ魔法を異なるルーンページから発動、画像未設定、連続命中・プール再利用を確認する。
 
 追加確認：Assets・Packages・Library/PackageCacheのGUIDを照合し、BookSceneの73件、BookValidation.prefabの74件のスクリプト参照がすべて解決することを確認。git diff --checkも問題なし。
+
+## ルーン描画フィードバックと失敗演出（2026-10-22）
+- ユーザー要件：正確な線は緑、見本から離れるほど赤。失敗時は全画面に軽い黒幕を置き、ルーン領域へ少し大きな赤い×を表示。
+- RuneTraceRealtimeEvaluatorにNormalizedDeviationを追加。従来の投影処理が求める見本からの距離をDistanceToleranceで正規化し、区間内の最大値を色へ渡す。許容距離・開始点・終了点・進行判定は変更していない。正確な位置は0、失敗距離は1。
+- 任意のIRuneTraceFeedbackViewを経由してRunePageViewへ逸脱量を通知。RuneLineGraphicは点ごとの頂点色に対応し、既存の色なし呼出しも維持。描画済みの位置の色は残し、見本へ戻ると新しく描く部分は緑へ戻る。完成済みストロークの色も保持。
+- RuneTraceControllerは無効な開始位置・描画中の逸脱を検出した時点で失敗演出を呼ぶ。途中で指を離した場合・発動方向入力失敗も対象。指を離す際の二重通知を抑制し、既存の再試行へ戻る。TraceFailedの通知も同じ失敗につき1回に統一。
+- RuneFailureOverlayを実行時に独立したScreen Space Overlay Canvasとして作成。全画面の黒Imageと、その上の赤い×を表示する。黒幕は透明度0.35、表示0.7秒、末尾0.15秒でフェード。Time.unscaledDeltaTimeで進行し、表示中は新規UI入力を遮る。画面の解像度・ルーンの画面位置は表示中も再計算する。
+- ×は初期状態では2本のuGUI Imageで構成するため外部画像アセット不要。RunePageViewのFailure Cross Spriteへ任意の画像を指定すれば差し替え可能。サイズはルーン領域の短辺を基準に1.15倍。黒幕濃度・色・×の色・大きさ・時間・線色・色変化カーブはRunePageViewのInspectorで調整できる。
+- BookFlipCoordinateMapperにキャプチャ領域→左ページCrop→本の表示UV→画面の逆変換を追加。BootstrapからDragInput経由で投影関数を渡すため、既存Scene・Prefabの参照追加や再保存は不要。失敗表示をRenderTextureの中へ入れない。
+- 再試行のBeginTraceでは直前の失敗演出を消さず、キャンセル・ページの終了・View無効化時には消す。View破棄時は生成したOverlayも破棄する。
+
+### 今回の確認と既存変更の保持
+- 開始時点で.vs、3つのTestPageアセット、BookScene、URPProjectSettingsに既存変更あり。Book_Test・PageView/Images・複数のPageView・ClearnRune/FireRune/WaterRune等も未追跡だった。これらを今回の実装で編集・破棄していない。
+- git status・fetch・追跡先コミット差分確認を実施。ブランチはMS-73/Fix/DeleteOldBook、コミット差分なし。禁止されたGit操作は行っていない。
+- 制限内のGet-Processでは既存Unityが検出できず、バッチ起動が終了コード1で失敗。標準エラーで同一プロジェクトのEditorが起動済みと判明後は追加起動を止め、computer-useスキルで既存Editorを使用した。バッチ起動失敗をコンパイルエラーとは扱わない。
+- Tools > YasudaHaruto > Verify Rune Feedbackは最終版でCOMPLETE。距離0・許容距離の半分・許容超過、失敗即時通知、指を離した際の重複抑止、無効開始、途中終了、正確な完走による発動クールダウン、キャンセル、緑と赤の頂点色の保持、全画面の暗幕アンカー、再試行中の演出維持を検証した。初回の検証用リフレクションのオーバーロード指定不足は修正し、再実行で解消済み。
+- BookSceneをPlay Modeにし、Preview Rune Failure (Play Mode)で開いた本に失敗演出を表示。黒幕がゲーム画面全体を覆い、赤い×が左ページのルーン領域に少し大きく重なることを目視確認。解除すると元の明るさへ戻った。Play Modeは終了済み。物理マウスで全ストロークをなぞる体感テストとは区別する。
+- 上記PreviewはPlay Mode中に実行し、本を開いて演出表示を一時停止する確認用メニュー。表示直後に描画が未更新の場合はStepを1回進める。確認後はPlayを停止する。Sceneやアセットを保存する処理はない。
+- BookSceneの作業前後SHA256は3F8690673527FE31ED5E7582A53D1886EA11409109A22A371F30569723DB6F44で同一。URPProjectSettingsもC317FE22B9488785C0611F0642429922E5D324430D929BFFB41648130F30C218で同一。
+- 全体のgit diff --checkは既存BookScene.unityの2362行目の末尾空白を検出。ユーザーの既存Scene変更を保持するため触っていない。今回のスクリプトと管理資料だけを対象にしたチェックは別途実施。
+
+## なぞり線全体の色同期へ変更（2026-10-22）
+- ユーザーの指定により、描いた位置ごとに色を保存する方式を変更。現在の逸脱量で、完成済みの画を含むなぞり線全体を同じ色へ更新する。
+- RunePageViewの点別色リストを取り除き、RuneLineGraphic.colorを更新する。危険になると全体が赤へ寄り、正確な位置へ戻ると描画済みの線も全体が緑へ戻る。画を終えても色を固定せず、次の画の逸脱量で全体を更新する。
+- 見本線と失敗時の暗幕・×、既存の判定条件は維持する。
+- Verify Rune Feedbackの描画検証は、全頂点が同じ色であること、完成済みの画と現在の画が一緒に赤くなること、追加描画なしでも全体が緑へ戻ることを確認する内容へ変更。
+- 最新のVerify Rune FeedbackはCOMPLETE。完成済みと描画中の全頂点が同じ色になること、赤から緑へ戻ることを確認。今回Play Modeは起動せず、Sceneは未保存。既存の失敗演出の検証もPASS。
+
+## 指離し後の中央下スワイプ発動（2026-10-22）
+- ユーザー要件：ルーン完成後は一度指を離す。その後、本の中央より下の円だけ明るくして他を暗くし、円から3方向へスワイプする。円外で触っても反応させず、円を緩やかに拡縮して誘導する。
+- RuneTraceControllerにWAITING_CAST_RELEASEとWAITING_CAST_STARTを追加（既存enum値を維持するため末尾に追加）。方向指定ありのルーン完了→指離し待ち→EndStrokeで開始待ち→TryBeginCastでCHARGING→既存ConfirmCast→クールダウンへ遷移。完了した指を離さず動かしても発動できない。方向指定なしのMAGIC_AIM_TYPE.NONEは従来通り自動発動。
+- BookGameDragInputは方向待機中の通常PointerDown・ページめくり開始を拒否する。既存のルーン終端からのスワイプ判定を除き、最後のPointerUpはEndStrokeだけへ渡す。専用Overlayの円内PointerDownだけがTryBeginCastを呼ぶ。
+- RuneCastOverlayはScreen Space Overlay Canvasで全画面入力を捕捉する。円外で押してから円内へドラッグしても開始しない。開始したポインターIDだけを受け付け、他の指や二重PointerUpを無視。開始後の指離し時に既存CastSwipeDetectorで距離・上方向・角度を判定する。短すぎる／方向範囲外なら従来の失敗表示とルーン再試行へ戻す。待機タイムアウトは設けない。
+- RuneCastGuideGraphicは透明な円形部分を残して周囲を暗くするuGUIメッシュと、上／左上／右上の矢印を描く。円の縁を金色にし、ゆっくり拡縮させる。スワイプ中に方向が有効になった矢印は緑になる。判定角度はCastSwipeDetectorの設定から取得し、ガイドと判定がずれないようにした。
+- 初期設定はBookGameDragInput InspectorのCast Guide：Cast Origin=(0.5,0.25)、Cast Radius=本の高さの0.08、Cast Shade=0.55、Cast Pulse Speed=1Hz、Cast Pulse Amount=0.08。Originは本の左下を(0,0)、右上を(1,1)とした値。表示出力UVと本の座標の変換を使い、実際の本の位置・サイズへ追従する。円の入力半径は一定で、脈動で判定が揺れないようにした。
+- ページ操作・入手ページ処理は既存の入力可能条件でも方向待ち状態を受理しないため、待機中の所持変更を進めない。外部からページ終了・キャンセルが起きた場合や入力コンポーネントの無効化時はガイドを消す。フォーカスを失った場合は保持中のスワイプだけ解除し、円内でやり直せる状態へ戻す。生成したOverlayは入力コンポーネント破棄時に破棄する。
+- 担当側の専用入力、RuneTraceController、CastSwipeDetector、検証メニューと新規2スクリプトのみ変更。hatake・他メンバーのコード、Scene・Prefab・既存アセット・通信形式は変更していない。BookSceneのSHA256は3F8690673527FE31ED5E7582A53D1886EA11409109A22A371F30569723DB6F44を維持。
+- Verify Rune FeedbackはCOMPLETE。元の線色・失敗表示の検証に加えて、ルーン完了後の指離し要求、指離し前の発動拒否、円外PointerDownからの侵入拒否、LEFT/CENTER/RIGHTの発動、二重PointerUp防止、短いスワイプ失敗、フォーカス相当の復帰、キャンセルを検証した。
+- BookSceneのPlay Modeでは、確認メニューで完了状態を模擬して円・3方向矢印・暗転・円の拡縮を目視確認。円外のクリックでは待機を維持、円内タップでは既存の短いスワイプ失敗処理へ届くことを確認。OS操作によるドラッグ発動は再現できておらず、3方向発動はイベント／Controllerの自動検証による確認。実際のルーンをなぞるところからの一連の操作確認とは区別する。Play Modeは終了済み。
+- Tools > YasudaHaruto > Preview Cast Guide (Play Mode)は本を開いたPlay Modeで実行する確認用。実行時のControllerを完成後の状態へ変更するが、Scene・アセットへ保存しない。確認後はPlayを停止する。
+- Git status・fetch・追跡先コミット差分を確認。HEADと追跡先の差分なし。fetchで別メンバーの新リモートブランチを取得したが、ローカルブランチ操作や同期はしていない。
+
+## ルーン完成時の拡大フェードと矢印の太さ（2026-10-22）
+- ユーザー確認済み：画像は「今なぞったルーンの形」をそのまま使う。拡大しながら薄くなって消える演出とする。
+- 最後のストロークがリアルタイム判定で完了し、View.EndStrokeで全線が揃った時点にIRuneTraceFeedbackView.PlayCompletionを一度だけ通知する。指を離す前に再生するが、既存の指離し待ち・中央下スワイプ・自動発動の状態遷移や成功条件は変更しない。ルーン途中の1画完了や、完成後のPointerUpでは再生し直さない。
+- RunePageViewにCompletion Duration（初期0.65秒）とCompletion End Scale（初期1.4倍）を追加。完成済みプレイヤーストロークをコピーし、現在の線色で独立したScreen Space Overlayへ重ねる。PNG・Sprite・MagicDataへの画像登録は不要で、元の線は残る。
+- RuneCompletionOverlayはコピーした線の外接範囲の中心を軸にSmoothStepで拡大し、同時にalphaを0へ下げる。実時間で進行する。入力Raycastを無効とし、GraphicRaycasterも付けないため、完成後の指離しと発動ガイドを遮らない。ガイドより手前、失敗の暗幕・×より奥に表示する。
+- 演出の開始時に入力点をコピーするので、元のストローク一覧の更新に影響されない。元のRuneLineGraphicの実際のRectを既存のMapperで画面へ投影し、AspectRatioFitterによる領域変更に対応。線幅も元の表示サイズに合わせる。画面位置は演出中も追従する。
+- 再試行・失敗・キャンセル・View無効化で演出を消し、View破棄時は生成Overlayも破棄する。専用画像や新しいMaterialを持たせる二重管理は追加していない。
+- 3方向の矢印の幅は円半径に対して0.065から0.1へ変更（約1.54倍）。BookGameDragInputのCast Arrow Widthで0.02〜0.2へ調整可能。矢印の角度・長さ・判定条件は維持。
+- Verify Rune Feedbackは最終版でCOMPLETE。ルーン途中では再生しない、最後の画で一度だけ再生、指離しで再生し直さない、拡大途中でscale>1かつalpha低下、最後にalpha=0、入力を遮らない、失敗時に残らないことを検証。従来の線全体の色変化・失敗・3方向発動の検証も通過。
+- Tools > YasudaHaruto > Preview Rune Completion (Play Mode)は、開いているルーンの見本線を入力済み線として模擬し、演出の途中を確認するメニュー。表示を一時停止するため、Stepを1回進めて確認後はPlayを止める。実際のなぞり操作の代替証拠とはしない。
+- 今回のBookScene上の目視確認は上記プレビューによるもの。重なったルーンが拡大し、薄くなって消え、元の線が残ることを確認した。Play Modeは終了済み。
+- 開始時からユーザーによる未保存のScene変更があったため、Sceneの再保存・再読み込みはせずに検証した。既存のReferenceRuneGraphic等のInspector設定は触っていない。BookSceneの保存済みファイルSHA256は3F8690673527FE31ED5E7582A53D1886EA11409109A22A371F30569723DB6F44を維持。
+- Git status・fetch・追跡先とのコミット差分を確認、差分なし。禁止Git操作なし。今回のスクリプトを対象にgit diff --checkを実施し、問題なし。
+
+## テスト補助コードの整理（2026-10-22）
+- ユーザー指示に基づき、Assets/YasudaHaruto内のテスト・デバッグ・Editor補助のC#参照とAssets全体のGUID参照を再確認。
+- 削除：BookReplacementUIBuilder.csと.meta。すでにBookPageReplacementUI.prefabが作成・調整済みのため、初回のUI自動生成処理は役目を終えた。
+- BookValidationSetupからPrepare and Verify Book Validation、Preview Page Selection、ConfigureInventoryを削除。検証前に設定assetを作成したり、検証Prefabを書き換えて保存する処理を除去。検証は既存の設定・Prefabをそのまま使う。
+- RuneFeedbackValidationからPreview Rune Completion / Preview Rune Failure / Preview Cast Guideと、それら専用の期限・EditorApplication.update処理を削除。内部状態のリフレクション書き換えや一時停止を伴う演出確認用の補助は残さない。
+- 残すEditorメニューはVerify Existing Book Validation、Verify Integrated Book Scene、Verify Rune Feedbackの3つ。既存動作を確かめる回帰検証コードは削除していない。
+- 過去のプレビュー専用分岐・SessionState・別レポート選択も削除。BookValidationPreview.txt等の過去レポートは確認証跡として保持する。管理資料の過去記録にある生成・Previewメニューは現在は利用できない。
+- 参照が残るため保持した旧デバッグコード：BookRaycastTest、Validation/BookFlipCoordinateTest、RuneRealtimeEvaluationTest、DebugRuneTraceView、BookNetworkTestUI。いずれもBookScene.unityとBookValidation.prefabにGUID参照がある。コードだけを消すとMissing Scriptになる。BookNetworkTestUIにはボタンから呼ぶ公開メソッドもあり、コンポーネントだけでなくUnityEventも整理する必要がある。
+- 現在のUnityにはユーザーの未保存Scene変更があるため、今回そのSceneの再読み込み・保存・ディスク上の配線変更はしていない。旧デバッグ5件は、未保存変更を保持した状態でScene・Prefabの参照を外す工程と一緒に扱う。現行ランタイムを含むValidationフォルダの一括削除もしない。
+- 削除したクラス・メニューへのC#残存参照なし。既存Unityでコンパイル後、Verify Rune FeedbackはCOMPLETE。Toolsメニューが検証3項目になったことも確認した。統合済みSceneの検証は未保存Sceneを開き直すため、今回は実行していない。
+- BookSceneの保存済みファイルSHA256は3F8690673527FE31ED5E7582A53D1886EA11409109A22A371F30569723DB6F44で同一。実行時コード・Scene・Prefab・他メンバーコードは今回未変更。
+- Git status・fetch・追跡先差分確認済み、追跡先とコミット差分なし。禁止Git操作なし。新しいDevelop等のリモート追跡情報だけ取得した。
+
+## 太いなぞり線の描画改善（2026-10-22）
+- 原因：入力点間ごとに独立した四角形を描くため、太線で継ぎ目の隙間・重なりと角張った端が目立っていた。
+- 隣り合う線分の断面を共有し、角の継ぎ目を接続。鋭い角の突出を制限し、ほぼ180度の折り返しは区切って丸い端でつなぐ。同じ座標の連続点は描画時のみ読み飛ばす。
+- 線の両端を半円にし、輪郭に約1出力ピクセル分の透明な帯を追加。RuneLineGraphicのEdge Softness（初期1、0.25〜3）で調整可能。既存Line Widthと参照は維持。共通描画なので見本線と完成時のコピーにも適用される。
+- RuneData・入力点・距離の成功失敗判定を変更しない。線色はRGBを全体同期し、輪郭だけalphaを0へ下げる。追加の画像・Materialは不要。
+- 既存Verify Rune Feedbackの色検証をRGB同期と透明な輪郭の検証に更新。幅28の線で重複点・急角度・折り返しを含むメッシュの有限性と入力点の保持も確認。Unityのコンパイル後にCOMPLETEを確認。
+- 今回はPlay Modeで実際になぞる目視確認は未実施。ユーザーの未保存Scene状態を保持し、他メンバーのコード・Scene・Prefab・ProjectSettingsは編集していない。

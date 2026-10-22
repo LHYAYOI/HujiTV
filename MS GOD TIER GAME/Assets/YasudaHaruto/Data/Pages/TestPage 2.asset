@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PageData
   m_pageId: 4
   m_insertType: 1
-  m_displayName: Test03
+  m_displayName: Water
   m_pageType: 0
   m_interaction:
     m_type: 1
-    m_runeData: {fileID: 11400000, guid: 2740ebe12dc589049bf3435e62d1b1e9, type: 2}
+    m_runeData: {fileID: 11400000, guid: a6d1404f226490f488ce1082a9bc6e52, type: 2}
   m_action:
     m_type: 1
     m_magicData: {fileID: 11400000, guid: 17ef150f604effd4e91c6dfb9950d6c0, type: 2}
-  m_leftVisualData: {fileID: 11400000, guid: aa578b02a4de86d42bb71958c283cf2a, type: 2}
-  m_rightVisualData: {fileID: 11400000, guid: 264d2370acd2bbb4cb0a4ae4702d382d, type: 2}
+  m_leftVisualData: {fileID: 11400000, guid: 2501a984eb7f02f40a71f7525e738758, type: 2}
+  m_rightVisualData: {fileID: 11400000, guid: 8a96f6982deee924bb41291a50aa4ae0, type: 2}

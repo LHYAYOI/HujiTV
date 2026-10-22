@@ -25,6 +25,8 @@ public class CastSwipeDetector : MonoBehaviour
     [SerializeField, Range(45f, 90f)] private float m_maxAngle = 65f;
 
     // スワイプの開始位置と終了位置から、魔法の詠唱の方向を評価する
+    public float GuideSideAngle => (m_centerAngle + m_maxAngle) * 0.5f;
+
     public bool TryEvaluate(Vector2 startScreenPosition, Vector2 endScreenPosition, out MAGIC_CAST_DIRECTION direction)
     {
         // 初期化

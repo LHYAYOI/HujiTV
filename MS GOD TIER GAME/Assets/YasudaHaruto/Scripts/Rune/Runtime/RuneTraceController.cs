@@ -19,7 +19,9 @@ public enum RUNE_TRACE_STATE
     FAILED_WAITING_RELEASE,
     CHARGING,
     WAITING_RELEASE_AFTER_CAST,
-    COOLDOWN
+    COOLDOWN,
+    WAITING_CAST_RELEASE,
+    WAITING_CAST_START
 }
 
 
@@ -37,6 +39,7 @@ public class RuneTraceController
     private float m_cooldownSeconds = 1.0f;
     private float m_cooldownRemaining;
     private bool m_pointerReleased;
+    private bool m_failureNotified;
 
     private const float MIN_POINT_DISTANCE = 0.005f;
     private const float START_TOLERANCE = 0.04f;
@@ -47,6 +50,9 @@ public class RuneTraceController
     public RUNE_TRACE_STATE State => m_state;
     public int CurrentStrokeIndex => m_strokeIndex;
     public float Progress => m_evaluator?.Progress ?? 0f;
+
+    public bool IsAwaitingCast => m_state == RUNE_TRACE_STATE.WAITING_CAST_RELEASE ||
+        m_state == RUNE_TRACE_STATE.WAITING_CAST_START || m_state == RUNE_TRACE_STATE.CHARGING;
 
     public bool CanBeginStroke => m_state == RUNE_TRACE_STATE.WAITING_STROKE;
     public float CooldownRemaining => m_cooldownRemaining;
@@ -91,12 +97,14 @@ public class RuneTraceController
         if (!m_evaluator.Begin(normalizedPosition))
         {
             m_state = RUNE_TRACE_STATE.FAILED_WAITING_RELEASE;
+            NotifyFailure();
             Debug.Log($"Rune : Invalid Start / Stroke={m_strokeIndex + 1}");
             return;
         }
 
         m_state = RUNE_TRACE_STATE.DRAWING;
         m_currentStroke.Add(normalizedPosition);
+        UpdateDeviation();
         m_view.UpdateCurrentStroke(m_currentStroke);
     }
 
@@ -109,15 +117,17 @@ public class RuneTraceController
 
         RUNE_REALTIME_RESULT result = m_evaluator.EvaluateSegment(previous, normalizedPosition);
 
+        m_currentStroke.Add(normalizedPosition);
+        UpdateDeviation();
+        m_view.UpdateCurrentStroke(m_currentStroke);
+
         if (result == RUNE_REALTIME_RESULT.FAILED)
         {
             m_state = RUNE_TRACE_STATE.FAILED_WAITING_RELEASE;
+            NotifyFailure();
             Debug.Log($"Rune : Failed / Stroke={m_strokeIndex + 1}, Progress={Progress:P1}");
             return;
         }
-
-        m_currentStroke.Add(normalizedPosition);
-        m_view.UpdateCurrentStroke(m_currentStroke);
 
         if (result != RUNE_REALTIME_RESULT.COMPLETED) return;
 
@@ -139,14 +149,17 @@ public class RuneTraceController
             case RUNE_TRACE_STATE.DRAWING:
             case RUNE_TRACE_STATE.FAILED_WAITING_RELEASE:
                 Debug.Log("Rune : Attempt Failed");
-                m_view.PlayFailure(new RuneTraceResult(0f, 0f, m_session.StrokeCount, false));
-                TraceFailed?.Invoke(new RuneTraceResult(0f, 0f, m_session.StrokeCount, false));
+                NotifyFailure();
                 ResetAttempt();
+                break;
+
+            case RUNE_TRACE_STATE.WAITING_CAST_RELEASE:
+                m_state = RUNE_TRACE_STATE.WAITING_CAST_START;
                 break;
 
             case RUNE_TRACE_STATE.CHARGING:
                 Debug.Log("Rune : Invalid Cast");
-                m_view.PlayFailure(new RuneTraceResult(0f, 0f, m_session.StrokeCount, false));
+                NotifyFailure();
                 ResetAttempt();
                 break;
 
@@ -170,7 +183,9 @@ public class RuneTraceController
         m_view.EndStroke();
 
         if (m_strokeIndex == m_runeData.TraceData.Strokes.Count - 1)
-        {// すべてのストロークが完了した場合、詠唱を確定する
+        {
+            if (m_view is IRuneTraceFeedbackView feedback) feedback.PlayCompletion();
+            // すべてのストロークが完了した場合、詠唱を確定する
             if (m_aimType == MAGIC_AIM_TYPE.NONE)
             {// 方向指定がない場合は詠唱を確定する
                 StartCooldown(false);
@@ -178,8 +193,8 @@ public class RuneTraceController
             }
             else
             {// 方向指定がある場合は詠唱を開始する
-                m_state = RUNE_TRACE_STATE.CHARGING;
-                Debug.Log("Rune : CHARGING");
+                m_state = RUNE_TRACE_STATE.WAITING_CAST_RELEASE;
+                Debug.Log("Rune : Release before aiming");
             }
         }
         else
@@ -189,6 +204,19 @@ public class RuneTraceController
     }
 
     // ルーンの詠唱を確定する
+    public bool TryBeginCast()
+    {
+        if (m_state != RUNE_TRACE_STATE.WAITING_CAST_START) return false;
+        m_state = RUNE_TRACE_STATE.CHARGING;
+        return true;
+    }
+
+    public void CancelCastGesture()
+    {
+        if (m_state == RUNE_TRACE_STATE.CHARGING)
+            m_state = RUNE_TRACE_STATE.WAITING_CAST_START;
+    }
+
     public void ConfirmCast(MAGIC_CAST_DIRECTION direction)
     {
         if (m_state != RUNE_TRACE_STATE.CHARGING)
@@ -244,8 +272,24 @@ public class RuneTraceController
         m_pointerReleased = true;
     }
 
+    private void UpdateDeviation()
+    {
+        if (m_view is IRuneTraceFeedbackView feedback)
+            feedback.SetTraceDeviation(m_evaluator?.NormalizedDeviation ?? 0f);
+    }
+
+    private void NotifyFailure()
+    {
+        if (m_failureNotified) return;
+        m_failureNotified = true;
+        var result = new RuneTraceResult(0f, 0f, m_session.StrokeCount, false);
+        m_view.PlayFailure(result);
+        TraceFailed?.Invoke(result);
+    }
+
     private void ResetAttempt()
     {
+        m_failureNotified = false;
         m_session ??= new RuneTraceSession();
         m_session.Clear();
         m_currentStroke.Clear();

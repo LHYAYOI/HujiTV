@@ -114,6 +114,18 @@ public class BookPageAreaDetector : MonoBehaviour
 
 
     // ルーンエリアの正規化された座標を取得する
+    public bool TryGetRuneScreenRect(out Rect rect)
+    {
+        rect = default;
+        return m_mapper != null && m_mapper.TryGetScreenRect(m_runeArea, out rect);
+    }
+
+    public bool TryGetGraphicScreenRect(RectTransform graphic, out Rect rect)
+    {
+        rect = default;
+        return m_mapper != null && m_mapper.TryGetScreenRect(graphic, out rect);
+    }
+
     public bool TryGetRunePosition(Vector2 screenPosition, out Vector2 normalizedPosition)
     {
         // 初期化

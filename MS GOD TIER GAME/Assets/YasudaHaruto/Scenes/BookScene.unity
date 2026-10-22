@@ -271,6 +271,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RunePageView
   m_referenceGraphic: {fileID: 2141207596}
   m_playerGraphic: {fileID: 1867493238}
+  m_accurateColor: {r: 0.1, g: 1, b: 0.2, a: 1}
+  m_deviatedColor: {r: 1, g: 0.08, b: 0.08, a: 1}
+  m_deviationColorPower: 1
+  m_failureDuration: 0.7
+  m_failureCrossScale: 1.15
+  m_failureShade: {r: 0, g: 0, b: 0, a: 0.35}
+  m_failureCrossColor: {r: 1, g: 0.05, b: 0.05, a: 1}
+  m_failureCrossSprite: {fileID: 0}
+  m_completionDuration: 0.65
+  m_completionEndScale: 1.4
 --- !u!114 &116282269
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,6 +298,7 @@ MonoBehaviour:
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_lineWidth: 20
+  m_edgeSoftness: 1
 --- !u!222 &116282270
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1609,7 +1620,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1008898202
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1625,7 +1636,7 @@ RectTransform:
   m_Father: {fileID: 1457169297}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1668,6 +1679,7 @@ MonoBehaviour:
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_lineWidth: 20
+  m_edgeSoftness: 1
 --- !u!1 &1043542059
 GameObject:
   m_ObjectHideFlags: 0
@@ -2215,6 +2227,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RunePageView
   m_referenceGraphic: {fileID: 1008898205}
   m_playerGraphic: {fileID: 2137297162}
+  m_accurateColor: {r: 0.1, g: 1, b: 0.2, a: 1}
+  m_deviatedColor: {r: 1, g: 0.08, b: 0.08, a: 1}
+  m_deviationColorPower: 1
+  m_failureDuration: 0.7
+  m_failureCrossScale: 1.15
+  m_failureShade: {r: 0, g: 0, b: 0, a: 0.35}
+  m_failureCrossColor: {r: 1, g: 0.05, b: 0.05, a: 1}
+  m_failureCrossSprite: {fileID: 0}
+  m_completionDuration: 0.65
+  m_completionEndScale: 1.4
 --- !u!224 &1457169297
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2233,8 +2255,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 200}
+  m_AnchoredPosition: {x: 0, y: -20}
+  m_SizeDelta: {x: 250, y: 250}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1457169298
 MonoBehaviour:
@@ -2253,6 +2275,7 @@ MonoBehaviour:
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_lineWidth: 20
+  m_edgeSoftness: 1
 --- !u!222 &1457169299
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2269,6 +2292,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 745800942036388505, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1430136643281866481, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
       propertyPath: m_Name
       value: BookPageReplacementUI
@@ -2355,7 +2382,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8616479938544289879, guid: 9517f07857a7a9a4981553fc38f33cae, type: 3}
       propertyPath: m_controller
-      value:
+      value: 
       objectReference: {fileID: 1832026887}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2565,6 +2592,8 @@ MonoBehaviour:
   m_lastFixedPage: {fileID: 11400000, guid: 7a1eea5c254fdfb4da586e878b790100, type: 2}
   m_initialPages:
   - {fileID: 11400000, guid: a20ef9d774043e844a1606179b63f096, type: 2}
+  - {fileID: 11400000, guid: 45ba07eb8d1192145bc513df592c55bf, type: 2}
+  - {fileID: 11400000, guid: db87baf7c5fe808489ccceb30c994698, type: 2}
   m_inventorySettings: {fileID: 11400000, guid: 3734ec477f6e93a428f87450c7a2f0f8, type: 2}
 --- !u!1 &1867493236
 GameObject:
@@ -2621,6 +2650,7 @@ MonoBehaviour:
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_lineWidth: 15
+  m_edgeSoftness: 1
 --- !u!114 &1867493239
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3025,10 +3055,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RuneLineGraphic
   m_Material: {fileID: 0}
-  m_Color: {r: 0.9137255, g: 0.89744794, b: 0.6431373, a: 1}
+  m_Color: {r: 0.2754717, g: 0.20322533, b: 0.2508544, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_lineWidth: 15
+  m_edgeSoftness: 1
 --- !u!114 &2137297163
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3125,6 +3156,7 @@ MonoBehaviour:
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_lineWidth: 20
+  m_edgeSoftness: 1
 --- !u!114 &2141207597
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3888,7 +3920,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81094a86de454abeb100ecc8447431fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::YasudaHaruto.BookValidation.YasudaBookViewController
-  m_bookData: {fileID: 11400000, guid: 79c8a48d506077c4687389e2a2028b21, type: 2}
+  m_bookData: {fileID: 11400000, guid: 7425eee5918961e4fae7064b2d6a77f5, type: 2}
   m_leftPageView: {fileID: 7635606618658084902}
   m_rightPageView: {fileID: 4345863370804085185}
   m_captureCamera: {fileID: 7369026162671368223}
@@ -5260,6 +5292,12 @@ MonoBehaviour:
   m_grabCorner: 0
   m_closeAtEnds: 1
   m_grabZone: 1
+  m_castOrigin: {x: 0.5, y: 0.25}
+  m_castRadius: 0.08
+  m_castShade: 0.55
+  m_castPulseSpeed: 1
+  m_castPulseAmount: 0.08
+  m_castArrowWidth: 0.2
 --- !u!1 &8333888641789855328
 GameObject:
   m_ObjectHideFlags: 0
