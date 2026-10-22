@@ -34,6 +34,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: 9da54b4b58096694e9de6fd26440dd12, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _BlendSourceMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BumpMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -124,6 +128,8 @@ Material:
     - _AmbientStrength: 2
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
+    - _BlendSourceMetallic: 0
+    - _BlendSourceSmoothness: 0.5
     - _BumpScale: 1
     - _CharacterId: 3
     - _ClearCoatMask: 0
@@ -169,6 +175,8 @@ Material:
     - _IsHair: 0
     - _LightColorInfluence: 1
     - _LightIntensityInfluence: 1
+    - _MaterialBlend: 1
+    - _MaterialBlendEnabled: 0
     - _Metallic: 0
     - _MulAlpha: 1
     - _NormalEnabled: 0
@@ -215,6 +223,8 @@ Material:
     - _ZWrite: 0
     m_Colors:
     - _BaseColor: {r: 0.36320752, g: 1, b: 0.47543338, a: 1}
+    - _BlendSourceColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BlendSourceEmission: {r: 0, g: 0, b: 0, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DeepShadowColor: {r: 0.34999993, g: 0.3199999, b: 0.47999996, a: 1}
     - _DeformAnchor: {r: 0, g: 0, b: 0, a: 1}

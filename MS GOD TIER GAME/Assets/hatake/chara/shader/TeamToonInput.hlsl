@@ -5,6 +5,9 @@
 
 // Keep this layout identical in every pass and every variant (SRP Batcher).
 CBUFFER_START(UnityPerMaterial)
+float4 _BlendSourceMap_ST;
+half4 _BlendSourceColor, _BlendSourceEmission;
+half _MaterialBlendEnabled, _MaterialBlend, _BlendSourceMetallic, _BlendSourceSmoothness;
 float4 _BaseMap_ST;
 half4 _BaseColor, _ShadowColor, _DeepShadowColor, _SpecularColor, _RimColor;
 half4 _EmissionColor, _OutlineColor;
@@ -33,6 +36,7 @@ half _SrcBlend, _DstBlend, _ZWrite;
 CBUFFER_END
 
 TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
+TEXTURE2D(_BlendSourceMap); SAMPLER(sampler_BlendSourceMap);
 TEXTURE2D(_NormalMap); SAMPLER(sampler_NormalMap);
 TEXTURE2D(_ControlMap); SAMPLER(sampler_ControlMap);
 TEXTURE2D(_SurfaceMap); SAMPLER(sampler_SurfaceMap);
