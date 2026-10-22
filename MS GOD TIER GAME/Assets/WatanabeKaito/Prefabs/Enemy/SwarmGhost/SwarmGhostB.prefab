@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 287605959859274362}
   - component: {fileID: 382643931330808387}
   m_Layer: 0
-  m_Name: SwarmGhostC
+  m_Name: SwarmGhostB
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -73,11 +73,13 @@ MonoBehaviour:
   - move_under
   - move_right
   - move_left
-  m_targetCamera: {fileID: 0}
+  m_target: {fileID: 0}
   m_minDelay: 0
   m_maxDelay: 1
-  m_moveSpeed: 5
-  m_stopDistance: 0.5
+  m_moveSpeed: 3
+  m_stopDistance: 0
+  m_shrinkDuration: 2
+  m_deathParticle: {fileID: 4058022614410997813, guid: a7fffa74bda47014399e144dd84c9784, type: 3}
 --- !u!1001 &6077947146731339621
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -145,7 +147,7 @@ PrefabInstance:
     - target: {fileID: -2922892357548988066, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 05510b609de88804ba50b9dc375d8738, type: 2}
+      objectReference: {fileID: 2100000, guid: 01b9a7381070f6744b387acdf4892b77, type: 2}
     - target: {fileID: 919132149155446097, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: m_Name
       value: ghost_mini_mdl
@@ -153,11 +155,11 @@ PrefabInstance:
     - target: {fileID: 2788675242186676951, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 05510b609de88804ba50b9dc375d8738, type: 2}
+      objectReference: {fileID: 2100000, guid: 01b9a7381070f6744b387acdf4892b77, type: 2}
     - target: {fileID: 6851099186128873815, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 05510b609de88804ba50b9dc375d8738, type: 2}
+      objectReference: {fileID: 2100000, guid: 01b9a7381070f6744b387acdf4892b77, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

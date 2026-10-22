@@ -73,11 +73,13 @@ MonoBehaviour:
   - move_under
   - move_right
   - move_left
-  m_targetCamera: {fileID: 0}
+  m_target: {fileID: 0}
   m_minDelay: 0
   m_maxDelay: 1
-  m_moveSpeed: 5
-  m_stopDistance: 0.5
+  m_moveSpeed: 3
+  m_stopDistance: 0
+  m_shrinkDuration: 2
+  m_deathParticle: {fileID: 4058022614410997813, guid: 35cd01bb2e56f4040b5647a3b6df40eb, type: 3}
 --- !u!1001 &6077947146731339621
 PrefabInstance:
   m_ObjectHideFlags: 0

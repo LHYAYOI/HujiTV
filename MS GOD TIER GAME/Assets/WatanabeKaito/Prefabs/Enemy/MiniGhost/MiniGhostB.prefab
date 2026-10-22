@@ -171,6 +171,8 @@ MonoBehaviour:
   m_timeLimit: 15
   m_kickFirePoint: {fileID: 4230615318380201651}
   m_throwFirePoint: {fileID: 1847888665569345119}
+  m_cameraHeightOffset: 1.5
+  m_turnSpeed: 60
 --- !u!114 &-1878883125415085335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -251,7 +253,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostDyingState
   m_shrinkDuration: 1
-  m_deathParticle: {fileID: 4058022614410997813, guid: 40c0fe6424d75b946927c08badf4e2a8, type: 3}
+  m_deathParticle: {fileID: 4058022614410997813, guid: a7fffa74bda47014399e144dd84c9784, type: 3}
 --- !u!136 &9170967074312127478
 CapsuleCollider:
   m_ObjectHideFlags: 0

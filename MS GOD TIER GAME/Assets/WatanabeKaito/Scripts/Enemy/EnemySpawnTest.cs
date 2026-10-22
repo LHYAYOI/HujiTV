@@ -24,7 +24,7 @@ public class EnemySpawnTest : MonoBehaviour
     {
        if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
-            m_activeEnemyManager.RemoveAllActiveEnemies();
+            //m_activeEnemyManager.RemoveAllActiveEnemies();
             //m_activeEnemyManager.SetAllMiniGhostsToBattleStart();
         }
 
