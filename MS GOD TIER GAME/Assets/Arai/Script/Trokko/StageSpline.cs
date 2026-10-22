@@ -11,6 +11,6 @@ public class StageSpline : MonoBehaviour
 
     private void Start()
     {
-        m_cart.SetSpline(m_startSplineController.Spline, m_startOffset, m_startSplineController.LoopFlag);
+        m_cart.SetSpline(m_startSplineController.Spline, m_startOffset, m_startSplineController.LoopFlag,true);
     }
 }
