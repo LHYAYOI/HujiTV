@@ -173,6 +173,24 @@ MonoBehaviour:
   externalVelocity: {x: 0, y: 0, z: 0}
   teleportDistance: 5
   boundsPadding: 0.5
+--- !u!114 &144929677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 144929671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 234324c925ad3e74eb03c1093ce95383, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeamToon.TeamToonMaterialBlend
+  materialA: {fileID: 2100000, guid: 01b9a7381070f6744b387acdf4892b77, type: 2}
+  materialB: {fileID: 2100000, guid: c6e9aa60ffc1ce84c9bc58bb8cb8b39d, type: 2}
+  blend: 0
+  renderers:
+  - {fileID: 220473855}
+  - {fileID: 2113394613}
 --- !u!1 &159532808
 GameObject:
   m_ObjectHideFlags: 0
@@ -467,6 +485,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 266555643}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 266555644}
   m_SourcePrefab: {fileID: 100100000, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
 --- !u!1 &266555639 stripped
 GameObject:
@@ -532,6 +553,24 @@ MonoBehaviour:
   externalVelocity: {x: 0, y: 0, z: 0}
   teleportDistance: 5
   boundsPadding: 0.5
+--- !u!114 &266555644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266555639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 234324c925ad3e74eb03c1093ce95383, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeamToon.TeamToonMaterialBlend
+  materialA: {fileID: 2100000, guid: 637b0e258e6a29e4cae96a9d9b59c376, type: 2}
+  materialB: {fileID: 2100000, guid: 678479888edc0b94891e3e42e2a2a850, type: 2}
+  blend: 0
+  renderers:
+  - {fileID: 266555642}
+  - {fileID: 266555640}
 --- !u!1001 &780345971
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -627,7 +666,7 @@ PrefabInstance:
     - target: {fileID: 6851099186128873815, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: a76f3627213218747ba40d05806de7ad, type: 2}
+      objectReference: {fileID: 2100000, guid: 30d510a22488d534fa696fdf2d950efb, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -635,6 +674,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 144929674}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 144929677}
   m_SourcePrefab: {fileID: 100100000, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
 --- !u!1001 &785113827
 PrefabInstance:
@@ -731,7 +773,7 @@ PrefabInstance:
     - target: {fileID: 6851099186128873815, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: a76f3627213218747ba40d05806de7ad, type: 2}
+      objectReference: {fileID: 2100000, guid: a99c97b1917a5ae47a21dfb1a497079d, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -739,6 +781,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1450812960}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1450812963}
   m_SourcePrefab: {fileID: 100100000, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
 --- !u!137 &1386728187 stripped
 SkinnedMeshRenderer:
@@ -794,6 +839,24 @@ MonoBehaviour:
   externalVelocity: {x: 0, y: 0, z: 0}
   teleportDistance: 5
   boundsPadding: 0.5
+--- !u!114 &1450812963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1450812957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 234324c925ad3e74eb03c1093ce95383, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeamToon.TeamToonMaterialBlend
+  materialA: {fileID: 2100000, guid: 05510b609de88804ba50b9dc375d8738, type: 2}
+  materialB: {fileID: 2100000, guid: fe728b56d25ba8046b9725048c3d2780, type: 2}
+  blend: 0
+  renderers:
+  - {fileID: 1386728187}
+  - {fileID: 10726400}
 --- !u!137 &1763724627 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 6851099186128873815, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}

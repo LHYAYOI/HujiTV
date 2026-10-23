@@ -111,7 +111,8 @@ half4 ToonOutlineFragment(PassVaryings input) : SV_Target
     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
     clip(_OutlineEnabled - 0.5);
     ToonBase(input.uv);
-    return half4(MixFog(_OutlineColor.rgb, input.fog), 1);
+    half opacity = _MaterialBlendEnabled > 0.5 ? saturate(_MaterialBlend) * saturate(_MulAlpha) * _Visibility * _OutlineColor.a : 1;
+    return half4(MixFog(_OutlineColor.rgb, input.fog) * opacity, opacity);
 }
 float4 ToonHairMaskFragment(PassVaryings input) : SV_Target
 {
@@ -149,7 +150,7 @@ float4 ToonGhostMaskFragment(PassVaryings input) : SV_Target
     UNITY_SETUP_INSTANCE_ID(input);
     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
         //消えてるなら遮蔽しない
-        if (_MulAlpha < 0.001)
+        if (_MulAlpha < 0.001 && (_MaterialBlendEnabled < 0.5 || _MaterialBlend >= 1))
             discard;
         
     ToonBase(input.uv);
@@ -175,6 +176,7 @@ half4 ToonGhostGlowFragment(PassVaryings input) : SV_Target
     half facing = saturate(dot(-SafeNormalize(input.normalWS), v) * 2);
     half3 glow = _GhostGlowColor.rgb * pow(facing, max(_GhostGlowFalloff, 0.1)) * _Visibility;
     glow *= saturate(_MulAlpha);
+    if (_MaterialBlendEnabled > 0.5) glow *= saturate(_MaterialBlend);
     return half4(MixFogColor(glow, half3(0, 0, 0), input.fog), 0);
 }
 #endif

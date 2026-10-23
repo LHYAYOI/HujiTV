@@ -2,6 +2,13 @@ Shader "custom/hatake/ToonMaster"
 {
     Properties
     {
+        [HideInInspector] _MaterialBlendEnabled("Model blend enabled", Float) = 0
+        [HideInInspector] _MaterialBlend("Model blend", Range(0,1)) = 1
+        [HideInInspector] _BlendSourceMap("Source texture", 2D) = "white" {}
+        [HideInInspector] _BlendSourceColor("Source color", Color) = (1,1,1,1)
+        [HideInInspector] _BlendSourceEmission("Source emission", Color) = (0,0,0,1)
+        [HideInInspector] _BlendSourceMetallic("Source metallic", Float) = 0
+        [HideInInspector] _BlendSourceSmoothness("Source smoothness", Float) = 0.5
         [MainTexture] _BaseMap("ベース画像", 2D) = "white" {}
         [MainColor] _BaseColor("ベース色", Color) = (0.8,0.65,0.5,1)
         _MulAlpha("最終算出の透明度に乗算する倍率", Range(0, 1)) = 1
@@ -217,6 +224,7 @@ Shader "custom/hatake/ToonMaster"
             Name "TeamToonOutline"
             Tags { "LightMode"="TeamToonOutline" }
             Cull Front ZWrite Off ZTest LEqual
+            Blend One OneMinusSrcAlpha
             HLSLPROGRAM
             #pragma target 3.5
             #pragma vertex ToonOutlineVertex

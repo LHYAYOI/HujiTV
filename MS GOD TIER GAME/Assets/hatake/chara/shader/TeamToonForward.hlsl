@@ -25,6 +25,7 @@ struct ToonVaryings
     float2 dynamicLightmapUV : TEXCOORD5;
 #endif
     half4 fogAndVertexLight : TEXCOORD6;
+    float2 sourceUV : TEXCOORD7;
     UNITY_VERTEX_INPUT_INSTANCE_ID
     UNITY_VERTEX_OUTPUT_STEREO
 };
@@ -40,6 +41,7 @@ ToonVaryings ToonVertex(ToonAttributes input)
     output.positionCS = TransformWorldToHClip(positionWS);
     output.positionWS = positionWS;
     output.uv = TRANSFORM_TEX(input.uv, _BaseMap);
+    output.sourceUV = TRANSFORM_TEX(input.uv, _BlendSourceMap);
     output.normalWS = n.normalWS;
     output.tangentWS = half4(n.tangentWS, input.tangentOS.w * GetOddNegativeScale());
     OUTPUT_LIGHTMAP_UV(input.lightmapUV, unity_LightmapST, output.lightmapUV);
@@ -143,6 +145,41 @@ half3 ToonAdditional(Light light, half3 normalWS, half3 albedo)
          * light.distanceAttenuation * ToonShadow(light.shadowAttenuation) * _AdditionalStrength;
 }
 
+// Evaluate the source with URP's metallic PBR lighting, then blend premultiplied
+// results. RGB and destination coverage must use the same interpolation weight.
+half4 ToonBlendSource(ToonVaryings input, half3 n, half3 v)
+{
+    half4 base = SAMPLE_TEXTURE2D(_BlendSourceMap, sampler_BlendSourceMap, input.sourceUV) * _BlendSourceColor;
+    InputData data = (InputData)0;
+    data.positionWS = input.positionWS;
+    data.normalWS = n;
+    data.viewDirectionWS = v;
+    data.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+#if defined(_MAIN_LIGHT_SHADOWS_SCREEN)
+    data.shadowCoord = ComputeScreenPos(TransformWorldToHClip(input.positionWS));
+#else
+    data.shadowCoord = TransformWorldToShadowCoord(input.positionWS);
+#endif
+    data.shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
+    data.vertexLighting = input.fogAndVertexLight.yzw;
+#ifdef DYNAMICLIGHTMAP_ON
+    data.bakedGI = SAMPLE_GI(input.lightmapUV, input.dynamicLightmapUV, input.vertexSH, n);
+#else
+    data.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, n);
+#endif
+    SurfaceData surface = (SurfaceData)0;
+    surface.albedo = base.rgb;
+    surface.alpha = 1;
+    surface.metallic = _BlendSourceMetallic;
+    surface.smoothness = _BlendSourceSmoothness;
+    surface.normalTS = half3(0, 0, 1);
+    surface.occlusion = 1;
+    surface.emission = _BlendSourceEmission.rgb;
+    half3 color = UniversalFragmentPBR(data, surface).rgb;
+    half alpha = saturate(base.a);
+    return half4(MixFog(color, input.fogAndVertexLight.x) * alpha, alpha);
+}
+
 half4 ToonFragment(ToonVaryings input, FRONT_FACE_TYPE face : FRONT_FACE_SEMANTIC) : SV_Target
 {
     UNITY_SETUP_INSTANCE_ID(input);
@@ -242,7 +279,10 @@ half4 ToonFragment(ToonVaryings input, FRONT_FACE_TYPE face : FRONT_FACE_SEMANTI
     half3 glow = _GhostRimColor.rgb * pow(fresnel, max(_GhostRimPower, 0.1)) * _Visibility;
     glow = MixFogColor(glow, half3(0, 0, 0), input.fogAndVertexLight.x);
     glow *= alphaMultiplier;
-    return half4(max(color, 0) * alpha + glow, alpha * (1 - _AdditiveBlend));
+    half4 result = half4(max(color, 0) * alpha + glow, alpha * (1 - _AdditiveBlend));
+    if (_MaterialBlendEnabled > 0.5)
+        result = lerp(ToonBlendSource(input, SafeNormalize(input.normalWS), v), result, saturate(_MaterialBlend));
+    return result;
 #else
     return half4(max(color, 0), 1);
 #endif
