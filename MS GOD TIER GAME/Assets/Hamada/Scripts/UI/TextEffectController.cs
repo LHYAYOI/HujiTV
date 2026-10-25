@@ -1,70 +1,132 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+public enum TEXT_EFFECT_STATE
+{
+    Standby,
+    Playing,
+    Completed
+}
 
 [Serializable]
 public class TextEffectSetting
 {
-    [Tooltip("ƒGƒtƒFƒNƒg‚ğ“K—p‚µ‚½‚¢•¶š—ñ")]
+    public bool m_applyToAllTextFlag = false;
+
+    [Tooltip("ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’é©ç”¨ã—ãŸã„æ–‡å­—åˆ—")]
     public string m_targetText;
 
-    [Tooltip("“K—p‚·‚éƒGƒtƒFƒNƒg")]
+    [Tooltip("é©ç”¨ã™ã‚‹ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ")]
     public TextEffect m_effect;
 }
 
-[RequireComponent(typeof(TMP_Text))]
 public class TextEffectController : MonoBehaviour
 {
-    [SerializeField]
-    List<TextEffectSetting> m_effectSettings = new();
+    [SerializeField] TMP_Text m_text;
+    [SerializeField]ã€€List<TextEffectSetting> m_effectSettings = new();
 
-    TMP_Text m_text;
+    Dictionary<TextEffectSetting, bool> m_completedEffects = new();
 
-    void Awake()
+    float m_elapsedTime;
+
+    TEXT_EFFECT_STATE m_state;
+
+    private void Start()
     {
-        m_text = GetComponent<TMP_Text>();
+        m_state = TEXT_EFFECT_STATE.Standby;
+    }
+
+    public void Play() 
+    {
+        m_state = TEXT_EFFECT_STATE.Playing;
+        m_elapsedTime = 0;
+
+        m_completedEffects.Clear();
+
+        foreach (TextEffectSetting setting in m_effectSettings) 
+        {
+            if (setting.m_effect == null) 
+            {
+                continue;
+            }
+
+            m_completedEffects.Add(setting, false);
+        }
+    }
+
+    public TEXT_EFFECT_STATE GetEffectState()
+    {
+        return m_state;
     }
 
     void LateUpdate()
     {
+        if (m_state != TEXT_EFFECT_STATE.Playing) 
+        {
+            return;
+        }
+
         if (m_effectSettings.Count == 0) 
         {
             return;
         }
 
-        // –ˆ‰ñŒ³‚ÌƒƒbƒVƒ…‚ğÄ¶¬‚·‚é
+        m_elapsedTime += Time.deltaTime;
+
+        // æ¯å›å…ƒã®ãƒ¡ãƒƒã‚·ãƒ¥ã‚’å†ç”Ÿæˆã™ã‚‹
         m_text.ForceMeshUpdate();
 
         TMP_TextInfo textInfo = m_text.textInfo;
 
+        ModifyMesh(textInfo);
+
+        // é ‚ç‚¹ã¨è‰²ã®å¤‰æ›´ã‚’åæ˜ 
+        m_text.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices | TMP_VertexDataUpdateFlags.Colors32);
+
+        //çµ‚äº†å‡¦ç†ã¨ã‹
+        CheckEffectCompletion(textInfo);
+    }
+
+    private void ModifyMesh(TMP_TextInfo textInfo) 
+    {
         foreach (TextEffectSetting setting in m_effectSettings)
         {
+            //ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãŒè¨­å®šã•ã‚Œã¦ã‚‹ã‹
             if (setting.m_effect == null)
             {
                 continue;
             }
 
-            if (string.IsNullOrEmpty(setting.m_targetText)) 
+            if (setting.m_applyToAllTextFlag)
             {
-                continue;
+                for (int i = 0; i < textInfo.characterCount; i++) 
+                {
+                    setting.m_effect.Apply(textInfo, i, i, m_elapsedTime);
+                }
             }
+            else 
+            {
+                //æ–‡å­—ã®æŒ‡å®šãŒã‚ã‚‹ã‹
+                if (string.IsNullOrEmpty(setting.m_targetText))
+                {
+                    continue;
+                }
 
-            //w’è‚µ‚½•¶š‚ÉƒGƒtƒFƒNƒg‚ğÀs
-            ApplyToMatchingText(textInfo, setting);
+                //æŒ‡å®šã—ãŸæ–‡å­—ã«ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’å®Ÿè¡Œ
+                ApplyToMatchingText(textInfo, setting);
+            }
         }
-
-        // ’¸“_‚Ì•ÏX‚ğ”½‰f
-        m_text.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices | TMP_VertexDataUpdateFlags.Colors32);
     }
 
     private void ApplyToMatchingText(TMP_TextInfo textInfo, TextEffectSetting setting)
     {
         string target = setting.m_targetText;
+         
         int count = textInfo.characterCount;
 
-        // ‘ÎÛ•¶š—ñ‚ğŒŸõ‚·‚é
+        // å¯¾è±¡æ–‡å­—åˆ—ã‚’æ¤œç´¢ã™ã‚‹
         for (int i = 0; i <= count - target.Length; i++)
         {
             bool isMatch = true;
@@ -83,14 +145,86 @@ public class TextEffectController : MonoBehaviour
                 continue;
             }
 
-            // ˆê’v‚µ‚½”ÍˆÍ‚Ì‘S‚Ä‚Ì•¶š‚É“K—p
+            // ä¸€è‡´ã—ãŸç¯„å›²ã®å…¨ã¦ã®æ–‡å­—ã«é©ç”¨
             for (int j = 0; j < target.Length; j++)
             {
-                setting.m_effect.Apply(textInfo, i + j);
+                setting.m_effect.Apply(textInfo, i + j, j, m_elapsedTime);
             }
 
-            // ˆê’v”ÍˆÍ‚ÌÅŒã‚Ü‚Åi‚ß‚é
+            // ä¸€è‡´ç¯„å›²ã®æœ€å¾Œã¾ã§é€²ã‚ã‚‹
             i += target.Length - 1;
+        }
+    }
+
+    private int GetTargetCharacterCount(TMP_TextInfo textInfo, TextEffectSetting setting)
+    {
+        if (setting.m_applyToAllTextFlag)
+            return textInfo.characterCount;
+
+        if (string.IsNullOrEmpty(setting.m_targetText))
+            return 0;
+
+        string target = setting.m_targetText;
+        int count = textInfo.characterCount;
+        int matchCount = 0;
+
+        for (int i = 0; i <= count - target.Length; i++)
+        {
+            bool isMatch = true;
+
+            for (int j = 0; j < target.Length; j++)
+            {
+                if (textInfo.characterInfo[i + j].character != target[j])
+                {
+                    isMatch = false;
+                    break;
+                }
+            }
+
+            if (!isMatch)
+                continue;
+
+            matchCount++;
+            i += target.Length - 1;
+        }
+
+        // ç¾åœ¨ã®ApplyToMatchingTextã§ã¯ã€
+        // ä¸€è‡´ã—ãŸç¯„å›²ã”ã¨ã«localIndexãŒ0ã‹ã‚‰å§‹ã¾ã‚‹
+        return matchCount > 0 ? target.Length : 0;
+    }
+
+    private void CheckEffectCompletion(TMP_TextInfo textInfo)
+    {
+        bool allCompleted = true;
+
+        foreach (TextEffectSetting setting in m_effectSettings)
+        {
+            if (setting.m_effect == null)
+                continue;
+
+            if (!m_completedEffects.TryGetValue(setting, out bool completed))
+                continue;
+
+            if (completed)
+                continue;
+
+            int characterCount = GetTargetCharacterCount(textInfo, setting);
+
+            float duration = setting.m_effect.GetDuration(characterCount);
+
+            if (m_elapsedTime >= duration)
+            {
+                m_completedEffects[setting] = true;
+            }
+            else
+            {
+                allCompleted = false;
+            }
+        }
+
+        if (allCompleted)
+        {
+            m_state = TEXT_EFFECT_STATE.Completed;
         }
     }
 }

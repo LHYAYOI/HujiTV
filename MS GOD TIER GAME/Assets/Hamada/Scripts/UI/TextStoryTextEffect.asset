@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fee75fe41590bd1489da0a08ae3533d7, type: 3}
   m_Name: TextStoryTextEffect
   m_EditorClassIdentifier: Assembly-CSharp::TextStoryTextEffect
-  m_speed: 24.37
-  m_radius: 0.15
+  m_duration: 0.5
+  m_delayPerCharacter: 0.2
+  m_startScale: 2
+  m_targetScale: 1
