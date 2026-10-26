@@ -1069,6 +1069,10 @@ PrefabInstance:
       propertyPath: m_target
       value: 
       objectReference: {fileID: 1459452787}
+    - target: {fileID: 2375542825176977384, guid: 54d6bca8b4c5a414a96df808e9d0a10e, type: 3}
+      propertyPath: m_spawnInterval
+      value: 0.05
+      objectReference: {fileID: 0}
     - target: {fileID: 4035501538683297309, guid: 54d6bca8b4c5a414a96df808e9d0a10e, type: 3}
       propertyPath: m_Name
       value: SwarmGhostManager

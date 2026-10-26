@@ -77,7 +77,10 @@ MonoBehaviour:
   m_minDelay: 0
   m_maxDelay: 1
   m_moveSpeed: 3
-  m_stopDistance: 0
+  m_passDistance: 0
+  m_returnDuration: 1.5
+  m_returnArcHeight: 3
+  m_returnAnimationSpeed: 0.15
   m_shrinkDuration: 2
   m_deathParticle: {fileID: 4058022614410997813, guid: 89b865f6e4ec0064984bc5885d17bc32, type: 3}
 --- !u!1001 &6077947146731339621

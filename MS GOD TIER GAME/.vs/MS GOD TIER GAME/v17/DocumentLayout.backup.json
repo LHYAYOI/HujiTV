@@ -170,7 +170,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Document",
@@ -235,21 +235,7 @@
               "ViewState": "AgIAAH0AAAAAAAAAAAAQwIgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-10-22T07:01:06.742Z",
-              "IsPinned": true,
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "SwarmGhost.cs",
-              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmGhost.cs",
-              "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmGhost.cs",
-              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmGhost.cs",
-              "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmGhost.cs",
-              "ViewState": "AgIAAIEAAAAAAAAAAAAnwJUAAAAqAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-22T08:58:25.155Z",
-              "EditorCaption": ""
+              "IsPinned": true
             },
             {
               "$type": "Bookmark",
@@ -261,6 +247,19 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "SwarmGhost.cs",
+              "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmGhost.cs",
+              "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmGhost.cs",
+              "ToolTip": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmGhost.cs",
+              "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmGhost.cs",
+              "ViewState": "AgIAAPQAAAAAAAAAAAAmwOMAAABCAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-22T08:58:25.155Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 2,
               "Title": "MiniGhostDyingState.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostDyingState.cs",
@@ -269,8 +268,7 @@
               "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostDyingState.cs",
               "ViewState": "AgIAAB4AAAAAAAAAAAAIwCYAAAA0AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-22T08:54:53.256Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-22T08:54:53.256Z"
             },
             {
               "$type": "Document",
@@ -282,8 +280,7 @@
               "RelativeToolTip": "Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemySpawnTest.cs",
               "ViewState": "AgIAAA0AAAAAAAAAAAAAwBoAAAAOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-16T08:01:10.343Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-16T08:01:10.343Z"
             },
             {
               "$type": "Document",
