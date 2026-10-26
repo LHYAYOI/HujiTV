@@ -1,3 +1,5 @@
+using System.Collections;
+using TeamToon;
 using UnityEngine;
 using UnityEngine.Splines;
 
@@ -27,6 +29,12 @@ public class MiniGhostEnemy : SplineMoveEnemy
 
     [Header("毎フレームプレイヤーに向く角度")]
     [SerializeField] private float m_turnSpeed = 60f;
+
+    [Header("モデル単位のマテリアルブレンド")]
+    [SerializeField] private TeamToonMaterialBlend m_toonMaterialBlend;
+
+    [Header("マテリアルブレンドの時間")]
+    [SerializeField] private float m_toonMaterialBlendDuration = 1.0f;
 
     private MiniGhostIdleState m_idleState;     // 待機ステート
     private MiniGhostSpawnState m_spawnState;   // 出現ステート
@@ -59,14 +67,14 @@ public class MiniGhostEnemy : SplineMoveEnemy
 
     protected override void Update()
     {
-        if (m_timeLimitStarted && !m_isDying)
-        {
-            m_timeLimit -= Time.deltaTime;
-            if (m_timeLimit <= 0f)
-            {
-                BeginDying();
-            }
-        }
+        //if (m_timeLimitStarted && !m_isDying)
+        //{
+        //    m_timeLimit -= Time.deltaTime;
+        //    if (m_timeLimit <= 0f)
+        //    {
+        //        BeginDying();
+        //    }
+        //}
 
         // 現在の状態だけを更新する。
         if (m_currentState != null)
@@ -196,6 +204,28 @@ public class MiniGhostEnemy : SplineMoveEnemy
         ChangeState(MINI_GHOST_STATE_TYPE.DYING);
     }
 
+    // マテリアルブレンドのコルーチン
+    public IEnumerator SwitchMaterialBlendCoroutine(float startValue, float endValue)
+    {
+        float duration = GetToonMaterialBlendDuration();
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+
+            float t = Mathf.Clamp01(elapsedTime / duration);
+            float easedT = Easing.EaseInOutSine(t);
+
+            float blendValue = Mathf.Lerp(startValue, endValue, easedT);
+            SetToonMaterialBlendValue(blendValue);
+
+            yield return null;
+        }
+
+        SetToonMaterialBlendValue(endValue);
+    }
+
     // 現在のステートタイプを取得する
     public MINI_GHOST_STATE_TYPE GetCurrentStateType()
     {
@@ -250,6 +280,18 @@ public class MiniGhostEnemy : SplineMoveEnemy
         return m_moveSpeed;
     }
 
+    // マテリアル単位のブレンドを取得する
+    public TeamToonMaterialBlend GetToonMaterialBlend()
+    {
+        return m_toonMaterialBlend;
+    }
+
+    // マテリアルブレンドの時間を取得する
+    public float GetToonMaterialBlendDuration()
+    {
+        return m_toonMaterialBlendDuration;
+    }
+
 
     // 移動速度を設定する
     public void SetMoveSpeed(float speed)
@@ -267,6 +309,12 @@ public class MiniGhostEnemy : SplineMoveEnemy
     public void SetDistanceTraveled(float distance)
     {
         m_distanceTraveled = distance;
+    }
+
+    // マテリアル単位のブレンドの値を設定する
+    public void SetToonMaterialBlendValue(float value)
+    {
+        m_toonMaterialBlend.blend = value;
     }
 
 
