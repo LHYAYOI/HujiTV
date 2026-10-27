@@ -11,7 +11,7 @@ public class TargetHitUI : MonoBehaviour
     Color m_defaultColor;
     Vector3 m_defaultSize;
 
-    private void Start()
+    public void Init()
     {
         m_defaultColor = m_image.color;
         m_defaultSize = m_image.transform.localScale;
@@ -29,18 +29,8 @@ public class TargetHitUI : MonoBehaviour
             return;
         }
 
-        m_image.transform.position = m_target.transform.position;
+        transform.position = m_target.transform.position;
         transform.LookAt(Camera.main.transform);
-    }
-
-    public void SetTarget(GameObject gameObject)
-    {
-        m_target = gameObject;
-    }
-
-    public void SetSprite(Sprite sprite) 
-    {
-        m_image.sprite = sprite;
     }
 
     public void ShowHitUI(GameObject target) 
@@ -60,17 +50,22 @@ public class TargetHitUI : MonoBehaviour
         Color startColor = m_defaultColor;
         Vector3 startSize = m_defaultSize;
 
-        Color endColor = new Color(m_defaultColor.r, m_defaultColor.g, m_defaultColor.b, 0);
+        Color endColor = new Color(1, 1, 1, 0);
         Vector3 endSize = m_defaultSize * 1.5f;
 
         while (elapsedTime < duration)
         {
-            float rate = Easing.EaseOutCubic(elapsedTime / duration);
+            float rate = elapsedTime / duration;
+
+            float colorRate = Easing.EaseInOutQuart(rate);
+            float sizeRate = Easing.EaseOutCubic(rate);
+
+            rate = Mathf.Clamp01(rate);
 
             elapsedTime += Time.deltaTime;
 
-            m_image.color = Color.Lerp(startColor, endColor, rate);
-            m_image.transform.localScale = Vector3.Lerp(startSize, endSize, rate);
+            m_image.color = Color.Lerp(startColor, endColor, colorRate);
+            m_image.transform.localScale = Vector3.Lerp(startSize, endSize, sizeRate);
 
             yield return null;
         }

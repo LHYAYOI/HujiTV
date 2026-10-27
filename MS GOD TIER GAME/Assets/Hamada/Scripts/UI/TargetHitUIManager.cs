@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class TargetHitUIManager : MonoBehaviour
 {
@@ -10,9 +11,14 @@ public class TargetHitUIManager : MonoBehaviour
 
     List<TargetHitUI> m_uiList = new List<TargetHitUI>();
 
-    void Start()
+    private void Awake()
     {
         CreateUIs();
+    }
+
+    private void Update()
+    {
+        
     }
 
     private void CreateUIs() 
@@ -20,6 +26,7 @@ public class TargetHitUIManager : MonoBehaviour
         for (int i = 0; i < m_poolNum; i++) 
         {
             TargetHitUI ui = Instantiate(m_uiPrefab, transform);
+            ui.Init();
             ui.gameObject.SetActive(false);
             m_uiList.Add(ui);
         }
@@ -39,7 +46,7 @@ public class TargetHitUIManager : MonoBehaviour
                 continue;
             }
 
-            if (ui.gameObject.activeSelf) 
+            if (ui.gameObject.activeSelf)
             {
                 continue;
             }
