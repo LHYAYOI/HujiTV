@@ -6,8 +6,8 @@ namespace LightShaftLab
     // サンプル数0は「取得不可／未実行」を意味し、0ms という結果ではない。
     public static class ShaftProfiling
     {
-        public enum PASS { ATMOSPHERE, COMPOSITE, SKY_MASK, RADIAL, RADIAL_FILTER, TEMPORAL, TILES, FOG_REACTIVE }
-        static readonly string[] g_names = { "Shaft.Atmosphere (fog + lights)", "Shaft.Composite", "Shaft.SkyMask", "Shaft.Radial", "Shaft.RadialFilter", "Shaft.Temporal", "Shaft.Tiles", "Shaft.FogReactive" };
+        public enum PASS { ATMOSPHERE, COMPOSITE, SKY_MASK, RADIAL, RADIAL_FILTER, TEMPORAL, TILES, FOG_REACTIVE, REFINE }
+        static readonly string[] g_names = { "Shaft.Atmosphere (fog + lights)", "Shaft.Composite", "Shaft.SkyMask", "Shaft.Radial", "Shaft.RadialFilter", "Shaft.Temporal", "Shaft.Tiles", "Shaft.FogReactive", "Shaft.Refine" };
         static readonly ProfilingSampler[] g_samplers = Create();
         public static bool IsEnabled { get; private set; }
         static ProfilingSampler[] Create()
