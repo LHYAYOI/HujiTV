@@ -40,6 +40,8 @@ public class RuneTraceController
     private float m_cooldownRemaining;
     private bool m_pointerReleased;
     private bool m_failureNotified;
+    private bool m_inputAvailable = true;
+    public bool IsInputAvailable => m_inputAvailable;
 
     private const float MIN_POINT_DISTANCE = 0.005f;
     private const float START_TOLERANCE = 0.04f;
@@ -54,7 +56,7 @@ public class RuneTraceController
     public bool IsAwaitingCast => m_state == RUNE_TRACE_STATE.WAITING_CAST_RELEASE ||
         m_state == RUNE_TRACE_STATE.WAITING_CAST_START || m_state == RUNE_TRACE_STATE.CHARGING;
 
-    public bool CanBeginStroke => m_state == RUNE_TRACE_STATE.WAITING_STROKE;
+    public bool CanBeginStroke => m_inputAvailable && m_state == RUNE_TRACE_STATE.WAITING_STROKE;
     public float CooldownRemaining => m_cooldownRemaining;
     public float CooldownProgress => m_cooldownSeconds > 0f
         ? 1f - Mathf.Clamp01(m_cooldownRemaining / m_cooldownSeconds) : 1f;
@@ -62,6 +64,29 @@ public class RuneTraceController
     public event Action<RuneTraceResult> TraceSucceeded;
     public event Action<RuneTraceResult> TraceFailed;
     public event Action<MAGIC_CAST_DIRECTION> CastConfirmed;
+
+    public void SetInputAvailable(bool available)
+    {
+        if (m_inputAvailable == available) return;
+        m_inputAvailable = available;
+        if (available || m_state == RUNE_TRACE_STATE.INACTIVE) return;
+        if (m_state == RUNE_TRACE_STATE.COOLDOWN)
+        {
+            // A lost pointer must not freeze an already started cooldown.
+            m_pointerReleased = true;
+            return;
+        }
+        ResetAttempt();
+    }
+
+    public void ResumeCooldown(float remaining)
+    {
+        if (remaining <= 0f || m_runeData == null) return;
+        m_state = RUNE_TRACE_STATE.COOLDOWN;
+        m_cooldownRemaining = remaining;
+        m_pointerReleased = true;
+        if (m_view is IRuneCooldownView cooldown) cooldown.ShowCooldown(1f - CooldownProgress);
+    }
 
     public void SetCooldown(float seconds)
     {
@@ -86,7 +111,7 @@ public class RuneTraceController
 
     public void BeginStroke(Vector2 normalizedPosition)
     {
-        if (m_state != RUNE_TRACE_STATE.WAITING_STROKE) return;
+        if (!CanBeginStroke) return;
 
         IReadOnlyList<Vector2> points = m_runeData.TraceData.Strokes[m_strokeIndex].Points;
         RuneTraceRule rule = m_runeData.Rule;
@@ -110,7 +135,7 @@ public class RuneTraceController
 
     public void AddPoint(Vector2 normalizedPosition)
     {
-        if (m_state != RUNE_TRACE_STATE.DRAWING) return;
+        if (!m_inputAvailable || m_state != RUNE_TRACE_STATE.DRAWING) return;
 
         Vector2 previous = m_currentStroke[m_currentStroke.Count - 1];
         if (Vector2.Distance(previous, normalizedPosition) < MIN_POINT_DISTANCE) return;
@@ -206,7 +231,7 @@ public class RuneTraceController
     // ルーンの詠唱を確定する
     public bool TryBeginCast()
     {
-        if (m_state != RUNE_TRACE_STATE.WAITING_CAST_START) return false;
+        if (!m_inputAvailable || m_state != RUNE_TRACE_STATE.WAITING_CAST_START) return false;
         m_state = RUNE_TRACE_STATE.CHARGING;
         return true;
     }
@@ -219,7 +244,7 @@ public class RuneTraceController
 
     public void ConfirmCast(MAGIC_CAST_DIRECTION direction)
     {
-        if (m_state != RUNE_TRACE_STATE.CHARGING)
+        if (!m_inputAvailable || m_state != RUNE_TRACE_STATE.CHARGING)
         {
             return;
         }
@@ -235,6 +260,7 @@ public class RuneTraceController
         m_state = RUNE_TRACE_STATE.COOLDOWN;
         m_cooldownRemaining = m_cooldownSeconds;
         m_pointerReleased = pointerReleased;
+        if (m_view is IRuneCooldownView cooldown) cooldown.ShowCooldown(1f);
         Debug.Log($"Rune : Cooldown Started / {m_cooldownSeconds:F1}s");
     }
 
@@ -247,6 +273,7 @@ public class RuneTraceController
 
         // クールダウンを進める
         m_cooldownRemaining = Mathf.Max(0f, m_cooldownRemaining - deltaTime);
+        if (m_view is IRuneCooldownView cooldown) cooldown.ShowCooldown(1f - CooldownProgress);
 
         if (m_cooldownRemaining > 0f)
         {// クールダウン中

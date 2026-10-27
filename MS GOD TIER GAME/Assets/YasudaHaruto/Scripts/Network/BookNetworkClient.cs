@@ -26,7 +26,13 @@ public class BookNetworkClient : MonoBehaviour
 
     private PLAYER_SLOT m_playerSlot = PLAYER_SLOT.NONE;
 
-    private float m_connectionTimer;
+    private float m_connectionDeadline;
+    private NetworkEndpoint m_endpoint;
+    private bool m_shouldReconnect;
+    private float m_nextReconnectTime;
+    private float m_reconnectDelay = 1f;
+
+    public bool IsReconnecting => m_shouldReconnect && ConnectionState != BOOK_CONNECTION_STATE.CONNECTED;
 
     public BOOK_CONNECTION_STATE ConnectionState { get; private set; } = BOOK_CONNECTION_STATE.DISCONNECTED;
 
@@ -49,62 +55,50 @@ public class BookNetworkClient : MonoBehaviour
 
     private void Start()
     {
-        // Unity TransportのNetworkDriverを作成
+        InitializeDriver();
+    }
+
+    private void InitializeDriver()
+    {
+        if (m_driver.IsCreated) return;
         m_driver = NetworkDriver.Create();
-
-        // ReliableSequencedPipelineStageを使用して信頼性のあるパイプラインを作成
         m_reliablePipeline = m_driver.CreatePipeline(typeof(ReliableSequencedPipelineStage));
-
-        SetConnectionState(BOOK_CONNECTION_STATE.DISCONNECTED);
     }
 
     private void Update()
     {
-        if (!m_driver.IsCreated)
-        {// ドライバーが作成されていない場合は更新しない
-            return;
-        }
-
-        // ドライバーの更新をスケジュールして完了させる
+        if (!m_driver.IsCreated) return;
         m_driver.ScheduleUpdate().Complete();
 
-        if (!m_connection.IsCreated)
-        {// 接続が作成されていない場合は更新しない
-            return;
-        }
-
-        NetworkEvent.Type eventType;
-
-        // 接続イベントを処理するループ
-        while ((eventType = m_connection.PopEvent(m_driver, out DataStreamReader reader)) != NetworkEvent.Type.Empty)
+        // Finish processing the old connection before a retry replaces its handle.
+        while (m_connection.IsCreated)
         {
+            NetworkEvent.Type eventType = m_connection.PopEvent(m_driver, out DataStreamReader reader);
+            if (eventType == NetworkEvent.Type.Empty) break;
             switch (eventType)
             {
                 case NetworkEvent.Type.Connect:
                     OnConnected();
                     break;
-
                 case NetworkEvent.Type.Data:
                     ReceiveData(reader);
                     break;
-
                 case NetworkEvent.Type.Disconnect:
                     OnDisconnected();
                     break;
             }
         }
 
-        // 接続タイマーを更新
-        if (ConnectionState == BOOK_CONNECTION_STATE.CONNECTING)
+        if (ConnectionState == BOOK_CONNECTION_STATE.CONNECTING && Time.unscaledTime >= m_connectionDeadline)
         {
-            m_connectionTimer += Time.deltaTime;
-            if (m_connectionTimer < m_connectionTimeoutSeconds)
-            {
-                return;
-            }
-
-            Debug.LogWarning("Serverへの接続がタイムアウトしました");
-            Disconnect();
+            Debug.LogWarning("Book server connection timed out; retry scheduled.");
+            CloseConnection();
+            OnDisconnected();
+        }
+        else if (ConnectionState == BOOK_CONNECTION_STATE.DISCONNECTED && m_shouldReconnect &&
+                 Time.unscaledTime >= m_nextReconnectTime)
+        {
+            BeginConnection();
         }
     }
 
@@ -116,7 +110,7 @@ public class BookNetworkClient : MonoBehaviour
             return;
         }
 
-        if (playerSlot == PLAYER_SLOT.NONE)
+        if (playerSlot != PLAYER_SLOT.PLAYER1 && playerSlot != PLAYER_SLOT.PLAYER2)
         {
             Debug.LogWarning("Playerが選択されていません");
             return;
@@ -138,56 +132,56 @@ public class BookNetworkClient : MonoBehaviour
             return;
         }
 
+        InitializeDriver();
         m_playerSlot = playerSlot;
+        m_endpoint = endpoint;
+        m_shouldReconnect = true;
+        m_reconnectDelay = 1f;
+        BeginConnection();
+    }
 
-        Debug.Log($"Serverへ接続開始 : {ipAddress}:{Port}");
-
-        // 接続を開始
-        m_connection = m_driver.Connect(endpoint);
-
-        // 接続タイマーをリセット
-        m_connectionTimer = 0.0f;
-
-        // 接続状態を更新
+    private void BeginConnection()
+    {
+        m_connection = m_driver.Connect(m_endpoint);
+        m_connectionDeadline = Time.unscaledTime + Mathf.Max(0.1f, m_connectionTimeoutSeconds);
+        if (!m_connection.IsCreated)
+        {
+            OnDisconnected();
+            return;
+        }
         SetConnectionState(BOOK_CONNECTION_STATE.CONNECTING);
     }
 
     public void Disconnect()
+    {
+        // Explicit disconnect also cancels all future retries.
+        m_shouldReconnect = false;
+        CloseConnection();
+        SetConnectionState(BOOK_CONNECTION_STATE.DISCONNECTED);
+    }
+
+    private void CloseConnection()
     {
         if (m_driver.IsCreated && m_connection.IsCreated)
         {
             m_driver.Disconnect(m_connection);
             m_driver.ScheduleUpdate().Complete();
         }
-
         m_connection = default;
-
-        m_connectionTimer = 0.0f;
-
-        SetConnectionState(BOOK_CONNECTION_STATE.DISCONNECTED);
-
-        Debug.Log("Book Serverから切断しました");
     }
 
     private void OnConnected()
     {
-        m_connectionTimer = 0.0f;
-
-        Debug.Log($"Book Serverへ接続成功 : {m_playerSlot}");
-
+        m_reconnectDelay = 1f;
         SetConnectionState(BOOK_CONNECTION_STATE.CONNECTED);
-
         SendRegisterController();
     }
 
     private void OnDisconnected()
     {
-        Debug.Log("Book Serverから切断されました");
-
         m_connection = default;
-        m_connectionTimer = 0.0f;
-
-        // 接続状態を更新
+        m_nextReconnectTime = Time.unscaledTime + m_reconnectDelay;
+        m_reconnectDelay = Mathf.Min(8f, m_reconnectDelay * 2f);
         SetConnectionState(BOOK_CONNECTION_STATE.DISCONNECTED);
     }
 
@@ -346,7 +340,7 @@ public class BookNetworkClient : MonoBehaviour
     private bool CanSend()
     {
         // 接続状態がCONNECTEDであり、接続が作成されている場合に送信可能
-        return ConnectionState == BOOK_CONNECTION_STATE.CONNECTED && m_connection.IsCreated;
+        return m_driver.IsCreated && ConnectionState == BOOK_CONNECTION_STATE.CONNECTED && m_connection.IsCreated;
     }
 
     private void ReceiveData(DataStreamReader reader)
@@ -415,6 +409,8 @@ public class BookNetworkClient : MonoBehaviour
             return;
         }
 
+        m_shouldReconnect = false;
+        SetConnectionState(BOOK_CONNECTION_STATE.DISCONNECTED);
         s_instance = null;
 
         if (!m_driver.IsCreated)

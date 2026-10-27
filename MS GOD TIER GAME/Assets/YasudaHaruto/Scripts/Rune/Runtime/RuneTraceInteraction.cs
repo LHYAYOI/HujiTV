@@ -13,6 +13,7 @@ public class RuneTraceInteraction : IPageInteraction
     private readonly BookInputController m_inputController;
     private readonly MAGIC_AIM_TYPE m_aimType;
     private readonly ICastMagicCommand m_successCommand;
+    private float m_cooldownUntil;
 
     public bool IsActive => m_runeTraceController.IsTracing;
 
@@ -30,6 +31,7 @@ public class RuneTraceInteraction : IPageInteraction
         m_runeTraceController.CastConfirmed += OnCastConfirmed;
         m_runeTraceController.TraceFailed += OnTraceFailed;
         m_runeTraceController.BeginTrace(m_runeData, m_aimType);
+        m_runeTraceController.ResumeCooldown(m_cooldownUntil - Time.time);
     }
 
     public void End()
@@ -37,6 +39,8 @@ public class RuneTraceInteraction : IPageInteraction
         m_runeTraceController.CastConfirmed -= OnCastConfirmed;
         m_runeTraceController.TraceFailed -= OnTraceFailed;
 
+        m_cooldownUntil = m_runeTraceController.State == RUNE_TRACE_STATE.COOLDOWN
+            ? Time.time + m_runeTraceController.CooldownRemaining : 0f;
         m_runeTraceController.Cancel();
 
         if (m_inputController.State == BOOK_INPUT_STATE.RUNE_TRACING)

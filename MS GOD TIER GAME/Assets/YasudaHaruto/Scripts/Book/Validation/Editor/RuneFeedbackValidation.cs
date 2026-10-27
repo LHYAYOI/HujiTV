@@ -9,11 +9,13 @@ namespace YasudaHaruto.BookValidation.Editor
 {
     public static class RuneFeedbackValidation
     {
-        private sealed class TraceView : IRuneTraceView, IRuneTraceFeedbackView
+        private sealed class TraceView : IRuneTraceView, IRuneTraceFeedbackView, IRuneCooldownView
         {
             public int Failures;
             public int Completions;
             public float Deviation;
+            public float Cooldown;
+            public void ShowCooldown(float remaining) => Cooldown = remaining;
             public void BeginTrace(RuneData rune) { }
             public void UpdateCurrentStroke(IReadOnlyList<Vector2> points) { }
             public void EndStroke() { }
@@ -76,6 +78,15 @@ namespace YasudaHaruto.BookValidation.Editor
                 Require(controller.State == RUNE_TRACE_STATE.COOLDOWN && fake.Failures == 3,
                     "Accurate completed rune still reaches cast cooldown");
                 Require(fake.Completions == 1, "Completion effect fires on full rune completion only");
+                Require(Mathf.Approximately(fake.Cooldown, 1f), "Cooldown starts with a full circle");
+                controller.Tick(0.25f);
+                Require(Mathf.Approximately(fake.Cooldown, 1f), "Automatic cast waits for finger release before advancing");
+                controller.EndStroke();
+                controller.SetCooldown(1f);
+                controller.Tick(0.25f);
+                Require(Mathf.Approximately(fake.Cooldown, 0.75f), "Cooldown circle uses the controller remaining time");
+                controller.Tick(1f);
+                Require(controller.CanBeginStroke && Mathf.Approximately(fake.Cooldown, 0f), "Cooldown finishes and tracing becomes available again");
                 controller.Cancel();
                 CheckGraphics(rune);
                 CheckCastGuide(rune, start, end);
@@ -259,6 +270,41 @@ namespace YasudaHaruto.BookValidation.Editor
                 Require(overlay.IsVisible, "Retry does not erase failure animation");
                 view.Clear();
                 Require(!overlay.IsVisible, "Cancel clears failure overlay");
+                view.BeginTrace(rune);
+                view.UpdateCurrentStroke(points);
+                view.EndStroke();
+                view.ShowCooldown(1f);
+                var cooldown = root.GetComponentInChildren<RuneCooldownGraphic>(true);
+                Require(cooldown != null && cooldown.gameObject.activeSelf && !cooldown.raycastTarget,
+                    "Cooldown ring is visible and does not capture input");
+                using (var mesh = new VertexHelper())
+                {
+                    typeof(RuneLineGraphic).GetMethod("OnPopulateMesh", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly).Invoke(line, new object[] { mesh });
+                    Require(mesh.currentVertCount == 0, "Cast removes the drawn rune");
+                }
+                cooldown.rectTransform.sizeDelta = new Vector2(200f, 200f);
+                cooldown.SetRemaining(0.75f);
+                using (var mesh = new VertexHelper())
+                {
+                    typeof(RuneCooldownGraphic).GetMethod("OnPopulateMesh", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly).Invoke(cooldown, new object[] { mesh });
+                    UIVertex first = default;
+                    mesh.PopulateUIVertex(ref first, 0);
+                    Require(first.position.x > 0f && Mathf.Abs(first.position.y) < 0.01f,
+                        "Quarter elapsed removes the clockwise top-right quarter");
+                    cooldown.SetRemaining(0f);
+                    typeof(RuneCooldownGraphic).GetMethod("OnPopulateMesh", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly).Invoke(cooldown, new object[] { mesh });
+                    Require(mesh.currentVertCount == 0, "Finished cooldown has no ring geometry");
+                }
+                view.BeginTrace(rune);
+                Require(!cooldown.gameObject.activeSelf, "New trace hides the timer");
+                view.ShowCooldown(0.5f);
+                view.Clear();
+                Require(!cooldown.gameObject.activeSelf, "Cancel hides the timer");
+                view.BeginTrace(rune);
+                view.ShowCooldown(0.5f);
+                // This validation runs in Edit Mode; dispatch the runtime lifecycle explicitly.
+                typeof(RunePageView).GetMethod("OnDisable", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(view, null);
+                Require(!cooldown.gameObject.activeSelf, "Disable notification hides the timer");
             }
             finally
             {

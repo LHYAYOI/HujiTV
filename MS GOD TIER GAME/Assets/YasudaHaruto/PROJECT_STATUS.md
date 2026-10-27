@@ -6,8 +6,8 @@
 ※動作確認の根拠は下記記録を参照。魔法通信はユーザーがテスト済みで問題なしと再確認しており、追加の再テストは不要。
 
 ## 現在の作業
-太くしたなぞり線の描画を改善。接続されたメッシュ、丸い端、透明な輪郭でギザギザを軽減。入力点・判定は維持。
-既存UnityでコンパイルとVerify Rune Feedbackを完了。実際になぞったときの見た目・手触りは未確認。
+2026-10-27：自動再接続の第1段階を実装。切断中はページめくりだけ許可し、描画・発動待ちを取り消す。クールダウンと所持・閲覧位置を維持する。
+詳細はNETWORK_RECOVERY_DESIGN.mdと末尾の実装記録を参照。ルーン編集はユーザー確認済み、円形クールダウン表示も実装済み。
 
 ## 次のタスク
 - ページ追加・削除の統合
@@ -57,10 +57,10 @@
 6. ルーン描画中エフェクト、射出方向選択演出を追加する。
 
 ## 最終作業
-日付：2026-10-22
-変更内容：RuneLineGraphicを独立した四角形から連続メッシュへ変更。丸い端と透明な輪郭を追加。太線・重複点・折り返しの回帰検証を追加。
-確認結果：既存Unityでコンパイル後、Verify Rune FeedbackがCOMPLETE。全線のRGB色同期、輪郭の透明度、有限座標、入力点の保持、既存の失敗・完成・発動処理を検証。Sceneを保存・再読込していない。
-未完了事項：実際になぞる際の見た目・操作感の確認。旧デバッグ5件のScene参照整理、MagicData着弾画像は継続課題。
+日付：2026-10-27
+変更内容：BookNetworkClientの自動再接続、切断時のルーン入力停止・キャンセル、再接続中表示、ページ間のクールダウン保持を追加。
+確認結果：既存Unityでコンパイル・Verify Network Recoveryを実行。ローカルUDPで接続失敗からの復帰・接続後切断からの復帰・同じプレイヤー枠の登録送信・明示停止がPASS。NetworkRecoveryと既存RuneFeedbackはCOMPLETE。Play Mode終了済み。Scene・Prefab・共有設定は未変更。
+未完了事項：AndroidのWi-Fi切断・復帰と表示を実機確認。通信の第2段階は登録承認・セッション復旧、第3段階は接続先自動発見・USB。設定ページ・お邪魔要素・旧デバッグ整理・MagicData着弾画像は継続。
 
 ## 動作確認記録（2026-10-21）
 - 起動中のUnity 6000.3.23f1のBookSceneでPlay Modeへ進め、本の見開き表示を確認。新規バッチコンパイルや実機ビルドは未実施。
@@ -438,3 +438,48 @@
 - RuneData・入力点・距離の成功失敗判定を変更しない。線色はRGBを全体同期し、輪郭だけalphaを0へ下げる。追加の画像・Materialは不要。
 - 既存Verify Rune Feedbackの色検証をRGB同期と透明な輪郭の検証に更新。幅28の線で重複点・急角度・折り返しを含むメッシュの有限性と入力点の保持も確認。Unityのコンパイル後にCOMPLETEを確認。
 - 今回はPlay Modeで実際になぞる目視確認は未実施。ユーザーの未保存Scene状態を保持し、他メンバーのコード・Scene・Prefab・ProjectSettingsは編集していない。
+
+## ルーン画像取り込みの改善（2026-10-27）
+- ユーザー指定の基準画像：Data/Runes/Images/Runa_Fire.png、Runa_Water.png、Runa_Clean.png。いずれも512×512、alpha範囲0〜255。色付きルーンを主対象とし、交差は直進方向をつないで「＋」を2画にする方針で承認済み。
+- RuneImagePreprocessor：透明画素を含む画像はRGBの明るさではなくalphaで二値化。Thresholdを上げるほど薄い部分も含む（alpha > 1 - Threshold）。完全不透明画像は従来の明るさ判定を維持。画像アセットのImport Settingsは変更しない。
+- RuneStrokeExtractor：直交接続がある場所の斜めショートカットを除き、実際の接続数で経路を分割。分岐点では短い接線方向が向かい合う経路（dot < -0.85）を優先結合する。離れた線同士は結合しない。端点のない閉じた輪も第二走査で抽出。画順・開始方向は画像から確定できないため、既存の手動編集を残す。
+- RuneEditorWindow：同じSkeletonの二重抽出を解消。Min Stroke Lengthを追加（初期0.01、範囲0〜0.05、画像の0〜1座標の経路長）。必要な短線が消える場合は0へ下げられる。Simplify Toleranceは従来通り点数の調整。
+- 単独C#検証：Unityの数値型等の代替を使い、実際の変更ソースを実行。「＋」が2画、閉ループが1画、単純化後も輪が残る、透明な黒を除外して不透明な黄色を取り込む検証がPASS。
+- 同じ単独環境でThreshold=0.3、Simplify Tolerance=0.002、Min Stroke Length=0.01：Fireは抽出7→採用7画/140点、Waterは9→8画/102点、Cleanは16→11画/110点。処理は各約0.08〜0.12秒だったが、Unity Editorの実測値ではない。形状の正しさ・筆順の保証ではない。
+- HEADの変更前ソースも同じ画像・Thresholdで比較：FireとCleanは抽出0画、Waterは133画。旧コードの色判定では入力形状自体が異なるため、この比較から速度向上率は算出しない。旧処理には短線フィルターがない。
+- Unity 6000.3.23f1のManaged DLLと既存Assembly-CSharp.dllを参照し、ルーンEditorフォルダの全C#を一時net9.0プロジェクトでコンパイル。警告0・エラー0。Unity自身のインポート・ドメインリロード・Editor操作の確認とは区別する。
+- 変更は担当内Editorスクリプト3件と管理資料のみ。各.metaとCP932文字コードを維持。Scene・Prefab・RuneData・hatake原本・通信・プレイ中のなぞり判定は変更していない。EditorでAnalyze Image→プレビュー→必要なら短線除去調整→Apply→Bakeの確認は未実施。
+
+## ルーン編集UIの追加と確認（2026-10-27）
+- RuneEditorWindowへDraw / Select・Deleteの切替、キャンバスの線選択と水色強調、選択削除・行ごとのDelete・Deleteキー、元画像の下書き表示と不透明度調整を追加。適用後は解析プレビューを隠し、元画像と編集済み線を見分けられるようにした。Undo/Redo・モード変更・フォーカス喪失時の描画キャンセルも接続。
+- 手描き追加と最後の線削除でもTraceDataを無効にし、編集後のBakeを必須にした。既存の結合・分割・反転・並べ替えを維持。
+- Verify Rune Editingを追加。一時RuneDataで選択・削除・Undo/Redo・描画追加・座標・キャンセル等14項目がUnityバッチ検証でPASS。既存RuneDataは変更しない。前回のUI操作でUnity全体を閉じてしまった事実と、その後プロジェクトを開き直したことをユーザーへ報告済み。未保存のウィンドウ状態の復元は未確認。
+- 後続のユーザー回答：「オッケーめっちゃよくなった」。編集機能のユーザー確認済みとして記録。
+
+## クールダウンの円形ワイプ表示（2026-10-27）
+- ユーザー指定：発動後は書いたルーンを消し、時計回りに消えていく円形タイマーへ変更。
+- IRuneCooldownViewを任意の表示通知先として追加。RuneTraceControllerのクールダウン開始時に残量1、既存Tickで残り時間の割合を通知する。入力待機・成功条件・発動タイミング・通信・待ち時間・Time.deltaTimeは維持。方向なし魔法の指離し待ち中も従来通り時間を進めない。
+- RunePageViewはクールダウン時に見本と描画済み線、完成時のコピー演出を消す。playerGraphicのRect内にRuneCooldownGraphicを実行時生成し、本の撮影Canvas内で表示する。終了後のBeginTraceでリングを隠し、見本を戻す。Cancel/Clear・OnDisableでも隠す。
+- RuneCooldownGraphicは画像不要のuGUIリング。12時から時計回りに欠ける。初期色は金色、Cooldown Diameter=0.28（描画領域の短辺に対する直径割合）、内径/外径比0.76。色と直径はRunePageViewのInspectorで調整可能。raycastTarget=falseで入力を遮らない。生成物はViewの子として破棄される。
+- 既存Unityを開いたままコンパイルし、Tools > YasudaHaruto > Verify Rune Feedbackを実行。最終結果はRuneFeedback COMPLETE。開始時の全円、指離し待機中の停止、残量0.75への同期、終了時の入力復帰、描画線の消去、1/4経過時の右上1/4消去、残量0の空メッシュ、再開・キャンセル・無効化通知での非表示を追加検証。無効化はEdit Mode検証なのでOnDisableを明示呼出ししており、Play Modeの物理操作による検証とは区別する。
+- 初回の検証コードではOnPopulateMeshの反射呼出しが継承先の同名メソッドと衝突し失敗。DeclaredOnly指定で修正。Edit Modeでenabled変更時にランタイムOnDisableが走るとの仮定も修正し、最終検証は従来の線色・失敗・完成演出・3方向発動を含めて通過した。
+- Scene・Prefab・既存RuneData・他メンバー領域・共有設定は未変更。開始時からあったClearnRune/FireRune/WaterRune.assetのユーザー変更を保持。既存Unityの再起動・Scene保存・Play Mode起動は今回していない。実際の発動時の見た目・サイズは未確認。git diff --checkは問題なし。
+
+## 通信復旧・USB接続の調査（2026-10-27）
+- AGENTS.md、PROJECT_STATUS.md全文、BOOK_INTERACTION_DESIGN.mdと現行通信コードを確認。新しい調査・段階的設計案はNETWORK_RECOVERY_DESIGN.mdを参照する。
+- ユーザー回答：WindowsゲームPC＋Androidタブレット、Unity Transportを使用。現在はWi-Fiと思われるが通信経路は未確定。
+- 自動再試行なし、本Scene遷移後の再接続UIなし、登録承認なし、古いプレイヤー枠が再登録を拒否し得る点を確認。実機で切断原因を再現したわけではない。
+- 推奨順：現行UDPで同じ接続先へ自動再接続→登録承認・セッション復旧→接続先自動発見。USBはテザリングによるIP通信が候補。adbの標準forward/reverseを現行UDPへそのまま使わない。
+- 今回は調査と設計資料のみ更新し、ゲームコード・Scene・Prefab・共有設定は未変更。USB対応・抜き差し・複数台動作は実機未確認。次は第1段階の再接続処理を実装し、登録承認と切断中操作の扱いを順に詰める。
+- 開始時の既存未コミット・未追跡変更を保持。親Gitアクセスは通常権限で失敗したが、承認付きでstatus・fetch・追跡先比較を完了。HEADと追跡先は0/0、追跡先とのファイル差分なし。禁止されたGit操作は未実施。
+
+## 自動再接続の第1段階（2026-10-27）
+- ユーザーは切断中にページめくりだけ可能、接続成功まで継続、途中のルーン／発動待ちは取消、開始済みクールダウン・所持・閲覧位置は維持する方針を承認。
+- BookNetworkClientで接続先とプレイヤー枠を保持し、1→2→4→8秒（以後8秒）の待機で再試行。接続タイムアウトは従来の5秒設定。待機とタイムアウトはunscaled time。明示Disconnectと破棄で停止。無効なプレイヤー枠も拒否する。
+- BookGameBootstrapから通信状態を入力へ通知。RuneTraceControllerで描画・発動開始・確定を止め、途中のルーンをリセット。入力中のポインターと占有を解除し、ページ操作を残す。開始済みクールダウンは切断で失わず、RuneTraceInteractionがページを離れた間の経過も保持する。
+- BookConnectionStatusViewを実行時生成し、再接続中／未接続を表示。入力を遮らず、接続で消える。Scene・Prefabの参照追加は不要。OS日本語フォント方式で、Androidの表示は未確認。
+- 既存Unityが別権限のプロセスとして起動していたため、通常権限のプロセス確認では見えなかった。バッチ起動直前の承認付き再確認で検出し、別Unityは起動せず、既存Editorのメニューから検証した。Editorの再起動・Scene保存・再読み込み操作はしていない（Play Mode終了時のUnity自身による復元は発生）。
+- Verify Network Recoveryを追加。最終実行でNetworkRecovery COMPLETE、従来のRuneFeedbackもCOMPLETE。ローカルUDPの後起動・切断・再接続・同じPLAYER2登録・Scene維持・明示停止、timeScale=0、描画取消・別ページからの入力再開防止・クールダウン保持、表示とRaycast非干渉を検証。結果抜粋はNetworkRecoveryResults.txt。
+- バックオフの最初の1秒は実時間で測定。2/4/8秒と上限は切断ハンドラーを明示呼出しし、次の試行時刻を照合した。実機Wi-Fi断や本の物理ドラッグの実証とは区別する。Play Modeは終了済み。
+- サーバー・メッセージ形式は変更せず、登録承認と古い枠の即時引継ぎは次段階。Transportが切断を検出するまでの時間は既存設定のまま。IP変更への自動追従、Android実機確認、USBは未実施。
+- 既存変更を保持し、既存CP932/UTF-8文字コードと.metaを維持。Scene・Prefab・hatake・他メンバー領域・共有設定は未変更。Git fetchと追跡先比較は0/0、禁止Git操作なし。

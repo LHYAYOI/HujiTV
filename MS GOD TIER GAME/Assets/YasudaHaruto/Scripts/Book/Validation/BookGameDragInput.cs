@@ -103,9 +103,22 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
         m_inputController = inputController;
     }
 
+    public void SetRuneInputAvailable(bool available)
+    {
+        m_runeController?.SetInputAvailable(available);
+        if (available) return;
+        if (m_castOverlay != null) m_castOverlay.Hide();
+        if (m_gesture == GESTURE.RUNE)
+        {
+            m_gesture = GESTURE.NONE;
+            m_runeStarted = false;
+        }
+        m_inputController?.EndRuneTrace();
+    }
+
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (m_runeController != null && m_runeController.IsAwaitingCast) return;
+        if (m_runeController != null && m_runeController.IsInputAvailable && m_runeController.IsAwaitingCast) return;
         if (m_inventoryOwner != null && m_inventoryOwner.IsInputBlocked) return;
         if (eventData.button != PointerEventData.InputButton.Left || m_gesture != GESTURE.NONE || m_areaDetector == null || m_runeController == null || m_inputController == null)
         {
@@ -117,7 +130,7 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
             return;
         }
 
-        if (area != BOOK_AREA_TYPE.RUNE)
+        if (!m_runeController.IsInputAvailable || area != BOOK_AREA_TYPE.RUNE)
         {// ルーン領域以外の入力はページめくりに渡す
             return;
         }
@@ -140,7 +153,7 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (m_runeController != null && m_runeController.IsAwaitingCast) return;
+        if (m_runeController != null && m_runeController.IsInputAvailable && m_runeController.IsAwaitingCast) return;
         if (m_inventoryOwner != null && m_inventoryOwner.IsInputBlocked) return;
         if (m_gesture != GESTURE.NONE || eventData.button != PointerEventData.InputButton.Left ||
             m_bookController == null || m_flipView == null || m_bookController.IsBusy || m_flipView.IsTurning)

@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackView
+public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackView, IRuneCooldownView
 {
     [SerializeField] private RuneLineGraphic m_referenceGraphic;
     [SerializeField] private RuneLineGraphic m_playerGraphic;
@@ -29,6 +29,11 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
     [SerializeField, Min(0.05f)] private float m_completionDuration = 0.65f;
     [SerializeField, Min(1f)] private float m_completionEndScale = 1.4f;
     private RuneCompletionOverlay m_completionOverlay;
+    [Header("Cooldown Feedback")]
+    [SerializeField, Range(0.05f, 0.8f)] private float m_cooldownDiameter = 0.28f;
+    [SerializeField] private Color m_cooldownColor = new Color(1f, 0.8f, 0.25f, 1f);
+    private RuneCooldownGraphic m_cooldownGraphic;
+
 
     private readonly List<RuneStrokeData> m_completedStrokes = new();
     private readonly List<RuneStrokeData> m_displayStrokes = new();
@@ -48,6 +53,7 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
     {
         // Retry resets the drawing without erasing the failure animation just started.
         if (m_runeData != runeData) HideFailure();
+        HideCooldown();
         m_runeData = runeData;
         HideCompletion();
         BringToFront();
@@ -145,6 +151,33 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
         return Rect.MinMaxRect(min.x, min.y, max.x, max.y);
     }
 
+    public void ShowCooldown(float remainingFraction)
+    {
+        HideCompletion();
+        ClearGraphics();
+        if (!isActiveAndEnabled || remainingFraction <= 0f) { HideCooldown(); return; }
+        if (m_cooldownGraphic == null)
+        {
+            m_cooldownGraphic = new GameObject("Rune Cooldown", typeof(RectTransform),
+                typeof(CanvasRenderer), typeof(RuneCooldownGraphic)).GetComponent<RuneCooldownGraphic>();
+            RectTransform parent = m_playerGraphic != null ? m_playerGraphic.rectTransform : transform as RectTransform;
+            m_cooldownGraphic.transform.SetParent(parent, false);
+            m_cooldownGraphic.raycastTarget = false;
+            m_cooldownGraphic.rectTransform.anchorMin = Vector2.zero;
+            m_cooldownGraphic.rectTransform.anchorMax = Vector2.one;
+            m_cooldownGraphic.rectTransform.offsetMin = m_cooldownGraphic.rectTransform.offsetMax = Vector2.zero;
+        }
+        m_cooldownGraphic.color = m_cooldownColor;
+        m_cooldownGraphic.rectTransform.localScale = Vector3.one * m_cooldownDiameter;
+        m_cooldownGraphic.SetRemaining(remainingFraction);
+        m_cooldownGraphic.gameObject.SetActive(true);
+    }
+
+    private void HideCooldown()
+    {
+        if (m_cooldownGraphic != null) m_cooldownGraphic.gameObject.SetActive(false);
+    }
+
     private void ClearGraphics()
     {
         m_completedStrokes.Clear();
@@ -156,6 +189,7 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
 
     public void Clear()
     {
+        HideCooldown();
         m_runeData = null;
         HideCompletion();
         ClearGraphics();
@@ -169,6 +203,7 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
 
     private void OnDisable()
     {
+        HideCooldown();
         HideFailure();
         HideCompletion();
     }
