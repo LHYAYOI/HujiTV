@@ -1,8 +1,7 @@
-Shader "custom/hatake/Book/Page Flip Composite"
+Shader "Book/Page Flip Composite"
 {
-    // RenderTextureで撮影した見開きを合成し、ページめくりと本の装飾を描く。
-    // BookFlipView が Graphics.Blit で出力RenderTextureへ描画する。
-    // 値の意味と単位は BookFlip.md を参照。長さはページ幅 = 1。
+    // RenderTextureで撮影した見開きを合成し、ページめくりと本の装飾を描く
+    // BookFlipView が Graphics.Blit で出力RenderTextureへ描画する
     Properties
     {
         [Header(Paper)]
@@ -101,6 +100,8 @@ Shader "custom/hatake/Book/Page Flip Composite"
         [HideInInspector] _SpotCount ("Spot count", Float) = 0
         [HideInInspector] _Rigid ("Rigid cover turn", Float) = 0
         [HideInInspector] _RigidCover ("Rigid cover", Float) = 1
+        [HideInInspector] _BoardMode ("Board mode", Float) = 0
+        [HideInInspector] _BoardOpen ("Board open amount", Float) = 1
         [HideInInspector] _FxMode ("Effect mode", Float) = 0
         [HideInInspector] _FxSide ("Effect side", Float) = 1
         [HideInInspector] _FxProgress ("Effect progress", Float) = 0
@@ -227,32 +228,26 @@ Shader "custom/hatake/Book/Page Flip Composite"
                 else if (h.rigidEdge > 0.5)
                 {
                     // 回っている板の小口
-                    col = float4(BookBoardEdgeColor(h.flatPos.y, 0.5), 1);
+                    col = float4(BookBoardEdgeColor(h.sheetPos.x + h.sheetPos.y, saturate(h.flapInside)), 1);
                 }
                 else if (h.rigidMargin > 0.5)
                 {
-                    // 硬い表紙の板のページより外：表側なら表紙の絵、内側なら表紙の内側の色
+                    // 硬い表紙の板のページより外：表側なら閉じた表紙の縁、内側なら開いた本の縁（着地した位置で）。
+                    // 置いてある板と同じ関数で描くので、金の罫・角金具・革の模様が着地の前後で変わらない
+                    // 内側の縁には、その側のページの束（小口）も板に載って一緒に回る
                     bool coverFace = h.kind > 0.5 && h.kind < 2.5;
-                    float2 boxCenter, boxHalf;
-                    BookCoverBox(h.kind < 1.5, boxCenter, boxHalf);
-                    float3 picture = float3(-1, -1, -1);
-                    if (coverFace && (h.kind < 1.5 ? _CoverFlags.x : _CoverFlags.y) > 0.5)
-                    {
-                        float2 coverUV = BookCoverUV(h.flatPos, h.kind < 1.5);
-                        picture = h.kind < 1.5 ? tex2Dlod(_FrontCoverTex, float4(coverUV, 0, 0)).rgb : tex2Dlod(_BackCoverTex, float4(coverUV, 0, 0)).rgb;
-                    }
-                    col = float4(coverFace ? BookCoverSurface(picture, h.flatPos - boxCenter)
-                                           : BookBoardInside(_RigidCover < 1.5, h.flatPos), 1);
-                    // 外周の金の罫（絵が無い表紙）も板と一緒に回る
-                    if (coverFace && picture.r < 0)
-                        col.rgb = BookCoverTrim(col.rgb, h.flatPos, BookSdRoundBox(h.flatPos - boxCenter, boxHalf, _CoverRadius));
+                    float4 carried = coverFace ? float4(0, 0, 0, 0) : BookStackCarried(h.flatPos);
+                    col = carried.a > 0 ? carried
+                        : float4(coverFace ? BookClosedBoardColor(h.flatPos, h.kind < 1.5)
+                                           : BookOpenBoardColor(h.flatPos), 1);
                 }
                 else col = float4(ShadePage(h, BookSamplePage(h.dest, h.right, h.uv).rgb, curlTilt), 1);
                 // 角金具は表紙・裏表紙の板に付いて一緒に回る。表側（絵の面）は全体、内側は縁の部分だけ
-                if (h.rigid > 0.5 && h.rigidEdge < 0.5)
+                // （縁は上の BookClosedBoardColor / BookOpenBoardColor が描く。ここは表側のページの範囲）
+                if (h.rigid > 0.5 && h.rigidEdge < 0.5 && h.rigidMargin < 0.5)
                 {
                     bool coverFace = h.kind > 0.5 && h.kind < 2.5;
-                    if (coverFace || h.rigidMargin > 0.5)
+                    if (coverFace)
                     {
                         float2 boxCenter, boxHalf;
                         BookCoverBox(h.flatPos.x >= 0, boxCenter, boxHalf);

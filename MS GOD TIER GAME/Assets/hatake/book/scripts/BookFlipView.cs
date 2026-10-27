@@ -131,6 +131,8 @@ namespace hatake
         [Tooltip("全ページを閉じた側に積んだときの小口の厚み（ページ幅比）")]
         [SerializeField, Range(0, 0.1f)] private float m_stackThickness = 0.035f;
         [SerializeField, Range(0, 0.1f)] private float m_minStackThickness = 0.006f;
+        [Tooltip("紙一枚（見開き1つ分）ごとに増える小口の厚み。残りが少ないと薄く、多いと Stack Thickness で頭打ち")]
+        [SerializeField, Range(0, 0.02f)] private float m_leafThickness = 0.0025f;
         [SerializeField, Range(1, 40)] private int m_stackLayers = 14;
         [Tooltip("小口が下へずれる割合（斜め上から見た厚み）")]
         [SerializeField, Range(0, 2)] private float m_stackDrop = 0.6f;
@@ -176,6 +178,7 @@ namespace hatake
         private static readonly int s_backCoverTex = Shader.PropertyToID("_BackCoverTex");
         private static readonly int s_coverFlags = Shader.PropertyToID("_CoverFlags");
         private static readonly int s_boardMode = Shader.PropertyToID("_BoardMode");
+        private static readonly int s_boardOpen = Shader.PropertyToID("_BoardOpen");
         private static readonly int s_magicColor = Shader.PropertyToID("_MagicColor");
         private static readonly int s_paperTint = Shader.PropertyToID("_PaperTint");
         private static readonly int s_magicStrength = Shader.PropertyToID("_MagicStrength");
@@ -218,6 +221,8 @@ namespace hatake
         private float m_effectSeed;
 
         private float m_readingProgress = 0.5f;
+        private int m_progressIndex;
+        private int m_progressCount;   // 0 = 枚数が未設定（進み具合の割合で厚みを決める）
         private float m_dim;
         private Coroutine m_dimRoutine;
         private readonly BookFlipSpot?[] m_spots = new BookFlipSpot?[MaxSpots];
@@ -242,11 +247,11 @@ namespace hatake
         /// <summary>めくりの進み具合 0〜1（角が背を越えると0.5）</summary>
         public float TurnAmount => m_turnAmount;
         public float PageAspect => m_pageAspect;
-        public float Dim => m_dim;
-
-        /// <summary>見開きページを置ける最大範囲 (xMin, yMin, xMax, yMax)。ページの縦横比に合わせて中央に収める</summary>
+        /// <summary>撮影テクスチャ内の左ページの範囲（XYWH、0〜1）。ページUV → 撮影カメラの Viewport 座標の変換に使う</summary>
         public Vector4 LeftCrop => m_leftCrop;
+        /// <summary>撮影テクスチャ内の右ページの範囲（XYWH、0〜1）</summary>
         public Vector4 RightCrop => m_rightCrop;
+        public float Dim => m_dim;
 
         // ------------------------------------------------------------------
         // 初期化と表示
@@ -383,9 +388,26 @@ namespace hatake
             m_readingProgress = Mathf.Clamp01(progress01);
         }
 
+        /// <summary>
+        /// 小口の厚みを左右の紙の枚数で決める（左 = spreadIndex 枚、右 = 残り）。
+        /// 残りが1枚なら薄く、めくっている間は前後の厚みの間を動く
+        /// </summary>
         public void SetReadingProgress(int spreadIndex, int spreadCount)
         {
+            m_progressCount = Mathf.Max(1, spreadCount);
+            m_progressIndex = Mathf.Clamp(spreadIndex, 0, m_progressCount - 1);
             SetReadingProgress(spreadCount <= 1 ? 0.5f : spreadIndex / (float)(spreadCount - 1));
+        }
+
+        // 片側の小口の厚み。表紙・裏表紙の内側だけの側（ページが無い）は 0
+        private float StackThickness(int spreadIndex, Texture spread, bool rightSide)
+        {
+            if (spread != null && m_coverInsides.TryGetValue(spread, out Vector2 inside) &&
+                (rightSide ? inside.y : inside.x) > 0.5f) return 0f;
+            if (m_progressCount <= 0)
+                return Mathf.Lerp(m_minStackThickness, m_stackThickness, rightSide ? 1f - m_readingProgress : m_readingProgress);
+            int leaves = rightSide ? m_progressCount - 1 - spreadIndex : spreadIndex;
+            return Mathf.Min(m_stackThickness, m_minStackThickness + Mathf.Max(0, leaves) * m_leafThickness);
         }
 
         /// <summary>BookModelView と同じ引数。魔導書の縁取りと紙の色。strength = 0 でマテリアルの値へ戻す</summary>
@@ -477,7 +499,13 @@ namespace hatake
 
             m_turning = false;
             LastTurnCommitted = committed;
-            if (committed) ShowView(next, nextCover);
+            if (committed)
+            {
+                // ページをめくり終えた時点で枚数を進める（BookController が後で同じ値を設定する。1フレームの厚みの跳びを防ぐ）
+                if (currentCover == BookCoverState.Open && nextCover == BookCoverState.Open && m_progressCount > 0)
+                    m_progressIndex = Mathf.Clamp(m_progressIndex + (turnRightPage ? 1 : -1), 0, m_progressCount - 1);
+                ShowView(next, nextCover);
+            }
             else ShowView(current, currentCover);
         }
 
@@ -782,15 +810,23 @@ namespace hatake
             material.SetTexture(s_frontCoverTex, m_frontCover != null ? m_frontCover : Texture2D.whiteTexture);
             material.SetTexture(s_backCoverTex, m_backCover != null ? m_backCover : Texture2D.whiteTexture);
             material.SetVector(s_coverFlags, new Vector4(m_frontCover != null ? 1f : 0f, m_backCover != null ? 1f : 0f, 0f, 0f));
-            // 表紙の板：表紙をめくっている間は、置いてある板は閉じた形のまま（開いた形にすると、着地する側に
-            // 板が先に現れて表紙が二重に見える）。めくり終えてから開いた形にする
-            BookCoverState boardState = m_currentCover != BookCoverState.Open ? m_currentCover
-                : m_turning ? m_destinationCover : m_currentCover;
-            material.SetFloat(s_boardMode, boardState == BookCoverState.FrontCover ? 1f : boardState == BookCoverState.BackCover ? -1f : 0f);
             // 表紙が回るめくりは硬い板として描く
             bool coverTurn = m_turning && (m_currentCover != BookCoverState.Open || m_destinationCover != BookCoverState.Open);
-            material.SetFloat(s_rigid, coverTurn && m_rigidCovers ? 1f : 0f);
+            bool rigidTurn = coverTurn && m_rigidCovers;
+            material.SetFloat(s_rigid, rigidTurn ? 1f : 0f);
             BookCoverState turningCover = m_currentCover != BookCoverState.Open ? m_currentCover : m_destinationCover;
+            // 表紙の板：硬い表紙をめくっている間は、開いた本の板のうち動かない側だけを置く（表紙なら右、裏表紙なら左）。
+            // 着地する側は回っている板だけが描くので、表紙が二重に見えない。開いた本と同じ色・罫・角金具で描き、
+            // 小口と板の厚みは開き具合（_BoardOpen）に合わせて出し入れする（めくり終えた瞬間に現れない）。
+            // 曲がる表紙（Rigid Covers OFF）は従来どおり、めくり終えるまで閉じた形のまま
+            BookCoverState boardState = m_currentCover != BookCoverState.Open ? m_currentCover
+                : m_turning ? m_destinationCover : m_currentCover;
+            float boardMode = boardState == BookCoverState.FrontCover ? 1f : boardState == BookCoverState.BackCover ? -1f : 0f;
+            if (rigidTurn) boardMode = turningCover == BookCoverState.BackCover ? -2f : 2f;
+            material.SetFloat(s_boardMode, boardMode);
+            float openAmount = !rigidTurn ? 1f
+                : m_currentCover != BookCoverState.Open ? m_turnAmount : 1f - m_turnAmount;
+            material.SetFloat(s_boardOpen, Mathf.Clamp01(openAmount));
             material.SetFloat(s_rigidCover, turningCover == BookCoverState.BackCover ? 2f : 1f);
             material.SetVector(s_bookRect, m_bookRect);
             material.SetFloat(s_pageAspect, m_pageAspect);
@@ -800,11 +836,21 @@ namespace hatake
             material.SetVector(s_fold, new Vector4(origin.x, origin.y, m_foldPoint.x, m_foldPoint.y));
             material.SetFloat(s_turnGlowId, m_turning ? m_turnGlow * Mathf.Sin(Mathf.PI * m_turnAmount) : 0f);
 
-            float left = Mathf.Lerp(m_minStackThickness, m_stackThickness, m_readingProgress);
-            float right = Mathf.Lerp(m_minStackThickness, m_stackThickness, 1f - m_readingProgress);
-            // 閉じた本は、すべてのページが表紙の下に重なる
-            // 閉じた本（と表紙をめくっている間）はページの束を見せない
-            if (boardState != BookCoverState.Open) { left = 0f; right = 0f; }
+            // 小口の厚み：左右の紙の枚数から。ページをめくっている間は、めくる前と後の厚みの間を開き具合で動かす
+            // （最後の1枚をめくるときに、めくり始めで右の束が急に消えたりしない）
+            Texture openSpread = m_currentCover == BookCoverState.Open ? m_current : m_destination;
+            float left = StackThickness(m_progressIndex, openSpread, false);
+            float right = StackThickness(m_progressIndex, openSpread, true);
+            bool pageTurn = m_turning && m_currentCover == BookCoverState.Open && m_destinationCover == BookCoverState.Open;
+            if (pageTurn && m_progressCount > 0)
+            {
+                int destinationIndex = Mathf.Clamp(m_progressIndex + (m_turnSide > 0f ? 1 : -1), 0, m_progressCount - 1);
+                left = Mathf.Lerp(left, StackThickness(destinationIndex, m_destination, false), m_turnAmount);
+                right = Mathf.Lerp(right, StackThickness(destinationIndex, m_destination, true), m_turnAmount);
+            }
+            // 閉じた本は、すべてのページが表紙の下に重なる。ページの束を見せない
+            // （硬い表紙をめくっている間は、シェーダーが開き具合に合わせて束を出し入れする）
+            if (boardState != BookCoverState.Open && !rigidTurn) { left = 0f; right = 0f; }
             material.SetVector(s_stack, new Vector4(left, right, m_stackLayers, m_stackDrop));
 
             material.SetFloat(s_fxMode, (float)m_effect);
