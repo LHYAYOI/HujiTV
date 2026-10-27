@@ -47,9 +47,6 @@ MonoBehaviour:
   m_brain: {fileID: 0}
   m_cameraList:
   - m_camera: {fileID: 0}
-    m_name: TPSCamera
-  - m_camera: {fileID: 0}
     m_name: FPSCamera
   - m_camera: {fileID: 0}
     m_name: BattleCamera
-  m_lookTarget: {fileID: 0}
