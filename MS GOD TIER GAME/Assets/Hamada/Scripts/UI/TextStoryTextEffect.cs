@@ -11,8 +11,6 @@ public class TextStoryTextEffect : TextEffect
 
     public override void Apply(TMP_TextInfo textInfo, int characterIndex, int localIndex, float elapsedTime)
     {
-        
-
         TMP_CharacterInfo charInfo = textInfo.characterInfo[characterIndex];
 
         if (!charInfo.isVisible)

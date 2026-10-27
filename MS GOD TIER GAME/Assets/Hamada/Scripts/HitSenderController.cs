@@ -1,4 +1,4 @@
-using Unity.VisualScripting;
+﻿using Unity.VisualScripting;
 using UnityEngine;
 
 public class BulletHitSenderController : MonoBehaviour
@@ -101,6 +101,7 @@ public class BulletHitSenderController : MonoBehaviour
         MagicData attackData = m_magicBulletController.GetMagicData();
 
         //hitData.SetDamage(attackData.GetDamage);
+        hitData.SetHitObject(gameObject);
         hitData.SetMagicType(attackData.MagicType);
         hitData.SetTag(gameObject.tag);
 
