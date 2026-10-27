@@ -10,11 +10,11 @@ public class EnemySpawnTest : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        m_enemySpawnManager.SpawnSplineMoveEnemy("MiniGhost_A", "test_spline1", "testPosition1");
+        //m_enemySpawnManager.SpawnSplineMoveEnemy("MiniGhost_A", "test_spline1", "testPosition1");
 
-        m_enemySpawnManager.SpawnSplineMoveEnemy("MiniGhost_B", "test_spline2", "testPosition2");
+        //m_enemySpawnManager.SpawnSplineMoveEnemy("MiniGhost_B", "test_spline2", "testPosition2");
 
-        m_enemySpawnManager.SpawnSplineMoveEnemy("MiniGhost_C", "test_spline3", "testPosition3");
+        //m_enemySpawnManager.SpawnSplineMoveEnemy("MiniGhost_C", "test_spline3", "testPosition3");
 
 
     }
@@ -25,7 +25,7 @@ public class EnemySpawnTest : MonoBehaviour
        if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             //m_activeEnemyManager.RemoveAllActiveEnemies();
-            m_activeEnemyManager.SetAllMiniGhostsToBattleStart();
+            //m_activeEnemyManager.SetAllMiniGhostsToBattleStart();
         }
 
 
