@@ -300,6 +300,10 @@ MonoBehaviour:
   m_timeLimit: 15
   m_kickFirePoint: {fileID: 4230615318380201651}
   m_throwFirePoint: {fileID: 1847888665569345119}
+  m_cameraHeightOffset: 1.5
+  m_turnSpeed: 60
+  m_toonMaterialBlend: {fileID: 6257968808050217282}
+  m_toonMaterialBlendDuration: 1
 --- !u!114 &2550911720611660208
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -339,7 +343,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostMoveState
   m_moveSpeed: 1
   m_rotateWithSplineFlag: 0
-  m_fireInterval: 2
+  m_fireInterval: 1
 --- !u!114 &4122682875455443804
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -379,7 +383,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdc09a0965b5f644ca86461f2aa85aac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostDyingState
-  m_shrinkDuration: 1
+  m_shrinkDuration: 1.5
   m_deathParticle: {fileID: 4058022614410997813, guid: 40c0fe6424d75b946927c08badf4e2a8, type: 3}
 --- !u!136 &9170967074312127478
 CapsuleCollider:
@@ -547,7 +551,15 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -2922892357548988066, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -2922892357548988066, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: cba0b8ae500cdbe459f89a9f63fb7cfe, type: 2}
+    - target: {fileID: -2922892357548988066, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
       value: 
       objectReference: {fileID: 2100000, guid: 637b0e258e6a29e4cae96a9d9b59c376, type: 2}
     - target: {fileID: 919132149155446097, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
@@ -565,7 +577,7 @@ PrefabInstance:
     - target: {fileID: 2788675242186676951, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 637b0e258e6a29e4cae96a9d9b59c376, type: 2}
+      objectReference: {fileID: 2100000, guid: cba0b8ae500cdbe459f89a9f63fb7cfe, type: 2}
     - target: {fileID: 6851099186128873815, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: m_CastShadows
       value: 0
@@ -573,15 +585,103 @@ PrefabInstance:
     - target: {fileID: 6851099186128873815, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 178f964934ac9a141a2efa372f1d5e7c, type: 2}
+      objectReference: {fileID: 2100000, guid: a76f3627213218747ba40d05806de7ad, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7657798703818053250}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6257968808050217282}
   m_SourcePrefab: {fileID: 100100000, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+--- !u!137 &156206056250254866 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -2922892357548988066, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+  m_PrefabInstance: {fileID: 6144379352803512140}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &745000623467193883 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 6851099186128873815, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+  m_PrefabInstance: {fileID: 6144379352803512140}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5967129915259381927 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+  m_PrefabInstance: {fileID: 6144379352803512140}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6450370341672071709 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+  m_PrefabInstance: {fileID: 6144379352803512140}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7657798703818053250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6450370341672071709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76665b8e19a7d3b4db4065ab2450dccc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeamToon.TeamToonGhostDeformer
+  renderers:
+  - {fileID: 8355977398376699291}
+  - {fileID: 745000623467193883}
+  - {fileID: 156206056250254866}
+  anchor: {fileID: 0}
+  localRoot: {x: 0, y: 1.32917, z: -0.115499675}
+  localTipDirection: {x: 0, y: -1, z: 0}
+  length: 1.5319337
+  localCenter: {x: 0, y: 0.56320316, z: -0.115499675}
+  dragPerSpeed: 0.12
+  turnDrag: 0.08
+  maxDrag: 0.6
+  dragFrequency: 2.2
+  dragDamping: 0.35
+  stretchPerSpeed: 0.06
+  maxStretch: 0.35
+  stretchFrequency: 3.5
+  stretchDamping: 0.3
+  localWaveDirection: {x: 1, y: 0, z: 0}
+  idleWaveAmplitude: 0.03
+  waveAmplitudePerSpeed: 0.04
+  maxWaveAmplitude: 0.25
+  waveFrequency: 1.2
+  waveFrequencyPerSpeed: 0.5
+  breathAmplitude: 0.01
+  breathFrequency: 0.5
+  puffFrequency: 4
+  puffDamping: 0.25
+  useTransformVelocity: 1
+  externalVelocity: {x: 0, y: 0, z: 0}
+  teleportDistance: 5
+  boundsPadding: 0.5
+--- !u!114 &6257968808050217282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6450370341672071709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 234324c925ad3e74eb03c1093ce95383, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeamToon.TeamToonMaterialBlend
+  materialA: {fileID: 2100000, guid: 637b0e258e6a29e4cae96a9d9b59c376, type: 2}
+  materialB: {fileID: 2100000, guid: cba0b8ae500cdbe459f89a9f63fb7cfe, type: 2}
+  blend: 1
+  renderers:
+  - {fileID: 8355977398376699291}
+  - {fileID: 156206056250254866}
+--- !u!137 &8355977398376699291 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2788675242186676951, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
   m_PrefabInstance: {fileID: 6144379352803512140}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7580411023305129412

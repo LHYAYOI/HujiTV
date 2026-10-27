@@ -37,6 +37,9 @@ public class MiniGhostDyingState : MiniGhostState
 
         // パーティクルを再生
         PlayDeathEffect(m_owner.transform.position);
+
+        // 元のマテリアルから透明マテリアルに切り替える
+        StartCoroutine(m_owner.SwitchMaterialBlendCoroutine(0, 1));
     }
 
     public override void ExitState()
