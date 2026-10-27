@@ -37,4 +37,7 @@ public class MiniGhostMoveState : MiniGhostState
             m_owner.ChangeState(MINI_GHOST_STATE_TYPE.ATTACK);
         }
     }
+
+   
+
 }

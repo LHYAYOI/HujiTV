@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Splines;
 
@@ -57,7 +58,7 @@ public class MiniGhostSpawnState : MiniGhostState
         {
             m_owner.transform.position = m_spawnTargetPos;
             m_owner.SetDistanceTraveled(0f);
-            //m_owner.StartTimeLimit();
+
             m_owner.ChangeState(MINI_GHOST_STATE_TYPE.IDLE);
         }
 
@@ -65,9 +66,10 @@ public class MiniGhostSpawnState : MiniGhostState
 
     public override void ExitState()
     {
-       
+        // “§–¾‚©‚çŒ³‚Ìƒ}ƒeƒŠƒAƒ‹‚É–ß‚·
+        StartCoroutine(m_owner.SwitchMaterialBlendCoroutine(1, 0));
     }
 
-
+    
 
 }

@@ -143,8 +143,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BattleData
   m_battleTime: 15
   m_enemyData:
-  - m_spawnType: 0
-    m_enemyId: MiniGhost_A
+  - m_enemyId: MiniGhost_A
     m_splineId: 1_1
     m_spawnId: 1_1
 --- !u!114 &14647525
@@ -1385,14 +1384,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12c9217d477de68469f5fa9a9d305fb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleData
-  m_battleTime: 15
+  m_battleTime: 17
   m_enemyData:
-  - m_spawnType: 0
-    m_enemyId: MiniGhost_A
+  - m_enemyId: MiniGhost_A
     m_splineId: 2_1
     m_spawnId: 2_1
-  - m_spawnType: 0
-    m_enemyId: MiniGhost_B
+  - m_enemyId: MiniGhost_B
     m_splineId: 2_2
     m_spawnId: 2_2
 --- !u!114 &569811096
@@ -1407,7 +1404,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4ddaf000ecc2ff46bc42fb9b3058124, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GimmickSplineBattle
-  m_gimmickPoint: 15.4
+  m_gimmickPoint: 15
   m_battleData: {fileID: 569811095}
   m_onFinishBattle:
     m_PersistentCalls:
@@ -1441,8 +1438,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BattleData
   m_battleTime: 15
   m_enemyData:
-  - m_spawnType: 0
-    m_enemyId: MiniGhost_A
+  - m_enemyId: MiniGhost_A
     m_splineId: 1_1
     m_spawnId: 1_1
 --- !u!114 &590592298
@@ -1865,16 +1861,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BattleData
   m_battleTime: 20
   m_enemyData:
-  - m_spawnType: 0
-    m_enemyId: MiniGhost_A
+  - m_enemyId: MiniGhost_A
     m_splineId: 3_1
     m_spawnId: 3_1
-  - m_spawnType: 0
-    m_enemyId: MiniGhost_B
+  - m_enemyId: MiniGhost_B
     m_splineId: 3_2
     m_spawnId: 3_2
-  - m_spawnType: 0
-    m_enemyId: MiniGhost_C
+  - m_enemyId: MiniGhost_C
     m_splineId: 3_3
     m_spawnId: 3_3
 --- !u!114 &785930345
@@ -1889,7 +1882,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4ddaf000ecc2ff46bc42fb9b3058124, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GimmickSplineBattle
-  m_gimmickPoint: 17.9
+  m_gimmickPoint: 19.5
   m_battleData: {fileID: 785930344}
   m_onFinishBattle:
     m_PersistentCalls:
@@ -3937,16 +3930,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BattleData
   m_battleTime: 12
   m_enemyData:
-  - m_spawnType: 0
-    m_enemyId: MiniGhost_A
+  - m_enemyId: MiniGhost_A
     m_splineId: 3_1
     m_spawnId: 3_1
-  - m_spawnType: 0
-    m_enemyId: MiniGhost_B
+  - m_enemyId: MiniGhost_B
     m_splineId: 3_2
     m_spawnId: 3_2
-  - m_spawnType: 0
-    m_enemyId: MiniGhost_A
+  - m_enemyId: MiniGhost_A
     m_splineId: 3_3
     m_spawnId: 3_3
 --- !u!114 &1380671917
@@ -4899,7 +4889,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1867198336154488999, guid: 266f0216aebc6ce4b97cc07a72b76fde, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 8.803484
+      value: 8.415625
       objectReference: {fileID: 0}
     - target: {fileID: 1867198336154488999, guid: 266f0216aebc6ce4b97cc07a72b76fde, type: 3}
       propertyPath: m_LocalPosition.y
@@ -4907,7 +4897,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1867198336154488999, guid: 266f0216aebc6ce4b97cc07a72b76fde, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 4.3322883
+      value: 4.4274764
       objectReference: {fileID: 0}
     - target: {fileID: 1867198336154488999, guid: 266f0216aebc6ce4b97cc07a72b76fde, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5450,7 +5440,7 @@ Transform:
   m_GameObject: {fileID: 1972872930}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 81.89, y: 52.21124, z: -42.67901}
+  m_LocalPosition: {x: 80.88, y: 52.21124, z: -43.95}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5480,12 +5470,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BattleData
   m_battleTime: 12
   m_enemyData:
-  - m_spawnType: 0
-    m_enemyId: MiniGhost_A
+  - m_enemyId: MiniGhost_A
     m_splineId: 2_1
     m_spawnId: 2_1
-  - m_spawnType: 0
-    m_enemyId: MiniGhost_B
+  - m_enemyId: MiniGhost_B
     m_splineId: 2_2
     m_spawnId: 2_2
 --- !u!114 &1983691970
@@ -5632,7 +5620,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1867198336154488999, guid: 266f0216aebc6ce4b97cc07a72b76fde, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 11.2897
+      value: 12.886501
       objectReference: {fileID: 0}
     - target: {fileID: 1867198336154488999, guid: 266f0216aebc6ce4b97cc07a72b76fde, type: 3}
       propertyPath: m_LocalPosition.y
@@ -5640,7 +5628,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1867198336154488999, guid: 266f0216aebc6ce4b97cc07a72b76fde, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 4.1108775
+      value: 4.2066517
       objectReference: {fileID: 0}
     - target: {fileID: 1867198336154488999, guid: 266f0216aebc6ce4b97cc07a72b76fde, type: 3}
       propertyPath: m_LocalRotation.w

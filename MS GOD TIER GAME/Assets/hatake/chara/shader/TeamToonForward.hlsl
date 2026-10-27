@@ -1,8 +1,5 @@
-
-
 #ifndef TEAM_TOON_FORWARD_INCLUDED
 #define TEAM_TOON_FORWARD_INCLUDED
-
 #include "TeamToonInput.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
@@ -16,7 +13,6 @@ struct ToonAttributes
     float2 dynamicLightmapUV : TEXCOORD2;
     UNITY_VERTEX_INPUT_INSTANCE_ID
 };
-
 struct ToonVaryings
 {
     float4 positionCS : SV_POSITION;
@@ -29,25 +25,23 @@ struct ToonVaryings
     float2 dynamicLightmapUV : TEXCOORD5;
 #endif
     half4 fogAndVertexLight : TEXCOORD6;
+    float2 sourceUV : TEXCOORD7;
     UNITY_VERTEX_INPUT_INSTANCE_ID
     UNITY_VERTEX_OUTPUT_STEREO
 };
-
-
-
-
-
 ToonVaryings ToonVertex(ToonAttributes input)
 {
     ToonVaryings output = (ToonVaryings)0;
     UNITY_SETUP_INSTANCE_ID(input);
     UNITY_TRANSFER_INSTANCE_ID(input, output);
     UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
-    VertexPositionInputs p = GetVertexPositionInputs(input.positionOS.xyz);
     VertexNormalInputs n = GetVertexNormalInputs(input.normalOS, input.tangentOS);
-    output.positionCS = p.positionCS;
-    output.positionWS = p.positionWS;
+    float3 positionWS = TransformObjectToWorld(input.positionOS.xyz);
+    ToonDeform(positionWS, n.normalWS, n.tangentWS);
+    output.positionCS = TransformWorldToHClip(positionWS);
+    output.positionWS = positionWS;
     output.uv = TRANSFORM_TEX(input.uv, _BaseMap);
+    output.sourceUV = TRANSFORM_TEX(input.uv, _BlendSourceMap);
     output.normalWS = n.normalWS;
     output.tangentWS = half4(n.tangentWS, input.tangentOS.w * GetOddNegativeScale());
     OUTPUT_LIGHTMAP_UV(input.lightmapUV, unity_LightmapST, output.lightmapUV);
@@ -55,31 +49,23 @@ ToonVaryings ToonVertex(ToonAttributes input)
 #ifdef DYNAMICLIGHTMAP_ON
     output.dynamicLightmapUV = input.dynamicLightmapUV * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
 #endif
-    output.fogAndVertexLight = half4(ComputeFogFactor(p.positionCS.z), VertexLighting(p.positionWS, n.normalWS));
+    output.fogAndVertexLight = half4(ComputeFogFactor(output.positionCS.z), VertexLighting(positionWS, n.normalWS));
     return output;
 }
 
-
-
-
-
 half ToonBand(half value, half threshold, half softness)
 {
-    // ハイライトやシャドウの細い帯状の部分において、微分幅の制限がちらつき（シマー）として現れる
     half width = max(max(softness, fwidth(value) * 0.5), 0.0001);
     return smoothstep(threshold - width, threshold + width, value);
 }
-
 half3 ToonLightColor(half3 color)
 {
     half intensity = max(max(color.r, color.g), color.b);
-    // ライトが存在しない場合、影響が減少してもゼロのままになる。
+    // A nonexistent light must remain zero even when its influence is reduced.
     half3 hue = color / max(intensity, 0.0001);
     return lerp(half3(1, 1, 1), hue, _LightColorInfluence)
          * lerp(min(intensity, 1.0h), intensity, _LightIntensityInfluence);
 }
-
-
 half ToonShadow(half attenuation)
 {
 #if defined(_TOON_RECEIVE_SHADOWS_OFF)
@@ -88,9 +74,6 @@ half ToonShadow(half attenuation)
     return lerp(1, attenuation, _ReceiveShadowStrength);
 #endif
 }
-
-
-
 half3 ToonDiffuseTint(half ndl, half4 control, float2 uv, half3 lightDir)
 {
     half offset = (control.a * 2 - 1) * _ThresholdMaskStrength;
@@ -121,7 +104,6 @@ half3 ToonDiffuseTint(half ndl, half4 control, float2 uv, half3 lightDir)
     return lerp(_ShadowColor.rgb, half3(1, 1, 1), lit);
 #endif
 }
-
 
 half3 ToonHighlight(ToonVaryings input, half3 n, half3 v, Light light, half3 albedo, half metallic, half roughness, half mask)
 {
@@ -157,20 +139,54 @@ half3 ToonHighlight(ToonVaryings input, half3 n, half3 v, Light light, half3 alb
 #endif
 }
 
-
-
 half3 ToonAdditional(Light light, half3 normalWS, half3 albedo)
 {
     return albedo * saturate(dot(normalWS, light.direction)) * ToonLightColor(light.color)
          * light.distanceAttenuation * ToonShadow(light.shadowAttenuation) * _AdditionalStrength;
 }
 
-
+// Evaluate the source with URP's metallic PBR lighting, then blend premultiplied
+// results. RGB and destination coverage must use the same interpolation weight.
+half4 ToonBlendSource(ToonVaryings input, half3 n, half3 v)
+{
+    half4 base = SAMPLE_TEXTURE2D(_BlendSourceMap, sampler_BlendSourceMap, input.sourceUV) * _BlendSourceColor;
+    InputData data = (InputData)0;
+    data.positionWS = input.positionWS;
+    data.normalWS = n;
+    data.viewDirectionWS = v;
+    data.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+#if defined(_MAIN_LIGHT_SHADOWS_SCREEN)
+    data.shadowCoord = ComputeScreenPos(TransformWorldToHClip(input.positionWS));
+#else
+    data.shadowCoord = TransformWorldToShadowCoord(input.positionWS);
+#endif
+    data.shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
+    data.vertexLighting = input.fogAndVertexLight.yzw;
+#ifdef DYNAMICLIGHTMAP_ON
+    data.bakedGI = SAMPLE_GI(input.lightmapUV, input.dynamicLightmapUV, input.vertexSH, n);
+#else
+    data.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, n);
+#endif
+    SurfaceData surface = (SurfaceData)0;
+    surface.albedo = base.rgb;
+    surface.alpha = 1;
+    surface.metallic = _BlendSourceMetallic;
+    surface.smoothness = _BlendSourceSmoothness;
+    surface.normalTS = half3(0, 0, 1);
+    surface.occlusion = 1;
+    surface.emission = _BlendSourceEmission.rgb;
+    half3 color = UniversalFragmentPBR(data, surface).rgb;
+    half alpha = saturate(base.a);
+    return half4(MixFog(color, input.fogAndVertexLight.x) * alpha, alpha);
+}
 
 half4 ToonFragment(ToonVaryings input, FRONT_FACE_TYPE face : FRONT_FACE_SEMANTIC) : SV_Target
 {
     UNITY_SETUP_INSTANCE_ID(input);
     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+#if defined(_TOON_TRANSPARENT)
+    if (_DepthPrepass > 0.5 && ToonGhostHidden(input.positionCS, input.positionWS)) discard;
+#endif // end _TOON_TRANSPARENT
     half4 base = ToonBase(input.uv);
     half3 n = ToonNormal(input.uv, input.normalWS, input.tangentWS, IS_FRONT_VFACE(face, true, false));
     half3 v = GetWorldSpaceNormalizeViewDir(input.positionWS);
@@ -179,33 +195,38 @@ half4 ToonFragment(ToonVaryings input, FRONT_FACE_TYPE face : FRONT_FACE_SEMANTI
     half4 control = ToonControl(input.uv);
     half3 surface = ToonSurface(input.uv);
     half ao = surface.b * control.g;
-    InputData inputData = (InputData) 0; // LIGHT_LOOP_BEGINには、この変数が必要です。
+    InputData inputData = (InputData)0; // LIGHT_LOOP_BEGIN needs this exact variable.
     inputData.positionWS = input.positionWS;
     inputData.normalWS = n;
     inputData.viewDirectionWS = v;
     inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
 #if defined(_MAIN_LIGHT_SHADOWS_SCREEN)
     inputData.shadowCoord = ComputeScreenPos(TransformWorldToHClip(input.positionWS));
-#else
+#else// _MAIN_LIGHT_SHADOWS_SCREEN
     inputData.shadowCoord = TransformWorldToShadowCoord(input.positionWS);
-#endif
+#endif// end _MAIN_LIGHT_SHADOWS_SCREEN
     half4 shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
     Light mainLight = GetMainLight(inputData.shadowCoord, input.positionWS, shadowMask);
     half3 lightingNormal = n;
 #if defined(_TOON_FACE)
     lightingNormal = SafeNormalize(lerp(n, SafeNormalize(_FaceForward.xyz), _FaceBlend));
-#endif
+#endif// end _TOON_FACE
     half3 bakedGI;
 #ifdef DYNAMICLIGHTMAP_ON
     bakedGI = SAMPLE_GI(input.lightmapUV, input.dynamicLightmapUV, input.vertexSH, n);
-#else
+#else// DYNAMICLIGHTMAP_ON
     bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, n);
-#endif
+#endif// DYNAMICLIGHTMAP_ON
     MixRealtimeAndBakedGI(mainLight, n, bakedGI, shadowMask);
+#if defined(_TOON_TRANSPARENT)
+    // SSAO describes the opaque surface behind a transparent body, not the body itself.
+    half directAO = 1, indirectAO = 1;
+#else// _TOON_TRANSPARENT
     AmbientOcclusionFactor screenAO = GetScreenSpaceAmbientOcclusion(inputData.normalizedScreenSpaceUV);
     half directAO = lerp(1, screenAO.directAmbientOcclusion, _SSAOReceive);
     half indirectAO = lerp(1, screenAO.indirectAmbientOcclusion, _SSAOReceive);
-    half diffuseWeight = lerp(1, 0.25, surface.r); // 意図的に変更しています、BRDFではないです
+#endif
+    half diffuseWeight = lerp(1, 0.25, surface.r); // Deliberately stylized, not a PBR BRDF.
     half3 tint = ToonDiffuseTint(dot(lightingNormal, mainLight.direction), control, input.uv, mainLight.direction);
     half3 shadowTint = lerp(_ShadowColor.rgb, tint, ToonShadow(mainLight.shadowAttenuation));
     color = base.rgb * shadowTint * ToonLightColor(mainLight.color) * mainLight.distanceAttenuation * directAO;
@@ -248,6 +269,22 @@ half4 ToonFragment(ToonVaryings input, FRONT_FACE_TYPE face : FRONT_FACE_SEMANTI
     color += emission;
 #endif
     color = MixFog(color, input.fogAndVertexLight.x);
+#if defined(_TOON_TRANSPARENT)
+    // Ghost body: see-through core, dense edge, glowing rim. Output is premultiplied;
+    // lowering alpha only (光の加算) moves the blend toward additive.
+    half fresnel = 1 - saturate(dot(n, v));
+    half alpha = saturate(base.a * lerp(_CoreAlpha, _EdgeAlpha, pow(fresnel, max(_EdgePower, 0.1)))) * _Visibility;
+    half alphaMultiplier = saturate(_MulAlpha);
+    alpha *= alphaMultiplier;
+    half3 glow = _GhostRimColor.rgb * pow(fresnel, max(_GhostRimPower, 0.1)) * _Visibility;
+    glow = MixFogColor(glow, half3(0, 0, 0), input.fogAndVertexLight.x);
+    glow *= alphaMultiplier;
+    half4 result = half4(max(color, 0) * alpha + glow, alpha * (1 - _AdditiveBlend));
+    if (_MaterialBlendEnabled > 0.5)
+        result = lerp(ToonBlendSource(input, SafeNormalize(input.normalWS), v), result, saturate(_MaterialBlend));
+    return result;
+#else
     return half4(max(color, 0), 1);
+#endif
 }
 #endif

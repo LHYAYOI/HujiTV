@@ -1,11 +1,17 @@
-
-
-Shader "custom/hatake/Toon"
+Shader "custom/hatake/ToonMaster"
 {
     Properties
     {
+        [HideInInspector] _MaterialBlendEnabled("Model blend enabled", Float) = 0
+        [HideInInspector] _MaterialBlend("Model blend", Range(0,1)) = 1
+        [HideInInspector] _BlendSourceMap("Source texture", 2D) = "white" {}
+        [HideInInspector] _BlendSourceColor("Source color", Color) = (1,1,1,1)
+        [HideInInspector] _BlendSourceEmission("Source emission", Color) = (0,0,0,1)
+        [HideInInspector] _BlendSourceMetallic("Source metallic", Float) = 0
+        [HideInInspector] _BlendSourceSmoothness("Source smoothness", Float) = 0.5
         [MainTexture] _BaseMap("ベース画像", 2D) = "white" {}
         [MainColor] _BaseColor("ベース色", Color) = (0.8,0.65,0.5,1)
+        _MulAlpha("最終算出の透明度に乗算する倍率", Range(0, 1)) = 1
         _ShadowColor("影の色（乗算）", Color) = (0.62,0.57,0.72,1)
         _ShadowThreshold("影になる範囲", Range(-1,1)) = 0.1
         _ShadowSoftness("境界の柔らかさ", Range(0.001,0.5)) = 0.035
@@ -77,20 +83,43 @@ Shader "custom/hatake/Toon"
         _AlphaClip("透明部分を切り抜く", Float) = 0
         _Cutoff("切り抜きの境界値", Range(0,1)) = 0.5
         [Enum(UnityEngine.Rendering.CullMode)] _Cull("裏面の表示", Float) = 2
+        _SurfaceType("表面の種類", Float) = 0
+        _CoreAlpha("中心の不透明度", Range(0,1)) = 0.35
+        _EdgeAlpha("縁の不透明度", Range(0,1)) = 1
+        _EdgePower("縁の幅（大きいほど細い）", Range(0.1,8)) = 1.5
+        _AdditiveBlend("光の加算", Range(0,1)) = 0.5
+        [HDR] _GhostRimColor("縁の発光色", Color) = (1,1,1,1)
+        _GhostRimPower("縁の発光の細さ", Range(0.1,12)) = 3
+        _Visibility("表示の濃さ", Range(0,1)) = 1
+        _DepthPrepass("重なった裏側を隠す", Float) = 1
+        _GhostGlowEnabled("外側の光（ハロー）を使用", Float) = 0
+        [HDR] _GhostGlowColor("外側の光の色", Color) = (1,1,1,1)
+        _GhostGlowWidth("外側の光の幅（m）", Range(0,0.5)) = 0.05
+        _GhostGlowFalloff("外側の光の減衰", Range(0.1,8)) = 2
+        _DeformEnabled("変形（デフォーマ）を使用", Float) = 0
+        _DeformCurve("変形の効き方（根元→先端）", Range(0.25,4)) = 1.5
+        _DeformWaveCount("揺れの波の数", Range(0,4)) = 1
+        [HideInInspector] _DeformAnchor("Deform anchor (xyz) / length (w)", Vector) = (0,0,0,1)
+        [HideInInspector] _DeformAxis("Deform axis toward tip", Vector) = (0,-1,0,0)
+        [HideInInspector] _DeformCenter("Stretch pivot (xyz) / inflate (w)", Vector) = (0,0,0,0)
+        [HideInInspector] _DeformStretch("Stretch direction (xyz) / factor (w)", Vector) = (0,1,0,1)
+        [HideInInspector] _DeformDrag("Tip drag offset", Vector) = (0,0,0,0)
+        [HideInInspector] _DeformWave("Wave amplitude (xyz) / phase (w)", Vector) = (0,0,0,0)
+        [HideInInspector] _SrcBlend("Src blend", Float) = 1
+        [HideInInspector] _DstBlend("Dst blend", Float) = 0
+        [HideInInspector] _ZWrite("Z write", Float) = 1
     }
-
-
     SubShader
     {
         Tags { "RenderPipeline"="UniversalPipeline" "RenderType"="Opaque" "Queue"="Geometry" }
         LOD 300
         Cull [_Cull]
-
         Pass
         {
             Name "ForwardLit"
             Tags { "LightMode"="UniversalForwardOnly" }
-            ZWrite On
+            Blend [_SrcBlend] [_DstBlend]
+            ZWrite [_ZWrite]
             HLSLPROGRAM
             #pragma target 3.5
             #pragma vertex ToonVertex
@@ -106,6 +135,7 @@ Shader "custom/hatake/Toon"
             #pragma shader_feature_local_fragment _ _TOON_REFLECTION
             #pragma shader_feature_local_fragment _ _TOON_EMISSION
             #pragma shader_feature_local_fragment _ _TOON_FACE
+            #pragma shader_feature_local_fragment _ _TOON_TRANSPARENT
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
@@ -122,12 +152,11 @@ Shader "custom/hatake/Toon"
             #pragma multi_compile _ SHADOWS_SHADOWMASK
             #pragma multi_compile _ USE_LEGACY_LIGHTMAPS
             #pragma multi_compile_fog
+            #pragma shader_feature_local_vertex _ _TOON_DEFORM
             #pragma multi_compile_instancing
             #include "TeamToonForward.hlsl"
             ENDHLSL
         }
-
-
         Pass
         {
             Name "ShadowCaster"
@@ -139,12 +168,11 @@ Shader "custom/hatake/Toon"
             #pragma fragment ToonDepthFragment
             #pragma shader_feature_local_fragment _ _TOON_ALPHA_CLIP
             #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
+            #pragma shader_feature_local_vertex _ _TOON_DEFORM
             #pragma multi_compile_instancing
             #include "TeamToonPasses.hlsl"
             ENDHLSL
         }
-
-
         Pass
         {
             Name "DepthOnly"
@@ -155,12 +183,11 @@ Shader "custom/hatake/Toon"
             #pragma vertex ToonPassVertex
             #pragma fragment ToonDepthFragment
             #pragma shader_feature_local_fragment _ _TOON_ALPHA_CLIP
+            #pragma shader_feature_local_vertex _ _TOON_DEFORM
             #pragma multi_compile_instancing
             #include "TeamToonPasses.hlsl"
             ENDHLSL
         }
-
-
         Pass
         {
             Name "DepthNormals"
@@ -173,12 +200,11 @@ Shader "custom/hatake/Toon"
             #pragma shader_feature_local_fragment _ _TOON_ALPHA_CLIP
             #pragma shader_feature_local _ _TOON_NORMALMAP
             #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
+            #pragma shader_feature_local_vertex _ _TOON_DEFORM
             #pragma multi_compile_instancing
             #include "TeamToonPasses.hlsl"
             ENDHLSL
         }
-
-
         Pass
         {
             Name "Meta"
@@ -193,25 +219,23 @@ Shader "custom/hatake/Toon"
             #include "TeamToonPasses.hlsl"
             ENDHLSL
         }
-
-
         Pass
         {
             Name "TeamToonOutline"
             Tags { "LightMode"="TeamToonOutline" }
             Cull Front ZWrite Off ZTest LEqual
+            Blend One OneMinusSrcAlpha
             HLSLPROGRAM
             #pragma target 3.5
             #pragma vertex ToonOutlineVertex
             #pragma fragment ToonOutlineFragment
             #pragma shader_feature_local_fragment _ _TOON_ALPHA_CLIP
             #pragma multi_compile_fog
+            #pragma shader_feature_local_vertex _ _TOON_DEFORM
             #pragma multi_compile_instancing
             #include "TeamToonPasses.hlsl"
             ENDHLSL
         }
-
-
         Pass
         {
             Name "TeamToonHairMask"
@@ -222,12 +246,11 @@ Shader "custom/hatake/Toon"
             #pragma vertex ToonPassVertex
             #pragma fragment ToonHairMaskFragment
             #pragma shader_feature_local_fragment _ _TOON_ALPHA_CLIP
+            #pragma shader_feature_local_vertex _ _TOON_DEFORM
             #pragma multi_compile_instancing
             #include "TeamToonPasses.hlsl"
             ENDHLSL
         }
-
-
         Pass
         {
             Name "TeamToonReveal"
@@ -239,14 +262,44 @@ Shader "custom/hatake/Toon"
             #pragma fragment ToonRevealFragment
             #pragma shader_feature_local_fragment _ _TOON_ALPHA_CLIP
             #pragma multi_compile_fog
+            #pragma shader_feature_local_vertex _ _TOON_DEFORM
+            #pragma multi_compile_instancing
+            #include "TeamToonPasses.hlsl"
+            ENDHLSL
+        }
+        Pass
+        {
+            Name "TeamToonGhostMask"
+            Tags { "LightMode"="TeamToonGhostMask" }
+            ZWrite On ZTest LEqual
+            HLSLPROGRAM
+            #pragma target 3.5
+            #pragma vertex ToonGhostMaskVertex
+            #pragma fragment ToonGhostMaskFragment
+            #pragma shader_feature_local_fragment _ _TOON_ALPHA_CLIP
+            #pragma shader_feature_local_vertex _ _TOON_DEFORM
+            #pragma multi_compile_instancing
+            #include "TeamToonPasses.hlsl"
+            ENDHLSL
+        }
+        Pass
+        {
+            Name "TeamToonGhostGlow"
+            Tags { "LightMode"="TeamToonGhostGlow" }
+            Cull Front ZWrite Off ZTest LEqual Blend One One
+            HLSLPROGRAM
+            #pragma target 3.5
+            #pragma vertex ToonGhostGlowVertex
+            #pragma fragment ToonGhostGlowFragment
+            #pragma shader_feature_local_fragment _ _TOON_ALPHA_CLIP
+            #pragma shader_feature_local_vertex _ _TOON_DEFORM
+            #pragma multi_compile_fog
             #pragma multi_compile_instancing
             #include "TeamToonPasses.hlsl"
             ENDHLSL
         }
     }
-
     CustomEditor "TeamToon.Editor.TeamToonShaderGUI"
-
     FallBack Off
 }
 

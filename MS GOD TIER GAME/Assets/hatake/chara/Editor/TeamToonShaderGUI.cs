@@ -8,10 +8,10 @@ namespace TeamToon.Editor
     {
         MaterialEditor editor;
         MaterialProperty[] properties;
-        bool appearance, surface, shine, lighting, character, edge, advanced;
+        bool appearance, surface, shine, lighting, character, edge, ghost, advanced;
         int preset;
-        static readonly string[] Presets = { "標準", "肌", "髪", "布", "金属", "瞳" };
-
+        static readonly string[] Presets = { "標準", "肌", "髪", "布", "金属", "瞳", "オバケ（半透明）" };
+        // Documentation window navigation changes only foldouts, never material values.
         internal void ShowDocumentationSection(int section)
         {
             appearance = section == 1;
@@ -21,6 +21,7 @@ namespace TeamToon.Editor
             character = section == 5;
             edge = section == 6;
             advanced = section == 7;
+            ghost = section == 8;
         }
         MaterialProperty P(string name) => FindProperty(name, properties, false);
         bool Any(string name) => editor.targets.Cast<Material>().Any(m => m.GetFloat(name) > 0.5f);
@@ -37,6 +38,7 @@ namespace TeamToon.Editor
             Field("_BaseColor", "ベース色", "画像へ掛ける色。白で元の画像の色。画像なしは、この色になります。");
             using (new EditorGUI.DisabledScope(AllUnlit))
             {
+                Field("_MulAlpha", "αの計算結果に乗算する", "半透明を使用していない場合無視されます");
                 Field("_ShadowColor", "影の色", "ベース色へ掛ける色です。最終的な影の色を直接指定する項目ではありません。");
                 Field("_ShadowThreshold", "影になる範囲", "大きいほど影が広がります。Ramp方式では詳細欄の画像で調整します。");
                 Field("_ShadowSoftness", "境界の柔らかさ", "面の明暗の境界幅。ライトの落ち影をぼかす設定とは別です。");
@@ -154,6 +156,41 @@ namespace TeamToon.Editor
                 Popup("_Cull", "裏面の表示", new[] { "両面", "裏面のみ", "表面のみ（通常）" });
                 EditorGUILayout.HelpBox("影を落とす／落とさないは、モデルのRendererにあるCast Shadowsで設定します。", MessageType.None);
             }
+            if (Fold(ref ghost, "半透明（オバケ）・変形"))
+            {
+                Popup("_SurfaceType", "表面の種類", new[] { "不透明", "半透明（オバケ）" });
+                if (AnyMode("_SurfaceType", 1))
+                {
+                    Field("_CoreAlpha", "中心の不透明度", "正面を向いた部分の濃さ。小さいほど向こうが透けます。ベース画像のAも掛かります。");
+                    Field("_EdgeAlpha", "縁の不透明度", "輪郭付近の濃さ。");
+                    Field("_EdgePower", "縁の幅", "大きいほど濃い縁が細くなります。");
+                    Field("_AdditiveBlend", "光の加算", "0＝通常の半透明、1＝背景に光を足すだけ（暗い場所で光って見える）。");
+                    Field("_GhostRimColor", "縁の発光色", "HDR。輪郭が光る色です。BloomはVolume側で設定します。");
+                    Field("_GhostRimPower", "縁の発光の細さ", "大きいほど細い。");
+                    Field("_Visibility", "表示の濃さ", "全体の濃さ。出現・消滅の演出はスクリプトからMaterialPropertyBlockで操作します。");
+                    Toggle("_DepthPrepass", "重なった裏側を隠す", "ONで、同じキャラクター識別番号の部位（体・手など）を1つの体として描き、奥の部位や裏面が透けないようにします。TeamToonRendererFeatureが必要です。");
+                    if (Any("_DepthPrepass"))
+                    {
+                        Field("_CharacterId", "キャラクター識別番号", "同じオバケの部位は同じ番号、別のオバケは別の番号。TeamToonCharacterでRendererごとにまとめて設定できます。");
+                        EditorGUILayout.HelpBox("同じ番号のオバケ同士が重なると、奥のオバケが手前のオバケに隠れます。オバケごとにTeamToonCharacterで別の番号を指定してください。", MessageType.Info);
+                    }
+                    Toggle("_GhostGlowEnabled", "外側の光（ハロー）を使用", "輪郭の外側へ光をにじませます。RendererにTeamToonRendererFeatureが必要です。");
+                    if (Any("_GhostGlowEnabled"))
+                    {
+                        Field("_GhostGlowColor", "外側の光の色", "HDR。");
+                        Field("_GhostGlowWidth", "外側の光の幅（m）", "法線方向へ膨らませる量。法線が分かれた角ではハローが割れます。");
+                        Field("_GhostGlowFalloff", "外側の光の減衰", "大きいほど輪郭の近くだけが光ります。");
+                    }
+                    EditorGUILayout.HelpBox("影を落とす場合はRendererのCast Shadowsで設定します（半透明でも影は不透明の形で落ちます）。", MessageType.None);
+                }
+                Toggle("_DeformEnabled", "変形（デフォーマ）を使用", "TeamToonGhostDeformerの動きに合わせて形を変えます。同じオバケの全部位のMaterialでONにしてください。");
+                if (Any("_DeformEnabled"))
+                {
+                    Field("_DeformCurve", "変形の効き方", "根元→先端の効き方。大きいほど先端だけが動きます。");
+                    Field("_DeformWaveCount", "揺れの波の数", "根元→先端の間にある波の数。");
+                    EditorGUILayout.HelpBox("モデルに『TeamToonGhostDeformer』を追加してください。コンポーネントがない場合は変形しません。", MessageType.Info);
+                }
+            }
             if (Fold(ref advanced, "自己発光・画像の配置・技術設定"))
             {
                 Toggle("_EmissionEnabled", "自己発光を使用", "画像なしでもHDR色だけで発光できます。BloomはVolume側で設定します。");
@@ -173,6 +210,9 @@ namespace TeamToon.Editor
                 if (changed) EditorUtility.SetDirty(material);
             }
             CheckImports();
+            EditorGUILayout.Space(6);
+            if (GUILayout.Button("使い方・画像の規格を開く"))
+                AssetDatabase.OpenAsset(AssetDatabase.LoadAssetAtPath<Object>("Assets/TeamToon/DesignerGuide.md"));
         }
         static bool Fold(ref bool value, string title)
         {
@@ -219,11 +259,12 @@ namespace TeamToon.Editor
         public override void ValidateMaterial(Material material) => TeamToonMaterial.Synchronize(material);
         public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader)
         {
-
+            // Basic migration from URP Lit / built-in materials. Specialty maps remain explicit.
             Texture baseMap = material.HasProperty("_BaseMap") ? material.GetTexture("_BaseMap") : material.HasProperty("_MainTex") ? material.GetTexture("_MainTex") : null;
             Color baseColor = material.HasProperty("_BaseColor") ? material.GetColor("_BaseColor") : material.HasProperty("_Color") ? material.GetColor("_Color") : Color.white;
             base.AssignNewShaderToMaterial(material, oldShader, newShader);
             material.SetTexture("_BaseMap", baseMap); material.SetColor("_BaseColor", baseColor);
+            // Keyword names from the previous shader are not valid feature settings here.
             material.shaderKeywords = new string[0];
             TeamToonMaterial.Synchronize(material);
         }
