@@ -5,6 +5,9 @@ using UnityEngine.InputSystem;
 
 public class SwarmGhostManager : MonoBehaviour
 {
+    [Header("群れお化けのデータ")]
+    [SerializeField] private EnemyData m_swarmGhostData;
+
     [Header("群れお化けの一個体リスト")]
     [SerializeField] private List<SwarmGhost> m_swarmGhostPrefabs;
 
@@ -26,9 +29,14 @@ public class SwarmGhostManager : MonoBehaviour
 
     private bool m_isSpawningFlag = false;  // 出現処理が重複して実行されるのを防ぐ
 
+    private int m_currentHealth = 0; // 現在の群れお化けの体力
+
+
     private void Start()
     {
         StartCoroutine(SpawnAllSwarmGhostCoroutine());
+
+        m_currentHealth = m_swarmGhostData.m_maxHealth;
     }
 
     private void Update()
@@ -47,7 +55,7 @@ public class SwarmGhostManager : MonoBehaviour
     }
 
     // 群れお化けを時間差で出現させる
-    private IEnumerator SpawnAllSwarmGhostCoroutine()
+    public IEnumerator SpawnAllSwarmGhostCoroutine()
     {
         if (m_isSpawningFlag)
         {
@@ -215,5 +223,29 @@ public class SwarmGhostManager : MonoBehaviour
         m_activeSwarmGhostList.Clear();
         m_activeSpawnPositions.Clear();
         m_availableSpawnPositions.Clear();
+    }
+
+    public void SetCurrentHealth(int health)
+    {
+        m_currentHealth = health;
+    }
+
+    private void OnTriggerEnter(Collider collision)
+    {
+        if (collision.gameObject.CompareTag("MagicBullet"))
+        {
+            m_currentHealth--;
+
+            if (m_currentHealth == 1)
+            {
+                // 体力が1になったらランダムに半分の群れお化けを削除
+                RemoveRandomHalfSwarmGhosts();
+            }
+            else if (m_currentHealth <= 0)
+            {
+                // 体力が0になったらすべての群れお化けを削除
+                RemoveAllSwarmGhosts();
+            }
+        }
     }
 }
