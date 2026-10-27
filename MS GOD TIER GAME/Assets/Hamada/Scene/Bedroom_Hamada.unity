@@ -1208,7 +1208,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: -20, y: 90, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -1.898, y: -0.301}
+  m_AnchoredPosition: {x: -1.898, y: -0.429}
   m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &496264274
@@ -2844,8 +2844,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 16777215
+  m_fontColor: {r: 1, g: 1, b: 1, a: 0}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -6277,11 +6277,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1380671916}
   m_SourcePrefab: {fileID: 100100000, guid: 266f0216aebc6ce4b97cc07a72b76fde, type: 3}
---- !u!1 &2063881070 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8958723840767735755, guid: 41ffec584f197e442b3d4cac00f8903e, type: 3}
-  m_PrefabInstance: {fileID: 2119929594}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2108895338 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8450414562296173851, guid: 26e78924a1e52d2439343c6042d253fa, type: 3}
@@ -6306,18 +6301,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 874989576}
     m_Modifications:
-    - target: {fileID: 578782270497587736, guid: 41ffec584f197e442b3d4cac00f8903e, type: 3}
-      propertyPath: m_amplitudeGain
-      value: 0.03
-      objectReference: {fileID: 0}
-    - target: {fileID: 578782270497587736, guid: 41ffec584f197e442b3d4cac00f8903e, type: 3}
-      propertyPath: m_frequencyGain
-      value: 0.8
-      objectReference: {fileID: 0}
-    - target: {fileID: 2310478160670157443, guid: 41ffec584f197e442b3d4cac00f8903e, type: 3}
-      propertyPath: Lens.NearClipPlane
-      value: 0.1
-      objectReference: {fileID: 0}
     - target: {fileID: 5990332571221697807, guid: 41ffec584f197e442b3d4cac00f8903e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -6358,6 +6341,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8522499374752743271, guid: 41ffec584f197e442b3d4cac00f8903e, type: 3}
+      propertyPath: m_positionAnchor
+      value: 
+      objectReference: {fileID: 660704628}
     - target: {fileID: 8958723840767735755, guid: 41ffec584f197e442b3d4cac00f8903e, type: 3}
       propertyPath: m_Name
       value: FPSCamera
@@ -6365,10 +6352,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8958723840767735755, guid: 41ffec584f197e442b3d4cac00f8903e, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2119929601}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 41ffec584f197e442b3d4cac00f8903e, type: 3}
 --- !u!4 &2119929595 stripped
 Transform:
@@ -6380,26 +6364,12 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2310478160670157443, guid: 41ffec584f197e442b3d4cac00f8903e, type: 3}
   m_PrefabInstance: {fileID: 2119929594}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2063881070}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f9dfa5b682dcd46bda6128250e975f58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineCamera
---- !u!114 &2119929601
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2063881070}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a8a11d73cb1f8343bbc40b611147958, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CameraDollyZoom
-  m_cinemachineCamera: {fileID: 2119929596}
-  m_positionAnchor: {fileID: 660704628}
 --- !u!1001 &2134107091
 PrefabInstance:
   m_ObjectHideFlags: 0

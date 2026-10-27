@@ -21,6 +21,7 @@ public class StoryTextSequencer : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.I))
         {
+            Debug.Log("ooooooooo");
             AppearText();
         }
 
