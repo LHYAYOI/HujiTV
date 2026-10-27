@@ -10,6 +10,9 @@ public class StoryTextController : MonoBehaviour
 
     public void Appear() 
     {
+        Color color = m_text.color;
+        m_text.color = new Color(color.r, color.g, color.b, 1);
+
         m_textEffectController.Play();
     }
 
