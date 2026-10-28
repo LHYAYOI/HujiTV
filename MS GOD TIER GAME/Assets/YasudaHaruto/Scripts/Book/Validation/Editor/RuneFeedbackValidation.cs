@@ -78,13 +78,13 @@ namespace YasudaHaruto.BookValidation.Editor
                 Require(controller.State == RUNE_TRACE_STATE.COOLDOWN && fake.Failures == 3,
                     "Accurate completed rune still reaches cast cooldown");
                 Require(fake.Completions == 1, "Completion effect fires on full rune completion only");
-                Require(Mathf.Approximately(fake.Cooldown, 1f), "Cooldown starts with a full circle");
+                Require(Mathf.Approximately(fake.Cooldown, 1f), "Cooldown starts at full remaining time");
                 controller.Tick(0.25f);
                 Require(Mathf.Approximately(fake.Cooldown, 1f), "Automatic cast waits for finger release before advancing");
                 controller.EndStroke();
                 controller.SetCooldown(1f);
                 controller.Tick(0.25f);
-                Require(Mathf.Approximately(fake.Cooldown, 0.75f), "Cooldown circle uses the controller remaining time");
+                Require(Mathf.Approximately(fake.Cooldown, 0.75f), "Cooldown feedback uses the controller remaining time");
                 controller.Tick(1f);
                 Require(controller.CanBeginStroke && Mathf.Approximately(fake.Cooldown, 0f), "Cooldown finishes and tracing becomes available again");
                 controller.Cancel();
@@ -92,6 +92,9 @@ namespace YasudaHaruto.BookValidation.Editor
                 CheckCastGuide(rune, start, end);
                 CheckCompletionTiming(start, end);
                 CheckThickLineGeometry();
+                CheckCooldownShader();
+                CheckPageImageBinding();
+                CheckCanvasCooldown();
             }
             finally { UnityEngine.Object.DestroyImmediate(rune); }
             Debug.Log("RuneFeedback COMPLETE");
@@ -273,44 +276,259 @@ namespace YasudaHaruto.BookValidation.Editor
                 view.BeginTrace(rune);
                 view.UpdateCurrentStroke(points);
                 view.EndStroke();
+                var image = new GameObject("Existing Colored Rune", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image)).GetComponent<Image>();
+                image.transform.SetParent(root.transform, false);
+                image.rectTransform.sizeDelta = new Vector2(200f, 200f);
+                Material original = image.material;
+                view.ConfigureCooldownImage(() => image);
+                view.PlayCooldownRelease();
                 view.ShowCooldown(1f);
-                var cooldown = root.GetComponentInChildren<RuneCooldownGraphic>(true);
-                Require(cooldown != null && cooldown.gameObject.activeSelf && !cooldown.raycastTarget,
-                    "Cooldown ring is visible and does not capture input");
+                var cooldown = root.GetComponent<RuneCooldownImageFeedback>();
+                Require(cooldown != null && cooldown.IsVisible && image.material != original,
+                    "Cooldown operates on the existing colored image");
+                Require(Mathf.Approximately(image.material.GetFloat("_Drain"), 0f), "Release begins without an abrupt dark jump");
+                cooldown.Advance(0.05f);
+                Require(image.material.GetFloat("_Drain") > 0.4f && image.material.GetFloat("_Drain") < 0.6f,
+                    "One-second cooldown reaches half drain after 0.05 seconds");
+                Require(image.material.GetFloat("_Flash") > 0f, "Release briefly brightens the rune");
+                Image releaseEcho = root.transform.Find("Rune Release Light").GetComponent<Image>();
+                Require(!releaseEcho.raycastTarget && releaseEcho.rectTransform.anchoredPosition.y > image.rectTransform.anchoredPosition.y &&
+                    releaseEcho.color.a > 0f, "Release light rises, fades and never blocks input");
+                cooldown.Advance(1f);
+                Require(Mathf.Approximately(image.material.GetFloat("_Drain"), 1f) && !releaseEcho.gameObject.activeSelf,
+                    "Release finishes with the rune drained and the releaseEcho hidden");
+                view.ShowCooldown(0.75f);
+                Require(Mathf.Approximately(image.material.GetFloat("_Recovery"), 0.25f), "Recovery follows the controller's remaining time");
                 using (var mesh = new VertexHelper())
                 {
                     typeof(RuneLineGraphic).GetMethod("OnPopulateMesh", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly).Invoke(line, new object[] { mesh });
                     Require(mesh.currentVertCount == 0, "Cast removes the drawn rune");
                 }
-                cooldown.rectTransform.sizeDelta = new Vector2(200f, 200f);
-                cooldown.SetRemaining(0.75f);
-                using (var mesh = new VertexHelper())
-                {
-                    typeof(RuneCooldownGraphic).GetMethod("OnPopulateMesh", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly).Invoke(cooldown, new object[] { mesh });
-                    UIVertex first = default;
-                    mesh.PopulateUIVertex(ref first, 0);
-                    Require(first.position.x > 0f && Mathf.Abs(first.position.y) < 0.01f,
-                        "Quarter elapsed removes the clockwise top-right quarter");
-                    cooldown.SetRemaining(0f);
-                    typeof(RuneCooldownGraphic).GetMethod("OnPopulateMesh", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly).Invoke(cooldown, new object[] { mesh });
-                    Require(mesh.currentVertCount == 0, "Finished cooldown has no ring geometry");
-                }
+                view.ShowCooldown(0f);
+                Require(!cooldown.IsVisible && image.material == original, "Completion restores the exact original material");
                 view.BeginTrace(rune);
-                Require(!cooldown.gameObject.activeSelf, "New trace hides the timer");
                 view.ShowCooldown(0.5f);
+                Require(Mathf.Approximately(image.material.GetFloat("_Drain"), 1f) &&
+                    Mathf.Approximately(image.material.GetFloat("_Flash"), 0f), "Resuming a page does not replay the release");
                 view.Clear();
-                Require(!cooldown.gameObject.activeSelf, "Cancel hides the timer");
+                Require(!cooldown.IsVisible && image.material == original, "Cancel restores the original image");
                 view.BeginTrace(rune);
                 view.ShowCooldown(0.5f);
-                // This validation runs in Edit Mode; dispatch the runtime lifecycle explicitly.
                 typeof(RunePageView).GetMethod("OnDisable", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(view, null);
-                Require(!cooldown.gameObject.activeSelf, "Disable notification hides the timer");
+                Require(!cooldown.IsVisible && image.material == original, "Disable restores the original image");
+                view.ConfigureCooldownImage(() => null);
+                view.ShowCooldown(0.5f);
+                Require(!cooldown.IsVisible, "Missing image does not break cooldown timing");
             }
             finally
             {
                 if (overlay != null) UnityEngine.Object.DestroyImmediate(overlay.gameObject);
                 if (completion != null) UnityEngine.Object.DestroyImmediate(completion.gameObject);
                 UnityEngine.Object.DestroyImmediate(root);
+            }
+        }
+
+        private static void CheckPageImageBinding()
+        {
+            foreach (string name in new[] { "07", "09", "11" })
+            {
+                var root = new GameObject("Page Image Binding Test", typeof(RectTransform), typeof(Canvas));
+                try
+                {
+                    var pageObject = new GameObject("Page", typeof(RectTransform), typeof(BookPageView));
+                    pageObject.transform.SetParent(root.transform, false);
+                    var pageView = pageObject.GetComponent<BookPageView>();
+                    var content = new GameObject("PageContent", typeof(RectTransform)).GetComponent<RectTransform>();
+                    content.SetParent(pageObject.transform, false);
+                    var settings = new SerializedObject(pageView);
+                    settings.FindProperty("m_pageContent").objectReferenceValue = content;
+                    settings.ApplyModifiedPropertiesWithoutUndo();
+                    var page = AssetDatabase.LoadAssetAtPath<BookPageData>("Assets/YasudaHaruto/Data/PageView/PageView_" + name + ".asset");
+                    pageView.ShowPage(page);
+                    var owner = root.AddComponent<YasudaBookViewController>();
+                    typeof(YasudaBookViewController).GetField("m_leftPageView", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(owner, pageView);
+                    var pages = (List<BookPageData>)typeof(YasudaBookViewController).GetField("m_runtimePages", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(owner);
+                    pages.Add(page);
+                    Image image = owner.GetCurrentRuneImage(-1);
+                    Require(image != null && image.sprite == page.Images[page.Images.Count - 1].Sprite,
+                        "PageView_" + name + " binds its existing colored rune without duplicating sprite data");
+                    Require(owner.GetCurrentRuneImage(0).sprite == page.Images[0].Sprite && owner.GetCurrentRuneImage(999) == null,
+                        "Explicit image index and invalid index are handled");
+                }
+                finally { UnityEngine.Object.DestroyImmediate(root); }
+            }
+        }
+
+        private static void CheckCanvasCooldown()
+        {
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.NewPreviewScene();
+            var root = new GameObject("Cooldown Canvas Test", typeof(RectTransform), typeof(Canvas));
+            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(root, scene);
+            var cameraObject = new GameObject("Cooldown Test Camera", typeof(Camera));
+            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(cameraObject, scene);
+            var camera = cameraObject.GetComponent<Camera>();
+            var texture = new RenderTexture(256, 256, 24, RenderTextureFormat.ARGB32);
+            var pixels = new Texture2D(256, 256, TextureFormat.RGBA32, false);
+            RenderTexture previous = RenderTexture.active;
+            try
+            {
+                camera.enabled = false;
+                camera.scene = scene;
+                camera.transform.position = new Vector3(0f, 0f, -10f);
+                camera.orthographic = true; camera.orthographicSize = 128f;
+                camera.clearFlags = CameraClearFlags.SolidColor; camera.backgroundColor = Color.black;
+                camera.targetTexture = texture; texture.Create();
+                Canvas canvas = root.GetComponent<Canvas>();
+                canvas.renderMode = RenderMode.WorldSpace; canvas.worldCamera = camera;
+                root.GetComponent<RectTransform>().sizeDelta = new Vector2(256f, 256f);
+                var image = new GameObject("Translated Scaled Rune", typeof(RectTransform), typeof(Image)).GetComponent<Image>();
+                image.transform.SetParent(root.transform, false);
+                image.rectTransform.pivot = new Vector2(0f, 1f);
+                image.rectTransform.anchoredPosition = new Vector2(-40f, 90f);
+                image.rectTransform.sizeDelta = new Vector2(80f, 120f);
+                image.rectTransform.localScale = new Vector3(1.2f, 0.8f, 1f);
+                var feedback = root.AddComponent<RuneCooldownImageFeedback>();
+                feedback.Show(image, false, 0.1f, 0.28f, 0.12f);
+                var corners = new Vector3[4]; image.rectTransform.GetWorldCorners(corners);
+                Vector3 bottom = camera.WorldToScreenPoint(corners[0]);
+                Vector3 top = camera.WorldToScreenPoint(corners[2]);
+                for (int step = 1; step <= 3; step++)
+                {
+                    feedback.SetRemaining(1f - step * 0.25f);
+                    Canvas.ForceUpdateCanvases(); camera.Render();
+                    RenderTexture.active = texture;
+                    pixels.ReadPixels(new Rect(0, 0, 256, 256), 0, 0); pixels.Apply();
+                    int bright = 0;
+                    int x = Mathf.RoundToInt((bottom.x + top.x) * 0.5f);
+                    int first = Mathf.CeilToInt(bottom.y), last = Mathf.FloorToInt(top.y) - 1;
+                    for (int y = first; y <= last; y++) if (pixels.GetPixel(x, y).r > 0.8f) bright++;
+                    float actual = (float)bright / (last - first + 1);
+                    Require(Mathf.Abs(actual - step * 0.25f) < 0.04f,
+                        "Batched Canvas restores translated, scaled, top-pivot image at " + step + "/4; actual=" + actual);
+                }
+                feedback.Hide();
+            }
+            finally
+            {
+                RenderTexture.active = previous;
+                camera.targetTexture = null;
+                texture.Release(); UnityEngine.Object.DestroyImmediate(texture); UnityEngine.Object.DestroyImmediate(pixels);
+                UnityEditor.SceneManagement.EditorSceneManager.ClosePreviewScene(scene);
+            }
+        }
+
+        private static void CheckCooldownShader()
+        {
+            Shader shader = Resources.Load<Shader>("RuneCooldownImage");
+            Require(shader != null && shader.isSupported && !ShaderUtil.ShaderHasError(shader), "Cooldown shader compiles for the current graphics API");
+            var material = new Material(shader);
+            var texture = new RenderTexture(32, 32, 0, RenderTextureFormat.ARGB32);
+            var readback = new Texture2D(32, 32, TextureFormat.RGBA32, false);
+            RenderTexture previous = RenderTexture.active;
+            bool pushed = false;
+            try
+            {
+                texture.Create();
+                RenderTexture.active = texture;
+                GL.Clear(true, true, Color.black);
+                material.SetTexture("_MainTex", Texture2D.whiteTexture);
+                material.SetFloat("_Darkness", 0.28f);
+                material.SetFloat("_Drain", 1f);
+                material.SetFloat("_Recovery", 0.5f);
+                GL.PushMatrix(); pushed = true;
+                GL.LoadOrtho();
+                material.SetPass(0);
+                GL.Begin(GL.QUADS); GL.Color(Color.white);
+                GL.MultiTexCoord2(0, 0f, 0f); GL.MultiTexCoord2(1, 0f, 0f); GL.Vertex3(0f, 0f, 0f);
+                GL.MultiTexCoord2(0, 0f, 1f); GL.MultiTexCoord2(1, 1f, 0f); GL.Vertex3(0f, 1f, 0f);
+                GL.MultiTexCoord2(0, 1f, 1f); GL.MultiTexCoord2(1, 1f, 0f); GL.Vertex3(1f, 1f, 0f);
+                GL.MultiTexCoord2(0, 1f, 0f); GL.MultiTexCoord2(1, 0f, 0f); GL.Vertex3(1f, 0f, 0f);
+                GL.End(); GL.PopMatrix(); pushed = false;
+                readback.ReadPixels(new Rect(0, 0, 32, 32), 0, 0); readback.Apply();
+                Require(readback.GetPixel(16, 8).r > 0.9f && readback.GetPixel(16, 24).r < 0.65f,
+                    "GPU output restores brightness from bottom while the top stays dark");
+                for (int step = 1; step <= 3; step++)
+                {
+                    material.SetFloat("_Recovery", step * 0.25f);
+                    DrawCooldownQuad(material);
+                    readback.ReadPixels(new Rect(0, 0, 32, 32), 0, 0); readback.Apply();
+                    int brightRows = 0;
+                    for (int row = 0; row < 32; row++) if (readback.GetPixel(16, row).r > 0.8f) brightRows++;
+                    Require(Mathf.Abs(brightRows - step * 8) <= 1,
+                        "Equal time steps restore equal height: " + step + "/4");
+                }
+                var green = new Texture2D(1, 1);
+                try
+                {
+                    green.SetPixel(0, 0, new Color(0.2f, 0.6f, 0.1f, 1f)); green.Apply();
+                    material.SetTexture("_MainTex", green);
+                    material.SetFloat("_Recovery", 0.5f); material.SetFloat("_Drain", 0.5f); material.SetFloat("_Flash", 0.65f);
+                    DrawCooldownQuad(material);
+                    readback.ReadPixels(new Rect(0, 0, 32, 32), 0, 0); readback.Apply();
+                    Require(readback.GetPixel(16, 8).r < readback.GetPixel(16, 24).r - 0.1f,
+                        "Release light no longer overlays the already recovered area: bottom=" + readback.GetPixel(16, 8) + ", top=" + readback.GetPixel(16, 24));
+                }
+                finally { UnityEngine.Object.DestroyImmediate(green); }
+                material.SetFloat("_Flash", 0f);
+                RenderCooldownPreview(material);
+            }
+            finally
+            {
+                if (pushed) GL.PopMatrix();
+                RenderTexture.active = previous;
+                texture.Release();
+                UnityEngine.Object.DestroyImmediate(texture);
+                UnityEngine.Object.DestroyImmediate(readback);
+                UnityEngine.Object.DestroyImmediate(material);
+            }
+        }
+
+        private static void DrawCooldownQuad(Material material)
+        {
+            GL.Clear(true, true, Color.black);
+            GL.PushMatrix();
+            GL.LoadOrtho(); material.SetPass(0);
+            GL.Begin(GL.QUADS); GL.Color(Color.white);
+            GL.MultiTexCoord2(0, 0f, 0f); GL.MultiTexCoord2(1, 0f, 0f); GL.Vertex3(0f, 0f, 0f);
+            GL.MultiTexCoord2(0, 0f, 1f); GL.MultiTexCoord2(1, 1f, 0f); GL.Vertex3(0f, 1f, 0f);
+            GL.MultiTexCoord2(0, 1f, 1f); GL.MultiTexCoord2(1, 1f, 0f); GL.Vertex3(1f, 1f, 0f);
+            GL.MultiTexCoord2(0, 1f, 0f); GL.MultiTexCoord2(1, 0f, 0f); GL.Vertex3(1f, 0f, 0f);
+            GL.End(); GL.PopMatrix();
+        }
+
+        private static void RenderCooldownPreview(Material material)
+        {
+            var target = new RenderTexture(1280, 256, 0, RenderTextureFormat.ARGB32);
+            var pixels = new Texture2D(1280, 256, TextureFormat.RGBA32, false);
+            RenderTexture previous = RenderTexture.active;
+            try
+            {
+                target.Create(); RenderTexture.active = target;
+                GL.Clear(true, true, new Color(0.94f, 0.91f, 0.8f, 1f));
+                material.SetTexture("_MainTex", AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/YasudaHaruto/Data/Runes/Images/Runa_Clean.png"));
+                for (int i = 0; i < 5; i++)
+                {
+                    material.SetFloat("_Drain", i == 0 ? 0f : 1f);
+                    material.SetFloat("_Recovery", i == 0 || i == 4 ? 1f : i == 3 ? 0.5f : 0f);
+                    material.SetFloat("_Flash", i == 1 ? 0.65f : 0f);
+                    GL.PushMatrix();
+                    GL.LoadOrtho(); material.SetPass(0);
+                    GL.Begin(GL.QUADS); GL.Color(Color.white);
+                    float left = i / 5f, right = (i + 1) / 5f;
+                    GL.MultiTexCoord2(0, 0f, 0f); GL.MultiTexCoord2(1, 0f, 0f); GL.Vertex3(left, 0f, 0f);
+                    GL.MultiTexCoord2(0, 0f, 1f); GL.MultiTexCoord2(1, 1f, 0f); GL.Vertex3(left, 1f, 0f);
+                    GL.MultiTexCoord2(0, 1f, 1f); GL.MultiTexCoord2(1, 1f, 0f); GL.Vertex3(right, 1f, 0f);
+                    GL.MultiTexCoord2(0, 1f, 0f); GL.MultiTexCoord2(1, 0f, 0f); GL.Vertex3(right, 0f, 0f);
+                    GL.End(); GL.PopMatrix();
+                }
+                pixels.ReadPixels(new Rect(0, 0, 1280, 256), 0, 0); pixels.Apply();
+                System.IO.Directory.CreateDirectory("Temp");
+                System.IO.File.WriteAllBytes("Temp/RuneCooldownPreview.png", pixels.EncodeToPNG());
+            }
+            finally
+            {
+                RenderTexture.active = previous;
+                target.Release(); UnityEngine.Object.DestroyImmediate(target); UnityEngine.Object.DestroyImmediate(pixels);
             }
         }
 

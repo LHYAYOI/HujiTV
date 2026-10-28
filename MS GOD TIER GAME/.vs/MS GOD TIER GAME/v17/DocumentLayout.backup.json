@@ -3,11 +3,23 @@
   "WorkspaceRootPath": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\ths30546\\documents\\github\\hujitv\\ms god tier game\\assets\\yasudaharuto\\scripts\\book\\validation\\bookgamedraginput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\ths30546\\documents\\github\\hujitv\\ms god tier game\\assets\\yasudaharuto\\scripts\\rune\\runtime\\runetracecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\rune\\runtime\\runetracecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\ths30546\\documents\\github\\hujitv\\ms god tier game\\assets\\yasudaharuto\\scripts\\rune\\runtime\\irunecooldownview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\rune\\runtime\\irunecooldownview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\ths30546\\documents\\github\\hujitv\\ms god tier game\\assets\\yasudaharuto\\scripts\\magic\\magicdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\magic\\magicdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\yasudaharuto\\scripts\\book\\validation\\bookgamedraginput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\yasudaharuto\\scripts\\book\\validation\\bookgamedraginput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\ths30546\\documents\\github\\hujitv\\ms god tier game\\assets\\hatake\\book\\scripts\\bookpagedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hatake\\book\\scripts\\bookpagedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hatake\\book\\scripts\\bookpagedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -83,19 +95,57 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "RuneTraceController.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceController.cs",
+              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceController.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceController.cs",
+              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\RuneTraceController.cs",
+              "ViewState": "AgIAAEkAAAAAAAAAAAAnwDwAAAA7AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-28T02:41:21.347Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "IRuneCooldownView.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\IRuneCooldownView.cs",
+              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\IRuneCooldownView.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\IRuneCooldownView.cs",
+              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Rune\\Runtime\\IRuneCooldownView.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAMAAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-28T02:40:58.286Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MagicData.cs",
+              "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Magic\\MagicData.cs",
+              "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Magic\\MagicData.cs",
+              "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Magic\\MagicData.cs",
+              "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Magic\\MagicData.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-28T02:26:36.684Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "BookGameDragInput.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Validation\\BookGameDragInput.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\Validation\\BookGameDragInput.cs",
               "ToolTip": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Validation\\BookGameDragInput.cs",
               "RelativeToolTip": "Assets\\YasudaHaruto\\Scripts\\Book\\Validation\\BookGameDragInput.cs",
-              "ViewState": "AgIAAC8AAAAAAAAAAAAswDwAAAAjAAAAAAAAAA==",
+              "ViewState": "AgIAAC0AAAAAAAAAAIBLwDwAAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-22T09:42:40.504Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-22T09:42:40.504Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 13,
               "Title": "BookFlipCoordinateTest.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookFlipCoordinateTest.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookFlipCoordinateTest.cs",
@@ -107,7 +157,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 14,
               "Title": "BookGameBootstrap.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookGameBootstrap.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\BookGameBootstrap.cs",
@@ -119,7 +169,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 7,
               "Title": "PageInstance.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Page\\PageInstance.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Page\\PageInstance.cs",
@@ -131,7 +181,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 8,
               "Title": "PageData.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Page\\Data\\PageData.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Page\\Data\\PageData.cs",
@@ -143,7 +193,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 15,
               "Title": "BookTestBootstrap.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookTestBootstrap.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\BookTestBootstrap.cs",
@@ -155,7 +205,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 16,
               "Title": "BookPageAreaDetector.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookPageAreaDetector.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookPageAreaDetector.cs",
@@ -167,7 +217,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 4,
               "Title": "BookPageData.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\hatake\\book\\scripts\\BookPageData.cs",
               "RelativeDocumentMoniker": "Assets\\hatake\\book\\scripts\\BookPageData.cs",
@@ -175,12 +225,11 @@
               "RelativeToolTip": "Assets\\hatake\\book\\scripts\\BookPageData.cs",
               "ViewState": "AgIAAEUAAAAAAAAAAIBLwEAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-20T10:01:09.213Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-20T10:01:09.213Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 12,
               "Title": "BookGameDragInput.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookGameDragInput.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookGameDragInput.cs",
@@ -192,7 +241,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 5,
               "Title": "BookPageView.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\hatake\\book\\scripts\\BookPageView.cs",
               "RelativeDocumentMoniker": "Assets\\hatake\\book\\scripts\\BookPageView.cs",
@@ -204,7 +253,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 17,
               "Title": "BookFlipCoordinateMapper.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookFlipCoordinateMapper.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookFlipCoordinateMapper.cs",
@@ -216,7 +265,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 18,
               "Title": "BookGameController.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookGameController.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\BookGameController.cs",
@@ -228,7 +277,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 9,
               "Title": "BookRaycastCoordinateMapper.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookRaycastCoordinateMapper.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookRaycastCoordinateMapper.cs",
@@ -240,7 +289,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 6,
               "Title": "BookFlipView.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\hatake\\book\\scripts\\BookFlipView.cs",
               "RelativeDocumentMoniker": "Assets\\hatake\\book\\scripts\\BookFlipView.cs",
@@ -252,7 +301,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 19,
               "Title": "BookInputRouter.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputRouter.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookInputRouter.cs",
@@ -264,7 +313,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 10,
               "Title": "BookController.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\hatake\\book\\scripts\\BookController.cs",
               "RelativeDocumentMoniker": "Assets\\hatake\\book\\scripts\\BookController.cs",
@@ -276,7 +325,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 11,
               "Title": "BookFlipDragInput.cs",
               "DocumentMoniker": "C:\\Users\\ths30546\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\hatake\\book\\scripts\\BookFlipDragInput.cs",
               "RelativeDocumentMoniker": "Assets\\hatake\\book\\scripts\\BookFlipDragInput.cs",

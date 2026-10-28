@@ -39,6 +39,7 @@ public class BookGameBootstrap : MonoBehaviour
             return;
         }
 
+        m_runeTraceView.ConfigureCooldownImage(() => m_gameController != null ? m_gameController.GetCurrentRuneImage() : null);
         m_runeTraceView.ConfigureScreenProjection(m_gameDragInput.GetRuneScreenRect, m_gameDragInput.GetGraphicScreenRect);
         m_gameDragInput.Initialize(m_runeTraceController, inputController);
         m_gameDragInput.SetInventoryOwner(m_gameController);

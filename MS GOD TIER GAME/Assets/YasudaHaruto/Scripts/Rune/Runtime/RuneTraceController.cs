@@ -260,6 +260,7 @@ public class RuneTraceController
         m_state = RUNE_TRACE_STATE.COOLDOWN;
         m_cooldownRemaining = m_cooldownSeconds;
         m_pointerReleased = pointerReleased;
+        if (m_view is IRuneCooldownReleaseView release) release.PlayCooldownRelease(m_cooldownSeconds);
         if (m_view is IRuneCooldownView cooldown) cooldown.ShowCooldown(1f);
         Debug.Log($"Rune : Cooldown Started / {m_cooldownSeconds:F1}s");
     }
