@@ -142,6 +142,25 @@ namespace YasudaHaruto.BookValidation
         private bool RemovalAlive => m_removalPresentation is UnityEngine.Object component
             ? component != null : m_removalPresentation != null;
 
+        public Image GetCurrentRuneImage(int imageIndex)
+        {
+            BookPageData page = GetPage(m_spreadIndex * 2);
+            if (page == null || m_leftPageView == null || page.Images.Count == 0) return null;
+            int index = imageIndex < 0 ? page.Images.Count - 1 : imageIndex;
+            if (index >= page.Images.Count) return null;
+            BookImageData data = page.Images[index];
+            if (data == null || data.Sprite == null) return null;
+            Image result = null;
+            foreach (Image image in m_leftPageView.GetComponentsInChildren<Image>())
+            {
+                if (image.sprite != data.Sprite) continue;
+                Vector2 expected = new Vector2(data.Position.x, -data.Position.y);
+                if ((image.rectTransform.anchoredPosition - expected).sqrMagnitude < 0.01f &&
+                    (image.rectTransform.sizeDelta - data.Size).sqrMagnitude < 0.01f) result = image;
+            }
+            return result;
+        }
+
         private void Awake()
         {
             if (m_bookData != null) m_bookData.CopyTo(m_runtimePages, m_runtimeSets);

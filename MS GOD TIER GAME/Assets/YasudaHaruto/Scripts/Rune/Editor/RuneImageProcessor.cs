@@ -26,6 +26,8 @@ public static class RuneImagePreprocessor
         bool[,] result = new bool[width, height];
 
         Color[] pixels = texture.GetPixels();
+        // Transparent artwork uses coverage, independent of the rune's RGB color.
+        bool useAlpha = System.Array.Exists(pixels, pixel => pixel.a < 0.999f);
 
         for (int y = 0; y < height; y++)
         {
@@ -40,7 +42,7 @@ public static class RuneImagePreprocessor
                     color.b * 0.114f;
 
                 // ˆÃ‚¢•”•ª‚ðƒ‹[ƒ“‚Æ‚µ‚Äˆµ‚¤
-                result[x, y] = brightness < threshold;
+                result[x, y] = useAlpha ? pixels[y * width + x].a > 1f - threshold : brightness < threshold;
             }
         }
 

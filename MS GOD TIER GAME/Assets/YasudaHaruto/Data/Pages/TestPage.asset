@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PageData
   m_pageId: 2
   m_insertType: 1
-  m_displayName: Test01
+  m_displayName: Clean
   m_pageType: 0
   m_interaction:
     m_type: 1
-    m_runeData: {fileID: 11400000, guid: 195a7a19dfd1a9d478b6bdb71bd92270, type: 2}
+    m_runeData: {fileID: 11400000, guid: e7415a1f0d2337c4083d62cb65833b9d, type: 2}
   m_action:
     m_type: 1
     m_magicData: {fileID: 11400000, guid: 17ef150f604effd4e91c6dfb9950d6c0, type: 2}
-  m_leftVisualData: {fileID: 11400000, guid: a50ce475f3162854cad21c04323e18b7, type: 2}
-  m_rightVisualData: {fileID: 11400000, guid: f77776490aa6fc24f93eb19393879ccc, type: 2}
+  m_leftVisualData: {fileID: 11400000, guid: 683600d286d803d44939ef252003ba97, type: 2}
+  m_rightVisualData: {fileID: 11400000, guid: f2cb3b18a6f51424aaffb62791fb2aab, type: 2}

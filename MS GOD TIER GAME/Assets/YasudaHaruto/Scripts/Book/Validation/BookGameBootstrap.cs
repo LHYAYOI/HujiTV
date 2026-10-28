@@ -39,6 +39,8 @@ public class BookGameBootstrap : MonoBehaviour
             return;
         }
 
+        m_runeTraceView.ConfigureCooldownImage(() => m_gameController != null ? m_gameController.GetCurrentRuneImage() : null);
+        m_runeTraceView.ConfigureScreenProjection(m_gameDragInput.GetRuneScreenRect, m_gameDragInput.GetGraphicScreenRect);
         m_gameDragInput.Initialize(m_runeTraceController, inputController);
         m_gameDragInput.SetInventoryOwner(m_gameController);
 
@@ -58,7 +60,13 @@ public class BookGameBootstrap : MonoBehaviour
 
         Debug.Log("BookGameBootstrap : 初期化完了");
         m_networkClient = networkClient;
-        if (m_networkClient != null) m_networkClient.AddPageReceived += OnAddPageReceived;
+        if (m_networkClient != null)
+        {
+            m_networkClient.AddPageReceived += OnAddPageReceived;
+            m_networkClient.OnConnectionStateChanged += OnConnectionStateChanged;
+            OnConnectionStateChanged(m_networkClient.ConnectionState);
+            gameObject.AddComponent<BookConnectionStatusView>().Initialize(m_networkClient);
+        }
     }
 
     private void Update()
@@ -68,6 +76,11 @@ public class BookGameBootstrap : MonoBehaviour
         var result = m_gameController.RequestAdd(m_requests.Peek());
         if (result != PAGE_ADD_RESULT.BUSY) m_requests.Dequeue();
         if (result == PAGE_ADD_RESULT.INVALID) Debug.LogWarning("Unsupported page definition; request rejected.", this);
+    }
+
+    private void OnConnectionStateChanged(BOOK_CONNECTION_STATE state)
+    {
+        m_gameDragInput.SetRuneInputAvailable(state == BOOK_CONNECTION_STATE.CONNECTED);
     }
 
     private void OnAddPageReceived(byte id)
@@ -82,7 +95,11 @@ public class BookGameBootstrap : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (m_networkClient != null) m_networkClient.AddPageReceived -= OnAddPageReceived;
+        if (m_networkClient != null)
+        {
+            m_networkClient.AddPageReceived -= OnAddPageReceived;
+            m_networkClient.OnConnectionStateChanged -= OnConnectionStateChanged;
+        }
         m_requests.Clear();
         if (m_gameController != null)
         {

@@ -45,6 +45,8 @@ public class BookGameController : MonoBehaviour
     private bool m_initialized;
 
     public PageInstance CurrentPage => m_currentPage;
+    public UnityEngine.UI.Image GetCurrentRuneImage() => m_currentPage?.Data.Interaction == null ? null :
+        m_bookController.GetCurrentRuneImage(m_currentPage.Data.Interaction.RuneImageIndex);
 
     public bool Initialize(PageFactory pageFactory, Func<bool> canEdit = null)
     {

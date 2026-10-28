@@ -15,6 +15,37 @@ public class RuneEditorWindow : EditorWindow
     private readonly List<Vector2> m_currentStroke = new();
 
     private bool m_isDrawing;
+    private enum CANVAS_TOOL { DRAW, SELECT }
+    private CANVAS_TOOL m_canvasTool;
+    private bool m_showSourceImage = true;
+    private float m_sourceImageOpacity = 0.3f;
+    private bool m_showImportedPreview = true;
+    private int m_canvasControlId;
+
+    private void OnEnable() => Undo.undoRedoPerformed += OnUndoRedo;
+    private void OnDisable()
+    {
+        Undo.undoRedoPerformed -= OnUndoRedo;
+        CancelCanvasInput();
+    }
+    private void OnLostFocus() => CancelCanvasInput();
+    private void OnUndoRedo()
+    {
+        CancelCanvasInput();
+        m_selectedStrokeIndex = -1;
+        m_mergeTargetIndex = -1;
+        ResetTest();
+        Repaint();
+    }
+    private void CancelCanvasInput()
+    {
+        if (m_canvasControlId != 0 && GUIUtility.hotControl == m_canvasControlId)
+            GUIUtility.hotControl = 0;
+        m_isDrawing = false;
+        m_currentStroke.Clear();
+        Repaint();
+    }
+
     private Rect m_drawingRect;
 
     private const float DRAWING_AREA_SIZE = 600f;
@@ -65,6 +96,7 @@ public class RuneEditorWindow : EditorWindow
     private List<RuneStrokeData> m_importedRuneStrokes = new();
 
     private float m_simplifyTolerance = 0.002f;
+    private float m_minImportedStrokeLength = 0.01f;
 
     private int m_extractedPointCount;
 
@@ -128,6 +160,7 @@ public class RuneEditorWindow : EditorWindow
 
                     EditorGUILayout.Space(5);
 
+                    DrawCanvasTools();
                     DrawCanvas();
                     HandleDrawingInput();
                     DrawInfo();
@@ -165,6 +198,7 @@ public class RuneEditorWindow : EditorWindow
 
         if (EditorGUI.EndChangeCheck())
         {
+            CancelCanvasInput();
             m_runeData = newRuneData;
             m_selectedStrokeIndex = -1;
             m_mergeTargetIndex = -1;
@@ -221,7 +255,16 @@ public class RuneEditorWindow : EditorWindow
         // 描画エリアの矩形を取得する
         m_drawingRect = GUILayoutUtility.GetRect(width, width, GUILayout.ExpandWidth(false));
 
-       EditorGUI.DrawRect(m_drawingRect, new Color(0.15f, 0.15f, 0.15f));
+        m_canvasControlId = GUIUtility.GetControlID("RuneCanvas".GetHashCode(), FocusType.Keyboard, m_drawingRect);
+        EditorGUI.DrawRect(m_drawingRect, new Color(0.15f, 0.15f, 0.15f));
+        if (m_showSourceImage && m_sourceRuneImage != null && Event.current.type == EventType.Repaint)
+        {
+            Color previous = GUI.color;
+            GUI.color = new Color(1f, 1f, 1f, m_sourceImageOpacity);
+            // Match the normalized 0..1 coordinates used by image extraction.
+            GUI.DrawTexture(m_drawingRect, m_sourceRuneImage, ScaleMode.StretchToFill, true);
+            GUI.color = previous;
+        }
 
         if (m_showBinaryPreview)
         {
@@ -233,7 +276,7 @@ public class RuneEditorWindow : EditorWindow
             DrawSkeletonPreview();
         }
 
-        DrawImportedStrokes();
+        if (m_showImportedPreview) DrawImportedStrokes();
 
         DrawSavedStrokes();
 
@@ -254,10 +297,9 @@ public class RuneEditorWindow : EditorWindow
         }
 
         // RuneDataに保存された各ストロークを描画する
-        foreach (RuneStrokeData stroke in m_runeData.AuthoringData.Strokes)
-        {
-            DrawStroke(stroke.Points, Color.white);
-        }
+        var strokes = m_runeData.AuthoringData.Strokes;
+        for (int i = 0; i < strokes.Count; i++)
+            DrawStroke(strokes[i].Points, i == m_selectedStrokeIndex ? Color.cyan : Color.white);
     }
 
     private void DrawBakedPoints()
@@ -328,76 +370,101 @@ public class RuneEditorWindow : EditorWindow
         Handles.EndGUI();
     }
 
+    private void DrawCanvasTools()
+    {
+        EditorGUILayout.LabelField("Canvas Editing", EditorStyles.boldLabel);
+        var tool = (CANVAS_TOOL)GUILayout.Toolbar((int)m_canvasTool, new[] { "Draw", "Select / Delete" });
+        if (tool != m_canvasTool) { CancelCanvasInput(); m_canvasTool = tool; }
+        m_showSourceImage = EditorGUILayout.Toggle("Show Source Image", m_showSourceImage);
+        m_sourceImageOpacity = EditorGUILayout.Slider("Source Opacity", m_sourceImageOpacity, 0f, 1f);
+        m_showImportedPreview = EditorGUILayout.Toggle("Show Import Preview", m_showImportedPreview);
+        EditorGUILayout.HelpBox(m_canvasTool == CANVAS_TOOL.DRAW
+            ? "Draw over the source image. Each drag adds one stroke. Bake after editing."
+            : "Click a saved stroke to select it (cyan). Delete removes it; Ctrl+Z restores it. Apply an import before editing its strokes.", MessageType.Info);
+        using (new EditorGUI.DisabledScope(m_selectedStrokeIndex < 0 || m_selectedStrokeIndex >= m_runeData.AuthoringData.Strokes.Count))
+            if (GUILayout.Button("Delete Selected Stroke")) DeleteSelectedStroke();
+    }
+
+    private void DeleteSelectedStroke()
+    {
+        int index = m_selectedStrokeIndex;
+        EditStroke(() =>
+        {
+            var strokes = new List<RuneStrokeData>(m_runeData.AuthoringData.Strokes);
+            if (index < 0 || index >= strokes.Count) return false;
+            strokes.RemoveAt(index);
+            m_runeData.AuthoringData.SetStrokes(strokes);
+            return true;
+        });
+        m_selectedStrokeIndex = -1;
+        m_mergeTargetIndex = -1;
+    }
+
+    private int FindStroke(Vector2 position)
+    {
+        float nearest = Mathf.Max(8f, m_lineWidth * 0.5f + 3f);
+        int selected = -1;
+        var strokes = m_runeData.AuthoringData.Strokes;
+        for (int i = 0; i < strokes.Count; i++)
+        {
+            var points = strokes[i].Points;
+            for (int j = 1; j < points.Count; j++)
+            {
+                Vector2 a = NormalizedToCanvas(points[j - 1]);
+                Vector2 b = NormalizedToCanvas(points[j]);
+                Vector2 segment = b - a;
+                float t = segment.sqrMagnitude > 0f ? Mathf.Clamp01(Vector2.Dot(position - a, segment) / segment.sqrMagnitude) : 0f;
+                float distance = Vector2.Distance(position, a + t * segment);
+                if (distance >= nearest) continue;
+                nearest = distance;
+                selected = i;
+            }
+        }
+        return selected;
+    }
+
     private void HandleDrawingInput()
     {
-        // 現在のイベントを取得する
         Event e = Event.current;
-
-        // マウスが描画エリアの外にある場合、描画中であればストロークを終了し、処理を終了する
-        if (!m_drawingRect.Contains(e.mousePosition))
+        if (e.type == EventType.KeyDown && GUIUtility.keyboardControl == m_canvasControlId)
         {
-            if (m_isDrawing && e.type == EventType.MouseUp)
-            {
-                FinishStroke();
-            }
-
-            return;
+            if (e.keyCode == KeyCode.Escape) { CancelCanvasInput(); e.Use(); return; }
+            if (m_canvasTool == CANVAS_TOOL.SELECT && (e.keyCode == KeyCode.Delete || e.keyCode == KeyCode.Backspace))
+            { DeleteSelectedStroke(); e.Use(); return; }
         }
-
-        // イベントの種類に応じて処理を分岐する
-        switch (e.type)
+        if (e.type == EventType.MouseDown && e.button == 0 && m_drawingRect.Contains(e.mousePosition))
         {
-            // マウスボタンが押された場合の処理
-            case EventType.MouseDown:
-
-                if (e.button != 0)
-                {// 左クリック以外の場合は処理を終了する
-                    return;
-                }
-
-                // ストロークの描画を開始する
+            GUIUtility.keyboardControl = m_canvasControlId;
+            if (m_canvasTool == CANVAS_TOOL.SELECT)
+            {
+                m_selectedStrokeIndex = FindStroke(e.mousePosition);
+                m_mergeTargetIndex = -1;
+                Repaint();
+            }
+            else
+            {
+                GUIUtility.hotControl = m_canvasControlId;
                 StartStroke(e.mousePosition);
-
-                // イベントを使用済みにする
-                e.Use();
-
-                break;
-
-            // マウスがドラッグされた場合の処理
-            case EventType.MouseDrag:
-
-                if (!m_isDrawing || e.button != 0)
-                {// 左クリック以外の場合または描画中でない場合は処理を終了する
-                    return;
-                }
-
-                // 現在のマウス位置をストロークに追加する
+            }
+            e.Use();
+        }
+        else if (m_isDrawing && GUIUtility.hotControl == m_canvasControlId)
+        {
+            if (e.type == EventType.MouseDrag && e.button == 0)
+            {
+                // End at the boundary instead of connecting across an excursion outside the canvas.
                 AddPoint(e.mousePosition);
-
-                // イベントを使用済みにする
+                if (!m_drawingRect.Contains(e.mousePosition))
+                { FinishStroke(); GUIUtility.hotControl = 0; }
                 e.Use();
-
-                break;
-
-
-            // マウスボタンが離された場合の処理
-            case EventType.MouseUp:
-
-                if (!m_isDrawing || e.button != 0)
-                {// 左クリック以外の場合または描画中でない場合は処理を終了する
-                    return;
-                }
-
-                // 現在のマウス位置をストロークに追加する
+            }
+            else if (e.type == EventType.MouseUp && e.button == 0)
+            {
                 AddPoint(e.mousePosition);
-
-                // ストロークの描画を終了する
                 FinishStroke();
-
-                // イベントを使用済みにする
+                GUIUtility.hotControl = 0;
                 e.Use();
-
-                break;
+            }
         }
     }
 
@@ -466,6 +533,8 @@ public class RuneEditorWindow : EditorWindow
 
         // RuneDataのAuthoringDataにストロークを追加する
         m_runeData.AuthoringData.AddStroke(stroke);
+        m_runeData.TraceData.Clear();
+        m_selectedStrokeIndex = m_runeData.AuthoringData.Strokes.Count - 1;
 
         // RuneDataを変更済みに設定する
         EditorUtility.SetDirty(m_runeData);
@@ -516,6 +585,9 @@ public class RuneEditorWindow : EditorWindow
 
         // RuneDataのAuthoringDataから最後のストロークを削除する
         m_runeData.AuthoringData.RemoveLastStroke();
+        m_runeData.TraceData.Clear();
+        m_selectedStrokeIndex = -1;
+        m_mergeTargetIndex = -1;
 
         // RuneDataを変更済みに設定する
         EditorUtility.SetDirty(m_runeData);
@@ -537,6 +609,8 @@ public class RuneEditorWindow : EditorWindow
 
         // RuneDataのAuthoringDataをクリアする
         m_runeData.AuthoringData.Clear();
+        m_selectedStrokeIndex = -1;
+        m_mergeTargetIndex = -1;
 
         // RuneDataのTraceDataをクリアする
         m_runeData.TraceData.Clear();
@@ -613,6 +687,7 @@ public class RuneEditorWindow : EditorWindow
             return;
         }
 
+        CancelCanvasInput();
         m_mode = newMode;
         ResetCurrentDrawing();
         ResetTest();
@@ -918,12 +993,20 @@ public class RuneEditorWindow : EditorWindow
             "Image Import",
             EditorStyles.boldLabel);
 
+        EditorGUI.BeginChangeCheck();
         m_sourceRuneImage =
             (Texture2D)EditorGUILayout.ObjectField(
                 "Source Image",
                 m_sourceRuneImage,
                 typeof(Texture2D),
                 false);
+        if (EditorGUI.EndChangeCheck())
+        {
+            m_binaryRuneImage = null;
+            m_skeletonRuneImage = null;
+            m_importedRuneStrokes.Clear();
+            m_extractedPointCount = 0;
+        }
 
         m_imageThreshold =
             EditorGUILayout.Slider(
@@ -931,6 +1014,9 @@ public class RuneEditorWindow : EditorWindow
                 m_imageThreshold,
                 MIN_IMAGE_THRESHOLD,
                 MAX_IMAGE_THRESHOLD);
+
+        EditorGUILayout.HelpBox("Transparent images: alpha coverage. Opaque images: dark lines on a light background.", MessageType.Info);
+        m_minImportedStrokeLength = EditorGUILayout.Slider("Min Stroke Length", m_minImportedStrokeLength, 0f, 0.05f);
 
         m_simplifyTolerance =
             EditorGUILayout.Slider(
@@ -1019,13 +1105,16 @@ public class RuneEditorWindow : EditorWindow
         for (int i = 0; i < count; i++)
         {
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField($"Stroke {i + 1}", GUILayout.Width(90));
+            if (GUILayout.Toggle(i == m_selectedStrokeIndex, $"Stroke {i + 1}", "Button", GUILayout.Width(90)))
+                m_selectedStrokeIndex = i;
 
             using (new EditorGUI.DisabledScope(i == 0))
             {
                 if (GUILayout.Button("Up", GUILayout.Width(50)))
                 {
                     EditStroke(() => m_runeData.AuthoringData.MoveStroke(i, i - 1));
+                    m_selectedStrokeIndex = i - 1;
+                    m_mergeTargetIndex = -1;
                     GUIUtility.ExitGUI();
                 }
             }
@@ -1035,6 +1124,8 @@ public class RuneEditorWindow : EditorWindow
                 if (GUILayout.Button("Down", GUILayout.Width(50)))
                 {
                     EditStroke(() => m_runeData.AuthoringData.MoveStroke(i, i + 1));
+                    m_selectedStrokeIndex = i + 1;
+                    m_mergeTargetIndex = -1;
                     GUIUtility.ExitGUI();
                 }
             }
@@ -1045,6 +1136,12 @@ public class RuneEditorWindow : EditorWindow
                 GUIUtility.ExitGUI();
             }
 
+            if (GUILayout.Button("Delete", GUILayout.Width(55)))
+            {
+                m_selectedStrokeIndex = i;
+                DeleteSelectedStroke();
+                GUIUtility.ExitGUI();
+            }
             EditorGUILayout.EndHorizontal();
         }
     }
@@ -1208,11 +1305,6 @@ public class RuneEditorWindow : EditorWindow
                 m_binaryRuneImage);
 
         // SkeletonからStrokeを抽出
-        m_importedRuneStrokes =
-            RuneStrokeExtractor.Extract(
-                m_skeletonRuneImage);
-
-        // SkeletonからStrokeを抽出
         List<RuneStrokeData> extractedStrokes =
             RuneStrokeExtractor.Extract(
                 m_skeletonRuneImage);
@@ -1223,6 +1315,11 @@ public class RuneEditorWindow : EditorWindow
 
         foreach (RuneStrokeData stroke in extractedStrokes)
         {
+            float length = 0f;
+            for (int i = 1; i < stroke.Points.Count; i++)
+                length += Vector2.Distance(stroke.Points[i - 1], stroke.Points[i]);
+            if (length < m_minImportedStrokeLength) continue;
+
             m_extractedPointCount += stroke.Points.Count;
 
             List<Vector2> simplifiedPoints =
@@ -1240,6 +1337,7 @@ public class RuneEditorWindow : EditorWindow
                     simplifiedPoints));
         }
 
+        m_showImportedPreview = true;
         Repaint();
     }
 
@@ -1355,6 +1453,11 @@ public class RuneEditorWindow : EditorWindow
         // RuneDataを変更済みに設定
         EditorUtility.SetDirty(m_runeData);
 
+        m_showImportedPreview = false;
+        m_showBinaryPreview = false;
+        m_showSkeletonPreview = false;
+        m_selectedStrokeIndex = -1;
+        m_mergeTargetIndex = -1;
         Repaint();
     }
 
