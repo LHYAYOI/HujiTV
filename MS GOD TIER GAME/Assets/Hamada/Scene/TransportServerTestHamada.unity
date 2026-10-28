@@ -211,6 +211,18 @@ PrefabInstance:
       propertyPath: m_targetHitUIManager
       value: 
       objectReference: {fileID: 1874669774}
+    - target: {fileID: 2723047527836766935, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
+      propertyPath: m_magicBulletPrefabList.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2723047527836766935, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
+      propertyPath: 'm_magicBulletPrefabList.Array.data[0]'
+      value: 
+      objectReference: {fileID: 7678089287139935553, guid: a5df6f03bb979484c968d72addf627a9, type: 3}
+    - target: {fileID: 2723047527836766935, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
+      propertyPath: 'm_magicBulletPrefabList.Array.data[1]'
+      value: 
+      objectReference: {fileID: 7678089287139935553, guid: 5a46e82ce7e5d4d4b8af7a9b988802ef, type: 3}
     - target: {fileID: 7078241854969815186, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
       propertyPath: m_Name
       value: MagicBulletManager
@@ -1026,6 +1038,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5555980636204488410, guid: 4487dfc90121ce04c8da989321422093, type: 3}
+      propertyPath: m_RenderPostProcessing
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8158479922000696081, guid: 4487dfc90121ce04c8da989321422093, type: 3}
       propertyPath: near clip plane
       value: 0.01
@@ -1312,6 +1328,10 @@ PrefabInstance:
       propertyPath: m_selectAreaDataList.Array.data[3].m_hasDualityFlag
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
+      propertyPath: magicData
+      value: 
+      objectReference: {fileID: 11400000, guid: fd84468c9ad10ad489611b6288bb8c24, type: 2}
     - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
       propertyPath: m_bulletManager
       value: 
