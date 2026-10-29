@@ -13,6 +13,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _CUSTOMDATA_ON
+  - _CUTOUT_ON
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -86,7 +87,7 @@ Material:
     - _Metallic: 0
     - _Mode: 0
     - _NoiseInfluence: 0.465
-    - _NoiseScale: 7.2
+    - _NoiseScale: 11
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _Progress: 0
@@ -95,7 +96,7 @@ Material:
     - _SrcBlend: 5
     - _UVSec: 0
     - _UseCustomData: 1
-    - _UseCutout: 0
+    - _UseCutout: 1
     - _UseMaskCutout: 0
     - _UseNoiseTex: 0
     - _ZWrite: 1
