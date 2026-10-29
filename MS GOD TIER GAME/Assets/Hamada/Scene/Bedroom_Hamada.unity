@@ -119,6 +119,93 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &11958417
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 11958418}
+  - component: {fileID: 11958420}
+  - component: {fileID: 11958419}
+  m_Layer: 5
+  m_Name: Collider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &11958418
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 11958417}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.04549853, y: -0.8147751, z: -0.077848606, w: 0.57272243}
+  m_LocalPosition: {x: 1.2, y: -2.45, z: -22.31}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 542484633}
+  m_LocalEulerAnglesHint: {x: 19.084, y: 0, z: 0}
+--- !u!114 &11958419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 11958417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ced5332850543c24ca276d1983454a1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitReceiverController
+  m_onHit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 542484634}
+        m_TargetAssemblyTypeName: StoryTextController, Assembly-CSharp
+        m_MethodName: Appear
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_onStay:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onExit:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!65 &11958420
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 11958417}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &14647522 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7410926984067148932, guid: 266f0216aebc6ce4b97cc07a72b76fde, type: 3}
@@ -175,6 +262,93 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!1 &27752124
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 27752125}
+  - component: {fileID: 27752127}
+  - component: {fileID: 27752126}
+  m_Layer: 5
+  m_Name: Collider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &27752125
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 27752124}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.16577372, y: -0, z: -0, w: 0.98616385}
+  m_LocalPosition: {x: 2.79, y: 3.55, z: -25.18}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 496264273}
+  m_LocalEulerAnglesHint: {x: 19.084, y: 0, z: 0}
+--- !u!114 &27752126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 27752124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ced5332850543c24ca276d1983454a1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitReceiverController
+  m_onHit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 496264278}
+        m_TargetAssemblyTypeName: StoryTextController, Assembly-CSharp
+        m_MethodName: Appear
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_onStay:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onExit:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!65 &27752127
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 27752124}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &85298544
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -635,6 +809,93 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 26e78924a1e52d2439343c6042d253fa, type: 3}
+--- !u!1 &207423829
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 207423830}
+  - component: {fileID: 207423832}
+  - component: {fileID: 207423831}
+  m_Layer: 5
+  m_Name: Collider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &207423830
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 207423829}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.07719707, y: -0.3452937, z: -0.015359861, w: 0.93518823}
+  m_LocalPosition: {x: 3.54, y: 0.46, z: -25.49}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 908909410}
+  m_LocalEulerAnglesHint: {x: 19.084, y: 0, z: 0}
+--- !u!114 &207423831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 207423829}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ced5332850543c24ca276d1983454a1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitReceiverController
+  m_onHit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 908909411}
+        m_TargetAssemblyTypeName: StoryTextController, Assembly-CSharp
+        m_MethodName: Appear
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_onStay:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onExit:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!65 &207423832
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 207423829}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!4 &209167004 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6962076647992322383, guid: 208145d2d23874443bf404f08cbe018e, type: 3}
@@ -1078,67 +1339,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5337608341804400928, guid: c3380b62e0d92924f8bbae1e4e95a7b9, type: 3}
   m_PrefabInstance: {fileID: 295077599}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &309391329
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 2099054121617892375, guid: 0562c36fc37c39a4391abbe20f391220, type: 3}
-      propertyPath: NoiseModule.enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3874896795331026761, guid: 0562c36fc37c39a4391abbe20f391220, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -3.984
-      objectReference: {fileID: 0}
-    - target: {fileID: 3874896795331026761, guid: 0562c36fc37c39a4391abbe20f391220, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.775
-      objectReference: {fileID: 0}
-    - target: {fileID: 3874896795331026761, guid: 0562c36fc37c39a4391abbe20f391220, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 6.745
-      objectReference: {fileID: 0}
-    - target: {fileID: 3874896795331026761, guid: 0562c36fc37c39a4391abbe20f391220, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3874896795331026761, guid: 0562c36fc37c39a4391abbe20f391220, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3874896795331026761, guid: 0562c36fc37c39a4391abbe20f391220, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3874896795331026761, guid: 0562c36fc37c39a4391abbe20f391220, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3874896795331026761, guid: 0562c36fc37c39a4391abbe20f391220, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3874896795331026761, guid: 0562c36fc37c39a4391abbe20f391220, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3874896795331026761, guid: 0562c36fc37c39a4391abbe20f391220, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5990460929640765348, guid: 0562c36fc37c39a4391abbe20f391220, type: 3}
-      propertyPath: m_Name
-      value: EFF_Ball01
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 0562c36fc37c39a4391abbe20f391220, type: 3}
 --- !u!114 &336202834 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6549873327943409991, guid: c6c176f2a4fafc74fa2004a4cbc388e6, type: 3}
@@ -1280,7 +1480,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 7.073}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 27752125}
   m_Father: {fileID: 1754699046}
   m_LocalEulerAnglesHint: {x: -20, y: 90, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -1639,7 +1840,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 1.557}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 11958418}
   m_Father: {fileID: 1754699046}
   m_LocalEulerAnglesHint: {x: -10, y: 199.867, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -2960,7 +3162,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: -11.07}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 207423830}
   m_Father: {fileID: 1754699046}
   m_LocalEulerAnglesHint: {x: -9.611, y: 130.739, z: -2.031}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -7108,4 +7311,3 @@ SceneRoots:
   - {fileID: 111778626}
   - {fileID: 934375039}
   - {fileID: 524437364}
-  - {fileID: 309391329}
