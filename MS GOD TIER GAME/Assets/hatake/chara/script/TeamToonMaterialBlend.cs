@@ -15,6 +15,10 @@ namespace TeamToon
         readonly List<Slot> slots = new List<Slot>();
         Material instance;
         Material previousA, previousB;
+        // 端（blend 0 / 1）でαが 1 になる側。そのときは不透明として描き、後ろが透けないようにする
+        bool sourceOpaque, targetOpaque;
+        int renderState = -1;
+        float depthPrepass;
         sealed class Slot { public Renderer renderer; public int index; public Material original; }
 
         void Reset()
@@ -28,7 +32,42 @@ namespace TeamToon
         void LateUpdate()
         {
             if (previousA != materialA || previousB != materialB) Rebuild();
-            if (instance) instance.SetFloat("_MaterialBlend", Mathf.Clamp01(blend));
+            if (!instance) return;
+            float weight = Mathf.Clamp01(blend);
+            instance.SetFloat("_MaterialBlend", weight);
+            bool fullyVisible = instance.GetFloat("_MulAlpha") >= 0.999f && instance.GetFloat("_Visibility") >= 0.999f;
+            bool opaque = (weight <= 0.001f && sourceOpaque) || (weight >= 0.999f && targetOpaque && fullyVisible);
+            ApplyRenderState(opaque);
+        }
+
+        // αが 1 の間は不透明の描き方（深度を書き、影を落とし、不透明の順番で描く）にする。
+        // 透明のままだと深度を書かないため、自分の奥の部分や後ろの物が描く順番しだいで透けて見える。
+        void ApplyRenderState(bool opaque)
+        {
+            int state = opaque ? 1 : 0;
+            if (state == renderState) return;
+            renderState = state;
+            instance.SetFloat("_ZWrite", opaque ? 1 : 0);
+            instance.SetOverrideTag("RenderType", opaque ? "Opaque" : "Transparent");
+            instance.renderQueue = (int)(opaque ? UnityEngine.Rendering.RenderQueue.Geometry : UnityEngine.Rendering.RenderQueue.Transparent);
+            instance.SetShaderPassEnabled("ShadowCaster", opaque);
+            instance.SetShaderPassEnabled("DepthOnly", opaque);
+            instance.SetShaderPassEnabled("DepthNormals", opaque);
+            // 不透明の間は深度で隠れるので、重なりを隠すマスクは使わない（前のフレームのマスクで自分が消えないように）
+            instance.SetFloat("_DepthPrepass", opaque ? 0 : depthPrepass);
+            instance.SetShaderPassEnabled("TeamToonGhostMask", !opaque && depthPrepass > 0.5f);
+            instance.SetShaderPassEnabled("TeamToonGhostGlow", !opaque && instance.GetFloat("_GhostGlowEnabled") > 0.5f);
+        }
+
+        // マテリアルが不透明か（α = 1 で描かれるか）
+        static bool IsOpaque(Material material)
+        {
+            if (!material) return false;
+            if (material.HasProperty("_SurfaceType") && material.GetFloat("_SurfaceType") > 0.5f) return false;
+            if (material.HasProperty("_Surface") && material.GetFloat("_Surface") > 0.5f) return false;
+            if (material.renderQueue >= (int)UnityEngine.Rendering.RenderQueue.GeometryLast) return false;
+            string color = material.HasProperty("_BaseColor") ? "_BaseColor" : "_Color";
+            return !material.HasProperty(color) || material.GetColor(color).a >= 0.999f;
         }
         void OnDidApplyAnimationProperties() => LateUpdate();
         [ContextMenu("対象を再取得 / マテリアル設定を再読み込み")]
@@ -40,7 +79,12 @@ namespace TeamToon
             // Keep generated materials out of saved scenes and prefabs.
             if (!Application.IsPlaying(gameObject) || !isActiveAndEnabled) return;
             if (!materialA || !TeamToonMaterial.IsSupported(materialB)) return;
+            sourceOpaque = IsOpaque(materialA);
+            targetOpaque = IsOpaque(materialB);
+            renderState = -1;
             instance = new Material(materialB) { name = name + " (Model Blend)", hideFlags = HideFlags.HideAndDontSave };
+            instance.SetFloat("_BlendTargetOpaque", targetOpaque ? 1 : 0);
+            depthPrepass = instance.GetFloat("_DepthPrepass");
             instance.SetFloat("_SurfaceType", 1);
             instance.SetFloat("_AlphaClip", 0);
             instance.SetFloat("_MaterialBlendEnabled", 1);
@@ -62,6 +106,7 @@ namespace TeamToon
             instance.SetShaderPassEnabled("ShadowCaster", false);
             instance.SetShaderPassEnabled("DepthOnly", false);
             instance.SetShaderPassEnabled("DepthNormals", false);
+            LateUpdate();
             var targets = renderers != null && renderers.Length > 0 ? renderers : GetComponentsInChildren<Renderer>(true);
             foreach (var target in targets)
             {

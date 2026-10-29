@@ -72,7 +72,8 @@ float2 ShaftFogInterval(float3 origin, float3 ray, float4x4 worldToLocal, float 
 {
     float3 localOrigin=mul(worldToLocal,float4(origin,1)).xyz;
     float3 localRay=mul((float3x3)worldToLocal,ray);
-    if(shape<0.5) return ShaftBoxInterval(localOrigin,localRay,limit);
+    // BOX(0)とGROUND(2)は箱で交差を取る
+    if(shape<0.5 || shape>1.5) return ShaftBoxInterval(localOrigin,localRay,limit);
     float scale=length(localRay);
     if(scale<1e-7) return ShaftEmptyInterval();
     return ShaftSphereInterval(localOrigin,localRay/scale,0.5,limit*scale)/scale;

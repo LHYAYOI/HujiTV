@@ -14,16 +14,56 @@ float _ShaftJitter, _ShaftFramePhase;
 int _LocalFogCount;
 float4x4 _LocalFogTransforms[16];
 float4 _LocalFogSettings[16], _LocalFogColors[16], _LocalFogSunBoost[16];
+float4 _LocalFogGround[16], _LocalFogFlow[16], _LocalFogSpread[16];
+
+
+// 格子点の値 Hash(i) を焼いた 3D テクスチャ（ShaftNoiseVolume.cs が作る。1 辺 SHAFT_NOISE_SIZE、繰り返し）
+TEXTURE3D(_ShaftNoiseVolume);
+#define SHAFT_NOISE_SIZE 64.0
 
 
 float Hash(float3 p) { p=frac(p*0.1031); p+=dot(p,p.yzx+33.33); return frac((p.x+p.y)*p.z); }
 
 
+// 値ノイズ。以前は格子の 8 隅で Hash を計算して 3 重に lerp していた（1 回およそ 100 命令、1 ステップで最大 3 回）。
+// 同じ Hash を焼いたテクスチャを、smoothstep 済みの位置で 1 回だけ線形補間して引く。
+// 格子 i と i+1 の中心のあいだを重み f で補間するので、64 格子の範囲では以前と同じ値になり、その外は 64 格子周期で繰り返す。
 float Noise(float3 p)
 {
     float3 i=floor(p), f=frac(p); f=f*f*(3-2*f);
-    return lerp(lerp(lerp(Hash(i),Hash(i+float3(1,0,0)),f.x),lerp(Hash(i+float3(0,1,0)),Hash(i+float3(1,1,0)),f.x),f.y),
-        lerp(lerp(Hash(i+float3(0,0,1)),Hash(i+float3(1,0,1)),f.x),lerp(Hash(i+float3(0,1,1)),Hash(i+1),f.x),f.y),f.z);
+    // 座標が大きいと UV の小数の精度が落ちるので、先に格子番号を 0〜63 に畳む
+    i-=SHAFT_NOISE_SIZE*floor(i/SHAFT_NOISE_SIZE);
+    return SAMPLE_TEXTURE3D_LOD(_ShaftNoiseVolume,sampler_LinearRepeat,(i+f+0.5)/SHAFT_NOISE_SIZE,0).r;
+}
+
+
+// 床を這う霧の重み。箱の下側に溜まり、上端をノイズで盛り上げ、広がりの中心から半径の内側だけに出す
+// ground = (溜まる高さ, 上端のぼかし, ノイズの細かさ, ノイズの強さ)、flow = (流れ xyz, 先端のぼかし)、spread = (中心 xyz, 半径。負なら無制限)
+float ShaftGroundWeight(float3 p, float3 local, int volume)
+{
+    float4 ground=_LocalFogGround[volume];
+    float4 flow=_LocalFogFlow[volume];
+    float4 spread=_LocalFogSpread[volume];
+    // ノイズを計算する前に、霧が届かない場所を捨てる（上端の上と、広がりの外）
+    float height=local.y*0.5+0.5;
+    float highest=ground.x*lerp(1,1.7,ground.w)+ground.y;
+    if(height>=highest) return 0;
+    float sideWeight=smoothstep(0,_LocalFogSettings[volume].z,1-max(abs(local.x),abs(local.z)));
+    if(sideWeight<=0) return 0;
+    float plainReach=spread.w>=0 ? length(p.xz-spread.xz) : 0;
+    if(spread.w>=0 && plainReach>=spread.w+flow.w*0.5) return 0;
+    float3 q=(p-flow.xyz*_Time.y)*ground.z;
+    float n=0.65*Noise(q)+0.35*Noise(q*2.03+float3(17.1,3.7,9.2));
+    float top=ground.x*lerp(1,0.3+1.4*n,ground.w);
+    float heightWeight=smoothstep(0,1,saturate((top-height)/max(ground.y,0.001)));
+    float body=lerp(1,0.4+1.2*n,ground.w*0.5);
+    float spreadWeight=1;
+    if(spread.w>=0)
+    {
+        float reach=plainReach+(n-0.5)*flow.w;
+        spreadWeight=saturate((spread.w-reach)/flow.w);
+    }
+    return heightWeight*sideWeight*body*spreadWeight;
 }
 
 
@@ -165,8 +205,16 @@ FogOutput ShaftEvaluate(Varyings input, bool detail)
             int volume=firstbitlow(remainingFogSamples);
             if(samplePosition<fogIntervals[volume].x || samplePosition>fogIntervals[volume].y) continue;
             float3 local=mul(_LocalFogTransforms[volume],float4(p,1)).xyz*2;
-            float boundary=_LocalFogSettings[volume].x<0.5 ? max(abs(local.x),max(abs(local.y),abs(local.z))) : length(local);
-            float regionWeight=smoothstep(0,_LocalFogSettings[volume].z,1-boundary);
+            float regionWeight;
+            if(_LocalFogSettings[volume].x>1.5)
+            {
+                regionWeight=ShaftGroundWeight(p,local,volume);
+            }
+            else
+            {
+                float boundary=_LocalFogSettings[volume].x<0.5 ? max(abs(local.x),max(abs(local.y),abs(local.z))) : length(local);
+                regionWeight=smoothstep(0,_LocalFogSettings[volume].z,1-boundary);
+            }
             float amount=regionWeight*_LocalFogSettings[volume].y;
             sunBoost=max(sunBoost,regionWeight*_LocalFogSunBoost[volume].x);
             if(_LocalFogSettings[volume].w>0.5) subtraction+=amount;

@@ -50,7 +50,10 @@ namespace LightShaftLab
             static readonly int g_fogId = Shader.PropertyToID("_ShaftFog");
             static readonly int g_fogDepthId = Shader.PropertyToID("_ShaftFogDepth"), g_godRayId = Shader.PropertyToID("_ShaftGodRay");
             int m_divisor;
-            bool m_useFogFlag, m_useGodRaysFlag, m_temporalFlag, m_tilesFlag;
+            // 実際に描画する画素数。Render Scale を下げると camera.pixelWidth/Height（出力の画素数）より小さくなる
+            int m_targetWidth, m_targetHeight;
+            bool m_useFogFlag, m_useGodRaysFlag, m_temporalFlag, m_tilesFlag, m_refineFlag;
+            Texture3D m_noiseVolume;
             float m_historyWeight;
             int m_historyHash;
             public bool HasActiveEffects() => m_useFogFlag || m_useGodRaysFlag;
@@ -92,6 +95,7 @@ namespace LightShaftLab
             int m_motionRectCount;
             readonly TextureHandle[] m_motionTextures = new TextureHandle[4];
             readonly Vector4[] m_fogSettings = new Vector4[16], m_fogColors = new Vector4[16];
+            readonly Vector4[] m_fogGround = new Vector4[16], m_fogFlow = new Vector4[16], m_fogSpread = new Vector4[16];
             public ShaftPass(Material material)
             {
                 this.m_material = material;
@@ -117,6 +121,8 @@ namespace LightShaftLab
                 m_delta = Mathf.Clamp((float)(now - m_selection.m_time), 0, 0.1f);
                 m_selection.m_time = now;
                 m_divisor = settings.m_resolutionDivisor.value;
+                m_targetWidth = Mathf.Max(1, data.cameraData.cameraTargetDescriptor.width);
+                m_targetHeight = Mathf.Max(1, data.cameraData.cameraTargetDescriptor.height);
                 m_useFogFlag = settings.IsFogActive();
                 m_useGodRaysFlag = false;
                 GeometryUtility.CalculateFrustumPlanes(data.cameraData.camera, m_planes);
@@ -131,8 +137,14 @@ namespace LightShaftLab
                 m_material.SetInt("_ShaftSpotSamples", settings.m_spotMinimumSamples.value);
                 m_material.SetInt("_ShaftLocalSamples", settings.m_localFogMinimumSamples.value);
                 m_material.SetFloat("_ShaftJitter", settings.m_sampleJitter.value);
-                m_material.SetInt("_ShaftRefineRoots", settings.m_refineRootsFlag.value && m_divisor > 1 ? 1 : 0);
-                m_material.SetInt("_ShaftRefineEdges", settings.m_refineDepthEdgesFlag.value && m_divisor > 1 ? 1 : 0);
+                bool refineRootsFlag = settings.m_refineRootsFlag.value && m_divisor > 1;
+                bool refineEdgesFlag = settings.m_refineDepthEdgesFlag.value && m_divisor > 1;
+                m_refineFlag = refineRootsFlag || refineEdgesFlag;
+                m_material.SetInt("_ShaftRefineRoots", refineRootsFlag ? 1 : 0);
+                m_material.SetInt("_ShaftRefineEdges", refineEdgesFlag ? 1 : 0);
+                // 霧のノイズ（格子点のハッシュを焼いた 3D テクスチャ）。初回だけ作る
+                if (!m_noiseVolume) m_noiseVolume = ShaftNoiseVolume.CreateTexture();
+                m_material.SetTexture("_ShaftNoiseVolume", m_noiseVolume);
                 m_tilesFlag = (settings.m_tileCullingFlag.value || ShaftTileDebug.ForCamera(camera) != SHAFT_TILE_DEBUG_MODE.OFF) && !camera.stereoEnabled && SystemInfo.IsFormatSupported(UnityEngine.Experimental.Rendering.GraphicsFormat.R32G32_UInt, UnityEngine.Experimental.Rendering.GraphicsFormatUsage.Render);
                 CollectLocalFog(settings, ref data);
                 CollectLights(settings, ref data);
@@ -176,7 +188,7 @@ namespace LightShaftLab
                 if (motion) motion.Bind(m_material);
                 foreach (var fog in LocalFogVolume.g_active)
                 {
-                    if (!fog || !fog.isActiveAndEnabled || (fog.m_density <= 0 && fog.m_sunBoost <= 0)) continue;
+                    if (!fog || !fog.isActiveAndEnabled || (fog.m_density <= 0 && fog.m_sunBoost <= 0) || !fog.HasVisibleRegion) continue;
                     var scale = fog.transform.lossyScale;
                     if (Mathf.Min(Mathf.Abs(scale.x), Mathf.Min(Mathf.Abs(scale.y), Mathf.Abs(scale.z))) < 0.0001f) continue;
                     var bounds = fog.RenderBounds;
@@ -209,6 +221,10 @@ namespace LightShaftLab
                     m_fogTransforms[localCount] = fog.transform.worldToLocalMatrix;
                     m_fogSettings[localCount] = new Vector4((int)fog.m_shape, fog.m_density * slot.m_weight, fog.m_edgeFade, fog.m_subtractFlag ? 1 : 0);
                     m_fogColors[localCount] = fog.m_tint.linear;
+                    m_fogGround[localCount] = new Vector4(fog.m_groundFill, fog.m_groundSoftness, fog.m_groundNoiseScale, fog.m_groundNoiseAmount);
+                    m_fogFlow[localCount] = new Vector4(fog.m_groundFlow.x, fog.m_groundFlow.y, fog.m_groundFlow.z, Mathf.Max(0.01f, fog.m_spreadEdge));
+                    var spreadOrigin = fog.m_spreadOrigin;
+                    m_fogSpread[localCount] = spreadOrigin ? new Vector4(spreadOrigin.position.x, spreadOrigin.position.y, spreadOrigin.position.z, fog.m_spreadRadius) : new Vector4(0, 0, 0, -1);
                     m_fogSunBoost[localCount] = new Vector4(settings.m_enableSpatialGodRaysFlag.value && !fog.m_subtractFlag ? fog.m_sunBoost * slot.m_weight : 0, 0, 0, 0);
                     localCount++;
                 }
@@ -221,6 +237,9 @@ namespace LightShaftLab
                 m_useFogFlag = settings.m_intensity.value > 0 && (settings.m_density.value > 0 || localCount > 0);
                 m_material.SetVectorArray("_LocalFogSettings", m_fogSettings);
                 m_material.SetVectorArray("_LocalFogColors", m_fogColors);
+                m_material.SetVectorArray("_LocalFogGround", m_fogGround);
+                m_material.SetVectorArray("_LocalFogFlow", m_fogFlow);
+                m_material.SetVectorArray("_LocalFogSpread", m_fogSpread);
             }
 
             // 太陽（ゴッドレイ）とスポットライトを集め、スポットは上位のみを選んでシェーダーへ渡す。
@@ -378,7 +397,7 @@ namespace LightShaftLab
                 if (apex.z <= camera.nearClipPlane) return new Vector4(2, 2, -1, -1);
                 float tangent = Mathf.Tan(light.spotAngle * Mathf.Deg2Rad * 0.5f);
                 float span = camera.orthographic ? camera.orthographicSize : apex.z * Mathf.Tan(camera.fieldOfView * Mathf.Deg2Rad * 0.5f);
-                float unitsPerPixel = 2 * span / Mathf.Max(1, camera.pixelHeight);
+                float unitsPerPixel = 2 * span / m_targetHeight;
                 float length = Mathf.Min(light.range * 0.25f, 4 * m_divisor * unitsPerPixel / Mathf.Max(0.01f, 2 * tangent));
                 float radius = length * tangent;
                 Vector3 end = light.transform.position + light.transform.forward * length;
@@ -390,7 +409,7 @@ namespace LightShaftLab
                     if (uv.z <= camera.nearClipPlane) return new Vector4(2, 2, -1, -1);
                     lower = Vector2.Min(lower, uv); upper = Vector2.Max(upper, uv);
                 }
-                Vector2 padding = new Vector2(2f * m_divisor / Mathf.Max(1, camera.pixelWidth), 2f * m_divisor / Mathf.Max(1, camera.pixelHeight));
+                Vector2 padding = new Vector2(2f * m_divisor / m_targetWidth, 2f * m_divisor / m_targetHeight);
                 lower -= padding; upper += padding;
                 // 大きな領域は既に画面上で十分なサンプル数があるため、詳細領域として扱わない。
                 if ((upper.x - lower.x) * (upper.y - lower.y) > 0.05f) return new Vector4(2, 2, -1, -1);
@@ -401,6 +420,17 @@ namespace LightShaftLab
                 public TextureHandle m_source;
                 public Material m_material;
             }
+
+            class OccluderPassData
+            {
+                public RendererListHandle m_list;
+            }
+
+            // God Ray を遮るもの: シェーダに LightMode "GodRayOccluder" のパスを持つレンダラー（半透明のカーテンなど）。
+            // 深度に書かれないものでも、空の判定から差し引けるようにする。
+            static readonly ShaderTagId g_occluderTag = new ShaderTagId("GodRayOccluder");
+            static readonly int g_occluderId = Shader.PropertyToID("_GodRayOccluder");
+            static readonly int g_occluderEnabledId = Shader.PropertyToID("_GodRayOccluderEnabled");
 
             public override void RecordRenderGraph(RenderGraph graph, ContextContainer frameData)
             {
@@ -457,11 +487,32 @@ namespace LightShaftLab
                     var radial = graph.CreateTexture(godRayDescriptor);
                     godRayDescriptor.name = "God Ray Filtered";
                     godRay = graph.CreateTexture(godRayDescriptor);
+
+                    // 遮るものを、空の判定と同じ解像度へ描く（重なりは濃い方）。描くものが無ければ 0 のまま。
+                    var occluderDescriptor = godRayDescriptor;
+                    occluderDescriptor.name = "God Ray Occluders";
+                    occluderDescriptor.clearBuffer = true;
+                    occluderDescriptor.clearColor = Color.clear;
+                    var occluder = graph.CreateTexture(occluderDescriptor);
+                    var renderingData = frameData.Get<UniversalRenderingData>();
+                    var drawSettings = RenderingUtils.CreateDrawingSettings(g_occluderTag, renderingData, cameraData, frameData.Get<UniversalLightData>(), SortingCriteria.None);
+                    var occluderList = graph.CreateRendererList(new RendererListParams(renderingData.cullResults, drawSettings, new FilteringSettings(RenderQueueRange.all)));
+                    using (var builder = graph.AddRasterRenderPass<OccluderPassData>("God Ray Occluders", out var occluderData))
+                    {
+                        occluderData.m_list = occluderList;
+                        builder.UseRendererList(occluderList);
+                        builder.SetRenderAttachment(occluder, 0);
+                        builder.SetGlobalTextureAfterPass(occluder, g_occluderId);
+                        builder.SetRenderFunc((OccluderPassData passData, RasterGraphContext context) => context.cmd.DrawRendererList(passData.m_list));
+                    }
+                    m_material.SetFloat(g_occluderEnabledId, 1);
+
                     using (var builder = graph.AddRasterRenderPass<PassData>("God Ray Sky Occlusion", out var data, ShaftProfiling.Get(ShaftProfiling.PASS.SKY_MASK)))
                     {
                         data.m_source = source;
                         data.m_material = m_material;
                         builder.UseTexture(source);
+                        builder.UseTexture(occluder);
                         builder.UseTexture(resources.cameraDepthTexture);
                         builder.UseAllGlobalTextures(true);
                         builder.SetRenderAttachment(mask, 0);
@@ -579,6 +630,27 @@ namespace LightShaftLab
                     builder.SetRenderFunc((PassData passData, RasterGraphContext context) => Blitter.BlitTexture(context.cmd, passData.m_source, new Vector4(1, 1, 0, 0), passData.m_material, 1));
                 }
 
+                // 深度の境界・スポットの根元だけをフル解像度でレイマーチし直し、合成結果へ重みで混ぜる。
+                // 以前は合成パスの中で行っていたため、4K の全画素が重いレイマーチのレジスタ使用量を抱えていた。
+                if (m_useFogFlag && m_refineFlag)
+                    using (var builder = graph.AddRasterRenderPass<PassData>("Light Shaft Detail Refine", out var data, ShaftProfiling.Get(ShaftProfiling.PASS.REFINE)))
+                    {
+                        foreach (var motionTexture in m_motionTextures) if (motionTexture.IsValid()) builder.UseTexture(motionTexture);
+                        data.m_source = source;
+                        data.m_material = m_material;
+                        builder.UseTexture(source);
+                        builder.UseTexture(fogTexture);
+                        builder.UseTexture(fogDepth);
+                        if (tileMasks.IsValid()) builder.UseTexture(tileMasks);
+                        if (m_useGodRaysFlag) builder.UseTexture(godRay);
+                        if (resources.cameraDepthTexture.IsValid()) builder.UseTexture(resources.cameraDepthTexture);
+                        if (resources.mainShadowsTexture.IsValid()) builder.UseTexture(resources.mainShadowsTexture);
+                        if (resources.additionalShadowsTexture.IsValid()) builder.UseTexture(resources.additionalShadowsTexture);
+                        builder.UseAllGlobalTextures(true);
+                        builder.SetRenderAttachment(output, 0, AccessFlags.ReadWrite);
+                        builder.SetRenderFunc((PassData passData, RasterGraphContext context) => Blitter.BlitTexture(context.cmd, passData.m_source, new Vector4(1, 1, 0, 0), passData.m_material, 7));
+                    }
+
                 resources.cameraColor = output;
             }
 
@@ -589,6 +661,7 @@ namespace LightShaftLab
             public void Dispose()
             {
                 CoreUtils.Destroy(m_beamNoise); m_beamNoise = null;
+                CoreUtils.Destroy(m_noiseVolume); m_noiseVolume = null;
                 foreach (var state in m_cameras.Values) state.m_history.Dispose();
                 m_cameras.Clear();
             } // 一時テクスチャはRender Graphが解放する。
