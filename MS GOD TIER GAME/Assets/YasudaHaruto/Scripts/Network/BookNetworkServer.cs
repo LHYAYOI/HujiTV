@@ -66,6 +66,11 @@ public class BookNetworkServer : MonoBehaviour
             return;
         }
 
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            SendObstacle(PLAYER_SLOT.PLAYER1, 1);
+        }
+
         m_driver.ScheduleUpdate().Complete();
 
         RemoveDisconnectedClients();
@@ -132,6 +137,21 @@ public class BookNetworkServer : MonoBehaviour
         }
     }
 
+    private uint m_obstacleEvent;
+    public bool SendObstacle(PLAYER_SLOT playerSlot, byte obstacleId)
+    {
+        if (obstacleId == 0 || !m_driver.IsCreated) return false;
+        foreach (var pair in m_playerSlots)
+        {
+            if (pair.Value != playerSlot || !pair.Key.IsCreated) continue;
+            if (m_driver.BeginSend(m_reliablePipeline, pair.Key, out DataStreamWriter writer) != 0) return false;
+            writer.WriteByte((byte)BOOK_MESSAGE_TYPE.APPLY_OBSTACLE);
+            writer.WriteUInt(++m_obstacleEvent);
+            writer.WriteByte(obstacleId);
+            return m_driver.EndSend(writer) >= 0;
+        }
+        return false;
+    }
     public bool SendAddPage(PLAYER_SLOT playerSlot, byte pageId)
     {
         if (pageId == 0)

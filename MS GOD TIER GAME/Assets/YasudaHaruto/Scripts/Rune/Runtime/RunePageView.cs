@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackView, IRuneCooldownView, IRuneCooldownReleaseView
+public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackView, IRuneCooldownView, IRuneCooldownReleaseView, IRuneCastPresentation
 {
     [SerializeField] private RuneLineGraphic m_referenceGraphic;
     [SerializeField] private RuneLineGraphic m_playerGraphic;
@@ -37,6 +37,32 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
     private Func<UnityEngine.UI.Image> m_cooldownImage;
     private bool m_releaseCooldown;
     private float m_releaseCooldownSeconds;
+
+    private Func<Rect?> m_spellBookRect;
+    private Func<Vector2> m_spellOrigin;
+    private Func<float> m_spellSideAngle;
+    private RuneSpellSettings m_spellSettings;
+    private RuneSpellEffect m_spellEffect;
+    private bool m_directionalCast = true;
+    public bool IsCastReady => m_spellEffect == null || !m_spellEffect.IsVisible || m_spellEffect.IsReady;
+    public RuneSpellEffect SpellEffect => m_spellEffect;
+
+    public void ConfigureSpellCast(Func<Rect?> bookRect, Func<Vector2> origin,
+        RuneSpellSettings settings, Func<float> sideAngle)
+    {
+        m_spellBookRect = bookRect;
+        m_spellOrigin = origin;
+        m_spellSettings = settings;
+        m_spellSideAngle = sideAngle;
+    }
+
+    public void SetDirectionalCast(bool directional) => m_directionalCast = directional;
+    public void SetSpellDrag(Vector2 delta, float radius) => m_spellEffect?.SetDrag(delta, radius);
+    public void LaunchCast(MAGIC_CAST_DIRECTION direction) => m_spellEffect?.Launch(direction);
+    private void HideSpell(bool keepFlying = false)
+    {
+        if (m_spellEffect != null && !(keepFlying && m_spellEffect.IsFlying)) m_spellEffect.Hide();
+    }
 
     public void ConfigureCooldownImage(Func<UnityEngine.UI.Image> image) => m_cooldownImage = image;
     public void PlayCooldownRelease(float cooldownSeconds = 1f)
@@ -67,6 +93,7 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
         HideCooldown();
         m_runeData = runeData;
         HideCompletion();
+        HideSpell(true);
         BringToFront();
         ClearGraphics();
         SetTraceDeviation(0f);
@@ -113,6 +140,16 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
         if (!isActiveAndEnabled || m_playerGraphic == null || m_completedStrokes.Count == 0) return;
         Rect? area = GetCompletionScreenRect();
         if (!area.HasValue || m_playerGraphic.rectTransform.rect.width <= 0f) return;
+        if (m_directionalCast && m_spellSettings != null && m_spellBookRect != null)
+        {
+            if (m_spellEffect == null)
+                m_spellEffect = new GameObject("Rune Spell Particles", typeof(RectTransform)).AddComponent<RuneSpellEffect>();
+            Color color = RuneSpellPalette.Sample(m_cooldownImage?.Invoke(), m_spellSettings.FallbackColor);
+            m_spellEffect.Play(m_completedStrokes, GetCompletionScreenRect, m_spellBookRect, m_spellOrigin,
+                m_spellSettings, color, m_spellSideAngle != null ? m_spellSideAngle() : 45f);
+            m_playerGraphic.Clear();
+            return;
+        }
         if (m_completionOverlay == null)
             m_completionOverlay = new GameObject("Rune Completion Overlay", typeof(RectTransform))
                 .AddComponent<RuneCompletionOverlay>();
@@ -133,6 +170,7 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
 
     public void PlayFailure(RuneTraceResult result)
     {
+        HideSpell();
         HideCompletion();
         if (!isActiveAndEnabled) return;
         if (m_failureOverlay == null)
@@ -192,6 +230,7 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
 
     public void Clear()
     {
+        HideSpell();
         HideCooldown();
         m_runeData = null;
         HideCompletion();
@@ -206,6 +245,7 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
 
     private void OnDisable()
     {
+        HideSpell();
         HideCooldown();
         HideFailure();
         HideCompletion();
@@ -213,6 +253,7 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
 
     private void OnDestroy()
     {
+        if (m_spellEffect != null) Destroy(m_spellEffect.gameObject);
         if (m_failureOverlay != null) Destroy(m_failureOverlay.gameObject);
         if (m_completionOverlay != null) Destroy(m_completionOverlay.gameObject);
     }

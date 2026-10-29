@@ -38,6 +38,7 @@ public class BookNetworkClient : MonoBehaviour
 
     public event Action<BOOK_CONNECTION_STATE> OnConnectionStateChanged;
     public event System.Action<byte> AddPageReceived;
+    public event System.Action<uint, byte> ObstacleReceived;
 
 
     private void Awake()
@@ -359,6 +360,12 @@ public class BookNetworkClient : MonoBehaviour
                 ReceiveTestPong(reader);
                 break;
 
+            case BOOK_MESSAGE_TYPE.APPLY_OBSTACLE:
+                if (reader.Length - reader.GetBytesRead() < 5) { Debug.LogWarning("Truncated obstacle packet."); break; }
+                uint eventId = reader.ReadUInt();
+                byte obstacleId = reader.ReadByte();
+                if (obstacleId != 0) ObstacleReceived?.Invoke(eventId, obstacleId);
+                break;
             case BOOK_MESSAGE_TYPE.ADD_PAGE:
                 ReceiveAddPage(reader);
                 break;

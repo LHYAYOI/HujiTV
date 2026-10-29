@@ -46,19 +46,6 @@ namespace YasudaHaruto.BookValidation
                 Quad(vh, m_center + a * (r * 0.87f), m_center + a * (r * 0.96f),
                     m_center + b * (r * 0.96f), m_center + b * (r * 0.87f), new Color(1f, 0.85f, 0.4f, 0.15f));
             }
-            for (int i = 0; i < 3; i++)
-            {
-                float angle = (i - 1) * m_sideAngle * Mathf.Deg2Rad;
-                Vector2 direction = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
-                Color tint = i == SelectedDirection ? new Color(0.3f, 1f, 0.55f, 1f) : new Color(1f, 0.9f, 0.5f, 0.95f);
-                Vector2 start = m_center + direction * r * 1.15f;
-                Vector2 end = m_center + direction * (r + m_length);
-                float width = Mathf.Max(2f, r * ArrowWidth);
-                Line(vh, start, end, width, tint);
-                Vector2 normal = new Vector2(-direction.y, direction.x);
-                Line(vh, end, end - direction * r * 0.33f + normal * r * 0.27f, width, tint);
-                Line(vh, end, end - direction * r * 0.33f - normal * r * 0.27f, width, tint);
-            }
         }
 
         private static Vector2 Unit(float angle) => new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
