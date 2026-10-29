@@ -64,6 +64,23 @@ namespace TeamToon
         /// <summary>Current world-space velocity used by the deformer.</summary>
         public Vector3 Velocity { get; private set; }
 
+        // 演出スクリプトが伸び縮みを直接決めるための上書き（保存しない）。weight 0 で通常の動きだけ。
+        Vector3 overrideDirection = Vector3.up;
+        float overrideFactor = 1;
+        float overrideWeight;
+
+        /// <summary>
+        /// 伸び縮みを上書きする。factor 1 で元の形、1 未満でその向きにつぶれ（横に広がり）、1 より大きいと伸びる。
+        /// weight 0〜1 で通常の動きと混ぜる。床に溶ける演出などで使う。
+        /// </summary>
+        public void SetStretchOverride(Vector3 worldDirection, float factor, float weight)
+        {
+            overrideDirection = worldDirection.sqrMagnitude > 1e-6f ? worldDirection.normalized : Vector3.up;
+            overrideFactor = Mathf.Max(factor, 0.05f);
+            overrideWeight = Mathf.Clamp01(weight);
+        }
+        public void ClearStretchOverride() => overrideWeight = 0;
+
         static readonly int AnchorId = Shader.PropertyToID("_DeformAnchor"), AxisId = Shader.PropertyToID("_DeformAxis"),
             CenterId = Shader.PropertyToID("_DeformCenter"), StretchId = Shader.PropertyToID("_DeformStretch"),
             DragId = Shader.PropertyToID("_DeformDrag"), WaveId = Shader.PropertyToID("_DeformWave");
@@ -88,6 +105,7 @@ namespace TeamToon
         public void ResetState()
         {
             drag = dragVelocity = Vector3.zero; stretch = stretchVelocity = puff = puffVelocity = 0;
+            overrideWeight = 0;
             hasLast = false;
         }
 
@@ -147,6 +165,15 @@ namespace TeamToon
             Vector3 waveDirection = Vector3.ProjectOnPlane(frame.TransformDirection(localWaveDirection), axis);
             waveDirection = waveDirection.sqrMagnitude > 1e-6f ? waveDirection.normalized : Vector3.zero;
             float inflate = breathAmplitude * Mathf.Sin(breathPhase) + puff;
+            Vector3 appliedDirection = stretchDirection;
+            float appliedFactor = 1 + stretch;
+            if (overrideWeight > 0)
+            {
+                // 伸び縮みは向きの正負を区別しないので、近い側へそろえてから混ぜる。
+                Vector3 target = Vector3.Dot(appliedDirection, overrideDirection) < 0 ? -overrideDirection : overrideDirection;
+                appliedDirection = Vector3.Slerp(appliedDirection, target, overrideWeight).normalized;
+                appliedFactor = Mathf.Lerp(appliedFactor, overrideFactor, overrideWeight);
+            }
 
             block ??= new MaterialPropertyBlock();
             if (renderers == null) return;
@@ -157,7 +184,7 @@ namespace TeamToon
                 block.SetVector(AnchorId, Point(frame.TransformPoint(localRoot), worldLength));
                 block.SetVector(AxisId, Point(axis, 0));
                 block.SetVector(CenterId, Point(frame.TransformPoint(localCenter), inflate));
-                block.SetVector(StretchId, Point(stretchDirection, 1 + stretch));
+                block.SetVector(StretchId, Point(appliedDirection, appliedFactor));
                 block.SetVector(DragId, Point(drag, 0));
                 block.SetVector(WaveId, Point(waveDirection * waveAmplitude, wavePhase));
                 r.SetPropertyBlock(block);

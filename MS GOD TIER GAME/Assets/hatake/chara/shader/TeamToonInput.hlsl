@@ -7,7 +7,7 @@
 CBUFFER_START(UnityPerMaterial)
 float4 _BlendSourceMap_ST;
 half4 _BlendSourceColor, _BlendSourceEmission;
-half _MaterialBlendEnabled, _MaterialBlend, _BlendSourceMetallic, _BlendSourceSmoothness;
+half _MaterialBlendEnabled, _MaterialBlend, _BlendSourceMetallic, _BlendSourceSmoothness, _BlendTargetOpaque;
 float4 _BaseMap_ST;
 half4 _BaseColor, _ShadowColor, _DeepShadowColor, _SpecularColor, _RimColor;
 half4 _EmissionColor, _OutlineColor;
@@ -32,6 +32,9 @@ float4 _DeformAnchor, _DeformAxis, _DeformCenter, _DeformStretch, _DeformDrag, _
 half _SurfaceType, _CoreAlpha, _EdgeAlpha, _EdgePower, _AdditiveBlend, _GhostRimPower, _Visibility, _DepthPrepass;
 half _GhostGlowEnabled, _GhostGlowWidth, _GhostGlowFalloff;
 half _DeformEnabled, _DeformCurve, _DeformWaveCount;
+float4 _SlicePlane;
+half4 _SliceGlowColor;
+half _SliceEnabled, _SliceGlowWidth;
 half _SrcBlend, _DstBlend, _ZWrite;
 CBUFFER_END
 
@@ -62,6 +65,28 @@ bool ToonGhostHidden(float4 positionCS, float3 positionWS)
     float2 mask = ToonGhostMask(positionCS);
     float depth = -TransformWorldToView(positionWS).z;
     return ToonGhostSameCharacter(mask) && depth > mask.x + max(0.002, depth * 0.002);
+}
+
+// 壁すり抜け: 平面の裏側（壁の中）を切り捨てる。値は FieldGhostWallPeek が MaterialPropertyBlock で書く。
+float ToonSliceDistance(float3 positionWS)
+{
+    return dot(_SlicePlane.xyz, positionWS) + _SlicePlane.w;
+}
+void ToonSliceClip(float3 positionWS)
+{
+    if (_SliceEnabled > 0.5)
+    {
+        clip(ToonSliceDistance(positionWS));
+    }
+}
+// 切り口に近いほど 1。切っていないときは 0。
+half ToonSliceGlow(float3 positionWS)
+{
+    if (_SliceEnabled < 0.5)
+    {
+        return 0;
+    }
+    return 1 - saturate(ToonSliceDistance(positionWS) / max(_SliceGlowWidth, 0.001));
 }
 
 half4 ToonBase(float2 uv)
