@@ -19,8 +19,9 @@ MonoBehaviour:
   m_interaction:
     m_type: 1
     m_runeData: {fileID: 11400000, guid: e7415a1f0d2337c4083d62cb65833b9d, type: 2}
+    m_runeImageIndex: -1
   m_action:
     m_type: 1
-    m_magicData: {fileID: 11400000, guid: 17ef150f604effd4e91c6dfb9950d6c0, type: 2}
+    m_magicData: {fileID: 11400000, guid: 1fc6fe6d07825934aa2aa07117f42783, type: 2}
   m_leftVisualData: {fileID: 11400000, guid: 683600d286d803d44939ef252003ba97, type: 2}
   m_rightVisualData: {fileID: 11400000, guid: f2cb3b18a6f51424aaffb62791fb2aab, type: 2}

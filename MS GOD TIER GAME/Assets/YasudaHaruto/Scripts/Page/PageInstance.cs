@@ -9,6 +9,7 @@ public class PageInstance
     private readonly PageData m_data;
     private readonly IPageInteraction m_interaction;
 
+    public PageObstacleState Obstacles { get; } = new PageObstacleState();
     public PageData Data => m_data;
     public IPageInteraction Interaction => m_interaction;
 
