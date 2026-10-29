@@ -586,6 +586,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1297821478226664944}
   - component: {fileID: 2375542825176977384}
+  - component: {fileID: 2742938954884847963}
   m_Layer: 0
   m_Name: SwarmGhostManager
   m_TagString: Untagged
@@ -658,10 +659,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0c4c55b7a843ee42a746600756a8017, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwarmGhostManager
+  m_swarmGhostData: {fileID: 11400000, guid: 166ad5e01487ed14c84cd256f0392837, type: 2}
   m_swarmGhostPrefabs:
   - {fileID: 382643931330808387, guid: 1a803c05535cd9a42a39f697038d0236, type: 3}
   - {fileID: 382643931330808387, guid: 290149f5283c2c24794aea44708c2cb3, type: 3}
   - {fileID: 382643931330808387, guid: 20784d1eb1d1a91429d7a58558af3b93, type: 3}
+  - {fileID: 382643931330808387, guid: c3cddaa4dd0e0ee4aa754d5248da0911, type: 3}
+  - {fileID: 382643931330808387, guid: 9a3c71dff8a281647b585acab2b50902, type: 3}
   m_spawnPositions:
   - {fileID: 1211283472923218840}
   - {fileID: 1642655772469075082}
@@ -701,8 +705,29 @@ MonoBehaviour:
   - {fileID: 3225085210961020875}
   - {fileID: 1553900831303023461}
   - {fileID: 878881299717708726}
-  m_spawnInterval: 0.1
+  m_spawnInterval: 0.05
   m_target: {fileID: 0}
+--- !u!65 &2742938954884847963
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4035501538683297309}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4, y: 2.4, z: 1}
+  m_Center: {x: -0.9, y: -0.72, z: -1.37}
 --- !u!1 &4735069395439638426
 GameObject:
   m_ObjectHideFlags: 0

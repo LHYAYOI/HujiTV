@@ -68,6 +68,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 317f9913daada9145a266f42e97cb7c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwarmMiniGhostTest
+  m_cameraHeightOffset: 1.5
+  m_turnSpeed: 120
   m_chargeStates:
   - move_over
   - move_under
@@ -83,6 +85,7 @@ MonoBehaviour:
   m_returnAnimationSpeed: 0.15
   m_shrinkDuration: 2
   m_deathParticle: {fileID: 4058022614410997813, guid: c50c3d67735e1e540bc58315328ffc20, type: 3}
+  m_isChargingFlag: 0
 --- !u!1001 &6077947146731339621
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -117,19 +120,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
-      propertyPath: m_LocalRotation.y
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -137,7 +140,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 180
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z

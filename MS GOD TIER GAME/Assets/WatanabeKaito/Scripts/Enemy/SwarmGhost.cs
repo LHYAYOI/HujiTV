@@ -4,6 +4,12 @@ using UnityEngine.InputSystem;
 
 public class SwarmGhost : MonoBehaviour
 {
+    [Header("カメラを向く高さの補正")]
+    [SerializeField] private float m_cameraHeightOffset = 1.5f;
+
+    [Header("毎フレームプレイヤーに向く角度")]
+    [SerializeField] private float m_turnSpeed = 60f;
+
     [SerializeField]
     private string[] m_chargeStates =
     {
@@ -36,27 +42,27 @@ public class SwarmGhost : MonoBehaviour
     [Header("帰還中のアニメーション速度")]
     [SerializeField] private float m_returnAnimationSpeed = 0.5f;
 
-    // Animatorの初期再生速度
-    private float m_defaultAnimatorSpeed = 1f;
-
     [Header("縮小にかかる時間（秒）")]
     [SerializeField] private float m_shrinkDuration = 2.0f;
 
     [Header("パーティクル")]
     [SerializeField] private GameObject m_deathParticle;
 
-    private GameObject m_spawnedDeathParticle;
+    private float m_defaultAnimatorSpeed = 1f; // Animatorの初期再生速度
+    private GameObject m_spawnedDeathParticle;  // 生成されたパーティクルの参照
 
-    private Coroutine m_shrinkCoroutine;
-    private Coroutine m_chargeCoroutine;
-    private Coroutine m_returnCoroutine;
+    private Coroutine m_shrinkCoroutine;    // 縮小コルーチンの参照
+    private Coroutine m_chargeCoroutine;    // 突撃コルーチンの参照
+    private Coroutine m_returnCoroutine;    // 帰還コルーチンの参照
 
-    private Animator m_animator;
+    private Animator m_animator;    // Animatorの参照
 
-    private bool m_isDying = false;
+    private bool m_isDying = false; // 死亡中かどうかのフラグ
 
-    // 初期位置を保存
-    private Vector3 m_initialPosition;
+    private Vector3 m_initialPosition; // 初期位置を保存
+
+    // 突撃中フラグ
+    public bool m_isChargingFlag = false;
 
     private void Awake()
     {
@@ -73,6 +79,8 @@ public class SwarmGhost : MonoBehaviour
         {
             m_defaultAnimatorSpeed = m_animator.speed;
         }
+
+        TurnToPlayerImmediately();
     }
 
     private void Update()
@@ -83,6 +91,58 @@ public class SwarmGhost : MonoBehaviour
         {
             StartCharge();
         }
+
+        if(!m_isChargingFlag)
+        {
+           TurnToPlayer();
+        }
+    }
+
+    // プレイヤーの方向へ即座に向く
+    private void TurnToPlayerImmediately()
+    {
+        Vector3 playerPosition = m_target.position;
+
+        // プレイヤーの狙う位置を調整
+        playerPosition.y -= m_cameraHeightOffset;
+
+        Vector3 direction = playerPosition - transform.position;
+
+        // 方向ベクトルがほぼゼロなら回転しない
+        if (direction.sqrMagnitude <= 0.0001f)
+        {
+            return;
+        }
+
+        // プレイヤーの方向へ即座に回転
+        transform.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+    }
+
+    // プレイヤーの方向を向く
+    private void TurnToPlayer()
+    {
+        Vector3 playerPosition = m_target.position;
+
+        // プレイヤーの狙う位置を調整
+        playerPosition.y -= m_cameraHeightOffset;
+
+        Vector3 direction = playerPosition - transform.position;
+
+        // 方向ベクトルがほぼゼロなら回転しない
+        if (direction.sqrMagnitude <= 0.0001f)
+        {
+            return;
+        }
+
+        // プレイヤーの方向を向く回転
+        Quaternion targetRotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+
+        // 毎フレーム少しずつ回転する
+        transform.rotation = Quaternion.RotateTowards(
+            transform.rotation,
+            targetRotation,
+            m_turnSpeed * Time.deltaTime
+        );
     }
 
     // 突撃を開始する
@@ -109,6 +169,8 @@ public class SwarmGhost : MonoBehaviour
     // 突撃から帰還までの処理
     private IEnumerator ChargeRoutine()
     {
+        m_isChargingFlag = true;
+
         // 待ち時間とアニメーションをランダムに選ぶ
         float delay = Random.Range(m_minDelay, m_maxDelay);
         int index = Random.Range(0, m_chargeStates.Length);
@@ -137,8 +199,7 @@ public class SwarmGhost : MonoBehaviour
         }
 
         // ターゲットを通り過ぎた位置
-        Vector3 passPosition =
-            targetPosition + direction * m_passDistance;
+        Vector3 passPosition = targetPosition + direction * m_passDistance;
 
         // 突撃アニメーションを再生
         m_animator.CrossFadeInFixedTime(
@@ -158,9 +219,7 @@ public class SwarmGhost : MonoBehaviour
         }
 
         // ターゲットを通り過ぎるまで直線移動
-        while (Vector3.Distance(
-            transform.position,
-            passPosition) > 0.01f)
+        while (Vector3.Distance(transform.position, passPosition) > 0.01f)
         {
             if (m_isDying)
             {
@@ -168,11 +227,7 @@ public class SwarmGhost : MonoBehaviour
                 yield break;
             }
 
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                passPosition,
-                m_moveSpeed * Time.deltaTime
-            );
+            transform.position = Vector3.MoveTowards(transform.position, passPosition, m_moveSpeed * Time.deltaTime);
 
             yield return null;
         }
@@ -184,13 +239,7 @@ public class SwarmGhost : MonoBehaviour
         m_animator.speed = m_returnAnimationSpeed;
 
         // 選択したアニメーションに応じた方向へ帰還
-        m_returnCoroutine = StartCoroutine(
-            ReturnToInitialPositionCoroutine(
-                passPosition,
-                m_initialPosition,
-                index
-            )
-        );
+        m_returnCoroutine = StartCoroutine(ReturnToInitialPositionCoroutine(passPosition, m_initialPosition, index));
 
         yield return m_returnCoroutine;
 
@@ -213,10 +262,7 @@ public class SwarmGhost : MonoBehaviour
     }
 
     // 放物線を描きながら一回転して元の位置に戻る
-    private IEnumerator ReturnToInitialPositionCoroutine(
-        Vector3 startPosition,
-        Vector3 targetPosition,
-        int chargeIndex)
+    private IEnumerator ReturnToInitialPositionCoroutine(Vector3 startPosition, Vector3 targetPosition, int chargeIndex)
     {
         if (m_returnDuration <= 0f)
         {
@@ -228,11 +274,7 @@ public class SwarmGhost : MonoBehaviour
         Vector3 arcDirection = GetReturnArcDirection(chargeIndex);
 
         // アニメーションに応じた回転軸と回転方向
-        GetReturnRotationSettings(
-            chargeIndex,
-            out Vector3 rotationAxis,
-            out float rotationSign
-        );
+        GetReturnRotationSettings(chargeIndex, out Vector3 rotationAxis, out float rotationSign);
 
         // 回転開始時の向きを保存
         Quaternion startRotation = transform.rotation;
@@ -248,9 +290,7 @@ public class SwarmGhost : MonoBehaviour
 
             elapsedTime += Time.deltaTime;
 
-            float t = Mathf.Clamp01(
-                elapsedTime / m_returnDuration
-            );
+            float t = Mathf.Clamp01(elapsedTime / m_returnDuration);
 
             // 移動を滑らかにするイージング
             float easedT = Easing.EaseInOutSine(t);
@@ -263,9 +303,7 @@ public class SwarmGhost : MonoBehaviour
             );
 
             // 放物線の弧を計算
-            float arcHeight =
-                4f * m_returnArcHeight *
-                easedT * (1f - easedT);
+            float arcHeight = 4f * m_returnArcHeight * easedT * (1f - easedT);
 
             // 指定された方向に放物線を描く
             position += arcDirection * arcHeight;
@@ -275,11 +313,7 @@ public class SwarmGhost : MonoBehaviour
             // 帰還中に360度、一回転させる
             float rotationAngle = 360f * rotationSign * t;
 
-            transform.rotation =
-                Quaternion.AngleAxis(
-                    rotationAngle,
-                    rotationAxis
-                ) * startRotation;
+            transform.rotation = Quaternion.AngleAxis(rotationAngle, rotationAxis) * startRotation;
 
             yield return null;
         }
@@ -287,6 +321,8 @@ public class SwarmGhost : MonoBehaviour
         // 最終位置と回転を正確に戻す
         transform.position = targetPosition;
         transform.rotation = startRotation;
+
+        m_isChargingFlag = false;
     }
 
     // アニメーション番号に対応する帰還方向を取得
@@ -340,10 +376,7 @@ public class SwarmGhost : MonoBehaviour
     }
 
     // アニメーションに応じた回転軸と回転方向を取得
-    private void GetReturnRotationSettings(
-        int chargeIndex,
-        out Vector3 rotationAxis,
-        out float rotationSign)
+    private void GetReturnRotationSettings(int chargeIndex, out Vector3 rotationAxis, out float rotationSign)
     {
         Transform viewTransform = null;
 
