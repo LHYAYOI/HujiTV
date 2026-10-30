@@ -9,6 +9,7 @@ Shader "custom/hatake/ToonMaster"
         [HideInInspector] _BlendSourceEmission("Source emission", Color) = (0,0,0,1)
         [HideInInspector] _BlendSourceMetallic("Source metallic", Float) = 0
         [HideInInspector] _BlendSourceSmoothness("Source smoothness", Float) = 0.5
+        [HideInInspector] _BlendTargetOpaque("Blend target is opaque", Float) = 0
         [MainTexture] _BaseMap("ベース画像", 2D) = "white" {}
         [MainColor] _BaseColor("ベース色", Color) = (0.8,0.65,0.5,1)
         _MulAlpha("最終算出の透明度に乗算する倍率", Range(0, 1)) = 1
@@ -105,6 +106,10 @@ Shader "custom/hatake/ToonMaster"
         [HideInInspector] _DeformStretch("Stretch direction (xyz) / factor (w)", Vector) = (0,1,0,1)
         [HideInInspector] _DeformDrag("Tip drag offset", Vector) = (0,0,0,0)
         [HideInInspector] _DeformWave("Wave amplitude (xyz) / phase (w)", Vector) = (0,0,0,0)
+        [HideInInspector] _SliceEnabled("切り口で切る（壁すり抜け）", Float) = 0
+        [HideInInspector] _SlicePlane("Slice plane normal (xyz) / offset (w)", Vector) = (0,1,0,0)
+        [HideInInspector][HDR] _SliceGlowColor("切り口の発光色", Color) = (0.55,0.75,1,1)
+        [HideInInspector] _SliceGlowWidth("切り口の発光の幅（m）", Range(0.001,0.5)) = 0.06
         [HideInInspector] _SrcBlend("Src blend", Float) = 1
         [HideInInspector] _DstBlend("Dst blend", Float) = 0
         [HideInInspector] _ZWrite("Z write", Float) = 1

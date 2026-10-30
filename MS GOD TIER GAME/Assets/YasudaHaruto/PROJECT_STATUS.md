@@ -5,9 +5,7 @@
 ルーン入力・ページめくり・魔法通信は動作確認済み。
 ※動作確認の根拠は下記記録を参照。魔法通信はユーザーがテスト済みで問題なしと再確認しており、追加の再テストは不要。
 
-## 現在の作業
-2026-10-28：クールダウンの高さ判定を画像ローカル座標で固定。UIのCanvasバッチ化で座標が変わる影響を受けない方式へ修正。
-配置・拡大・左上pivotを持つ実Canvasの撮影検証で25%・50%・75%の回復高さが一致。透明余白は従来通り画像範囲に含む。実操作・Android確認は未実施。
+$12026-10-29：お邪魔4枠の初期実装。左右擦り・スクラッチ、枠保持、4番枠の操作制限、付与通信と予約を追加。Editor／現行SceneのPlay Mode検証と既存RuneFeedbackは通過。完成素材、実機通信、物理操作は未確認。詳細は末尾とBOOK_OBSTACLE_IMPLEMENTATION.mdを参照。
 
 ## 次のタスク
 - ページ追加・削除の統合
@@ -58,6 +56,11 @@
 
 ## 最終作業
 日付：2026-10-28
+変更内容：MagicDataへ[SerializeField] private Texture2D m_impactRuneTextureと読取専用ImpactRuneTextureを追加。InspectorのImpact Rune Textureへ魔法ごとの固定画像を1枚設定できる。
+確認結果：フィールド・APIと利用箇所を静的確認。既存のID・型・狙い方・通信形式は維持。Git fetch後、追跡先とのコミット・ファイル差分なし。Unityコンパイル・Inspector・Play Mode検証は未実施。
+未完了事項：各MagicDataへの画像割り当て。着弾表示側での参照・未設定時の演出省略と、弾・命中コードへの接続。既存画像の用途を決め打ちせず、今回assetへの自動割り当てはしていない。
+
+### 前回作業（クールダウン）
 変更内容：RuneCooldownImageCoordinatesを追加し、バッチ化前の画像内の高さ0〜1をUV1へ渡す方式へ変更。シェーダーから画像ローカルRectとCanvas頂点座標の混在計算を除去。
 確認結果：Verify Rune FeedbackがCOMPLETE。専用PreviewSceneに移動・拡大・左上pivotのWorld Space Canvas/Imageを作り、Camera.RenderのGPU読み戻しで回復高さ25%・50%・75%がそれぞれ0.25・0.5・0.75になることを確認。既存回帰検証も通過。Scene保存・再読み込みなし。
 未完了事項：ユーザーの実操作とAndroidでの再確認。透明余白による見え始めの差は現仕様として残す。領域全体の暗幕方式は未実装。
@@ -338,7 +341,7 @@
 - RuneDataは編集・判定用の線とルールを管理する。本のRunePageViewもTraceDataの線を描画する。RuneDataには画像参照はない。RuneEditorWindowの取り込み画像はEditor側の作業用フィールド。
 - HamadaのMagicBulletControllerはMagicData参照を既に保持する。HitSenderControllerも弾から同じMagicDataを取得するが、現在のHitDataへはMagicType等しか渡していない。着弾エフェクト本体はコメント段階。
 
-### 推奨する保存場所とAPI（未実装）
+### 推奨する保存場所とAPI（2026-10-28にフィールド・プロパティのみ実装済み）
 - Assets/YasudaHaruto/Scripts/Magic/MagicData.csへ[SerializeField] private Texture2D m_impactRuneTextureと読取専用ImpactRuneTextureプロパティを追加する案。
 - 魔法ごとのMagicDataアセット上で1回だけ画像を指定する。PNG等の実体はAssets/YasudaHaruto/Data/Runes/Images等に置き、参照として設定する。画像の実ファイルは複製しない。
 - Texture2Dを推奨するのは、着弾用のMaterial・Particle・Decalへテクスチャとして渡しやすく、Sprite AtlasのUV切り出しに依存しないため。白い形状＋透明背景を基本にし、色や発光・拡大・フェードはエフェクト側で扱う。
@@ -533,3 +536,61 @@
 - 仮案：種類IDから効果を生成し、PageInstanceに実行中効果を保持。基底クラスで開始・入力・更新・終了を揃え、派生側で解除判定を担当。状態と表示寿命を分離する。本全体の使用済み効果はページ効果と対象範囲を分ける。
 - 未確定：付与対象（閲覧中／任意個体、左右片側／見開き）、同時付与、めくり可否、解除通知・再接続同期、べとべとの全体解除／部分除去。ユーザーと相談して確定する。画像生成・コード実装は未着手。
 - ゲームコード・Scene・Prefabは変更せず、既存変更を保持。今回は実機・Play Mode検証なし。
+
+## お邪魔4枠方式の仕様合意（2026-10-28）
+- BOOK_INTERACTION_DESIGN.md末尾に4枠方式の確定仕様と推奨構成を追記。旧単一効果案より優先する。
+- 見開きごとに4枠、複数枠付与・個別解除、空き番号順／不足分は古い枠から上書き、上書き進捗リセット、空きの詰め直しなし、ページ移動後も状態保持を合意。
+- 4番枠だけが通常アクション・めくりを禁止する。4番枠解除で再開し、1〜3番枠の残存は再開を妨げないことをユーザー最終確認。
+- 今回は設計資料のみ更新。コード・素材生成・Unity検証は未実施。通信復旧・入力中の付与・固定ページの扱い等は未確定として資料へ分離。
+
+## お邪魔4枠の初期実装（2026-10-29）
+- 合意した方針で実装を開始。PageInstanceごとにPageObstacleStateを持ち、各枠に独立したObstacleInstance／解除処理を保持。空き番号順・不足分の古い枠上書き・全枠置換・進捗リセット・解除後の詰め直しなしに対応。
+- 左右擦りとスクラッチを実装。スクラッチは64×64の除去形状を保持し、透明余白を必要面積から除外。高速移動は線分で処理し、除去済み領域の再加算なし。スクラッチ素材はRead/Write Enabled必須。
+- BookGameDragInputへ解除入力を接続。4番枠中は通常ルーンとめくりを禁止。描画／発動待ちは取消し、開始済みクールダウンは維持。上書きされた枠への古い解除入力は引き継がない。
+- APPLY_OBSTACLE=6（uintイベントID＋byte種類ID）、BookNetworkServer.SendObstacleを追加。既存通信値は維持。受信の重複除外、めくり中の順序付き予約、固定ページ／表紙での破棄を実装。再接続時は未適用予約と比較基準を破棄し、付与済み状態は維持。送信保存・再送・解除通知・状態同期は未実装。
+- 設定空時にResources/BookObstaclesのRub(ID1/1枠)、Ink(ID2/2枠)を使う。仮表示は色付き四角形。表示はScreen Space Overlayで、めくり中は非表示。本の紙質や曲面・めくりへの汚れ合成と完成素材は未対応。
+- BookObstacle COMPLETE。枠割当・独立解除・上書き・古い入力による誤解除防止・4番枠制限・見開き独立・左右反転・スクラッチ形状保持／透明余白をEditorで確認。
+- BookObstacleRuntime COMPLETE。現在のBookSceneを保存／差し替えせずPlay Modeで、パケット解析→付与、重複無視、ページ状態保持、めくり中複数予約の完了後適用、入力禁止／復帰、描画取消、クールダウン維持、4つの表示生成を検証。入力状態の一部は反射で設定した検証で、物理操作の実証とは区別する。
+- 既存Verify Rune FeedbackもCOMPLETE。初回の追加検証コードでDataStreamWriterをIDisposable扱いしてコンパイル失敗。NativeArrayを所有する形式へ修正後、Unityでコンパイルと上記検証を通過。
+- 操作を伴う目視確認では表紙の表示まで確認。自動ドラッグで表紙から進められず、お邪魔を物理的に擦る体感確認は未完了。最終のPlay Modeは終了済み。実PC／Android通信とAndroid描画は未確認。
+- 敵側の呼び出し追加は他メンバー領域のため未変更。利用方法・通信・制限・検証メニューはBOOK_OBSTACLE_IMPLEMENTATION.mdを参照。
+- 開始時のAGENTS.md・設計資料・PROJECT_STATUS.md・BookScene・MagicData・.vsの既存変更を保持。Scene・Prefab・hatake原本・共有設定は未変更。確認時点の保存済みScene SHA256は479FB93964D78D196200B4EF0C6ADBAFBA08691FA593CFC98BBB59082D4B0009。
+- Git status/fetch/追跡先比較を実施し、現在ブランチMS-82/Feature/BookObstacleは追跡先とのコミット差分なし。禁止Git操作は未実施。
+- 最終調整：表示メッシュは解除進捗が変わったときだけ再構築し、右指定範囲をページ内へ制限。Previewメニューに最初の通常見開きを開く処理とFill Four Slotsを追加。最終ランタイム／EditorコードはUnityの参照設定による別出力コンパイルも成功。これら最終調整後の物理操作・目視確認は未実施。
+
+## Book管理再設計に向けた現状調査（2026-10-29）
+- ユーザー依頼はまず現状確認。ゲームコード・Scene・Prefab・hatake原本は変更せず、静的調査のみ実施。今回のUnityコンパイル・Play Mode・実機確認は未実施。
+- 現行BookSceneはBookGameBootstrap → BookGameController → YasudaBookViewController → hatake.BookFlipView / BookPageViewの構成。YasudaBookViewControllerは既にhatake.BookControllerの専用複製。BookSceneのm_modelViewは未設定、Flip View・表紙内側・Live Turning Pagesは有効。BookValidation.prefabにも専用Controllerがあり、Book.prefab / OldBook.prefabとhatakeのBookRenderTestは元Controllerを参照している。資産全体を一括置換する前提にはしない。
+- 初期一覧はBookGameController.Initial Pagesと表示用BookDataで二重設定。表示側AwakeがBookDataを読み、管理側Initializeが固定ページ・左右参照・件数を照合する。追加・削除・入れ替え時は逆に管理側Applyが表示用一覧を組み、TryApplyInventoryの完了で論理一覧を確定する。初期化と更新でデータの流れが異なる。
+- PageData / PageInstanceはゲーム用1見開き、BookPageDataは片側1枚。現在の対応は表示枚数3+2N、ゲーム見開きi→表示Spread i+1、左index 2+2i。左右や固定ページの計算は管理・表示の境界で扱うべき。
+- YasudaBookViewControllerは約900行。撮影、RenderTexture切替、表紙、めくり、ライブ撮影、一覧編集、燃焼／復活、旧Noise除去、Rune画像取得が同居。AddPage / RemovePage / BurnLeaf / InsertLeaf / BurnSpread等、管理側PageInstance一覧を更新しない公開編集経路も残る。現行専用ControllerへのこれらAPIの外部C#呼出しは今回の検索では検出しなかったが、削除前にはUnityEvent・Prefab・実行時参照も確認が必要。
+- 操作可否はBookGameController.Ready / IsInputBlocked、BookGameDragInputのGESTURE、BookInputController、RuneTraceController、BookObstacleController.Ready / BlocksActions、表示側IsBusyとFlipView.IsTurningへ分散。入力側もFlipView.BeginDrag等を直接呼ぶ。状態を単一enumへ押し込むより、操作ごとの可否判定の窓口と中断・完了通知を揃える案を推奨。
+- Bootstrapは初期化に加えて通信購読、ページ要求キュー、ルーン更新、お邪魔生成・接続状態反映を担う。ネットワークClientはStartで一度取得する構成。起動順に関する実行時不具合は今回未検証。
+- Rune画像は専用Controllerが生成ImageをSprite・位置・サイズで照合して取得する。BookPageViewは画像を再生成し、生成Imageをindexで返す公開契約がない。専用PageViewを作るなら画像参照を安定して取得できるようにする価値がある。
+- 複製候補：撮影・表紙・めくりの連携部分、必要ならBookPageViewとBookFlipView。BookFlipViewはShader / Material / cgincと併せて依存確認が必要。BookData / BookSpreadDataはゲーム側を一覧の正にすれば不要化できる見込み。BookPageDataは既存asset参照維持のため当初再利用する案。BookModelView、元入力、デバッグ入力、旧Noise管理は現行Sceneの用途と必要性を確認して選別する。以上は提案であり新しい複製・移行は未実施。
+- 推奨する次の設計：所持・現在ページを所有する管理、描画とめくりを受け持つ表示、操作可否と入力振分け、通信要求の受付を分離。初期化も編集も同じ管理一覧から表示を生成。既存PageInstance・RuneTraceInteraction・クールダウン・お邪魔状態は移行時に保持する。固定ページ、めくり取消、編集中断、上限入れ替え、切断時の入力制限を回帰確認対象とする。
+- Git：通常権限は親HujiTV管理ディレクトリへのアクセスで失敗。承認付きstatus/fetch/追跡先比較は成功。MS-82/Feature/BookObstacleは追跡先とコミット・確定ファイル差分なし。既存の未コミット／未追跡のお邪魔実装、BookScene、管理資料、MagicData、.vs変更を保持。履歴操作なし。
+
+## Book管理の再構成（2026-10-29、実装済み）
+- ユーザーから再設計・実装の指示を受け、担当側の専用構成へ適用。詳細と設定手順はBOOK_MANAGEMENT_DESIGN.md。過去の「初期BookDataとInitial Pagesの両方を揃える」という記録は、今回以降の専用版には適用しない。
+- BookInventoryを新設。所持見開き一覧、追加・削除・入れ替え候補と表示投影を分離。初期表示も編集も同じBuildVisualPagesで作り、専用表示側のBookData参照と初期照合処理を除去。固定ページとInitial Pagesのみで初期化できる。
+- BookGameControllerは現在個体・Interaction・編集受付／確定・選択・操作可否を担当。表示完了通知でInteractionを再開し、撮影途中の再開を防止。初期化完了前の入力を禁止し、CanNavigate / CanRemoveObstaclesを共通化。
+- 既存専用複製YasudaBookViewControllerを再構成。管理を迂回する独立ページ編集・見開きセット管理・旧Noise除去を除去。撮影・表紙・めくり・ライブ撮影は維持。ドラッグのBegin / Update / Endは表示側経由に統一。約900行から約560行へ縮小。
+- BookPageRequestQueueを新設。Bootstrapに同居していたID解決・有界FIFO・保留処理を分離。Bootstrapの必須参照検証と、管理初期化成功後の入力接続を追加。既存の通信形式と起動時Client取得方式は維持。
+- 現行BookSceneを保存・差し替えずVerify Book Management In Current Sceneを実行しBookManagement COMPLETE。初期3見開きの投影、上限8までの追加、現在個体保持、満杯選択と辞退、閲覧個体の入れ替え、古い個体の拒否、削除、編集中断・復帰、開閉を確認。新規検証コードはEditor配下。
+- 既存Verify Book Obstacles In Current SceneもBookObstacleRuntime COMPLETE。4番枠制限／解除、途中描画取消、開始済みクールダウン保持、めくり予約、個体状態保持を確認。Verify Rune FeedbackもRuneFeedback COMPLETE。物理ドラッグ操作・Android・実PC間通信の実証とは区別する。
+- Unityの参照設定を使い、Temp/BookRefactorValidationへ別出力のランタイム／Editorコンパイルも成功。最初の補助Python実行で既定CP932読込エラー、Editor用rsp追記で改行不足があり、UTF-8明示と改行修正後に通過。ゲームコードの最終コンパイルエラーなし。
+- hatake原本・Scene・Prefab・共有設定・既存アセットは変更なし。保存済みBookScene SHA256は479FB93964D78D196200B4EF0C6ADBAFBA08691FA593CFC98BBB59082D4B0009で同一。既存のお邪魔実装等の未コミット変更を維持。Play Mode終了済み。Git履歴操作なし。diff --checkで出たScene末尾空白は今回未変更の既存差分。
+- 継続上の前提：低レベルのBookFlipView / BookPageView / BookPageDataとShader等は原本参照で再利用。ルーン画像は既存の生成Image照合方式。旧Book.prefab / OldBook.prefab等の元Controller構成とBookDataアセットは保持。新専用PageViewや全表示部品の複製は行っていない。
+
+## ルーン粒子・直接方向指定演出（2026-10-29、実装済み）
+- ユーザー合意：なぞった線のみを粒子化し、少し上昇して中央下へ集合。色は印刷ルーン画像から取得。中心の弾と周囲を漂う粒を重ね、指を離してから弾を触る→少し追従するドラッグ→指を離した瞬間に発射。中央下の明るい領域を維持。集合0.9秒程度を初期値とし各数値をInspector調整可能。方向指定中だけ魔法風の画像矢印を表示。
+- RuneSpellEffect / RuneParticleGraphic / RuneSpellSettings / RuneSpellPalette / IRuneCastPresentationを追加。Dissolving Rune、Spell Core、Orbiting Motes、Spell Trailの4 ParticleSystemをuGUIで合成。書いた線を長さ基準で均等サンプリングし、浮上と曲線収束、待機、追従、3方向への発射を実装。Screen Space Overlay表示で、本の紙質・曲面への合成ではない。
+- 色は既存のRune Image Indexで指定されたSpriteからGPUで32×32読み戻し、白い紙・黒い線を除いた有彩色を抽出。元アセットのRead/Write設定・画像・MagicDataへ重複設定を追加しない。無彩色／画像なしにはFallback Colorを使用。
+- RunePageViewへ専用表示接続を追加。BookGameBootstrap→BookGameDragInput.ConfigureSpellPresentationで既存Sceneへ自動接続。RuneTraceControllerは集合完了までTryBeginCastを拒否し、確定時に粒子発射→既存クールダウン／CastConfirmedへ進む。方向指定なしの魔法は即発動のまま。切断・4番枠による入力禁止・失敗・ページ終了で未発射表示を解除。フォーカス喪失では保持操作だけ取消。
+- 調整場所：BookGameDragInputのSpell Particle Presentation → Spell Settings。Float / Gather Duration、Float Height、Trace Particle Count / Size、Core Size、Orbit関連、Drag Follow / Limit、Flight Duration、Trail数、Arrow Sprite / Length / Idle Alpha。既存Cast Guideの位置・半径・暗さ設定は維持。旧Arrow Widthは互換フィールドとして残るが、画像矢印の大きさは新Arrow Lengthで調整。
+- 組み込みimage_genで透過の白金の魔法風矢印を生成。Resources/RuneSpell/MagicAimArrow.pngへコピーし、RuneSpellAssetImporterで当該新規PNGをSprite設定。既存メッシュ矢印をImageへ置換。素材パス・生成プロンプト・設定・構成・検証はRUNE_SPELL_PRESENTATION.md。
+- Unityの参照設定を使う別出力ランタイム／Editorコンパイルが成功。最終版は既存Unityでコンパイルし、新規Verify Rune Spell In Current SceneがRuneSpell COMPLETE。非Readable画像の色取得、粒子化と線の消去、集合前ガード、Coreと周囲粒、次フレーム保持と48頂点、直接追従、3方向の1回発射、即時クールダウン、尾、フォーカス取消・入力禁止時消去・方向指定なしを確認。入力は合成ポインターイベント、描画は実Game画面を使用。
+- Temp/RuneSpellValidationに結果と段階別の実画面PNGを保存。浮上・中央下の弾・方向指定中の画像矢印・発射を目視確認。初期版はCanvasRenderer不足で粒子が描画されず、RequireComponent追加後に表示成功。検証コードの曖昧なGetMethodもDeclaredOnly指定で修正し、最終検証を通過。
+- 既存Verify Rune FeedbackはRuneFeedback COMPLETE、Verify Book Obstacles In Current SceneはBookObstacleRuntime COMPLETE。物理ドラッグの体感・Android実機・実PC間通信は今回未確認。最終Play Modeは終了済み。Unityは開始時からWindows対象であり、Codexによるプラットフォーム切替は行っていない。
+- Scene・Prefab・hatake原本・共有設定は未変更。開始時からあったFireMagic / IceMagic、PageView_07 / 08、TestPage群、MagicType、Close / Open関連新規データ、number.png.meta等の既存ユーザー変更を保持。BookScene保存済みSHA256は479FB93964D78D196200B4EF0C6ADBAFBA08691FA593CFC98BBB59082D4B0009で同一。Git status/fetch/追跡先比較を実施し追跡先とのコミット差分なし。Git履歴操作なし。

@@ -10,5 +10,13 @@ public enum MAGIC_TYPE
     FIRE,
     ICE,
     THUNDER,
-    HEAL
+    HEAL,
+    EVENT
+}
+
+public enum EVENT_MAGIC_TYPE
+{
+    NONE,
+    OPEN,
+    CLOSE,
 }

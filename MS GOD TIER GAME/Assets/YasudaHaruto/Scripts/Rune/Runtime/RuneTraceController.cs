@@ -105,6 +105,7 @@ public class RuneTraceController
 
         m_runeData = runeData;
         m_aimType = aimType;
+        if (m_view is IRuneCastPresentation presentation) presentation.SetDirectionalCast(aimType != MAGIC_AIM_TYPE.NONE);
         m_session = new RuneTraceSession();
         ResetAttempt();
     }
@@ -231,7 +232,8 @@ public class RuneTraceController
     // ÉãÅ[ÉìÇÃârè•ÇämíËÇ∑ÇÈ
     public bool TryBeginCast()
     {
-        if (!m_inputAvailable || m_state != RUNE_TRACE_STATE.WAITING_CAST_START) return false;
+        if (!m_inputAvailable || m_state != RUNE_TRACE_STATE.WAITING_CAST_START ||
+            (m_view is IRuneCastPresentation presentation && !presentation.IsCastReady)) return false;
         m_state = RUNE_TRACE_STATE.CHARGING;
         return true;
     }
@@ -250,6 +252,7 @@ public class RuneTraceController
         }
 
         Debug.Log($"Rune : Cast Confirmed / Direction={direction}");
+        if (m_view is IRuneCastPresentation presentation) presentation.LaunchCast(direction);
         StartCooldown(true);
         CastConfirmed?.Invoke(direction);
     }

@@ -9,7 +9,9 @@ namespace LightShaftLab
         public enum SHAPE
         {
             BOX = 0,
-            SPHERE = 1
+            SPHERE = 1,
+            // 床に溜まる霧。箱の下側に溜まり、上端がノイズで盛り上がる
+            GROUND = 2
         }
 
         [UnityEngine.Serialization.FormerlySerializedAs("shape")]
@@ -19,7 +21,7 @@ namespace LightShaftLab
         public float m_priority = 1;
         [Range(0, 10), Tooltip("この領域の太陽散乱を追加強調。0=通常、2=最大3倍。空間God Rayと霧が必要。境界はEdge Fadeでぼかす。重なりは最大値。")]
         public float m_sunBoost;
-        [Range(0, 0.5f)]
+        [Range(0, 5), Tooltip("1mあたりの濃さ。全体の霧は0.01〜0.1、床を這う濃い煙は1〜3が目安。")]
         [UnityEngine.Serialization.FormerlySerializedAs("density")]
         public float m_density = 0.1f;
         [UnityEngine.Serialization.FormerlySerializedAs("tint")]
@@ -30,6 +32,25 @@ namespace LightShaftLab
         [Tooltip("領域内の密度を減らして霧を抜く。")]
         [UnityEngine.Serialization.FormerlySerializedAs("subtract")]
         public bool m_subtractFlag;
+        [Header("床を這う霧（Shape = GROUND のときだけ使用）")]
+        [Range(0.05f, 1), Tooltip("箱の高さのうち霧が溜まる割合。")]
+        public float m_groundFill = 0.45f;
+        [Range(0.01f, 1), Tooltip("霧の上端のぼかし幅（箱の高さに対する割合）。")]
+        public float m_groundSoftness = 0.25f;
+        [Min(0.01f), Tooltip("もこもこの細かさ。1mあたりの山の数。")]
+        public float m_groundNoiseScale = 1.4f;
+        [Range(0, 1), Tooltip("上端の凸凹と内部のむらの強さ。")]
+        public float m_groundNoiseAmount = 0.75f;
+        [Tooltip("霧の模様が流れる向きと速さ（ワールド、m/s）。")]
+        public Vector3 m_groundFlow = new Vector3(0, 0, 0.25f);
+        [Tooltip("広がりの中心。未設定なら箱全体に霧を出す。")]
+        public Transform m_spreadOrigin;
+        [Min(0), Tooltip("広がりの中心からの半径（m）。DoorSmokeが実行中に書き換える。")]
+        public float m_spreadRadius = 100;
+        [Min(0.01f), Tooltip("広がりの先端のぼかし幅（m）。")]
+        public float m_spreadEdge = 1.2f;
+        // 描画に寄与するか。広がり半径が0の床霧は何も映らない
+        public bool HasVisibleRegion => !(m_shape == SHAPE.GROUND && m_spreadOrigin && m_spreadRadius <= 0);
         [HideInInspector, Tooltip("互換性のため保持。動的Fogは現在停止中です。")]
         [UnityEngine.Serialization.FormerlySerializedAs("m_reactive")]
         public bool m_reactiveFlag;
@@ -59,10 +80,29 @@ namespace LightShaftLab
         {
             Gizmos.matrix = transform.localToWorldMatrix;
             Gizmos.color = m_subtractFlag ? Color.red : m_tint;
-            if (m_shape == SHAPE.BOX)
-                Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
-            else
+            if (m_shape == SHAPE.SPHERE)
                 Gizmos.DrawWireSphere(Vector3.zero, 0.5f);
+            else
+                Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
+            if (m_shape != SHAPE.GROUND)
+                return;
+            // 霧が溜まる高さの目安
+            float level = m_groundFill - 0.5f;
+            Gizmos.DrawWireCube(new Vector3(0, level, 0), new Vector3(1, 0, 1));
+            if (!m_spreadOrigin)
+                return;
+            // 広がりの半径（ワールドの水平円）
+            Gizmos.matrix = Matrix4x4.identity;
+            Vector3 center = m_spreadOrigin.position;
+            float radius = Mathf.Min(m_spreadRadius, 50);
+            Vector3 previous = center + new Vector3(radius, 0, 0);
+            for (int i = 1; i <= 32; i++)
+            {
+                float angle = i / 32f * Mathf.PI * 2;
+                Vector3 next = center + new Vector3(Mathf.Cos(angle) * radius, 0, Mathf.Sin(angle) * radius);
+                Gizmos.DrawLine(previous, next);
+                previous = next;
+            }
         }
     }
 }

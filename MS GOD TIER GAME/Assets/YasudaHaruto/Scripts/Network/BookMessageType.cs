@@ -12,4 +12,5 @@ public enum BOOK_MESSAGE_TYPE : byte
     CAST_MAGIC,
     ADD_PAGE,
     CURSOR_POSITION,
+    APPLY_OBSTACLE = 6,
 }
