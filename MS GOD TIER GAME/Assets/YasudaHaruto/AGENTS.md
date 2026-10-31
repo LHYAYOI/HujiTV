@@ -24,6 +24,8 @@
 - 2026-10-21、ユーザーは「命名規則が元のコードと一致してれば反映して大丈夫」と承認。命名確認・調整後、提示済みの候補構成をAssets/YasudaHaruto/Scenes/BookScene.unityへ反映してよい。Scene名・GUIDと接続処理は維持する。hatake原本変更・既存ファイル削除は引き続き未許可。
 
 ## 実装方針
+- 旧Book整理の最新状態：Hamada側BookSceneの削除を確認し、2026-10-21に旧グローバルBook構成16スクリプト、候補Scene、移行補助を削除済み。BookSceneと検証Prefabの非アクティブな旧コンポーネントも除去した。以下のHamada側参照に関する過去記録は当時の状態。現行はValidation配下の専用版を使用する。
+- 着弾ルーンはユーザー確定で「魔法ごとに固定の画像1枚」。MagicDataを着弾画像の唯一の設定場所とし、RuneData・PageData・弾Prefabへ同じ用途の画像設定を追加しない。2026-10-28にImpactRuneTextureを追加済み。画像の割り当て・着弾表示への接続は未実施。本の表示用画像は既存BookPageDataで管理する。
 - 2026-10-21、ユーザー承認により未使用のDebugPageInteraction.cs、TransportClientTest.cs、TransportServerTest.csと各.metaを削除。旧Book系も新構成への切り替え完了を条件に削除可能との方針。ただしHamada側Sceneは旧BookTestBootstrapがアクティブなため、現時点では参照中の旧構成を保持する。
 - 既存の命名・責務分離・コーディング形式を維持する。既存C#は主にm_フィールド形式。文字コードは変更前に確認し、一括変換しない。
 - 担当側のクラス・メソッド・プロパティはPascalCase、インスタンスフィールドはm_、staticフィールドはs_。担当側のenum型・要素は既存のPAGE_TYPE等に合わせてUPPER_SNAKE_CASEとする。複製元hatakeの公開型名はそのまま利用する。

@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 578782270497587736}
   - component: {fileID: 6235136893984158850}
   - component: {fileID: 207501958209289960}
+  - component: {fileID: 8522499374752743271}
   m_Layer: 0
   m_Name: FPSCamera
   m_TagString: Untagged
@@ -62,7 +63,7 @@ MonoBehaviour:
   Lens:
     FieldOfView: 60
     OrthographicSize: 5
-    NearClipPlane: 0.3
+    NearClipPlane: 0.1
     FarClipPlane: 1000
     Dutch: 0
     ModeOverride: 0
@@ -110,8 +111,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CameraShake
   m_multiChannelPerlin: {fileID: 1191959326370482418}
   m_cinemachineRotationExtension: {fileID: 207501958209289960}
-  m_amplitudeGain: 0.1
-  m_frequencyGain: 1
+  m_amplitudeGain: 0.03
+  m_frequencyGain: 0.8
 --- !u!114 &6235136893984158850
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,3 +138,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51d319188987b894d9d894436b8bd80a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CinemachineRotationShake
+--- !u!114 &8522499374752743271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8958723840767735755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a8a11d73cb1f8343bbc40b611147958, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraDollyZoom
+  m_cinemachineCamera: {fileID: 2310478160670157443}
+  m_positionAnchor: {fileID: 0}

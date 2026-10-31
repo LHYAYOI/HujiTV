@@ -13,10 +13,7 @@ namespace YasudaHaruto.BookValidation.Editor
     public static class BookValidationSetup
     {
         private const string ScenePath = "Assets/YasudaHaruto/Scenes/BookValidation.unity";
-        private const string PrefabPath = "Assets/YasudaHaruto/Prefabs/BookValidation.prefab";
-        private static string ReportPath => SessionState.GetBool(Preview, false)
-            ? "Assets/YasudaHaruto/BookValidationPreview.txt" : "Assets/YasudaHaruto/BookValidationResults.txt";
-        private const string Preview = "YasudaBookValidation.Preview";
+        private const string ReportPath = "Assets/YasudaHaruto/BookValidationResults.txt";
         private const string Running = "YasudaBookValidation.Running";
         private static int s_step;
         private static double s_next;
@@ -30,90 +27,19 @@ namespace YasudaHaruto.BookValidation.Editor
         private static BookPageReplacementPanel s_panel;
         private static bool s_selectionReopened;
 
-        [MenuItem("Tools/YasudaHaruto/Preview Page Selection")]
-        public static void PreviewSelection()
-        {
-            VerifyExisting(true);
-        }
-
-        private static void ConfigureInventory()
-        {
-            const string settingsPath = "Assets/YasudaHaruto/Data/BookInventorySettings.asset";
-            var settings = AssetDatabase.LoadAssetAtPath<BookInventorySettings>(settingsPath);
-            if (settings == null)
-            {
-                settings = ScriptableObject.CreateInstance<BookInventorySettings>();
-                AssetDatabase.CreateAsset(settings, settingsPath);
-            }
-            var root = PrefabUtility.LoadPrefabContents(PrefabPath);
-            try
-            {
-                foreach (var game in root.GetComponentsInChildren<BookGameController>(true))
-                {
-                    var serialized = new SerializedObject(game);
-                    serialized.FindProperty("m_inventorySettings").objectReferenceValue = settings;
-                    serialized.ApplyModifiedPropertiesWithoutUndo();
-                }
-                foreach (var bootstrap in root.GetComponentsInChildren<BookGameBootstrap>(true))
-                {
-                    var serialized = new SerializedObject(bootstrap);
-                    serialized.FindProperty("m_pageDatabase").objectReferenceValue =
-                        AssetDatabase.LoadAssetAtPath<PageDatabase>("Assets/YasudaHaruto/Data/PageDatabase/TestPageDatabase.asset");
-                    serialized.ApplyModifiedPropertiesWithoutUndo();
-                }
-                BookReplacementUIBuilder.Attach(root);
-                PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
-            }
-            finally { PrefabUtility.UnloadPrefabContents(root); }
-        }
-
         static BookValidationSetup()
         {
             EditorApplication.playModeStateChanged += OnPlayMode;
         }
 
-        [MenuItem("Tools/YasudaHaruto/Prepare and Verify Book Validation")]
-        public static void PrepareAndVerify()
-        {
-            if (EditorApplication.isPlayingOrWillChangePlaymode)
-                throw new InvalidOperationException("Exit Play Mode first.");
-            for (int i = 0; i < SceneManager.sceneCount; i++)
-                if (SceneManager.GetSceneAt(i).isDirty)
-                    throw new InvalidOperationException("An open scene has unsaved changes. Save it yourself before validation.");
-            if (AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath) != null)
-                throw new InvalidOperationException("Validation prefab already exists; it will not be overwritten.");
-
-            var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
-            foreach (var root in scene.GetRootGameObjects())
-                foreach (var transform in root.GetComponentsInChildren<Transform>(true))
-                    if (GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(transform.gameObject) != 0)
-                        throw new InvalidOperationException("Missing script on " + transform.name);
-
-            var container = new GameObject("BookValidationRoot");
-            foreach (var root in scene.GetRootGameObjects())
-                if (root != container) root.transform.SetParent(container.transform, true);
-            PrefabUtility.SaveAsPrefabAssetAndConnect(container, PrefabPath, InteractionMode.AutomatedAction);
-            EditorSceneManager.SaveScene(scene, ScenePath);
-            ConfigureInventory();
-            File.WriteAllText(ReportPath, "Prepared dedicated scene and prefab.\n");
-            StartSmokeCheck();
-        }
-
         [MenuItem("Tools/YasudaHaruto/Verify Existing Book Validation")]
         public static void VerifyExisting()
-        {
-            VerifyExisting(false);
-        }
-
-        private static void VerifyExisting(bool preview)
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 throw new InvalidOperationException("Exit Play Mode first.");
             for (int i = 0; i < SceneManager.sceneCount; i++)
                 if (SceneManager.GetSceneAt(i).isDirty)
                     throw new InvalidOperationException("An open scene has unsaved changes. Save it yourself first.");
-            SessionState.SetBool(Preview, preview);
-            ConfigureInventory();
             EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
             File.WriteAllText(ReportPath, "Verifying existing dedicated scene.\n");
             StartSmokeCheck();
@@ -125,25 +51,12 @@ namespace YasudaHaruto.BookValidation.Editor
             EditorApplication.EnterPlaymode();
         }
 
-        [MenuItem("Tools/YasudaHaruto/Verify Integration Candidate")]
-        public static void VerifyCandidate()
-        {
-            if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Exit Play Mode first.");
-            for (int i = 0; i < SceneManager.sceneCount; i++)
-                if (SceneManager.GetSceneAt(i).isDirty) throw new InvalidOperationException("An open scene has unsaved changes.");
-            SessionState.SetBool(Preview, false);
-            EditorSceneManager.OpenScene(BookIntegrationPreparation.Candidate, OpenSceneMode.Single);
-            File.WriteAllText(ReportPath, "Verifying integration candidate; source BookScene untouched.\n");
-            StartSmokeCheck();
-        }
-
         [MenuItem("Tools/YasudaHaruto/Verify Integrated Book Scene")]
         public static void VerifyIntegratedBookScene()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Exit Play Mode first.");
             for (int i = 0; i < SceneManager.sceneCount; i++)
                 if (SceneManager.GetSceneAt(i).isDirty) throw new InvalidOperationException("An open scene has unsaved changes.");
-            SessionState.SetBool(Preview, false);
             EditorSceneManager.OpenScene("Assets/YasudaHaruto/Scenes/BookScene.unity", OpenSceneMode.Single);
             File.WriteAllText(ReportPath, "Verifying integrated BookScene.\n");
             StartSmokeCheck();
@@ -164,7 +77,6 @@ namespace YasudaHaruto.BookValidation.Editor
             {
                 if (s_endSample != null) UnityEngine.Object.DestroyImmediate(s_endSample);
                 SessionState.SetBool(Running, false);
-                SessionState.SetBool(Preview, false);
                 EditorApplication.update -= Tick;
                 AssetDatabase.Refresh();
             }
@@ -242,12 +154,6 @@ namespace YasudaHaruto.BookValidation.Editor
                                 "Full inventory requests selection");
                             Require(s_game.Pages.Count == s_count && s_game.IsInputBlocked, "Selection preserves inventory and blocks input");
                             Require(s_panel.IsVisible && !s_panel.CanConfirm, "Selection opens without a default destructive choice");
-                            if (SessionState.GetBool(Preview, false))
-                            {
-                                EditorApplication.update -= Tick;
-                                // Interactive preview remains in Play Mode until the user stops it.
-                                return;
-                            }
                         }
                         break;
                     case 7:

@@ -148,6 +148,7 @@ PassVaryings ToonGhostMaskVertex(PassAttributes input)
 float4 ToonGhostMaskFragment(PassVaryings input) : SV_Target
 {
     UNITY_SETUP_INSTANCE_ID(input);
+    ToonSliceClip(input.positionWS);
     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
         //消えてるなら遮蔽しない
         if (_MulAlpha < 0.001 && (_MaterialBlendEnabled < 0.5 || _MaterialBlend >= 1))
@@ -167,6 +168,7 @@ PassVaryings ToonGhostGlowVertex(PassAttributes input)
 half4 ToonGhostGlowFragment(PassVaryings input) : SV_Target
 {
     UNITY_SETUP_INSTANCE_ID(input);
+    ToonSliceClip(input.positionWS);
     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
     ToonBase(input.uv);
     // Back faces of the inflated shell: bright next to the body's silhouette, fading outward.

@@ -19,11 +19,18 @@ public class MagicBulletController : MonoBehaviour
 
     [SerializeField] List<BezierControlPoint> m_bezierControlPoints;
 
+    TargetHitUIManager m_hitUIManager;
+
     Vector3 m_controlPoint;
 
     public MagicData GetMagicData()
     {
         return m_magicData;
+    }
+
+    public void SetHitUIManager(TargetHitUIManager manager) 
+    {
+        m_hitUIManager = manager;
     }
 
     public void FireBullet(GameObject target, MAGIC_CAST_DIRECTION direction)
@@ -83,6 +90,22 @@ public class MagicBulletController : MonoBehaviour
         float u = 1.0f - rate;
 
         return u * u * start + 2f * u * rate * controlPoint + rate * rate * end;
+    }
+
+    public void HitProcess(HitData hitData) 
+    {
+        if (hitData == null) 
+        {
+            return;
+        }
+
+        //ヒットUI
+        if (m_hitUIManager) 
+        {
+            m_hitUIManager.ShowHitUI(hitData.GetHitObject);
+        }
+
+        //ヒットエフェクト
     }
 
     //発射音再生 

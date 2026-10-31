@@ -5,7 +5,6 @@
 // 概要： 本の初期化と管理
 //-----------------------------------------------
 using UnityEngine;
-using System.Collections.Generic;
 
 namespace YasudaHaruto.BookValidation
 {
@@ -21,26 +20,31 @@ public class BookGameBootstrap : MonoBehaviour
     [Header("Input")]
     [SerializeField] private BookGameDragInput m_gameDragInput;
 
+    [Header("Obstacles")]
+    [SerializeField] private ObstacleData[] m_obstacles = new ObstacleData[0];
+    [SerializeField] private Rect m_rightObstacleArea = new Rect(0.1f, 0.15f, 0.8f, 0.7f);
+    private BookObstacleController m_obstacleController;
     private RuneTraceController m_runeTraceController;
     [SerializeField] private PageDatabase m_pageDatabase;
     private BookNetworkClient m_networkClient;
-    private readonly Queue<PageData> m_requests = new Queue<PageData>();
+    private BookPageRequestQueue m_pageRequests;
 
     private void Start()
     {
+        if (m_gameController == null || m_runeTraceView == null || m_gameDragInput == null)
+        {
+            Debug.LogError("BookGameBootstrap : 本・ルーン表示・入力の参照を設定してください", this);
+            return;
+        }
         BookInputController inputController = new BookInputController();
 
         m_runeTraceController = new RuneTraceController(m_runeTraceView);
         m_runeTraceController.SetCooldown(m_runeCooldownSeconds);
 
-        if (m_gameDragInput == null)
-        {
-            Debug.LogError("BookGameBootstrap : BookGameDragInputが未設定です", this);
-            return;
-        }
-
-        m_gameDragInput.Initialize(m_runeTraceController, inputController);
+        m_runeTraceView.ConfigureCooldownImage(() => m_gameController != null ? m_gameController.GetCurrentRuneImage() : null);
+        m_runeTraceView.ConfigureScreenProjection(m_gameDragInput.GetRuneScreenRect, m_gameDragInput.GetGraphicScreenRect);
         m_gameDragInput.SetInventoryOwner(m_gameController);
+        m_gameDragInput.ConfigureSpellPresentation(m_runeTraceView);
 
         BookNetworkClient networkClient = BookNetworkClient.Instance;
         BookNetworkService networkService = networkClient != null ? new BookNetworkService(networkClient) : null;
@@ -56,34 +60,42 @@ public class BookGameBootstrap : MonoBehaviour
             return;
         }
 
+        m_gameDragInput.Initialize(m_runeTraceController, inputController);
+        m_pageRequests = new BookPageRequestQueue(m_pageDatabase, m_gameController);
         Debug.Log("BookGameBootstrap : 初期化完了");
+        m_obstacleController = gameObject.AddComponent<BookObstacleController>();
+        m_obstacleController.Initialize(m_gameController, m_gameDragInput, m_obstacles, m_rightObstacleArea);
         m_networkClient = networkClient;
-        if (m_networkClient != null) m_networkClient.AddPageReceived += OnAddPageReceived;
+        if (m_networkClient != null)
+        {
+            m_networkClient.AddPageReceived += m_pageRequests.Receive;
+            m_networkClient.ObstacleReceived += m_obstacleController.Receive;
+            m_networkClient.OnConnectionStateChanged += OnConnectionStateChanged;
+            OnConnectionStateChanged(m_networkClient.ConnectionState);
+            gameObject.AddComponent<BookConnectionStatusView>().Initialize(m_networkClient);
+        }
     }
 
     private void Update()
     {
         m_runeTraceController?.Tick(Time.deltaTime);
-        if (m_requests.Count == 0 || m_gameController == null || m_gameController.IsInputBlocked) return;
-        var result = m_gameController.RequestAdd(m_requests.Peek());
-        if (result != PAGE_ADD_RESULT.BUSY) m_requests.Dequeue();
-        if (result == PAGE_ADD_RESULT.INVALID) Debug.LogWarning("Unsupported page definition; request rejected.", this);
+        m_pageRequests?.Tick();
     }
 
-    private void OnAddPageReceived(byte id)
+    private void OnConnectionStateChanged(BOOK_CONNECTION_STATE state)
     {
-        if (m_pageDatabase == null) { Debug.LogWarning("Page database is not configured.", this); return; }
-        PageData data = m_pageDatabase.GetPage(id);
-        if (data == null) return;
-        if (m_requests.Count >= m_gameController.MaxPendingRequests)
-        { Debug.LogWarning("Page request queue is full; incoming request rejected.", this); return; }
-        m_requests.Enqueue(data);
+        m_obstacleController.SetConnected(state == BOOK_CONNECTION_STATE.CONNECTED);
     }
 
     private void OnDestroy()
     {
-        if (m_networkClient != null) m_networkClient.AddPageReceived -= OnAddPageReceived;
-        m_requests.Clear();
+        if (m_networkClient != null)
+        {
+            if (m_pageRequests != null) m_networkClient.AddPageReceived -= m_pageRequests.Receive;
+            if (m_obstacleController != null) m_networkClient.ObstacleReceived -= m_obstacleController.Receive;
+            m_networkClient.OnConnectionStateChanged -= OnConnectionStateChanged;
+        }
+        m_pageRequests?.Clear();
         if (m_gameController != null)
         {
             m_gameController.Shutdown();

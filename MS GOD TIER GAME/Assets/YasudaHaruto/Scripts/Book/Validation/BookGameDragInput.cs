@@ -12,7 +12,7 @@ namespace YasudaHaruto.BookValidation
 [RequireComponent(typeof(RectTransform))]
 public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    private enum GESTURE { NONE, RUNE, PAGE }
+    private enum GESTURE { NONE, RUNE, PAGE, OBSTACLE }
 
     [Header("Book")]
     [SerializeField] private YasudaBookViewController m_bookController;
@@ -28,6 +28,9 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
 
     private RectTransform m_displayRect;
     private BookGameController m_inventoryOwner;
+    private BookObstacleController m_obstacles;
+    public void SetObstacleController(BookObstacleController controller) => m_obstacles = controller;
+    public void CancelObstaclePointer() { if (m_gesture == GESTURE.OBSTACLE) m_gesture = GESTURE.NONE; }
     public bool IsGestureActive => m_gesture != GESTURE.NONE;
     public void SetInventoryOwner(BookGameController owner) => m_inventoryOwner = owner;
     private RuneTraceController m_runeController;
@@ -36,7 +39,72 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
     private GESTURE m_gesture;
     private int m_pointerId;
     private bool m_runeStarted;
-    private Vector2 m_chargeStartPosition;
+    [Header("Cast Guide")]
+    [SerializeField] private Vector2 m_castOrigin = new Vector2(0.5f, 0.25f);
+    [SerializeField, Range(0.03f, 0.2f)] private float m_castRadius = 0.08f;
+    [SerializeField, Range(0f, 0.85f)] private float m_castShade = 0.55f;
+    [SerializeField, Min(0.1f)] private float m_castPulseSpeed = 1f;
+    [SerializeField, Range(0f, 0.25f)] private float m_castPulseAmount = 0.08f;
+    [SerializeField, Range(0.02f, 0.2f)] private float m_castArrowWidth = 0.1f;
+    [Header("Spell Particle Presentation")]
+    [SerializeField] private RuneSpellSettings m_spellSettings = new RuneSpellSettings();
+    private RunePageView m_spellView;
+    private RuneCastOverlay m_castOverlay;
+
+    public void ConfigureSpellPresentation(RunePageView view)
+    {
+        m_spellView = view;
+        view.ConfigureSpellCast(GetBookScreenRect, () => m_castOrigin, m_spellSettings,
+            () => m_castSwipeDetector != null ? m_castSwipeDetector.GuideSideAngle : 45f);
+    }
+
+    private void Update()
+    {
+        bool show = m_runeController != null &&
+            (m_runeController.State == RUNE_TRACE_STATE.WAITING_CAST_RELEASE ||
+             m_runeController.State == RUNE_TRACE_STATE.WAITING_CAST_START ||
+             m_runeController.State == RUNE_TRACE_STATE.CHARGING);
+        if (!show)
+        {
+            if (m_castOverlay != null) m_castOverlay.Hide();
+            return;
+        }
+        if (m_castOverlay == null)
+        {
+            m_castOverlay = new GameObject("Rune Cast Guide", typeof(RectTransform)).AddComponent<RuneCastOverlay>();
+            m_castOverlay.Configure(m_runeController, m_castSwipeDetector, GetBookScreenRect,
+                m_castOrigin, m_castRadius, m_castShade, m_castPulseSpeed, m_castPulseAmount, m_castArrowWidth, m_spellView, m_spellSettings);
+        }
+        m_castOverlay.gameObject.SetActive(true);
+    }
+
+    public Rect? GetBookScreenRect()
+    {
+        if (m_flipView == null || m_displayRect == null) return null;
+        Vector2 min = m_flipView.UvToBook(Vector2.zero);
+        Vector2 max = m_flipView.UvToBook(Vector2.one);
+        Vector2 extent = max - min;
+        if (Mathf.Abs(extent.x) < 0.0001f || Mathf.Abs(extent.y) < 0.0001f) return null;
+        Canvas canvas = m_displayRect.GetComponentInParent<Canvas>();
+        Camera camera = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
+        Vector2 lower = ProjectBookPoint(new Vector2(-1f, 0f), min, extent, camera);
+        Vector2 upper = ProjectBookPoint(new Vector2(1f, m_flipView.PageAspect), min, extent, camera);
+        return Rect.MinMaxRect(Mathf.Min(lower.x, upper.x), Mathf.Min(lower.y, upper.y),
+            Mathf.Max(lower.x, upper.x), Mathf.Max(lower.y, upper.y));
+    }
+
+    private Vector2 ProjectBookPoint(Vector2 book, Vector2 min, Vector2 extent, Camera camera)
+    {
+        Vector2 uv = new Vector2((book.x - min.x) / extent.x, (book.y - min.y) / extent.y);
+        Rect rect = m_displayRect.rect;
+        return RectTransformUtility.WorldToScreenPoint(camera, m_displayRect.TransformPoint(new Vector3(
+            Mathf.LerpUnclamped(rect.xMin, rect.xMax, uv.x), Mathf.LerpUnclamped(rect.yMin, rect.yMax, uv.y), 0f)));
+    }
+
+    private void OnDestroy()
+    {
+        if (m_castOverlay != null) Destroy(m_castOverlay.gameObject);
+    }
 
     private void Awake()
     {
@@ -49,9 +117,27 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
         m_inputController = inputController;
     }
 
+    public void SetRuneInputAvailable(bool available)
+    {
+        m_runeController?.SetInputAvailable(available);
+        if (available) return;
+        if (m_castOverlay != null) m_castOverlay.Hide();
+        if (m_gesture == GESTURE.RUNE)
+        {
+            m_gesture = GESTURE.NONE;
+            m_runeStarted = false;
+        }
+        m_inputController?.EndRuneTrace();
+    }
+
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (m_inventoryOwner != null && m_inventoryOwner.IsInputBlocked) return;
+        if (m_gesture == GESTURE.NONE && eventData.button == PointerEventData.InputButton.Left &&
+            m_obstacles != null && m_obstacles.BeginPointer(eventData.position))
+        { m_gesture = GESTURE.OBSTACLE; m_pointerId = eventData.pointerId; return; }
+        if (m_obstacles != null && m_obstacles.BlocksActions) return;
+        if (m_runeController != null && m_runeController.IsInputAvailable && m_runeController.IsAwaitingCast) return;
+        if (m_inventoryOwner == null || !m_inventoryOwner.CanNavigate) return;
         if (eventData.button != PointerEventData.InputButton.Left || m_gesture != GESTURE.NONE || m_areaDetector == null || m_runeController == null || m_inputController == null)
         {
             return;
@@ -62,7 +148,7 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
             return;
         }
 
-        if (area != BOOK_AREA_TYPE.RUNE)
+        if (!m_runeController.IsInputAvailable || area != BOOK_AREA_TYPE.RUNE)
         {// ルーン領域以外の入力はページめくりに渡す
             return;
         }
@@ -85,7 +171,9 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (m_inventoryOwner != null && m_inventoryOwner.IsInputBlocked) return;
+        if (m_obstacles != null && m_obstacles.BlocksActions) return;
+        if (m_runeController != null && m_runeController.IsInputAvailable && m_runeController.IsAwaitingCast) return;
+        if (m_inventoryOwner == null || !m_inventoryOwner.CanNavigate) return;
         if (m_gesture != GESTURE.NONE || eventData.button != PointerEventData.InputButton.Left ||
             m_bookController == null || m_flipView == null || m_bookController.IsBusy || m_flipView.IsTurning)
         {
@@ -126,32 +214,9 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
             _ => null
         };
 
-        // ドラッグを開始
-        m_flipView.BeginDrag(point, corner);
-
+        if (!m_bookController.TryBeginPageDrag(point, corner, m_closeAtEnds)) return;
         if (TryGetBookPoint(eventData.position, eventData.pressEventCamera, out Vector2 current))
-        {// ドラッグ中の座標を更新
-            m_flipView.UpdateDrag(current);
-        }
-
-        if (m_closeAtEnds)
-        {// 端の見開きで閉じる場合はフリックを開始
-            m_bookController.Flick(rightPage);
-        }
-        else if (rightPage)
-        {// 右ページをつかんだ場合は次の見開きを表示
-            m_bookController.ShowNextSpread();
-        }
-        else
-        {// 左ページをつかんだ場合は前の見開きを表示
-            m_bookController.ShowPreviousSpread();
-        }
-
-        if (!m_bookController.IsBusy)
-        {// ページめくりが受け付けられなかった場合はドラッグをキャンセル
-            m_flipView.CancelDrag();
-            return;
-        }
+            m_bookController.UpdatePageDrag(current);
 
         // ドラッグ中のポインタIDを記録
         m_gesture = GESTURE.PAGE;
@@ -165,6 +230,7 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
             return;
         }
 
+        if (m_gesture == GESTURE.OBSTACLE) { m_obstacles.MovePointer(eventData.position); return; }
         if (m_gesture == GESTURE.RUNE)
         {// ルーン入力中の場合はルーンの座標を更新
             UpdateRune(eventData.position);
@@ -173,12 +239,14 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
 
         if (TryGetBookPoint(eventData.position, eventData.pressEventCamera, out Vector2 point))
         {// ページめくり中の場合はドラッグの座標を更新
-            m_flipView.UpdateDrag(point);
+            m_bookController.UpdatePageDrag(point);
         }
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        if (m_gesture == GESTURE.OBSTACLE && eventData.pointerId == m_pointerId)
+        { m_obstacles.CancelPointer(); m_gesture = GESTURE.NONE; return; }
         if (m_gesture != GESTURE.RUNE || eventData.pointerId != m_pointerId)
         {// ルーン入力中でない場合は無効
             return;
@@ -190,15 +258,7 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
             // ルーン入力中の座標を更新
             UpdateRune(eventData.position);
 
-            if (m_runeController.State == RUNE_TRACE_STATE.CHARGING && m_castSwipeDetector != null &&
-                m_castSwipeDetector.TryEvaluate(m_chargeStartPosition, eventData.position, out MAGIC_CAST_DIRECTION direction))
-            {// ルーン入力がチャージ中で、スワイプ方向が判定できた場合はキャストを確定
-                m_runeController.ConfirmCast(direction);
-            }
-            else
-            {// ルーン入力を終了
-                m_runeController.EndStroke();
-            }
+            m_runeController.EndStroke();
 
             // ルーン入力を終了
             m_inputController.EndRuneTrace();
@@ -218,10 +278,10 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
 
         if (TryGetBookPoint(eventData.position, eventData.pressEventCamera, out Vector2 point))
         {// ページめくり中の場合はドラッグの座標を更新
-            m_flipView.UpdateDrag(point);
+            m_bookController.UpdatePageDrag(point);
         }
 
-        m_flipView.EndDrag();
+        m_bookController.EndPageDrag();
         m_gesture = GESTURE.NONE;
     }
 
@@ -240,10 +300,19 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
         // ルーン入力中の座標を更新
         m_runeController.AddPoint(runePosition);
 
-        if (m_runeController.State == RUNE_TRACE_STATE.CHARGING)
-        {// ルーン入力がチャージ中の場合はスワイプ開始位置を記録 
-            m_chargeStartPosition = screenPosition;
-        }
+
+    }
+
+    public Rect? GetRuneScreenRect()
+    {
+        return m_areaDetector != null && m_areaDetector.TryGetRuneScreenRect(out Rect rect)
+            ? rect : (Rect?)null;
+    }
+
+    public Rect? GetGraphicScreenRect(RectTransform graphic)
+    {
+        return m_areaDetector != null && m_areaDetector.TryGetGraphicScreenRect(graphic, out Rect rect)
+            ? rect : (Rect?)null;
     }
 
     private bool TryGetBookPoint(Vector2 screenPosition, Camera eventCamera, out Vector2 point)
@@ -253,9 +322,12 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
 
     private void OnDisable()
     {
+        m_obstacles?.CancelPointer();
+        if (m_castOverlay != null) m_castOverlay.Hide();
+        if (m_runeController != null && m_runeController.IsAwaitingCast) m_runeController.Cancel();
         if (m_gesture == GESTURE.PAGE && m_flipView != null)
         {// ページめくり中の場合はドラッグを終了
-            m_flipView.EndDrag();
+            m_bookController.EndPageDrag();
         }
 
         if (m_gesture == GESTURE.RUNE && m_runeStarted)

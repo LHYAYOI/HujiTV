@@ -1,0 +1,34 @@
+2026-10-27 / Unity 6000.3.23f1 / Existing Editor Play Mode
+Local UDP server, no Android hardware validation. Scene was not saved.
+One-second retry was measured in real time at timeScale=0; longer retry delays were checked through the disconnect handler.
+
+RuneFeedback COMPLETE
+NetworkRecovery PASS: Disconnect clears partial tracing and releases page navigation
+NetworkRecovery PASS: Turning to another page cannot re-enable offline drawing
+NetworkRecovery PASS: Disconnect retains and advances an already started cooldown
+NetworkRecovery PASS: Cooldown expiry cannot unlock offline casting
+NetworkRecovery PASS: Page interaction retains cooldown across leaving and returning
+NetworkRecovery PASS: Invalid address never starts automatic retries
+NetworkRecovery PASS: Invalid player slot never starts automatic retries
+NetworkRecovery PASS: Initial failure schedules retry with timeScale zero
+NetworkRecovery PASS: Reconnect banner displays while the server is unavailable
+NetworkRecovery PASS: Connection banner never captures page input
+NetworkRecovery PASS: Connection banner never captures page input
+NetworkRecovery PASS: Connection status canvas has no input raycaster
+NetworkRecovery PASS: Retry waits its one second interval using unscaled time
+NetworkRecovery PASS: Late-started local server binds successfully
+NetworkRecovery PASS: Each connection sends the original player registration
+NetworkRecovery PASS: Connection restores rune input
+NetworkRecovery PASS: Connection banner disappears after successful connection
+NetworkRecovery PASS: Cast is pending before connection loss
+NetworkRecovery PASS: Real transport disconnect cancels pending cast and blocks rune input
+NetworkRecovery PASS: Each connection sends the original player registration
+NetworkRecovery PASS: Reconnect registers the same slot and retains the current scene
+NetworkRecovery PASS: Successful connection resets retry delay
+NetworkRecovery PASS: Explicit disconnect stops automatic retries
+NetworkRecovery PASS: Retry wait is 1 seconds and remains capped
+NetworkRecovery PASS: Retry wait is 2 seconds and remains capped
+NetworkRecovery PASS: Retry wait is 4 seconds and remains capped
+NetworkRecovery PASS: Retry wait is 8 seconds and remains capped
+NetworkRecovery PASS: Retry wait is 8 seconds and remains capped
+NetworkRecovery COMPLETE

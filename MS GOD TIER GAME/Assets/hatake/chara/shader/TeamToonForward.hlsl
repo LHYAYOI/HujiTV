@@ -185,6 +185,8 @@ half4 ToonFragment(ToonVaryings input, FRONT_FACE_TYPE face : FRONT_FACE_SEMANTI
     UNITY_SETUP_INSTANCE_ID(input);
     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 #if defined(_TOON_TRANSPARENT)
+    // 壁すり抜けの切り口はゴーストだけ（不透明では clip が早い深度テストを止めてしまうため）。
+    ToonSliceClip(input.positionWS);
     if (_DepthPrepass > 0.5 && ToonGhostHidden(input.positionCS, input.positionWS)) discard;
 #endif // end _TOON_TRANSPARENT
     half4 base = ToonBase(input.uv);
@@ -277,9 +279,16 @@ half4 ToonFragment(ToonVaryings input, FRONT_FACE_TYPE face : FRONT_FACE_SEMANTI
     half alphaMultiplier = saturate(_MulAlpha);
     alpha *= alphaMultiplier;
     half3 glow = _GhostRimColor.rgb * pow(fresnel, max(_GhostRimPower, 0.1)) * _Visibility;
+    glow += _SliceGlowColor.rgb * ToonSliceGlow(input.positionWS) * _Visibility;
     glow = MixFogColor(glow, half3(0, 0, 0), input.fogAndVertexLight.x);
     glow *= alphaMultiplier;
     half4 result = half4(max(color, 0) * alpha + glow, alpha * (1 - _AdditiveBlend));
+    // ブレンド先が元々不透明なマテリアルなら、ゴーストの透け方ではなく不透明（α = 1）として混ぜる
+    if (_MaterialBlendEnabled > 0.5 && _BlendTargetOpaque > 0.5)
+    {
+        half opacity = alphaMultiplier * _Visibility;
+        result = half4(max(color, 0) * opacity, opacity);
+    }
     if (_MaterialBlendEnabled > 0.5)
         result = lerp(ToonBlendSource(input, SafeNormalize(input.normalWS), v), result, saturate(_MaterialBlend));
     return result;

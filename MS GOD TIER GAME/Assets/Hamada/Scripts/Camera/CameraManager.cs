@@ -38,7 +38,17 @@ public class CameraManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.P)) 
         {
-            SwitchCamera("BattleCamera");
+            SwitchCamera("FPSCamera");
+        }
+
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            DollyCamera(1, 40, 1);
+        }
+
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            DollyCamera(1, 60, 0);
         }
     }
 
@@ -215,6 +225,25 @@ public class CameraManager : MonoBehaviour
         }
 
         lookTargetChanger.SetLookTarget(lookTarget);
+    }
+
+    public void DollyCamera(float duration, float zoomValue, float pullBackAmount) 
+    {
+        CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
+
+        if (currentVirtualCamera == null)
+        {
+            return;
+        }
+
+        CameraDollyZoom dollyZoom = currentVirtualCamera.GetComponent<CameraDollyZoom>();
+
+        if (dollyZoom == null)
+        {
+            return;
+        }
+
+        dollyZoom.DollyCamera(duration, zoomValue, pullBackAmount);
     }
 
     public CAMERA_DATA GetCameraByName(string cameraName)

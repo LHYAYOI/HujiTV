@@ -29,6 +29,8 @@ public class RuneTraceRealtimeEvaluator
     private bool m_isCompleted;
     private bool m_hasFailed;
 
+    public float NormalizedDeviation { get; private set; }
+
     public float Progress => m_pathLength > 0f ? Mathf.Clamp01(m_maxDistance / m_pathLength) : 0f;
     public float CurrentProgress => m_pathLength > 0f ? Mathf.Clamp01(m_currentDistance / m_pathLength) : 0f;
     public bool IsCompleted => m_isCompleted;
@@ -59,6 +61,7 @@ public class RuneTraceRealtimeEvaluator
             return false;
         }
 
+        NormalizedDeviation = Mathf.Clamp01(RunePathUtility.DistancePointToSegment(position, m_referencePoints[0], m_referencePoints[1]) / Mathf.Max(0.0001f, m_distanceTolerance));
         m_hasStarted = true;
         return true;
     }
@@ -77,6 +80,7 @@ public class RuneTraceRealtimeEvaluator
         }
 
         // 入力距離をサンプリング間隔で分割して評価する
+        NormalizedDeviation = 0f;
         float inputDistance = Vector2.Distance(previous, current);
         int sampleCount = Mathf.Max(1, Mathf.CeilToInt(inputDistance / m_sampleInterval));
 
@@ -98,6 +102,9 @@ public class RuneTraceRealtimeEvaluator
 
             // パス上に投影し、距離を取得
             bool projected = RunePathUtility.TryProjectOnPath(m_referencePoints, position, m_currentDistance, backwardAllowance, forwardAllowance, out float pathDistance, out float distanceFromPath);
+
+            NormalizedDeviation = Mathf.Max(NormalizedDeviation, projected
+                ? Mathf.Clamp01(distanceFromPath / Mathf.Max(0.0001f, m_distanceTolerance)) : 1f);
 
             if (!projected || distanceFromPath > m_distanceTolerance)
             {// パス上に投影できない、または許容距離を超えた場合は失敗
@@ -126,6 +133,7 @@ public class RuneTraceRealtimeEvaluator
     // 評価をリセットする
     public void Reset()
     {
+        NormalizedDeviation = 0f;
         m_currentDistance = 0f;
         m_maxDistance = 0f;
         m_hasStarted = false;
@@ -136,6 +144,7 @@ public class RuneTraceRealtimeEvaluator
     // 評価が失敗した場合の処理
     private RUNE_REALTIME_RESULT Fail()
     {
+        NormalizedDeviation = 1f;
         m_hasFailed = true;
         return RUNE_REALTIME_RESULT.FAILED;
     }

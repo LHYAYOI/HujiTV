@@ -58,12 +58,10 @@ public class TargetSelector : MonoBehaviour
 
         if (assignAllFlag)
         {
-            Debug.Log("simple");
             AssignTargetSimple();
         }
         else
         {
-            Debug.Log("complex");
             AssignTarget();
         }
     }

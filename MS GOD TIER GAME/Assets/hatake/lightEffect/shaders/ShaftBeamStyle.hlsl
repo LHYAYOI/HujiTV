@@ -16,7 +16,8 @@ float ComputeShaftBeamAngular(int light, float cone, float3 fromLight, float3 po
         float2 angular = float2(dot(fromLight, _ShaftBeamRight[light].xyz), dot(fromLight, _ShaftBeamUp[light].xyz)) * _ShaftBeamRight[light].w / axial;
         // 角度マスクは実際のサンプリング格子に合わせてフィルタする。適応的レイマーチの
         // 内部では微分命令が未定義になるため使えない。頂点付近ではマスクの平均値を使う。
-        float height = detailFlag ? _ScreenParams.y : _ShaftLowSize.w;
+        // _ScreenParams は出力の画素数で、Render Scale を下げると実際の描画より大きい。描画先の画素数を使う
+        float height = detailFlag ? _ScaledScreenParams.y : _ShaftLowSize.w;
         float viewDepth = unity_OrthoParams.w > .5 ? 1 : max(.001, -TransformWorldToView(positionWS).z);
         float footprint = 2 * viewDepth / max(1, height * abs(UNITY_MATRIX_P._m11)) * _ShaftBeamRight[light].w / axial;
         float2 angularSlope = (float2(dot(ray, _ShaftBeamRight[light].xyz), dot(ray, _ShaftBeamUp[light].xyz)) * _ShaftBeamRight[light].w - angular * dot(ray, _ShaftSpotDirection[light].xyz)) / axial;

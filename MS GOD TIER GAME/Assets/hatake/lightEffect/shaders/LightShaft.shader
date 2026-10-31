@@ -16,7 +16,9 @@ Shader "Hidden/hatake/Volumetric"
             #pragma fragment Frag
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT _SHADOWS_SOFT_LOW _SHADOWS_SOFT_MEDIUM _SHADOWS_SOFT_HIGH
+            // ソフトシャドウのキーワード (_SHADOWS_SOFT*) はあえて宣言しない。
+            // 1 ステップごとに High (16 タップ) のフィルタをかけるのは重く、
+            // 光線方向の積分とサンプル位置のゆらぎで縁は十分ぼける。ハードウェア PCF の 1 タップで引く。
 
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
@@ -36,9 +38,7 @@ Shader "Hidden/hatake/Volumetric"
             #pragma target 4.5
             #pragma vertex Vert
             #pragma fragment Composite
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT _SHADOWS_SOFT_LOW _SHADOWS_SOFT_MEDIUM _SHADOWS_SOFT_HIGH
+            // フル解像度の全画素で動くので、レイマーチは含めない（精細化は下の "Light Shaft Detail Refine" パス）
 
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
@@ -67,6 +67,9 @@ Shader "Hidden/hatake/Volumetric"
 
 
             float4 _GodRaySun, _GodRayTexelSize;
+            // God Ray を遮るもの（LightMode "GodRayOccluder" のパスを持つ半透明など）。深度に入らないものの分。
+            TEXTURE2D_X(_GodRayOccluder);
+            float _GodRayOccluderEnabled;
             half4 Mask(Varyings input):SV_Target
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
@@ -81,6 +84,7 @@ Shader "Hidden/hatake/Volumetric"
                     #endif
                 }
                 sky*=0.25;
+                if (_GodRayOccluderEnabled>0.5) sky*=1-saturate(LOAD_TEXTURE2D_X(_GodRayOccluder,uint2(input.positionCS.xy)).r);
                 float2 offset=input.texcoord-_GodRaySun.xy; offset.x*=_ScreenParams.x/_ScreenParams.y;
                 return sky*exp(-dot(offset,offset)/max(0.0001,_GodRaySun.z*_GodRaySun.z));
             }
@@ -173,6 +177,29 @@ Shader "Hidden/hatake/Volumetric"
             #pragma vertex Vert
             #pragma fragment Tiles
             #include "Assets/hatake/lightEffect/shaders/ShaftTiles.hlsl"
+            ENDHLSL
+        }
+        Pass
+        {
+            // 深度の境界・スポットの根元だけフル解像度でレイマーチし、合成結果へ重みで混ぜる。
+            // 色は lerp(合成, 精細, w) と同じになる。アルファ (元の source.a) は書き換えない
+            Name "Light Shaft Detail Refine"
+            ZWrite Off ZTest Always Cull Off
+            Blend SrcAlpha OneMinusSrcAlpha, Zero One
+            HLSLPROGRAM
+            #pragma target 4.5
+            #pragma vertex Vert
+            #pragma fragment Refine
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
+
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
+
+
+            #include "Assets/hatake/lightEffect/shaders/ShaftComposite.hlsl"
             ENDHLSL
         }
     }
