@@ -14,7 +14,7 @@ public class ChestDrawer : MonoBehaviour
     
     private Coroutine m_moveCoroutine; // 移動用コルーチン
 
-    private void Start()
+    private void Awake()
     {
         m_initialPosition = transform.localPosition;
     }
@@ -98,5 +98,11 @@ public class ChestDrawer : MonoBehaviour
     public bool IsMoveCoroutineFinished()
     {
         return m_moveCoroutine == null;
+    }
+
+    // 引き出しの移動先のローカル位置を取得する
+    public Vector3 GetTargetPosition()
+    {
+        return m_targetPosition;
     }
 }

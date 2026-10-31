@@ -17,8 +17,8 @@ public class SwarmGhostManager : MonoBehaviour
     [Header("出現間隔（秒）")]
     [SerializeField] private float m_spawnInterval = 0.1f;
 
-    [Header("群れお化けのターゲット")]
-    [SerializeField] private Transform m_target;
+    [Header("群れお化けの突撃間隔（秒）")]
+    [SerializeField] private float m_attackInterval = 5.0f;
 
 
     private List<SwarmGhost> m_activeSwarmGhostList = new List<SwarmGhost>(); // 現在出現している群れお化け
@@ -31,11 +31,15 @@ public class SwarmGhostManager : MonoBehaviour
 
     private int m_currentHealth = 0; // 現在の群れお化けの体力
 
+    private float m_attackTimer = 0.0f; // 群れお化けを突撃させるタイマー
+
+    private bool m_isActiveFlag = false; // 群れお化けがアクティブかどうか
+
+    private bool m_isAttackingFlag = false; // 群れお化けが突撃中かどうか
+
 
     private void Start()
     {
-        StartCoroutine(SpawnAllSwarmGhostCoroutine());
-
         m_currentHealth = m_swarmGhostData.m_maxHealth;
     }
 
@@ -47,10 +51,58 @@ public class SwarmGhostManager : MonoBehaviour
             RemoveRandomHalfSwarmGhosts();
         }
 
-        if (Keyboard.current != null &&
-            Keyboard.current.enterKey.wasPressedThisFrame)
+        if(m_isActiveFlag)
         {
-            StartCoroutine(SpawnAllSwarmGhostCoroutine());
+            UpdateAttackTimer();
+        }  
+
+    }
+
+    private void UpdateAttackTimer()
+    {
+        // 群れお化けを突撃させるタイマーを更新
+        m_attackTimer += Time.deltaTime;
+
+        if (m_attackTimer >= m_attackInterval)
+        {
+            if (!m_isAttackingFlag)
+            {
+                AttackAllSwarmGhosts();
+                m_isAttackingFlag = true;
+            }
+        }
+
+        // 群れお化けの突撃が終了したらフラグをリセット
+        if (m_isAttackingFlag)
+        {
+            bool allFinished = true;
+            for (int i = 0; i < m_activeSwarmGhostList.Count; i++)
+            {
+                SwarmGhost swarmGhost = m_activeSwarmGhostList[i];
+                if (swarmGhost != null && swarmGhost.GetIsChargingFlag())
+                {
+                    allFinished = false;
+                    break;
+                }
+            }
+            if (allFinished)
+            {
+                m_isAttackingFlag = false;
+                m_attackTimer = 0.0f; // タイマーをリセット
+            }
+        }
+    }
+
+    // 全ての群れお化けを突撃させる
+    private void AttackAllSwarmGhosts()
+    {
+        for (int i = 0; i < m_activeSwarmGhostList.Count; i++)
+        {
+            SwarmGhost swarmGhost = m_activeSwarmGhostList[i];
+            if (swarmGhost != null)
+            {
+                swarmGhost.StartCharge();
+            }
         }
     }
 
@@ -143,8 +195,6 @@ public class SwarmGhostManager : MonoBehaviour
                 transform
             );
 
-            swarmGhost.SetTarget(m_target);
-
             // お化けと出現位置を同じインデックスで登録
             m_activeSwarmGhostList.Add(swarmGhost);
             m_activeSpawnPositions.Add(spawnPosition);
@@ -157,6 +207,8 @@ public class SwarmGhostManager : MonoBehaviour
         }
 
         m_isSpawningFlag = false;
+
+        m_isActiveFlag = true;
     }
 
     // ランダムに半分の群れお化けを削除する
@@ -223,6 +275,8 @@ public class SwarmGhostManager : MonoBehaviour
         m_activeSwarmGhostList.Clear();
         m_activeSpawnPositions.Clear();
         m_availableSpawnPositions.Clear();
+
+        m_isActiveFlag = false;
     }
 
     public void SetCurrentHealth(int health)
@@ -230,10 +284,17 @@ public class SwarmGhostManager : MonoBehaviour
         m_currentHealth = health;
     }
 
+
     private void OnTriggerEnter(Collider collision)
     {
         if (collision.gameObject.CompareTag("MagicBullet"))
         {
+            if(m_isAttackingFlag) 
+            {
+                // 突撃中は無敵
+                return;
+            }
+
             m_currentHealth--;
 
             if (m_currentHealth == 1)

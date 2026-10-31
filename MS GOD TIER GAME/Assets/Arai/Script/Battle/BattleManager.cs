@@ -80,8 +80,8 @@ public class BattleManager : MonoBehaviour
         float lastSpawnTime = startTime;
 
 
-        // ミニオバケをバトル開始状態にする
-        m_activeEnemyManager.SetAllMiniGhostsToBattleStart();
+        // エネミーをバトル開始状態にする
+        m_activeEnemyManager.SetAllActiveEnemiesToBattleStart();
 
 
 

@@ -19,9 +19,6 @@ public class SwarmGhost : MonoBehaviour
         "Charge4"
     };
 
-    [Header("突撃先")]
-    [SerializeField] private Transform m_target;
-
     [Header("待ち時間（秒）")]
     [SerializeField] private float m_minDelay = 0f;
     [SerializeField] private float m_maxDelay = 4f;
@@ -48,6 +45,9 @@ public class SwarmGhost : MonoBehaviour
     [Header("パーティクル")]
     [SerializeField] private GameObject m_deathParticle;
 
+
+    private Transform m_target; // プレイヤーのTransformを保持する変数
+
     private float m_defaultAnimatorSpeed = 1f; // Animatorの初期再生速度
     private GameObject m_spawnedDeathParticle;  // 生成されたパーティクルの参照
 
@@ -61,8 +61,7 @@ public class SwarmGhost : MonoBehaviour
 
     private Vector3 m_initialPosition; // 初期位置を保存
 
-    // 突撃中フラグ
-    public bool m_isChargingFlag = false;
+    public bool m_isChargingFlag = false; // 突撃中フラグ
 
     private void Awake()
     {
@@ -70,10 +69,7 @@ public class SwarmGhost : MonoBehaviour
 
         m_animator = GetComponentInChildren<Animator>();
 
-        if (m_target == null && Camera.main != null)
-        {
-            m_target = Camera.main.transform;
-        }
+        m_target = Camera.main.transform;
 
         if (m_animator != null)
         {
@@ -85,12 +81,12 @@ public class SwarmGhost : MonoBehaviour
 
     private void Update()
     {
-        // Eキーで突撃
-        if (Keyboard.current != null &&
-            Keyboard.current.eKey.wasPressedThisFrame)
-        {
-            StartCharge();
-        }
+        //// Eキーで突撃
+        //if (Keyboard.current != null &&
+        //    Keyboard.current.eKey.wasPressedThisFrame)
+        //{
+        //    StartCharge();
+        //}
 
         if(!m_isChargingFlag)
         {
@@ -146,7 +142,7 @@ public class SwarmGhost : MonoBehaviour
     }
 
     // 突撃を開始する
-    private void StartCharge()
+    public void StartCharge()
     {
         // 死亡中や突撃中の重複呼び出しを防ぐ
         if (m_isDying || m_chargeCoroutine != null)
@@ -323,6 +319,12 @@ public class SwarmGhost : MonoBehaviour
         transform.rotation = startRotation;
 
         m_isChargingFlag = false;
+    }
+
+    // 突撃中かどうかを取得
+    public bool GetIsChargingFlag()
+    {
+        return m_isChargingFlag;
     }
 
     // アニメーション番号に対応する帰還方向を取得

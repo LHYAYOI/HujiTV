@@ -1,17 +1,18 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 
-public class ConductorGhost : EnemyBase
+public class ConductorGhost : MonoBehaviour
 {
+    [Header("群れお化けのマネージャー")]
+    [SerializeField] private SwarmGhostManager m_swarmGhostManager;
+
     [Header("タンス")]
     [SerializeField] private ChestShaker m_chestShaker;
 
     [Header("アニメーター")]
     [SerializeField] private Animator m_animator;
-
-    [Header("メインカメラ")]
-    [SerializeField] private Transform m_target;
 
     [Header("カメラを向く高さの補正")]
     [SerializeField] private float m_cameraHeightOffset = 1.5f;
@@ -51,16 +52,15 @@ public class ConductorGhost : EnemyBase
 
     private Vector3 m_originalRotation; // 元の回転
 
-    // 姿を現わしているかどうか
-    private bool m_isVisibleFlag = false;
+    private bool m_isVisibleFlag = false;   // 姿を現わしているかどうか
+
+    private bool m_isBattleStartedFlag = false; // 戦闘が始まったかどうか
+
+    private bool m_upperDrawerLockedFlag = false; // 上の引き出しが閉まったかどうか
+
+    private bool m_lowerDrawerLockedFlag = false; // 下の引き出しが閉まったかどうか
 
     private void Start()
-    {
-        Initialize();
-    }
-
-
-    public override void Initialize()
     {
         TurnToPlayerImmediately();
 
@@ -81,9 +81,11 @@ public class ConductorGhost : EnemyBase
 
         // 最初は小さくしておく
         transform.localScale = Vector3.zero;
+
+        // 引き出しを開けた状態にしておく
+        m_upperChestDrawer.transform.localPosition = m_upperChestDrawer.GetTargetPosition();
+        m_lowerChestDrawer.transform.localPosition = m_lowerChestDrawer.GetTargetPosition();
     }
-
-
 
     private void Update()
     {
@@ -98,52 +100,100 @@ public class ConductorGhost : EnemyBase
             TurnToFront();
         }
 
-        //m_callMiniGhostTimer += Time.deltaTime;
+        if(m_isBattleStartedFlag)
+        {
+            UpdateCallTimer();
+        }
+    }
 
-        //if (m_callMiniGhostTimer >= m_callMiniGhostInterval)
-        //{
-        //    if(m_callMiniGhostFlag)
-        //    {
-        //        return;
-        //    }
+    private void UpdateCallTimer()
+    {
+        m_callMiniGhostTimer += Time.deltaTime;
 
-        //    // ランダムに引き出しを選んで開ける
-        //    if (Random.value < 0.5f)
-        //    {
-        //        StartCoroutine(OpenAndCloseUpperChest());
-        //    }
-        //    else
-        //    {
-        //        StartCoroutine(OpenAndCloseLowerChest());
-        //    }
+        if (m_callMiniGhostTimer >= m_callMiniGhostInterval)
+        {
+            // 呼び出しフラグが立っているか、両方の引き出しが閉まっている場合は何もしない
+            if (m_callMiniGhostFlag || m_upperDrawerLockedFlag && m_lowerDrawerLockedFlag)
+            {
+                return;
+            }
 
-        //    m_callMiniGhostFlag = true;
-        //}
+            // ランダムに引き出しを選んで開ける
+            if (Random.value < 0.5f)
+            {
+                if (m_upperDrawerLockedFlag)
+                {
+                    StartCoroutine(OpenAndCloseLowerChest());
+                }
+                else
+                {
+                    StartCoroutine(OpenAndCloseUpperChest());
+                }
+            }
+            else
+            {
+                if (m_lowerDrawerLockedFlag)
+                {
+                    StartCoroutine(OpenAndCloseUpperChest());
+                }
+                else
+                {
+                    StartCoroutine(OpenAndCloseLowerChest());
+                }
+            }
 
+            m_callMiniGhostFlag = true;
+        }
+    }
 
-        //if (Keyboard.current != null &&
-        //    Keyboard.current.tKey.wasPressedThisFrame)
-        //{
-        //    StartCoroutine(OpenAndCloseUpperChest());
-        //}
+    public void StartBattle()
+    {
+        StartCoroutine(StartBattleCoroutine());
+    }
 
-        //if (Keyboard.current != null &&
-        //    Keyboard.current.yKey.wasPressedThisFrame)
-        //{
-        //    StartCoroutine(OpenAndCloseLowerChest());
-        //}
+    public IEnumerator StartBattleCoroutine()
+    {
+        m_isVisibleFlag = true;
+
+        StartCoroutine(ExpandCoroutine());
+
+        // アニメーションを再生
+        m_animator.SetFloat("fSpeed", 1f);
+        m_animator.Play("swing", 0, 0f);
+
+        yield return new WaitForSeconds(m_hideDelay * 0.8f);
+
+        // 群れお化けを出現させる
+        StartCoroutine(m_swarmGhostManager.SpawnAllSwarmGhostCoroutine());
+
+        StartCoroutine(ShrinkCoroutine());
+
+        yield return new WaitForSeconds(m_hideDelay * 0.2f);
+
+        // 上の引き出しを閉める
+        StartCoroutine(CloseUpperChest());
+
+        // 下の引き出しを閉める
+        yield return StartCoroutine(CloseLowerChest());
+
+        m_isVisibleFlag = false;
+
+        m_isBattleStartedFlag = true;
     }
 
     // 上の引き出しを開けて、閉める
-    private IEnumerator OpenAndCloseUpperChest()
+    public IEnumerator OpenAndCloseUpperChest()
     {
         // 上の引き出しに移動して開ける
         yield return StartCoroutine(MoveToUpperChestAndOpen());
 
         yield return new WaitForSeconds(m_hideDelay * 0.8f);
 
-
-        m_isVisibleFlag = false;
+        if (!m_upperDrawerLockedFlag && m_lowerDrawerLockedFlag)
+        {
+            // 群れお化けを出現させる
+            StartCoroutine(m_swarmGhostManager.SpawnAllSwarmGhostCoroutine());
+        }
 
         StartCoroutine(ShrinkCoroutine());
 
@@ -154,7 +204,7 @@ public class ConductorGhost : EnemyBase
     }
 
     // 下の引き出しを開けて、閉める
-    private IEnumerator OpenAndCloseLowerChest()
+    public IEnumerator OpenAndCloseLowerChest()
     {
         // 下の引き出しに移動して開ける
         yield return StartCoroutine(MoveToLowerChestAndOpen());
@@ -162,7 +212,11 @@ public class ConductorGhost : EnemyBase
       
         yield return new WaitForSeconds(m_hideDelay * 0.8f);
 
-        m_isVisibleFlag = false;
+        if(!m_upperDrawerLockedFlag && m_lowerDrawerLockedFlag)
+        {
+            // 群れお化けを出現させる
+            StartCoroutine(m_swarmGhostManager.SpawnAllSwarmGhostCoroutine());
+        }
 
         StartCoroutine(ShrinkCoroutine());
 
@@ -211,8 +265,10 @@ public class ConductorGhost : EnemyBase
         m_callMiniGhostFlag = false;
         m_callMiniGhostTimer = 0.0f;
 
+        m_isVisibleFlag = false;
+
         // タンスを揺らす
-        m_chestShaker.StartChestShake();
+        m_chestShaker.StartUpperChestAnimation();
     }
 
     // 下の引き出しに移動して開ける
@@ -254,8 +310,10 @@ public class ConductorGhost : EnemyBase
         m_callMiniGhostFlag = false;
         m_callMiniGhostTimer = 0.0f;
 
+        m_isVisibleFlag = false;
+
         // タンスを揺らす
-        m_chestShaker.StartChestShake();
+        m_chestShaker.StartLowerChestAnimation();
     }
 
    
@@ -263,7 +321,7 @@ public class ConductorGhost : EnemyBase
     // プレイヤーの方向へ即座に向く
     private void TurnToPlayerImmediately()
     {
-        Vector3 playerPosition = m_target.position;
+        Vector3 playerPosition = Camera.main.transform.position;
 
         // プレイヤーの狙う位置を調整
         playerPosition.y -= m_cameraHeightOffset;
@@ -283,7 +341,7 @@ public class ConductorGhost : EnemyBase
     // プレイヤーの方向を向く
     private void TurnToPlayer()
     {
-        Vector3 playerPosition = m_target.position;
+        Vector3 playerPosition = Camera.main.transform.position;
 
         // プレイヤーの狙う位置を調整
         playerPosition.y -= m_cameraHeightOffset;
@@ -362,5 +420,36 @@ public class ConductorGhost : EnemyBase
         }
 
         transform.localScale = Vector3.zero;
+    }
+
+    // 群れお化けを全て削除する
+    public void RemoveAllSwarmGhosts()
+    {
+        m_swarmGhostManager.RemoveAllSwarmGhosts();
+    }
+
+    public void SetUpperDrawerLockedFlag(bool flag)
+    {
+        m_upperDrawerLockedFlag = flag;
+    }
+
+    public void SetLowerDrawerLockedFlag(bool flag)
+    {
+        m_lowerDrawerLockedFlag = flag;
+    }
+
+    public bool GetUpperDrawerLockedFlag()
+    {
+        return m_upperDrawerLockedFlag;
+    }
+
+    public bool GetLowerDrawerLockedFlag()
+    {
+        return m_lowerDrawerLockedFlag;
+    }
+
+    public bool GetIsVisibleFlag()
+    {
+        return m_isVisibleFlag;
     }
 }
