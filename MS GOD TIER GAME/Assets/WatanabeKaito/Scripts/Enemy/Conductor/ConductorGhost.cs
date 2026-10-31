@@ -70,9 +70,6 @@ public class ConductorGhost : MonoBehaviour
         // 上の引き出しの位置に移動
         transform.position = m_upperHidePosition.position;
 
-        // 少し後ろに下がる
-        transform.position += transform.forward * 0.5f;
-
         // 引き出しの子オブジェクトにする
         transform.SetParent(m_upperChestDrawer.transform);
 
@@ -89,18 +86,9 @@ public class ConductorGhost : MonoBehaviour
 
     private void Update()
     {
-        if (m_isVisibleFlag)
-        {
-            // プレイヤーの方向を向く
-            TurnToPlayer();
-        }
-        else
-        {
-            // 正面方向を向く
-            TurnToFront();
-        }
+        TurnToPlayer();
 
-        if(m_isBattleStartedFlag)
+        if (m_isBattleStartedFlag)
         {
             UpdateCallTimer();
         }
@@ -189,7 +177,7 @@ public class ConductorGhost : MonoBehaviour
 
         yield return new WaitForSeconds(m_hideDelay * 0.8f);
 
-        if (!m_upperDrawerLockedFlag && m_lowerDrawerLockedFlag)
+        if (!m_upperDrawerLockedFlag && !m_lowerDrawerLockedFlag)
         {
             // 群れお化けを出現させる
             StartCoroutine(m_swarmGhostManager.SpawnAllSwarmGhostCoroutine());
@@ -212,7 +200,7 @@ public class ConductorGhost : MonoBehaviour
       
         yield return new WaitForSeconds(m_hideDelay * 0.8f);
 
-        if(!m_upperDrawerLockedFlag && m_lowerDrawerLockedFlag)
+        if(!m_upperDrawerLockedFlag && !m_lowerDrawerLockedFlag)
         {
             // 群れお化けを出現させる
             StartCoroutine(m_swarmGhostManager.SpawnAllSwarmGhostCoroutine());

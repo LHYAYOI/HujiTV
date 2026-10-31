@@ -75,7 +75,6 @@ MonoBehaviour:
   - move_under
   - move_right
   - move_left
-  m_target: {fileID: 0}
   m_minDelay: 0
   m_maxDelay: 1
   m_moveSpeed: 3
@@ -85,7 +84,8 @@ MonoBehaviour:
   m_returnAnimationSpeed: 0.15
   m_shrinkDuration: 2
   m_deathParticle: {fileID: 4058022614410997813, guid: 21cee7413a62aaa41ad3a3550d4a7c67, type: 3}
-  m_isChargingFlag: 0
+  m_toonMaterialBlend: {fileID: 6905769979568370226}
+  m_toonMaterialBlendDuration: 1
 --- !u!1001 &6077947146731339621
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -153,7 +153,7 @@ PrefabInstance:
     - target: {fileID: -2922892357548988066, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 91737796faedc454580e0c0f2a95303d, type: 2}
+      objectReference: {fileID: 2100000, guid: 76a92c921e9f5ec4ba431b002ffdf3b0, type: 2}
     - target: {fileID: 919132149155446097, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: m_Name
       value: ghost_mini_mdl
@@ -161,18 +161,106 @@ PrefabInstance:
     - target: {fileID: 2788675242186676951, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 91737796faedc454580e0c0f2a95303d, type: 2}
+      objectReference: {fileID: 2100000, guid: 76a92c921e9f5ec4ba431b002ffdf3b0, type: 2}
     - target: {fileID: 6851099186128873815, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 91737796faedc454580e0c0f2a95303d, type: 2}
+      objectReference: {fileID: 2100000, guid: a76f3627213218747ba40d05806de7ad, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1856382402241693781}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6905769979568370226}
   m_SourcePrefab: {fileID: 100100000, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+--- !u!137 &231645493251511867 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -2922892357548988066, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+  m_PrefabInstance: {fileID: 6077947146731339621}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &813685692338591282 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 6851099186128873815, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+  m_PrefabInstance: {fileID: 6077947146731339621}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6040327412048746638 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+  m_PrefabInstance: {fileID: 6077947146731339621}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6383955188633829940 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+  m_PrefabInstance: {fileID: 6077947146731339621}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1856382402241693781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6383955188633829940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76665b8e19a7d3b4db4065ab2450dccc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeamToon.TeamToonGhostDeformer
+  renderers:
+  - {fileID: 8280547283468264882}
+  - {fileID: 813685692338591282}
+  - {fileID: 231645493251511867}
+  anchor: {fileID: 0}
+  localRoot: {x: 0, y: 1.32917, z: -0.115499675}
+  localTipDirection: {x: 0, y: -1, z: 0}
+  length: 1.5319337
+  localCenter: {x: 0, y: 0.56320316, z: -0.115499675}
+  dragPerSpeed: 0.12
+  turnDrag: 0.08
+  maxDrag: 0.6
+  dragFrequency: 2.2
+  dragDamping: 0.35
+  stretchPerSpeed: 0.06
+  maxStretch: 0.35
+  stretchFrequency: 3.5
+  stretchDamping: 0.3
+  localWaveDirection: {x: 1, y: 0, z: 0}
+  idleWaveAmplitude: 0.03
+  waveAmplitudePerSpeed: 0.04
+  maxWaveAmplitude: 0.25
+  waveFrequency: 1.2
+  waveFrequencyPerSpeed: 0.5
+  breathAmplitude: 0.01
+  breathFrequency: 0.5
+  puffFrequency: 4
+  puffDamping: 0.25
+  useTransformVelocity: 1
+  externalVelocity: {x: 0, y: 0, z: 0}
+  teleportDistance: 5
+  boundsPadding: 0.5
+--- !u!114 &6905769979568370226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6383955188633829940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 234324c925ad3e74eb03c1093ce95383, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeamToon.TeamToonMaterialBlend
+  materialA: {fileID: 2100000, guid: 91737796faedc454580e0c0f2a95303d, type: 2}
+  materialB: {fileID: 2100000, guid: 76a92c921e9f5ec4ba431b002ffdf3b0, type: 2}
+  blend: 1
+  renderers:
+  - {fileID: 8280547283468264882}
+  - {fileID: 231645493251511867}
+--- !u!137 &8280547283468264882 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2788675242186676951, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
   m_PrefabInstance: {fileID: 6077947146731339621}
   m_PrefabAsset: {fileID: 0}

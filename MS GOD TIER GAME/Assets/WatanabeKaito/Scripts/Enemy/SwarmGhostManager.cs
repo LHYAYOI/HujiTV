@@ -199,6 +199,9 @@ public class SwarmGhostManager : MonoBehaviour
             m_activeSwarmGhostList.Add(swarmGhost);
             m_activeSpawnPositions.Add(spawnPosition);
 
+            // マテリアルブレンド開始
+            swarmGhost.StartMaterialBlend();
+
             // 次のお化けが出現するまで待機
             if (m_availableSpawnPositions.Count > 0)
             {

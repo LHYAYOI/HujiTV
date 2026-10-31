@@ -1,4 +1,5 @@
 using System.Collections;
+using TeamToon;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -45,6 +46,12 @@ public class SwarmGhost : MonoBehaviour
     [Header("パーティクル")]
     [SerializeField] private GameObject m_deathParticle;
 
+    [Header("モデル単位のマテリアルブレンド")]
+    [SerializeField] private TeamToonMaterialBlend m_toonMaterialBlend;
+
+    [Header("マテリアルブレンドの時間")]
+    [SerializeField] private float m_toonMaterialBlendDuration = 1.0f;
+
 
     private Transform m_target; // プレイヤーのTransformを保持する変数
 
@@ -61,7 +68,7 @@ public class SwarmGhost : MonoBehaviour
 
     private Vector3 m_initialPosition; // 初期位置を保存
 
-    public bool m_isChargingFlag = false; // 突撃中フラグ
+    private bool m_isChargingFlag = false; // 突撃中フラグ
 
     private void Awake()
     {
@@ -435,6 +442,34 @@ public class SwarmGhost : MonoBehaviour
         rotationAxis.Normalize();
     }
 
+    public void StartMaterialBlend()
+    {
+        // 透明から元のマテリアルに戻す
+        StartCoroutine(SwitchMaterialBlendCoroutine(1, 0));
+    }
+
+    // マテリアルブレンドのコルーチン
+    public IEnumerator SwitchMaterialBlendCoroutine(float startValue, float endValue)
+    {
+        float duration = m_toonMaterialBlend.blend;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+
+            float t = Mathf.Clamp01(elapsedTime / duration);
+            float easedT = Easing.EaseInOutSine(t);
+
+            float blendValue = Mathf.Lerp(startValue, endValue, easedT);
+            m_toonMaterialBlend.blend = blendValue;
+
+            yield return null;
+        }
+
+        m_toonMaterialBlend.blend = endValue;
+    }
+
     public void SetTarget(Transform target)
     {
         m_target = target;
@@ -479,6 +514,9 @@ public class SwarmGhost : MonoBehaviour
 
         // パーティクルを再生
         PlayDeathEffect(transform.position);
+
+        // 元のマテリアルから透明マテリアルに切り替える
+        StartCoroutine(SwitchMaterialBlendCoroutine(0, 1));
     }
 
     // 縮小して消滅する

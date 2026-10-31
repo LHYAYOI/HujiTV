@@ -20,17 +20,7 @@ public class ConductorGhostManager : EnemyBase
     // Update is called once per frame
     void Update()
     {
-        if (Keyboard.current != null &&
-            Keyboard.current.tKey.wasPressedThisFrame)
-        {
-            m_conductorGhost.StartBattle();
-        }
-
-        if (Keyboard.current != null &&
-            Keyboard.current.yKey.wasPressedThisFrame)
-        {
-            EndBattle();
-        }
+       
     }
 
     public void StartBattle()

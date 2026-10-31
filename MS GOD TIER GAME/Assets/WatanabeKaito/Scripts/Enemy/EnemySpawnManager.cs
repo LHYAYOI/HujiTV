@@ -140,7 +140,7 @@ public class EnemySpawnManager : MonoBehaviour
 
         Vector3 spawnPosition = spawnTransform.position;
 
-        EnemyBase enemyObj = Instantiate(prefab, spawnPosition, Quaternion.identity);
+        EnemyBase enemyObj = Instantiate(prefab, spawnPosition, prefab.transform.rotation);
         enemyObj.SetPlayerPosition(m_playerTransform);
         enemyObj.SetActiveEnemyManager(m_activeEnemyManager);
         enemyObj.Initialize();
