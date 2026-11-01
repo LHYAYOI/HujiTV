@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 420583556dd536042904ac28324683be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  m_targetHitUIManager: {fileID: 0}
   m_magicBulletPrefabList:
   - {fileID: 7678089287139935553, guid: 5a46e82ce7e5d4d4b8af7a9b988802ef, type: 3}
   m_bulletSpawnPoint: {fileID: 0}
-  m_aimScript: {fileID: 0}
