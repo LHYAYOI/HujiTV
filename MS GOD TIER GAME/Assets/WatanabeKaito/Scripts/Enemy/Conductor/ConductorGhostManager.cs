@@ -21,19 +21,19 @@ public class ConductorGhostManager : EnemyBase
     void Update()
     {
        // デバック
-         if (Keyboard.current != null &&
-                Keyboard.current.bKey.wasPressedThisFrame)
-          {
-            m_conductorGhost.SetUpperDrawerLockedFlag(true);
-            StartCoroutine(m_conductorGhost.LockUpperChest());
-        }
+        //if (Keyboard.current != null &&
+        //        Keyboard.current.bKey.wasPressedThisFrame)
+        //{
+        //    m_conductorGhost.SetUpperDrawerLockedFlag(true);
+        //    StartCoroutine(m_conductorGhost.LockUpperChest());
+        //}
 
-        if (Keyboard.current != null &&
-               Keyboard.current.nKey.wasPressedThisFrame)
-        {
-            m_conductorGhost.SetLowerDrawerLockedFlag(true);
-            StartCoroutine(m_conductorGhost.LockLowerChest());
-        }
+        //if (Keyboard.current != null &&
+        //       Keyboard.current.nKey.wasPressedThisFrame)
+        //{
+        //    m_conductorGhost.SetLowerDrawerLockedFlag(true);
+        //    StartCoroutine(m_conductorGhost.LockLowerChest());
+        //}
     }
 
     public void StartBattle()

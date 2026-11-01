@@ -45,12 +45,6 @@ public class SwarmGhostManager : MonoBehaviour
 
     private void Update()
     {
-        if (Keyboard.current != null &&
-            Keyboard.current.spaceKey.wasPressedThisFrame)
-        {
-            RemoveRandomHalfSwarmGhosts();
-        }
-
         if(m_isActiveFlag)
         {
             UpdateAttackTimer();

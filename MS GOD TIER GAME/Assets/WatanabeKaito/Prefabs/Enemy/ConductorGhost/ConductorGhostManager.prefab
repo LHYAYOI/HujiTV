@@ -235,6 +235,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7683028610441076602}
   - component: {fileID: 1805963002013783076}
+  - component: {fileID: 2253100600589201335}
   m_Layer: 0
   m_Name: ConductorGhostManager
   m_TagString: Untagged
@@ -274,6 +275,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ConductorGhostManager
   m_enemyData: {fileID: 11400000, guid: 76542ede1402560438e35b0d4fb4fc36, type: 2}
   m_conductorGhost: {fileID: 2139168138064926937}
+--- !u!65 &2253100600589201335
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4563933557310973050}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.66, y: 2.16, z: 1}
+  m_Center: {x: 1.95, y: 1.77, z: 0}
 --- !u!1 &6035388554859512672
 GameObject:
   m_ObjectHideFlags: 0
