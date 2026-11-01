@@ -1,9 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GimmickSplineSetBattleCamera : GimmickSpline
 {
     [SerializeField] private GimmickSplineRange m_range;
     [SerializeField] private GameObject m_lookTarget;
+    [SerializeField] private float m_duration = 0.5f;
 
     private bool m_isLookFlag;
 
@@ -34,7 +35,7 @@ public class GimmickSplineSetBattleCamera : GimmickSpline
 
         m_isLookFlag = true;
 
-        CameraManager.Instance.SetLookTarget(m_lookTarget);
+        CameraManager.Instance.SetLookTarget(m_lookTarget, m_duration);
         CameraManager.Instance.SwitchCamera("BattleCamera");
     }
 
