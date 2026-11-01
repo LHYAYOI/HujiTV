@@ -208,7 +208,7 @@ public class CameraManager : MonoBehaviour
         zoom.ChangeFOV(duration, FOV);
     }
 
-    public void SetLookTarget(GameObject lookTarget) 
+    public void SetLookTarget(GameObject lookTarget, float duration)
     {
         CinemachineCamera targetCamera = GetCameraByName("BattleCamera").GetCamera();
 
@@ -224,7 +224,7 @@ public class CameraManager : MonoBehaviour
             return;
         }
 
-        lookTargetChanger.SetLookTarget(lookTarget);
+        lookTargetChanger.SetLookTarget(lookTarget, duration);
     }
 
     public void DollyCamera(float duration, float zoomValue, float pullBackAmount) 

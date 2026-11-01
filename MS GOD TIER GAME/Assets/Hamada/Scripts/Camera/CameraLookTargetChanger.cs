@@ -31,7 +31,7 @@ public class CameraLookTargetChanger : MonoBehaviour
         SetLookTarget(target, m_defaultTargetTransitionTime);
     }
 
-    public void SetLookTarget(GameObject target,float duration)
+    public void SetLookTarget(GameObject target, float duration = 0.5f)
     {
         if (m_cinemachineCamera == null)
         {
