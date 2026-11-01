@@ -85,7 +85,7 @@ MonoBehaviour:
   m_shrinkDuration: 2
   m_deathParticle: {fileID: 4058022614410997813, guid: 89b865f6e4ec0064984bc5885d17bc32, type: 3}
   m_toonMaterialBlend: {fileID: 684233303231041808}
-  m_toonMaterialBlendDuration: 1
+  m_toonMaterialBlendDuration: 0.1
 --- !u!1001 &6077947146731339621
 PrefabInstance:
   m_ObjectHideFlags: 0

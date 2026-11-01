@@ -20,7 +20,20 @@ public class ConductorGhostManager : EnemyBase
     // Update is called once per frame
     void Update()
     {
-       
+       // デバック
+         if (Keyboard.current != null &&
+                Keyboard.current.bKey.wasPressedThisFrame)
+          {
+            m_conductorGhost.SetUpperDrawerLockedFlag(true);
+            StartCoroutine(m_conductorGhost.LockUpperChest());
+        }
+
+        if (Keyboard.current != null &&
+               Keyboard.current.nKey.wasPressedThisFrame)
+        {
+            m_conductorGhost.SetLowerDrawerLockedFlag(true);
+            StartCoroutine(m_conductorGhost.LockLowerChest());
+        }
     }
 
     public void StartBattle()
@@ -51,11 +64,14 @@ public class ConductorGhostManager : EnemyBase
             {
                 // 上の引き出しから閉める
                 m_conductorGhost.SetUpperDrawerLockedFlag(true);
+                StartCoroutine(m_conductorGhost.LockUpperChest());
+
             }
             else if (m_currentHealth <= 0)
             {
                 // 下の引き出しを閉める
                 m_conductorGhost.SetLowerDrawerLockedFlag(true);
+                StartCoroutine(m_conductorGhost.LockLowerChest());
             }
         }
     }

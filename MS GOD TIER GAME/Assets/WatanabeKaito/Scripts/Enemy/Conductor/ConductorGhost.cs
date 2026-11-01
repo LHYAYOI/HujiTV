@@ -106,28 +106,13 @@ public class ConductorGhost : MonoBehaviour
                 return;
             }
 
-            // ランダムに引き出しを選んで開ける
-            if (Random.value < 0.5f)
+            if (m_upperDrawerLockedFlag)
             {
-                if (m_upperDrawerLockedFlag)
-                {
-                    StartCoroutine(OpenAndCloseLowerChest());
-                }
-                else
-                {
-                    StartCoroutine(OpenAndCloseUpperChest());
-                }
+                StartCoroutine(OpenAndCloseLowerChest());
             }
             else
             {
-                if (m_lowerDrawerLockedFlag)
-                {
-                    StartCoroutine(OpenAndCloseUpperChest());
-                }
-                else
-                {
-                    StartCoroutine(OpenAndCloseLowerChest());
-                }
+                StartCoroutine(OpenAndCloseUpperChest());
             }
 
             m_callMiniGhostFlag = true;
@@ -149,20 +134,22 @@ public class ConductorGhost : MonoBehaviour
         m_animator.SetFloat("fSpeed", 1f);
         m_animator.Play("swing", 0, 0f);
 
-        yield return new WaitForSeconds(m_hideDelay * 0.8f);
+        yield return new WaitForSeconds(m_hideDelay * 0.4f);
 
         // 群れお化けを出現させる
         StartCoroutine(m_swarmGhostManager.SpawnAllSwarmGhostCoroutine());
+
+        yield return new WaitForSeconds(m_hideDelay * 0.4f);
 
         StartCoroutine(ShrinkCoroutine());
 
         yield return new WaitForSeconds(m_hideDelay * 0.2f);
 
         // 上の引き出しを閉める
-        StartCoroutine(CloseUpperChest());
+        //StartCoroutine(CloseUpperChest());
 
         // 下の引き出しを閉める
-        yield return StartCoroutine(CloseLowerChest());
+        //yield return StartCoroutine(CloseLowerChest());
 
         m_isVisibleFlag = false;
 
@@ -175,13 +162,15 @@ public class ConductorGhost : MonoBehaviour
         // 上の引き出しに移動して開ける
         yield return StartCoroutine(MoveToUpperChestAndOpen());
 
-        yield return new WaitForSeconds(m_hideDelay * 0.8f);
+        yield return new WaitForSeconds(m_hideDelay * 0.4f);
 
-        if (!m_upperDrawerLockedFlag && !m_lowerDrawerLockedFlag)
+        if (!m_upperDrawerLockedFlag)
         {
             // 群れお化けを出現させる
             StartCoroutine(m_swarmGhostManager.SpawnAllSwarmGhostCoroutine());
         }
+
+        yield return new WaitForSeconds(m_hideDelay * 0.4f);
 
         StartCoroutine(ShrinkCoroutine());
 
@@ -198,13 +187,17 @@ public class ConductorGhost : MonoBehaviour
         yield return StartCoroutine(MoveToLowerChestAndOpen());
 
       
-        yield return new WaitForSeconds(m_hideDelay * 0.8f);
+        yield return new WaitForSeconds(m_hideDelay * 0.4f);
 
-        if(!m_upperDrawerLockedFlag && !m_lowerDrawerLockedFlag)
+        if(!m_lowerDrawerLockedFlag)
         {
             // 群れお化けを出現させる
             StartCoroutine(m_swarmGhostManager.SpawnAllSwarmGhostCoroutine());
+
+            Debug.Log("群れお化けを出現させる");
         }
+
+        yield return new WaitForSeconds(m_hideDelay * 0.4f);
 
         StartCoroutine(ShrinkCoroutine());
 
@@ -224,9 +217,9 @@ public class ConductorGhost : MonoBehaviour
         transform.SetParent(m_upperChestDrawer.transform);
 
         // 上の引き出しを開ける
-        m_upperChestDrawer.OpenDrawer();
+        //m_upperChestDrawer.OpenDrawer();
 
-        yield return new WaitUntil(() => m_upperChestDrawer.IsMoveCoroutineFinished());
+        //yield return new WaitUntil(() => m_upperChestDrawer.IsMoveCoroutineFinished());
 
         m_isVisibleFlag = true;
 
@@ -235,17 +228,19 @@ public class ConductorGhost : MonoBehaviour
         // アニメーションを再生
         m_animator.SetFloat("fSpeed", 1f);
         m_animator.Play("swing", 0, 0f);
+
+        yield return null;
     }
 
     // 上の引き出しを閉める
     private IEnumerator CloseUpperChest()
     {
         // 上の引き出しを閉める
-        m_upperChestDrawer.CloseDrawer();
+        //m_upperChestDrawer.CloseDrawer();
 
-        //StartCoroutine(ShrinkCoroutine());
+        StartCoroutine(ShrinkCoroutine());
 
-        yield return new WaitUntil(() => m_upperChestDrawer.IsMoveCoroutineFinished());
+        //yield return new WaitUntil(() => m_upperChestDrawer.IsMoveCoroutineFinished());
 
         // アニメーションを止める
         m_animator.SetFloat("fSpeed", 0f);
@@ -256,7 +251,9 @@ public class ConductorGhost : MonoBehaviour
         m_isVisibleFlag = false;
 
         // タンスを揺らす
-        m_chestShaker.StartUpperChestAnimation();
+        //m_chestShaker.StartUpperChestAnimation();
+
+        yield return null;
     }
 
     // 下の引き出しに移動して開ける
@@ -269,9 +266,9 @@ public class ConductorGhost : MonoBehaviour
         transform.SetParent(m_lowerChestDrawer.transform);
 
         // 下の引き出しを開ける
-        m_lowerChestDrawer.OpenDrawer();
+        //m_lowerChestDrawer.OpenDrawer();
 
-        yield return new WaitUntil(() => m_lowerChestDrawer.IsMoveCoroutineFinished());
+        //yield return new WaitUntil(() => m_lowerChestDrawer.IsMoveCoroutineFinished());
 
         m_isVisibleFlag = true;
 
@@ -280,15 +277,17 @@ public class ConductorGhost : MonoBehaviour
         // アニメーションを再生
         m_animator.SetFloat("fSpeed", 1f);
         m_animator.Play("swing", 0, 0f);
+
+        yield return null;
     }
 
     // 下の引き出しを閉める
     private IEnumerator CloseLowerChest()
     {
         // 下の引き出しを閉める
-        m_lowerChestDrawer.CloseDrawer();
+        //m_lowerChestDrawer.CloseDrawer();
 
-        yield return new WaitUntil(() => m_lowerChestDrawer.IsMoveCoroutineFinished());
+        //yield return new WaitUntil(() => m_lowerChestDrawer.IsMoveCoroutineFinished());
         // アニメーションを止める
         m_animator.SetFloat("fSpeed", 0f);
 
@@ -301,10 +300,34 @@ public class ConductorGhost : MonoBehaviour
         m_isVisibleFlag = false;
 
         // タンスを揺らす
+        //m_chestShaker.StartLowerChestAnimation();
+
+        yield return null;
+    }
+
+    // 下の引き出しを閉めて、ロックする
+    public IEnumerator LockLowerChest()
+    {
+         // 下の引き出しを閉める
+        m_lowerChestDrawer.CloseDrawer();
+        yield return new WaitUntil(() => m_lowerChestDrawer.IsMoveCoroutineFinished());
+        m_lowerDrawerLockedFlag = true;
+
+        // タンスを揺らす
         m_chestShaker.StartLowerChestAnimation();
     }
 
-   
+    // 上の引き出しを閉めて、ロックする
+    public IEnumerator LockUpperChest()
+    {
+        // 上の引き出しを閉める
+        m_upperChestDrawer.CloseDrawer();
+        yield return new WaitUntil(() => m_upperChestDrawer.IsMoveCoroutineFinished());
+        m_upperDrawerLockedFlag = true;
+
+        // タンスを揺らす
+        m_chestShaker.StartUpperChestAnimation();
+    }
 
     // プレイヤーの方向へ即座に向く
     private void TurnToPlayerImmediately()

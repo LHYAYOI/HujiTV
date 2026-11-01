@@ -59,7 +59,14 @@ public class ActiveEnemyManager : MonoBehaviour
                 {
                     miniGhostEnemy.ChangeState(MINI_GHOST_STATE_TYPE.DYING);
                 }
-               
+
+                // ConductorGhostManagerの場合はバトル終了処理を呼び出す
+                ConductorGhostManager conductorGhostManager = enemy as ConductorGhostManager;
+                if (conductorGhostManager != null)
+                {
+                    conductorGhostManager.EndBattle();
+                }
+
             }
         }
         m_activeEnemies.Clear();

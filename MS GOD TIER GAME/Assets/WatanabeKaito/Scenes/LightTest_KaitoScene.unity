@@ -9894,7 +9894,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12c9217d477de68469f5fa9a9d305fb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleData
-  m_battleTime: 60
+  m_battleTime: 20
   m_enemyData:
   - m_enemyId: ConductorGhost
     m_splineId: 
