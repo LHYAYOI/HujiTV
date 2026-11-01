@@ -49,7 +49,15 @@ public class BattleManager : MonoBehaviour
 
         foreach (BattleEnemyData data in enemyData)
         {
-            m_spawnManager.SpawnSplineMoveEnemy(data.EnemyId, data.SplineId, data.SpawnId);
+            if(data.SplineId != "")
+            {
+                m_spawnManager.SpawnSplineMoveEnemy(data.EnemyId, data.SplineId, data.SpawnId);
+            }
+            else
+            {
+                m_spawnManager.SpawnPopUpEnemy(data.EnemyId, data.SpawnId);
+            }
+            
         }
     }
 
@@ -80,8 +88,8 @@ public class BattleManager : MonoBehaviour
         float lastSpawnTime = startTime;
 
 
-        // ミニオバケをバトル開始状態にする
-        m_activeEnemyManager.SetAllMiniGhostsToBattleStart();
+        // エネミーをバトル開始状態にする
+        m_activeEnemyManager.SetAllActiveEnemiesToBattleStart();
 
 
 

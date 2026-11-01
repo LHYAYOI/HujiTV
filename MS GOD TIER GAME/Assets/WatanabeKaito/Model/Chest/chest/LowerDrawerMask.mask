@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: LowerDrawerMask
+  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: chest2
+    m_Weight: 1
+  - m_Path: chest2/chest2
+    m_Weight: 1
+  - m_Path: chest2/chestdrawer
+    m_Weight: 1
+  - m_Path: chest2/chestdrawer/polySurface316
+    m_Weight: 1
+  - m_Path: chest2/chestdrawer/polySurface319
+    m_Weight: 1
+  - m_Path: chest2/chestdrawer/polySurface324
+    m_Weight: 1
+  - m_Path: chest2/chestdrawer1
+    m_Weight: 0
+  - m_Path: chest2/chestdrawer1/polySurface327
+    m_Weight: 0
+  - m_Path: chest2/chestdrawer1/polySurface330
+    m_Weight: 0
+  - m_Path: chest2/chestdrawer1/polySurface334
+    m_Weight: 0
+  - m_Path: Root_jnt
+    m_Weight: 0
+  - m_Path: Root_jnt/chestdrawer1
+    m_Weight: 0
+  - m_Path: Root_jnt/chestdrawer1/chestdrawer1_L_handle
+    m_Weight: 0
+  - m_Path: Root_jnt/chestdrawer1/chestdrawer1_R_handle
+    m_Weight: 0
+  - m_Path: Root_jnt/chestdrawer2
+    m_Weight: 1
+  - m_Path: Root_jnt/chestdrawer2/chestdrawer2_L_handle
+    m_Weight: 1
+  - m_Path: Root_jnt/chestdrawer2/chestdrawer2_R_handle
+    m_Weight: 1

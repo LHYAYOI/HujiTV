@@ -59,7 +59,14 @@ public class ActiveEnemyManager : MonoBehaviour
                 {
                     miniGhostEnemy.ChangeState(MINI_GHOST_STATE_TYPE.DYING);
                 }
-               
+
+                // ConductorGhostManagerの場合はバトル終了処理を呼び出す
+                ConductorGhostManager conductorGhostManager = enemy as ConductorGhostManager;
+                if (conductorGhostManager != null)
+                {
+                    conductorGhostManager.EndBattle();
+                }
+
             }
         }
         m_activeEnemies.Clear();
@@ -80,6 +87,14 @@ public class ActiveEnemyManager : MonoBehaviour
         }
     }
 
+    // アクティブな全てのエネミーをバトル開始状態にする
+    public void SetAllActiveEnemiesToBattleStart()
+    {
+        SetAllMiniGhostsToBattleStart();
+
+        SetAllSwarmGhostsToBattleStart();
+    }
+
     // アクティブなミニオバケをすべてバトル開始状態にする
     public void SetAllMiniGhostsToBattleStart()
     {
@@ -92,6 +107,22 @@ public class ActiveEnemyManager : MonoBehaviour
                 {
                     miniGhostEnemy.StartTimeLimit();
                     miniGhostEnemy.ChangeState(MINI_GHOST_STATE_TYPE.MOVE);
+                }
+            }
+        }
+    }
+
+    // アクティブな指揮者お化けをすべてバトル開始状態にする
+    public void SetAllSwarmGhostsToBattleStart()
+    {
+        foreach (var enemy in m_activeEnemies)
+        {
+            if (enemy != null)
+            {
+                ConductorGhostManager conductorGhostManager = enemy as ConductorGhostManager;
+                if (conductorGhostManager != null)
+                {
+                    conductorGhostManager.StartBattle();
                 }
             }
         }

@@ -255,7 +255,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostDyingState
   m_shrinkDuration: 1.5
-  m_deathParticle: {fileID: 4058022614410997813, guid: 40c0fe6424d75b946927c08badf4e2a8, type: 3}
+  m_deathParticle: {fileID: 4058022614410997813, guid: 89b865f6e4ec0064984bc5885d17bc32, type: 3}
 --- !u!136 &9170967074312127478
 CapsuleCollider:
   m_ObjectHideFlags: 0
