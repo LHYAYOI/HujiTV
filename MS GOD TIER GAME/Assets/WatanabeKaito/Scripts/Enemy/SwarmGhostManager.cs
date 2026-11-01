@@ -103,6 +103,9 @@ public class SwarmGhostManager : MonoBehaviour
     // ŒQ‚ê‚¨‰»‚¯‚ğŠÔ·‚ÅoŒ»‚³‚¹‚é
     public IEnumerator SpawnAllSwarmGhostCoroutine()
     {
+        // ‘Ì—Í‚ğÅ‘å’l‚Éİ’è
+        SetCurrentHealth(m_swarmGhostData.m_maxHealth);
+
         if (m_isSpawningFlag)
         {
             yield break;
