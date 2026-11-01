@@ -594,3 +594,13 @@ $12026-10-29：お邪魔4枠の初期実装。左右擦り・スクラッチ、�
 - Temp/RuneSpellValidationに結果と段階別の実画面PNGを保存。浮上・中央下の弾・方向指定中の画像矢印・発射を目視確認。初期版はCanvasRenderer不足で粒子が描画されず、RequireComponent追加後に表示成功。検証コードの曖昧なGetMethodもDeclaredOnly指定で修正し、最終検証を通過。
 - 既存Verify Rune FeedbackはRuneFeedback COMPLETE、Verify Book Obstacles In Current SceneはBookObstacleRuntime COMPLETE。物理ドラッグの体感・Android実機・実PC間通信は今回未確認。最終Play Modeは終了済み。Unityは開始時からWindows対象であり、Codexによるプラットフォーム切替は行っていない。
 - Scene・Prefab・hatake原本・共有設定は未変更。開始時からあったFireMagic / IceMagic、PageView_07 / 08、TestPage群、MagicType、Close / Open関連新規データ、number.png.meta等の既存ユーザー変更を保持。BookScene保存済みSHA256は479FB93964D78D196200B4EF0C6ADBAFBA08691FA593CFC98BBB59082D4B0009で同一。Git status/fetch/追跡先比較を実施し追跡先とのコミット差分なし。Git履歴操作なし。
+
+## イベント魔法の受信設計調査（2026-11-01）
+- ユーザー依頼により静的調査。MAGIC_TYPE.EVENTとEVENT_MAGIC_TYPE.NONE / OPEN / CLOSE、MagicData.EventMagicTypeは定義済みだが、弾のCreateHitDataはMagicTypeだけを転記し、HitDataにイベント種別の保持がない。
+- 現行はBulletHitSenderController → HitReceiverController → UnityEvent<HitData>。IHitableは既存だが送信側は具象HitReceiverControllerを取得する。EnemyBaseとの共通継承は不要。
+- 提案：既存の命中受付を利用し、イベント種別を命中データへ運び、対象側のIEventMagicReceiver.TryReceiveEventMagicで受理判定と固有アクションを担当。敵の継承構造を維持し、必要なら独立受信コンポーネントで構成する。未実装。
+- 子Colliderからの受信先解決、同一命中の重複実行防止、NONE・非対応種別・既に遷移済みの扱いを実装時に確認する。既存SendExitがOnStayを呼ぶ点も発見したが未変更。
+- ゲームコード・Scene・Prefabは変更なし。Unity実行・コンパイル・Play Mode確認は未実施。Git status/fetch/追跡先比較を実施し、作業開始時の未コミット変更なし、追跡先とのコミット差分・確定ファイル差分なし。管理資料のみ追記。
+## イベント魔法受信インターフェース追加（2026-11-01）
+- ユーザー承認によりScripts/Magic/IEventMagicReceiver.csと.metaのみ追加。TryReceiveEventMagic(EVENT_MAGIC_TYPE eventMagicType)のbool戻り値は、対応する魔法を受理してアクションを実行したかを表す。
+- 既存HitData・命中経路・敵・オブジェクトへの実装や接続は変更していない。既存enumとの型名・公開メソッド命名を静的確認。Unityコンパイル・Play Mode検証は未実施。
