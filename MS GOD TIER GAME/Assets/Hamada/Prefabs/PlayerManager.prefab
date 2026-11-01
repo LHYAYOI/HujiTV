@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4096183140209637247}
   - component: {fileID: 1715315696896216547}
   m_Layer: 0
-  m_Name: Player
+  m_Name: PlayerManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -49,7 +49,7 @@ MonoBehaviour:
   m_magicDatabase: {fileID: 11400000, guid: 79b1f032ed3a57542a6da4c73d1f4111, type: 2}
   m_targetSelector: {fileID: 1715315696896216547}
   m_bookNetworkServer: {fileID: 0}
-  magicData: {fileID: 11400000, guid: 17ef150f604effd4e91c6dfb9950d6c0, type: 2}
+  magicData: {fileID: 11400000, guid: fd84468c9ad10ad489611b6288bb8c24, type: 2}
 --- !u!114 &1715315696896216547
 MonoBehaviour:
   m_ObjectHideFlags: 0
