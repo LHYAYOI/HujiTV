@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class ConductorGhostManager : EnemyBase
+public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
 {
     [Header("ŽwŠöŽÒ‚¨‰»‚¯")]
     [SerializeField] private ConductorGhost m_conductorGhost;
@@ -70,9 +70,26 @@ public class ConductorGhostManager : EnemyBase
 
                 hitData.SetHitObject(this.gameObject);
 
+                MagicData magicData = collision.gameObject.GetComponent<MagicBulletController>()?.GetMagicData();
+
+                hitData.SetMagicData(magicData);
+
                 hitReceiver.OnHit(hitData);
+
+                if (magicData != null)
+                {
+                    TryReceiveEventMagic(magicData.EventMagicType);
+                }
             }
 
+            
+        }
+    }
+
+    public bool TryReceiveEventMagic(EVENT_MAGIC_TYPE eventMagicType)
+    {
+        if (eventMagicType == EVENT_MAGIC_TYPE.CLOSE)
+        {
             m_currentHealth--;
 
             if (m_currentHealth == 1)
@@ -89,5 +106,7 @@ public class ConductorGhostManager : EnemyBase
                 StartCoroutine(m_conductorGhost.LockLowerChest());
             }
         }
+        
+        return false;
     }
 }
