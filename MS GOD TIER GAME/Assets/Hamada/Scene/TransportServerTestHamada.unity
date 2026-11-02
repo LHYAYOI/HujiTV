@@ -1092,20 +1092,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6427638907401506824, guid: ce184db34ac8da94ca85e34522eee837, type: 3}
-      propertyPath: m_anchor
-      value: 
-      objectReference: {fileID: 1922008277}
-    - target: {fileID: 6427638907401506824, guid: ce184db34ac8da94ca85e34522eee837, type: 3}
       propertyPath: m_resetLookPoint
       value: 
       objectReference: {fileID: 58678878}
     - target: {fileID: 6667048728300016894, guid: ce184db34ac8da94ca85e34522eee837, type: 3}
       propertyPath: m_Name
       value: BattleCamera
-      objectReference: {fileID: 0}
-    - target: {fileID: 6667048728300016894, guid: ce184db34ac8da94ca85e34522eee837, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1248,7 +1240,7 @@ Transform:
   m_GameObject: {fileID: 1381631492}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: 0.3}
+  m_LocalPosition: {x: 0, y: -0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1274,11 +1266,6 @@ MonoBehaviour:
 Transform:
   m_CorrespondingSourceObject: {fileID: 8101182528761447535, guid: 4487dfc90121ce04c8da989321422093, type: 3}
   m_PrefabInstance: {fileID: 1358071902}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1922008277 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8101752488860778592, guid: ce184db34ac8da94ca85e34522eee837, type: 3}
-  m_PrefabInstance: {fileID: 1159934683}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1937184587
 GameObject:

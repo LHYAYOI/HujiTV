@@ -62,7 +62,7 @@ public class PlayerController : MonoBehaviour
 
         CameraManager.Instance.SetLookTarget(1);
 
-        //CameraManager.Instance.ShakeCamera(.5f, 0.5f);
+        CameraManager.Instance.ShakeCamera(.5f, 0.5f);
 
         m_bulletManager.FireBullet(magicData, direction, target);
     }

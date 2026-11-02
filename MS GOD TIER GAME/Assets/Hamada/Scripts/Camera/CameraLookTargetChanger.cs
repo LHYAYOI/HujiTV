@@ -32,6 +32,8 @@ public class CameraLookTargetChanger : MonoBehaviour
     {
         m_cinemachineCamera.LookAt = null;
 
+        m_currentLookTarget = null;
+
         m_cinemachineCamera.transform.rotation = m_resetLookPoint.transform.rotation;
     }
 
@@ -80,16 +82,9 @@ public class CameraLookTargetChanger : MonoBehaviour
         {
             //トランジション前のアンカーの初期位置設定
             {
-                Transform previousLookTarget = m_cinemachineCamera.LookAt;
+                Transform cam = m_cinemachineCamera.transform;
 
-                if (previousLookTarget != null)
-                {
-                    m_anchor.transform.position = previousLookTarget.transform.position;
-                }
-                else
-                {
-                    m_anchor.transform.position = m_anchorDefaultPosition;
-                }
+                m_anchor.transform.position = cam.position + cam.forward * 10f;
 
                 m_cinemachineCamera.LookAt = m_anchor.transform;
             }
