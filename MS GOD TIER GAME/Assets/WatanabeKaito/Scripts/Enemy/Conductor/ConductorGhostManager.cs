@@ -6,6 +6,8 @@ public class ConductorGhostManager : EnemyBase
     [Header("指揮者お化け")]
     [SerializeField] private ConductorGhost m_conductorGhost;
 
+    bool m_battleStartFlag = false; // 戦闘開始フラグ
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -39,6 +41,8 @@ public class ConductorGhostManager : EnemyBase
     public void StartBattle()
     {
         m_conductorGhost.StartBattle();
+
+        m_battleStartFlag = true;
     }
 
     public void EndBattle()
@@ -53,9 +57,9 @@ public class ConductorGhostManager : EnemyBase
     {
         if (collision.gameObject.CompareTag("MagicBullet"))
         {
-            if(m_conductorGhost.GetIsVisibleFlag())
+            if(m_conductorGhost.GetIsVisibleFlag() || !m_battleStartFlag)
             {
-                return;　// 指揮者お化けが出ている状態では閉めれない
+                return;　// 指揮者お化けが出ている状態、バトル開始前は閉めれない
             }
 
             m_currentHealth--;
