@@ -7,13 +7,12 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: EM_hamon01
+  m_Name: EM_orbs01
   m_Shader: {fileID: 4800000, guid: 11686ab80f146a543841cdeca8e0bbef, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _CUSTOMDATA_ON
-  - _CUTOUT_ON
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -46,11 +45,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 2fe62c9f248ada54cba50fbc6122c2a9, type: 3}
+        m_Texture: {fileID: 2800000, guid: 43a60e68678fc014691abacaf3398641, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MaskTex:
-        m_Texture: {fileID: 2800000, guid: 2fe62c9f248ada54cba50fbc6122c2a9, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -96,7 +95,7 @@ Material:
     - _SrcBlend: 5
     - _UVSec: 0
     - _UseCustomData: 1
-    - _UseCutout: 1
+    - _UseCutout: 0
     - _UseMaskCutout: 0
     - _UseNoiseTex: 0
     - _ZWrite: 1
