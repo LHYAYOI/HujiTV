@@ -208,23 +208,41 @@ public class CameraManager : MonoBehaviour
         zoom.ChangeFOV(duration, FOV);
     }
 
-    public void SetLookTarget(GameObject lookTarget, float duration)
+    public void RegisterLookTarget(GameObject lookTarget)
     {
-        CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
+        CinemachineCamera battleCamera = GetCameraByName("BattleCamera").GetCamera();
 
-        if (currentVirtualCamera == null)
+        if (battleCamera == null)
         {
             return;
         }
-
-        CameraLookTargetChanger lookTargetChanger = currentVirtualCamera.GetComponent<CameraLookTargetChanger>();
+        CameraLookTargetChanger lookTargetChanger = battleCamera.GetComponent<CameraLookTargetChanger>();
 
         if (lookTargetChanger == null) 
         {
             return;
         }
 
-        lookTargetChanger.SetLookTarget(lookTarget, duration);
+        lookTargetChanger.RegisterLookTarget(lookTarget);
+    }
+
+    public void SetLookTarget(float duration)
+    {
+        CinemachineCamera battleCamera = GetCameraByName("BattleCamera").GetCamera();
+
+        if (battleCamera == null)
+        {
+            return;
+        }
+
+        CameraLookTargetChanger lookTargetChanger = battleCamera.GetComponent<CameraLookTargetChanger>();
+
+        if (lookTargetChanger == null) 
+        {
+            return;
+        }
+
+        lookTargetChanger.SetLookTarget(duration);
     }
 
     public void DollyCamera(float duration, float zoomValue, float pullBackAmount) 

@@ -14,6 +14,8 @@ public class CameraLookTargetChanger : MonoBehaviour
 
     GameObject m_currentLookTarget;
 
+    GameObject m_lookTarget;
+
     Coroutine m_transitionCoroutine;
 
     private void Awake()
@@ -24,14 +26,19 @@ public class CameraLookTargetChanger : MonoBehaviour
         }
     }
 
-    public void SetLookTarget(GameObject target, float duration = 0.5f)
+    public void RegisterLookTarget(GameObject target) 
+    {
+        m_lookTarget = target;
+    }
+
+    public void SetLookTarget(float duration = 0.5f)
     {
         if (m_cinemachineCamera == null)
         {
             return;
         }
 
-        if (m_currentLookTarget == target) 
+        if (m_currentLookTarget == m_lookTarget) 
         {
             return;
         }
@@ -46,16 +53,16 @@ public class CameraLookTargetChanger : MonoBehaviour
         //アンカーない場合
         if (m_anchor == null)
         {
-            m_cinemachineCamera.LookAt = (target != null) ? target.transform : null;
-            m_currentLookTarget = target;
+            m_cinemachineCamera.LookAt = (m_lookTarget != null) ? m_lookTarget.transform : null;
+            m_currentLookTarget = m_lookTarget;
             return;
         }
 
         //ターゲット解除
-        if (target == null)
+        if (m_lookTarget == null)
         {
             m_cinemachineCamera.LookAt = null;
-            m_currentLookTarget = target;
+            m_currentLookTarget = m_lookTarget;
             return;
         }
 
@@ -79,15 +86,15 @@ public class CameraLookTargetChanger : MonoBehaviour
             }
         }
 
-        m_currentLookTarget = target;
+        m_currentLookTarget = m_lookTarget;
 
         if (duration <= 0) 
         {
-            m_anchor.transform.position = target.transform.position;
+            m_anchor.transform.position = m_lookTarget.transform.position;
             return;
         }
 
-        m_transitionCoroutine = StartCoroutine(TargetTransitionRoutine(duration, target));
+        m_transitionCoroutine = StartCoroutine(TargetTransitionRoutine(duration, m_lookTarget));
     }
 
     private IEnumerator TargetTransitionRoutine(float duration, GameObject target)
