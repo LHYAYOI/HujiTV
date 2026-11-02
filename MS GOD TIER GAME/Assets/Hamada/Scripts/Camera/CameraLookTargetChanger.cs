@@ -8,8 +8,6 @@ public class CameraLookTargetChanger : MonoBehaviour
 {
     [SerializeField] private CinemachineCamera m_cinemachineCamera;
 
-    [SerializeField] private float m_defaultTargetTransitionTime = .5f;
-
     [SerializeField] private GameObject m_anchor;
 
     Vector3 m_anchorDefaultPosition;
@@ -24,11 +22,6 @@ public class CameraLookTargetChanger : MonoBehaviour
         {
             m_anchorDefaultPosition = m_anchor.transform.position;
         }
-    }
-
-    public void SetLookTarget(GameObject target) 
-    {
-        SetLookTarget(target, m_defaultTargetTransitionTime);
     }
 
     public void SetLookTarget(GameObject target, float duration = 0.5f)

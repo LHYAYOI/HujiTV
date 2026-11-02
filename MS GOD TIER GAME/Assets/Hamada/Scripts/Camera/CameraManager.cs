@@ -38,7 +38,7 @@ public class CameraManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.P)) 
         {
-            SwitchCamera("FPSCamera");
+            SwitchCamera("BattleCamera");
         }
 
         if (Input.GetKeyDown(KeyCode.L))
