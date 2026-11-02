@@ -121,7 +121,9 @@ Shader "Book/Page Flip Composite"
             #pragma vertex Vert
             #pragma fragment Frag
             #pragma target 3.5
+
             #include "UnityCG.cginc"
+
             #include "BookFlipCore.cginc"
             #include "BookFlipLook.cginc"
             #include "BookFlipEffects.cginc"
