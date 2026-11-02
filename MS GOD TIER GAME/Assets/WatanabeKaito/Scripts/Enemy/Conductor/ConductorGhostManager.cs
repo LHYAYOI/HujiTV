@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class ConductorGhostManager : EnemyBase
+public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
 {
     [Header("指揮者お化け")]
     [SerializeField] private ConductorGhost m_conductorGhost;
+
+    private bool m_battleStartFlag = false; // 戦闘開始フラグ
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -39,6 +41,8 @@ public class ConductorGhostManager : EnemyBase
     public void StartBattle()
     {
         m_conductorGhost.StartBattle();
+
+        m_battleStartFlag = true;
     }
 
     public void EndBattle()
@@ -53,11 +57,39 @@ public class ConductorGhostManager : EnemyBase
     {
         if (collision.gameObject.CompareTag("MagicBullet"))
         {
-            if(m_conductorGhost.GetIsVisibleFlag())
+            if(m_conductorGhost.GetIsVisibleFlag() || !m_battleStartFlag)
             {
-                return;　// 指揮者お化けが出ている状態では閉めれない
+                return;
             }
 
+            HitReceiverController hitReceiver = collision.gameObject.GetComponent<HitReceiverController>();
+
+            if (hitReceiver != null)
+            {
+                HitData hitData = new HitData();
+
+                hitData.SetHitObject(this.gameObject);
+
+                MagicData magicData = collision.gameObject.GetComponent<MagicBulletController>()?.GetMagicData();
+
+                hitData.SetMagicData(magicData);
+
+                hitReceiver.OnHit(hitData);
+
+                if (magicData != null)
+                {
+                    TryReceiveEventMagic(magicData.EventMagicType);
+                }
+            }
+
+            
+        }
+    }
+
+    public bool TryReceiveEventMagic(EVENT_MAGIC_TYPE eventMagicType)
+    {
+        if (eventMagicType == EVENT_MAGIC_TYPE.CLOSE)
+        {
             m_currentHealth--;
 
             if (m_currentHealth == 1)
@@ -74,5 +106,7 @@ public class ConductorGhostManager : EnemyBase
                 StartCoroutine(m_conductorGhost.LockLowerChest());
             }
         }
+        
+        return false;
     }
 }

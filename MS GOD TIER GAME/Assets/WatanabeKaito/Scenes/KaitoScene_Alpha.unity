@@ -3690,6 +3690,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: -0.052
       objectReference: {fileID: 0}
+    - target: {fileID: 4892619252162404982, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5269512252250483001, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
       propertyPath: Lens.NearClipPlane
       value: 0.1
@@ -4864,12 +4868,12 @@ PrefabInstance:
       objectReference: {fileID: 540407830}
     - target: {fileID: 6811702407854686011, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_startOffset
-      value: 20
+      value: 63
       objectReference: {fileID: 0}
     - target: {fileID: 6811702407854686011, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_startSplineController
       value: 
-      objectReference: {fileID: 1183142328}
+      objectReference: {fileID: 2019704239}
     - target: {fileID: 8778732444337950149, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_Name
       value: Sp_BedRoom
@@ -6616,17 +6620,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7782454354869500046, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
   m_PrefabInstance: {fileID: 1476320023}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1183142328 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 111196645449119932, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
-  m_PrefabInstance: {fileID: 1476320023}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9cb05fac2f1bb648accdb5d6724626e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SplineController2
 --- !u!4 &1193560304 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0e4b469007e3b784da93dc4aca2728a5, type: 3}
@@ -10804,7 +10797,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1867198336154488999, guid: 266f0216aebc6ce4b97cc07a72b76fde, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.8893385
+      value: 6.045006
       objectReference: {fileID: 0}
     - target: {fileID: 1867198336154488999, guid: 266f0216aebc6ce4b97cc07a72b76fde, type: 3}
       propertyPath: m_LocalPosition.y
@@ -10812,7 +10805,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1867198336154488999, guid: 266f0216aebc6ce4b97cc07a72b76fde, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 54.228897
+      value: 58.3901
       objectReference: {fileID: 0}
     - target: {fileID: 1867198336154488999, guid: 266f0216aebc6ce4b97cc07a72b76fde, type: 3}
       propertyPath: m_LocalRotation.w
@@ -12225,7 +12218,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4ddaf000ecc2ff46bc42fb9b3058124, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GimmickSplineBattle
-  m_gimmickPoint: 64.7
+  m_gimmickPoint: 69.4
   m_battleData: {fileID: 1921922555}
   m_onFinishBattle:
     m_PersistentCalls:
