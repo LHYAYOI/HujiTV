@@ -238,7 +238,7 @@ public class ConductorGhost : MonoBehaviour
         // ã‚Ìˆø‚«o‚µ‚ð•Â‚ß‚é
         //m_upperChestDrawer.CloseDrawer();
 
-        StartCoroutine(ShrinkCoroutine());
+        //StartCoroutine(ShrinkCoroutine());
 
         //yield return new WaitUntil(() => m_upperChestDrawer.IsMoveCoroutineFinished());
 
