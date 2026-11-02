@@ -1,5 +1,37 @@
 # Project Status
 
+## フチ撤去後も続く表示揺れの履歴調査（2026-11-02）
+- ユーザーから切り戻し後も揺れが続くとの報告。読み取り専用のGit履歴・差分調査を実施。YasudaBookViewController.csとBookScene.unityにはHEADとの差分なし。フチ追加・撮影ポストプロセス上書きは撤去済みで、UnityのRuntime DLLの更新日時も切り戻し後だった。
+- 有力な原因候補：058b5b1（2026-10-27 21:00、Multi Resolution対応 ベース1/2 TAA）でPC_RPAssetのm_RenderScaleが1→0.5、m_UpscalingFilterが0→4へ変更。ローカルURPソースで4=STPを確認。10/29のDevelop統合履歴より前の共有描画変更で、フチ導入より前から現構成に含まれる。
+- 現在のEditor品質はPC（index1）、GraphicsSettingsとPC品質設定は該当PC_RPAssetを使用。本の撮影カメラは既定Renderer・ポストプロセス有効。連続撮影は20b538dd（10/21）からの処理。URPローカルソースはSTP時に投影へjitterを適用し、STP/TAAがpostProcessEnabledに依存することを確認。
+- 前回の撮影ポストプロセス無効化はSTP停止と半解像度設定の残留を同時に起こすため、画素変動停止と可読性低下の両方を説明できる。前回の「ポストプロセスが原因」という説明は具体性が不足していた。共有設定の当該コミットを隔離したA/B実行は未実施なので、発症コミットの確定とは区別する。
+- 今回は調査のみ。ゲームコード・Scene・共有URP設定は未変更。次に検証するなら本撮影だけ等倍・時間方向の拡大なしの描画経路を用意し、同条件で可読性と揺れを比較する。ゲーム全体の描画設定を無断で変更しない。
+
+## フチ導入前の描画処理へ復帰（2026-11-02）
+- ユーザーからポストプロセス無効化後の画質低下・文字の読みにくさ・フチが本に収まらないとの報告。ユーザーが許可した切り戻しを選択し、このチャットで追加したフチ表示と撮影カメラのポストプロセス上書きを撤去。
+- YasudaBookViewControllerの通常・ライブ・取消・一覧更新の全撮影経路を元のBookPageView.ShowPage直接呼出しへ復帰。BookGameControllerのRegisterPageFrames呼出し2箇所を除去。撮影解像度・画像Importer・Scene・Prefab・hatake原本・共有設定には変更なし。
+- BookPageFrameSettings.cs、Resources/BookPageFrameSettings.asset、Editor/BookFrameValidation.csと各.metaは、作業フォルダーframe-rollback/archivedへ退避。フチ画像などユーザーが追加した画像素材は保持。修正前の担当側2スクリプトもframe-rollbackへバックアップ。
+- Runtime別出力コンパイル成功（既存警告3件）。切り戻し後のPlay Mode・実機画質は未確認。過去の画素一致検証は撮影の静止性のみを確認したもので、可読性・画質維持を保証していなかった。フチを再実装する場合は元の画質を基準にし、画像が見開き用か／紙の有効表示領域とUVの対応を先に確認する。
+
+## 開いたページの表示揺れ調査・対処（2026-11-02）
+- ユーザー報告：本を開いた後も操作せずに画像がガクガクする。既存BookSceneのPlay ModeでUI座標を採取し、本文RectTransformの移動は検出しなかった。
+- 撮影元RenderTexture（600x600）のGPU読み戻しを比較。撮影カメラのURPポストプロセス有効時は静止ページでも毎回約4.1〜5.0万画素が変化し、RGBの差が8を超える画素も約2800〜5800あった。元・ライブ撮影CameraのrenderPostProcessingを無効化すると5回の採取で差分0。比較ログは作業フォルダーframe-validation/capture-comparison.txtへ保存。
+- YasudaBookViewController.Awakeで撮影カメラのrenderPostProcessingをfalseに設定。ライブ撮影リグ複製より前に適用し、両方へ反映。Sceneアセット・hatakeコード・共有URP設定・フチの表示処理は未変更。本の合成シェーダーによる紙質・めくり・発光は維持。ポストプロセス内の個別の原因エフェクトまでは未特定。
+- Editor検証メニューVerify Page Frame Stabilityを追加。Play Modeで見開き1を開き、撮影カメラの設定・UI座標・静止テクスチャの5回の一致を検証する。診断用の自動実行と一時設定切替は最終版から除去。
+- Runtime別出力コンパイル成功（既存警告3件）。修正後にUnityのToolsメニューからVerify Page Frame Stabilityを実行し、FRAME STABILITY PASSを確認。フチ付き見開き1で5回すべて撮影画素差分0、通常・ライブ両Cameraのポストプロセス無効とUI座標の安定を検証。Play Modeを終了し、Scene保存はしていない。Git操作は行わず、既存の未コミット作業を保持。Android・別PCでの再現確認は未実施。
+
+## ページ種別ごとの下地込みフチ（2026-11-02）
+- ユーザー指示により暗転対応を後回しにし、本文より後ろへ下地込みフチを描画する処理を追加。担当側YasudaBookViewControllerとBookGameControllerのみ接続変更。hatake原本・Scene・Prefab・シェーダーは未変更。
+- BookPageFrameSettingsを追加し、Resources/BookPageFrameSettings.assetへ魔法用Jumon_Huti、攻略用Obake_HutiをTexture2Dとして設定。横長の見開き画像という前提で、左ページはUVの左半分、右ページは右半分を表示。画像交換は共通設定assetで行える。View Controller側の設定参照で上書き可能。
+- 判定元はPageData.PageType。見開きの並びに合わせて左右の種類を保持し、同じBookPageDataを異なる種類で共有しても混同しない。追加・入替候補は撮影完了時に種類一覧も確定する。固定ページ・表紙内側・OBSTACLEには専用フチを付けない。
+- 撮影用BookPageView直下の最初の子へRawImageを配置し、本文の後ろ／親の紙色より前へ描画。入力判定を無効化し、ページ内容の画像インデックスへ混入させない。通常・元ページのライブ撮影・めくり先・めくり取消・一覧更新の撮影経路へ適用。
+- Unity 6000.3.23f1同梱Roslynと既存Bee応答ファイルによるRuntime別出力コンパイル成功。既存警告3件。Play Mode、見開き画像の左右分割の目視、ページめくり・追加入替の実操作は未確認。暗転からフチを除外する処理は未実装。
+
+## フチ画像の表示設計相談（2026-11-02）
+- コード静的調査のみ。BookPageViewのUIを撮影し、YasudaBookViewControllerが現見開き・旧見開きのRenderTextureを管理する構成を確認。BookFlipComposite.shaderは合成後にBookApplyDimを適用するため、撮影元でフチのMaterialを分けるだけではこの暗転を除外できない。
+- 提案：ページ種別ごとの共通フチ設定を用意し、撮影元で本文・ゲーム状態用暗転・フチの順に合成する。ゲーム状態の暗転を撮影前へ移せる場合は既存めくり経路を再利用可能。合成後暗転を維持する場合はフチ専用テクスチャ／マスクと同じめくりUVでの処理が必要。紙の折り影・遮蔽とゲーム状態の暗転は仕様を分ける。
+- ゲームコード・Scene・Prefab・画像設定は未変更。Unity実行・表示検証は未実施。既存の未コミット変更を保持。Git status/fetch/追跡先比較を実施し、追跡先との確定差分なし。
+
 ## 現在の状態
 新しい本モデルへの統合完了。
 ルーン入力・ページめくり・魔法通信は動作確認済み。
@@ -604,3 +636,17 @@ $12026-10-29：お邪魔4枠の初期実装。左右擦り・スクラッチ、�
 ## イベント魔法受信インターフェース追加（2026-11-01）
 - ユーザー承認によりScripts/Magic/IEventMagicReceiver.csと.metaのみ追加。TryReceiveEventMagic(EVENT_MAGIC_TYPE eventMagicType)のbool戻り値は、対応する魔法を受理してアクションを実行したかを表す。
 - 既存HitData・命中経路・敵・オブジェクトへの実装や接続は変更していない。既存enumとの型名・公開メソッド命名を静的確認。Unityコンパイル・Play Mode検証は未実施。
+## Server自動探索の段階追加（2026-11-02）
+- ユーザー指示によりGit操作は一切実施しない。コード・Scene・GUID参照を静的調査後、担当フォルダのみ変更。Scene／Prefab／共有設定／他メンバーコードは未変更。
+- 現行はClientのScene跨ぎ維持・再接続が実装済み。PageChangedとPlayer別BookInputState／MagicSystemという過去会話の構成とは異なる。魔法はCAST_MAGICのSkillId＋方向でイベント配送。Vector2は送受信済みだがServerの保存先は全Player共通。
+- ServerDiscoveryProtocol／Client／Responderを追加。UDP7776で4秒探索し、BookConnectionUIが発見IPを補完。手入力編集中は保持。Manual IPと既存Connect操作は維持。Serverは7777待受成功後に応答開始。Client本体の接続・再試行処理は変更していない。
+- Unity同版Roslynと既存Bee参照設定で別出力コンパイル成功。既存警告3件。Unity Play Mode・実UDP探索・別PC／Android／USBテザリングは未確認。詳細な調査結果・設計・確認手順はSERVER_DISCOVERY.md。
+- 次段階：登録承認／拒否応答を導入して重複Slot拒否時の再試行を制御。その後に再接続状態同期・Player別データを検討。USB専用Transportは未追加。
+## Server待機画面・開始通知・Scene跨ぎ維持（2026-11-02）
+- ユーザー確定：1台でも開始可能。ゲーム中の新規接続・再接続もBookSceneへ進める。正式MainゲームSceneは直接編集せず、担当フォルダへコピーして使用する。
+- BookServerLobbyを新規作成し、Main/Main_Game_SceneからBookServerGameを新GUIDで完全コピー。コピー元・元Prefab・共有設定は未変更。コピー元／先のSHA256は0863D87D4E24E353E765ECFCC536AEC9BCCFF07B19256CD4512FFA2EA721E7E7。Git操作はユーザー指示により一切していない。
+- BookNetworkServerを永続化し、後続Sceneの既存Server参照は通信本体への転送窓口として維持。BookServerGameFlowが1台以上の登録とSceneロード完了を確認して開始する。BookServerLobbyUIはPlayer1／2登録状態と開始ボタンを実行時生成。
+- REGISTRATION_ACCEPTED=7、REGISTRATION_REJECTED=8、GAME_STARTED=9を追加（旧0〜6維持）。Clientは登録承認後にCONNECTED、拒否時は自動再試行停止。接続画面は開始通知まで待機し、通知受信後BookSceneへ遷移。開始後の登録にも開始通知を送る。ゲーム前のCAST_MAGICはServer側で抑止。
+- Runtime／Editorの別出力コンパイル成功、既存Runtime警告3件。Unityバッチは検証コード開始前に終了コード1で停止し原因未特定。Play Mode・UI目視・Android実機は未確認。ServerLobbyValidationの専用統合検証と既存NetworkRecoveryValidationの登録応答対応を追加。
+- 起動方法・PC／タブレット別Build Profile設定・確認手順・検証の未確認範囲はSERVER_LOBBY.md。共有Build Settingsは未変更。PC側ではBookServerLobbyとBookServerGameをScene Listへ追加してビルドする。
+- ゲーム終了／ロビー復帰／セッションリセットは未実装。正式Sceneへの統合と実機確認が残る。

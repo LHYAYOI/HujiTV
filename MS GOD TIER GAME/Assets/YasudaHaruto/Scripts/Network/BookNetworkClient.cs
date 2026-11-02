@@ -32,6 +32,11 @@ public class BookNetworkClient : MonoBehaviour
     private float m_nextReconnectTime;
     private float m_reconnectDelay = 1f;
 
+    private bool m_transportConnected;
+    public bool HasGameStarted { get; private set; }
+    public string LastConnectionError { get; private set; }
+    public event Action GameStarted;
+
     public bool IsReconnecting => m_shouldReconnect && ConnectionState != BOOK_CONNECTION_STATE.CONNECTED;
 
     public BOOK_CONNECTION_STATE ConnectionState { get; private set; } = BOOK_CONNECTION_STATE.DISCONNECTED;
@@ -134,6 +139,7 @@ public class BookNetworkClient : MonoBehaviour
         }
 
         InitializeDriver();
+        LastConnectionError = null;
         m_playerSlot = playerSlot;
         m_endpoint = endpoint;
         m_shouldReconnect = true;
@@ -143,6 +149,8 @@ public class BookNetworkClient : MonoBehaviour
 
     private void BeginConnection()
     {
+        m_transportConnected = false;
+        HasGameStarted = false;
         m_connection = m_driver.Connect(m_endpoint);
         m_connectionDeadline = Time.unscaledTime + Mathf.Max(0.1f, m_connectionTimeoutSeconds);
         if (!m_connection.IsCreated)
@@ -157,6 +165,8 @@ public class BookNetworkClient : MonoBehaviour
     {
         // Explicit disconnect also cancels all future retries.
         m_shouldReconnect = false;
+        HasGameStarted = false;
+        m_transportConnected = false;
         CloseConnection();
         SetConnectionState(BOOK_CONNECTION_STATE.DISCONNECTED);
     }
@@ -173,13 +183,15 @@ public class BookNetworkClient : MonoBehaviour
 
     private void OnConnected()
     {
-        m_reconnectDelay = 1f;
-        SetConnectionState(BOOK_CONNECTION_STATE.CONNECTED);
+        m_transportConnected = true;
+        m_connectionDeadline = Time.unscaledTime + Mathf.Max(0.1f, m_connectionTimeoutSeconds);
         SendRegisterController();
     }
 
     private void OnDisconnected()
     {
+        m_transportConnected = false;
+        HasGameStarted = false;
         m_connection = default;
         m_nextReconnectTime = Time.unscaledTime + m_reconnectDelay;
         m_reconnectDelay = Mathf.Min(8f, m_reconnectDelay * 2f);
@@ -203,7 +215,7 @@ public class BookNetworkClient : MonoBehaviour
 
     private void SendRegisterController()
     {
-        if (!CanSend())
+        if (!m_driver.IsCreated || !m_connection.IsCreated || !m_transportConnected)
         {
             return;
         }
@@ -356,6 +368,21 @@ public class BookNetworkClient : MonoBehaviour
 
         switch (messageType)
         {
+            case BOOK_MESSAGE_TYPE.REGISTRATION_ACCEPTED:
+                if (reader.Length != 1 || !m_transportConnected || ConnectionState != BOOK_CONNECTION_STATE.CONNECTING) break;
+                m_reconnectDelay = 1f;
+                SetConnectionState(BOOK_CONNECTION_STATE.CONNECTED);
+                break;
+            case BOOK_MESSAGE_TYPE.REGISTRATION_REJECTED:
+                if (reader.Length != 1 || !m_transportConnected) break;
+                LastConnectionError = "Player slot is already in use. Select another Player.";
+                Disconnect();
+                break;
+            case BOOK_MESSAGE_TYPE.GAME_STARTED:
+                if (reader.Length != 1 || !CanSend() || HasGameStarted) break;
+                HasGameStarted = true;
+                GameStarted?.Invoke();
+                break;
             case BOOK_MESSAGE_TYPE.TEST_PONG:
                 ReceiveTestPong(reader);
                 break;
@@ -417,6 +444,8 @@ public class BookNetworkClient : MonoBehaviour
         }
 
         m_shouldReconnect = false;
+        HasGameStarted = false;
+        m_transportConnected = false;
         SetConnectionState(BOOK_CONNECTION_STATE.DISCONNECTED);
         s_instance = null;
 
