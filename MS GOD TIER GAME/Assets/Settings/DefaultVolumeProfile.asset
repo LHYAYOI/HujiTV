@@ -598,6 +598,7 @@ MonoBehaviour:
   - {fileID: -1410297666881709256}
   - {fileID: 4046174863986525841}
   - {fileID: -849353310441436724}
+  - {fileID: 6253648505038151302}
 --- !u!114 &853819529557874667
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1089,6 +1090,55 @@ MonoBehaviour:
   intensity:
     m_OverrideState: 1
     m_Value: 0
+--- !u!114 &6253648505038151302
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a55f525ff08016d4784891b3f567f2d7, type: 3}
+  m_Name: DistanceFogVolume
+  m_EditorClassIdentifier: Assembly-CSharp::LightShaftLab.DistanceFogVolume
+  active: 1
+  m_enableFlag:
+    m_OverrideState: 1
+    m_Value: 0
+  m_linkToLightShaftFlag:
+    m_OverrideState: 1
+    m_Value: 1
+  m_startDistance:
+    m_OverrideState: 1
+    m_Value: 8
+  m_overlap:
+    m_OverrideState: 1
+    m_Value: 2
+  m_density:
+    m_OverrideState: 1
+    m_Value: 0.06
+  m_maxOpacity:
+    m_OverrideState: 1
+    m_Value: 1
+  m_nearColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.06, g: 0.07, b: 0.11, a: 1}
+  m_farColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.01, g: 0.012, b: 0.02, a: 1}
+  m_colorDistance:
+    m_OverrideState: 1
+    m_Value: 25
+  m_baseHeight:
+    m_OverrideState: 1
+    m_Value: 0
+  m_heightFalloff:
+    m_OverrideState: 1
+    m_Value: 0
+  m_applyToSkyFlag:
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &6940869943325143175
 MonoBehaviour:
   m_ObjectHideFlags: 3

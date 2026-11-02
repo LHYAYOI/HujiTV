@@ -1,5 +1,21 @@
 # Project Status
 
+## Android本表示の負荷調査・実装保留（2026-11-02）
+- ユーザー指示により今回は調査と解決案のみ。コード・Scene・Material・共有設定は変更していない。実機の本画面はユーザーが開き、ADBで読み取り計測を行った。
+- Mi A3/Adreno610/OpenGLESで通常ページを表示した最新60フレームの平均1455.93ms（0.687FPS、最小766.22ms、最大1800.06ms）。同時期のUnityMainは0〜2%、UnityGfxDeviceWは0〜1%で、CPU計算過多よりGPU/描画ドライバー側の完了待ちを強く示唆。GPU個別パスの時間は未取得で、本合成/Bloom/撮影の寄与割合やドライバー固有問題は未確定。
+- 撮影A/Bは現状800×450だが、本合成の出力高さ1000と毎フレーム処理は残る。URP Render Scaleを下げても自前合成RTの寸法は連動しない。紙のにじみ6追加サンプル、手続きノイズによる凹凸等、Bloom6段（最大11 Blit）、通常時にも継続する撮影が有力候補。燃焼粒子や暗転ぼかしを通常時にも常時実行と誤認しない。
+- PSS約211MiB、SwapPSS6KB。低メモリ通知はあるが強制終了/GCが主因との証拠なし。GPU稼働率ノードはアクセス拒否、温度HALは未準備で温度要因は未判定。
+- 提案：同条件で単純合成/Bloom停止/撮影停止/合成解像度だけの変更を個別比較。その結果に応じ、静的な紙質の事前生成・再利用、表示変更時だけ更新、紙質のテクスチャ化、通常と重い演出のシェーダー分離、Bloom削減を優先。文字の撮影解像度を一律に下げる案は後回し。まだ未実装。
+- 詳細・採取データは作業用フォルダーのandroid-book-performance-investigation.md、android-book-latency.txt、android-book-cpu.txt、android-book-screen.png。Git確認/fetch/差分は既存の親パス解決エラーで失敗。履歴変更は行っていない。
+
+## Android本表示の暫定軽量化（2026-11-02）
+- 切り戻し済み：ユーザーが別の手法で対応中のため、追加したBookAndroidBuildQuality.csと.metaを撤去。Androidビルド時の軽量設定上書きを停止した。既存のシェーダーコンパイル対策と他の変更は維持。以下は撤去前の作業記録。
+- ユーザー報告：ShaderCache再生成後はAndroid実機で本が表示されたが、非常に重く操作できない。静的調査ではBookFlipViewが高さ1000の合成を毎フレーム実施し、Bloom最大11 Blit、暗転ぼかし5 Blit、紙の凹凸・インクにじみ処理を追加していた。GPU/CPUフレーム時間の実測は未実施で、支配的ボトルネックの確定とは区別する。
+- 担当側EditorにBookAndroidBuildQualityを追加。AndroidビルドのAssets/YasudaHaruto配下のSceneコピーだけに適用し、専用ControllerのFlipView出力高さを最大500へ制限、Bloom・暗転ぼかし・PaperBump・InkBleedを無効化する。Materialはビルド用に複製し、元Material・保存済みScene・Prefab・hatake原本・共有設定には変更しない。撮影元の解像度やページめくり・入力・通信は変更していない。
+- Unity同梱Roslynと現行Runtime DLL/Unity参照を使った別出力C#コンパイルは成功。ビルドScene処理の実行・端末FPS・画質・操作性は未確認。次はClean Build後にEditor.logの「Book Android quality:」で適用を確認し、実機で操作と文字の可読性を確認する。切り戻しはこのEditorスクリプトと.metaの撤去後にClean Buildする。
+- 端末ログにAPP_CMD_LOW_MEMORYがあったが、最新終了履歴はUSER REQUESTED/remove task（PSS279MB/RSS369MB）で、OSのメモリ不足強制終了とは確認されていない。
+- Git status/fetch/追跡先差分は既存の親リポジトリパス解決エラーで失敗。既存変更を維持し、Commit/Push/ブランチ操作は行っていない。
+
 ## フチ撤去後も続く表示揺れの履歴調査（2026-11-02）
 - ユーザーから切り戻し後も揺れが続くとの報告。読み取り専用のGit履歴・差分調査を実施。YasudaBookViewController.csとBookScene.unityにはHEADとの差分なし。フチ追加・撮影ポストプロセス上書きは撤去済みで、UnityのRuntime DLLの更新日時も切り戻し後だった。
 - 有力な原因候補：058b5b1（2026-10-27 21:00、Multi Resolution対応 ベース1/2 TAA）でPC_RPAssetのm_RenderScaleが1→0.5、m_UpscalingFilterが0→4へ変更。ローカルURPソースで4=STPを確認。10/29のDevelop統合履歴より前の共有描画変更で、フチ導入より前から現構成に含まれる。
