@@ -210,14 +210,14 @@ public class CameraManager : MonoBehaviour
 
     public void SetLookTarget(GameObject lookTarget, float duration)
     {
-        CinemachineCamera targetCamera = GetCameraByName("BattleCamera").GetCamera();
+        CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
 
-        if (targetCamera == null) 
+        if (currentVirtualCamera == null)
         {
             return;
         }
 
-        CameraLookTargetChanger lookTargetChanger = targetCamera.GetComponent<CameraLookTargetChanger>();
+        CameraLookTargetChanger lookTargetChanger = currentVirtualCamera.GetComponent<CameraLookTargetChanger>();
 
         if (lookTargetChanger == null) 
         {
