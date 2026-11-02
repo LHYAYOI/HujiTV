@@ -98,11 +98,11 @@ public class BulletHitSenderController : MonoBehaviour
     {
         HitData hitData = new HitData();
 
-        MagicData attackData = m_magicBulletController.GetMagicData();
+        MagicData magicData = m_magicBulletController.GetMagicData();
 
         //hitData.SetDamage(attackData.GetDamage);
         hitData.SetHitObject(gameObject);
-        hitData.SetMagicType(attackData.MagicType);
+        hitData.SetMagicData(magicData);
         hitData.SetTag(gameObject.tag);
 
         return hitData;
