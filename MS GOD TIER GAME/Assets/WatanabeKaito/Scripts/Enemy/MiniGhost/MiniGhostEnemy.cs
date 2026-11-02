@@ -331,11 +331,6 @@ public class MiniGhostEnemy : SplineMoveEnemy
     {
         if (collision.gameObject.CompareTag("MagicBullet"))
         {
-            if(!m_timeLimitStarted)
-            {
-                return;
-            }
-
             BeginDying();
         }
     }

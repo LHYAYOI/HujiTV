@@ -4864,12 +4864,12 @@ PrefabInstance:
       objectReference: {fileID: 540407830}
     - target: {fileID: 6811702407854686011, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_startOffset
-      value: 60
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 6811702407854686011, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_startSplineController
       value: 
-      objectReference: {fileID: 2019704239}
+      objectReference: {fileID: 1183142328}
     - target: {fileID: 8778732444337950149, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_Name
       value: Sp_BedRoom
@@ -6616,6 +6616,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7782454354869500046, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
   m_PrefabInstance: {fileID: 1476320023}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1183142328 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 111196645449119932, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+  m_PrefabInstance: {fileID: 1476320023}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9cb05fac2f1bb648accdb5d6724626e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SplineController2
 --- !u!4 &1193560304 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0e4b469007e3b784da93dc4aca2728a5, type: 3}

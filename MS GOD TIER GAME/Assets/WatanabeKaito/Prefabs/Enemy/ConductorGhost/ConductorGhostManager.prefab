@@ -124,7 +124,7 @@ GameObject:
   - component: {fileID: 2139168138064926937}
   m_Layer: 0
   m_Name: ConductorGhost
-  m_TagString: Target
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -251,7 +251,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4563933557310973050}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -260,7 +260,7 @@ Transform:
   - {fileID: 3657512928046305364}
   - {fileID: 6284718150492280836}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!114 &1805963002013783076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -558,10 +558,6 @@ PrefabInstance:
     - target: {fileID: 4035501538683297309, guid: 54d6bca8b4c5a414a96df808e9d0a10e, type: 3}
       propertyPath: m_IsActive
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4035501538683297309, guid: 54d6bca8b4c5a414a96df808e9d0a10e, type: 3}
-      propertyPath: m_TagString
-      value: Target
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
