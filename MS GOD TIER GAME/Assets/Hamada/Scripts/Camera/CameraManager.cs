@@ -41,6 +41,16 @@ public class CameraManager : MonoBehaviour
             SwitchCamera("BattleCamera");
         }
 
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            SwitchCamera("FPSCamera");
+        }
+
+        if (Input.GetKeyDown(KeyCode.I)) 
+        {
+            ResetCameraOrientation();
+        }
+
         if (Input.GetKeyDown(KeyCode.L))
         {
             DollyCamera(1, 40, 1);
@@ -63,7 +73,6 @@ public class CameraManager : MonoBehaviour
                 if (virtualCamera != null) 
                 {
                     virtualCamera.Priority = 0;
-                    virtualCamera.gameObject.SetActive(false);
                 }
 
                 continue;
@@ -80,7 +89,6 @@ public class CameraManager : MonoBehaviour
 
         CinemachineCamera virtualCamera = camera.GetCamera();
 
-        virtualCamera.gameObject.SetActive(true);
         virtualCamera.Priority = 10;
 
         m_currentCamera = camera;
@@ -206,6 +214,25 @@ public class CameraManager : MonoBehaviour
         }
 
         zoom.ChangeFOV(duration, FOV);
+    }
+
+    public void ResetCameraOrientation() 
+    {
+        CinemachineCamera battleCamera = GetCameraByName("BattleCamera").GetCamera();
+
+        if (battleCamera == null)
+        {
+            return;
+        }
+
+        CameraLookTargetChanger lookTargetChanger = battleCamera.GetComponent<CameraLookTargetChanger>();
+
+        if (lookTargetChanger == null)
+        {
+            return;
+        }
+
+       lookTargetChanger.ResetOrientation();
     }
 
     public void RegisterLookTarget(GameObject lookTarget)
