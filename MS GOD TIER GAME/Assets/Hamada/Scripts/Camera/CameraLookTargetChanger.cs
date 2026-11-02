@@ -10,6 +10,8 @@ public class CameraLookTargetChanger : MonoBehaviour
 
     [SerializeField] private GameObject m_anchor;
 
+    [SerializeField] private GameObject m_resetLookPoint;
+
     Vector3 m_anchorDefaultPosition;
 
     GameObject m_currentLookTarget;
@@ -24,6 +26,13 @@ public class CameraLookTargetChanger : MonoBehaviour
         {
             m_anchorDefaultPosition = m_anchor.transform.position;
         }
+    }
+
+    public void ResetOrientation() 
+    {
+        m_cinemachineCamera.LookAt = null;
+
+        m_cinemachineCamera.transform.rotation = m_resetLookPoint.transform.rotation;
     }
 
     public void RegisterLookTarget(GameObject target) 
