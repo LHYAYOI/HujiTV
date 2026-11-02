@@ -2,6 +2,9 @@
 
 public class GimmickSplineSetBattleCamera : GimmickSpline
 {
+    static private GimmickSplineSetBattleCamera m_settingScript;
+
+
     [SerializeField] private GimmickSplineRange m_range;
     
     private bool m_isLookFlag;
@@ -32,6 +35,7 @@ public class GimmickSplineSetBattleCamera : GimmickSpline
         }
 
         m_isLookFlag = true;
+        m_settingScript = this;
 
         CameraManager.Instance.SwitchCamera("BattleCamera");
     }
@@ -46,9 +50,11 @@ public class GimmickSplineSetBattleCamera : GimmickSpline
         m_isLookFlag = false;
 
 
-        
-        CameraManager.Instance.SwitchCamera("FPSCamera");        
-
+        if(m_settingScript == this)
+        {
+            m_settingScript = null;
+            CameraManager.Instance.SwitchCamera("FPSCamera");
+        }
     }
 
 
