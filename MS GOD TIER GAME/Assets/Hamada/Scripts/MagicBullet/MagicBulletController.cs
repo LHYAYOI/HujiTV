@@ -67,8 +67,6 @@ public class MagicBulletController : MonoBehaviour
     {
         Vector3 startPosition = transform.position;
 
-        Vector3 endPosition = target.transform.position;
-
         float deltaTime = 0;
 
         while (deltaTime < duration)
@@ -79,9 +77,7 @@ public class MagicBulletController : MonoBehaviour
 
             rate = Mathf.Clamp01(rate);
 
-            Vector3 position = Vector3.Lerp(startPosition, endPosition, rate);
-
-            transform.position = CalculateBezier(startPosition, m_controlPoint, endPosition, rate);
+            transform.position = CalculateBezier(startPosition, m_controlPoint, target.transform.position, rate);
 
             yield return null;
         }
