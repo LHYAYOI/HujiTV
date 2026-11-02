@@ -27,7 +27,7 @@ public class CartController : MonoBehaviour
     [SerializeField] private float m_distance; // 全体の進んだ距離
 
 
-    [SerializeField]private SplineContainer m_spline;
+    private SplineContainer m_spline;
     
     private float m_splineAnchor = 0.0f; // 進んだ距離 - アンカーポイント
     

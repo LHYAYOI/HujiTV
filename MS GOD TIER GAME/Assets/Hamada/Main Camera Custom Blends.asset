@@ -35,22 +35,11 @@ MonoBehaviour:
         m_PreInfinity: 0
         m_PostInfinity: 0
         m_RotationOrder: 0
-  - From: BattleCamera
-    To: FPSCamera
-    Blend:
-      Style: 1
-      Time: 1
-      CustomCurve:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 0
-        m_PostInfinity: 0
-        m_RotationOrder: 0
   - From: FPSCamera
     To: BattleCamera
     Blend:
       Style: 1
-      Time: 1
+      Time: 3
       CustomCurve:
         serializedVersion: 2
         m_Curve: []
