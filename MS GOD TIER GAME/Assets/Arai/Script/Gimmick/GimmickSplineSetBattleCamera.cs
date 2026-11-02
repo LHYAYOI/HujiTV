@@ -46,7 +46,8 @@ public class GimmickSplineSetBattleCamera : GimmickSpline
         m_isLookFlag = false;
 
 
-        CameraManager.Instance.SwitchCamera("FPSCamera");
+        
+        CameraManager.Instance.SwitchCamera("FPSCamera");        
 
     }
 

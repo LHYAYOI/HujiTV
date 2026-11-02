@@ -14,7 +14,8 @@ public class GimmickSplineSetLookTarget : GimmickSpline
     // ―――――――――――――――――――――――――――――――――――――  
     public void SetLookTarget()
     {
-        CameraManager.Instance.SetLookTarget(m_target,m_duration);
+        CameraManager.Instance.RegisterLookTarget(m_target);
+        CameraManager.Instance.SetLookTarget(m_duration);
     }
 
 
