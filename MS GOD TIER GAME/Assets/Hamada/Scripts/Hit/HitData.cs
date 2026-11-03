@@ -6,7 +6,7 @@ public class HitData
 
     string m_tag = "None";
 
-    MAGIC_TYPE m_magicType = MAGIC_TYPE.FIRE;
+    MagicData m_magicData;
 
     GameObject m_hitObject = null;
 
@@ -20,9 +20,9 @@ public class HitData
         m_tag = tag;
     }
 
-    public void SetMagicType(MAGIC_TYPE magicType)
+    public void SetMagicData(MagicData magicData)
     {
-        m_magicType = magicType;
+        m_magicData = magicData;
     }
 
     public void SetHitObject(GameObject hitObject)
@@ -45,7 +45,7 @@ public class HitData
 
     public string GetTag => m_tag;
 
-    public MAGIC_TYPE GetMagicType => m_magicType;
+    public MagicData GetMagicData => m_magicData;
 
     public GameObject GetHitObject => m_hitObject;
 }

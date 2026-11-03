@@ -18,10 +18,10 @@ public sealed class BookPageView : MonoBehaviour
 
     public void ShowPage(BookPageData pageData)
     {
+        // Page Content が未設定なら、ページ自身に画像を置く（ページは RectMask2D で切り抜かれる）
         if (m_pageContent == null)
         {
-            Debug.LogError("BookPageView : PageContentが未設定です", this);
-            return;
+            m_pageContent = (RectTransform)transform;
         }
 
         ClearImages();

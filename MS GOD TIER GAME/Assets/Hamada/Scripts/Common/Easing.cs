@@ -1,6 +1,6 @@
-//
-//ƒC[ƒWƒ“ƒOŠÖ”ŠÇ—ƒNƒ‰ƒX
-//à_“cƒ‹ƒCƒX
+ï»¿//
+//ã‚¤ãƒ¼ã‚¸ãƒ³ã‚°é–¢æ•°ç®¡ç†ã‚¯ãƒ©ã‚¹
+//æ¿±ç”°ãƒ«ã‚¤ã‚¹
 //
 
 using UnityEngine;
@@ -9,37 +9,43 @@ public static class Easing
 {
     private const float PI = Mathf.PI;
 
-    // ƒC[ƒYƒCƒ“EƒTƒCƒ“
+    // ã‚¤ãƒ¼ã‚ºã‚¤ãƒ³ãƒ»ã‚µã‚¤ãƒ³
     public static float EaseInSine(float t)
     {
         return 1.0f - Mathf.Cos((t * PI) * 0.5f);
     }
 
-    // ƒC[ƒYƒAƒEƒgEƒTƒCƒ“
+    // ã‚¤ãƒ¼ã‚ºã‚¢ã‚¦ãƒˆãƒ»ã‚µã‚¤ãƒ³
     public static float EaseOutSine(float t)
     {
         return Mathf.Sin((t * PI) * 0.5f);
     }
 
-    // ƒC[ƒYƒCƒ“EƒAƒEƒgEƒTƒCƒ“
+    // ã‚¤ãƒ¼ã‚ºã‚¤ãƒ³ãƒ»ã‚¢ã‚¦ãƒˆãƒ»ã‚µã‚¤ãƒ³
     public static float EaseInOutSine(float t)
     {
         return -0.5f * (Mathf.Cos(PI * t) - 1.0f);
     }
 
-    // ƒC[ƒYƒCƒ“EƒNƒAƒhƒ‰ƒeƒBƒbƒN
+    // ã‚¤ãƒ¼ã‚ºã‚¤ãƒ³ãƒ»ã‚¯ã‚¢ãƒ‰ãƒ©ãƒ†ã‚£ãƒƒã‚¯
     public static float EaseInQuad(float t)
     {
         return t * t;
     }
 
-    // ƒC[ƒYƒAƒEƒgEƒNƒAƒhƒ‰ƒeƒBƒbƒN
+    // ã‚¤ãƒ¼ã‚ºã‚¢ã‚¦ãƒˆãƒ»ã‚¯ã‚¢ãƒ‰ãƒ©ãƒ†ã‚£ãƒƒã‚¯
     public static float EaseOutQuad(float t)
     {
         return 1.0f - (1.0f - t) * (1.0f - t);
     }
 
-    // ƒC[ƒYƒCƒ“EƒAƒEƒgEƒNƒAƒhƒ‰ƒeƒBƒbƒN
+    // ã‚¤ãƒ¼ã‚ºã‚¢ã‚¦ãƒˆãƒ»ã‚¯ã‚¤ãƒ³ãƒ†ã‚£ãƒƒã‚¯
+    public static float EaseOutQuint(float t)
+    {
+        return 1.0f - Mathf.Pow(1.0f - t, 5);
+    }
+
+    // ã‚¤ãƒ¼ã‚ºã‚¤ãƒ³ãƒ»ã‚¢ã‚¦ãƒˆãƒ»ã‚¯ã‚¢ãƒ‰ãƒ©ãƒ†ã‚£ãƒƒã‚¯
     public static float EaseInOutQuad(float t)
     {
         if (t < 0.5f)
@@ -52,25 +58,25 @@ public static class Easing
         }
     }
 
-    // ƒC[ƒYƒCƒ“EƒLƒ…[ƒrƒbƒN
+    // ã‚¤ãƒ¼ã‚ºã‚¤ãƒ³ãƒ»ã‚­ãƒ¥ãƒ¼ãƒ“ãƒƒã‚¯
     public static float EaseInCubic(float t)
     {
         return t * t * t;
     }
 
-    // ƒC[ƒYƒCƒ“‚Ìæw’è‰Â”\ŠÖ”
+    // ã‚¤ãƒ¼ã‚ºã‚¤ãƒ³ã®ä¹—æŒ‡å®šå¯èƒ½é–¢æ•°
     public static float EaseInPow(float t,int pow)
     {
         return Mathf.Pow(t, pow);
     }
 
-    // ƒC[ƒYƒAƒEƒgEƒLƒ…[ƒrƒbƒN
+    // ã‚¤ãƒ¼ã‚ºã‚¢ã‚¦ãƒˆãƒ»ã‚­ãƒ¥ãƒ¼ãƒ“ãƒƒã‚¯
     public static float EaseOutCubic(float t)
     {
         return 1.0f - Mathf.Pow(1.0f - t, 3.0f);
     }
 
-    // ƒC[ƒYƒCƒ“EƒAƒEƒgEƒLƒ…[ƒrƒbƒN
+    // ã‚¤ãƒ¼ã‚ºã‚¤ãƒ³ãƒ»ã‚¢ã‚¦ãƒˆãƒ»ã‚­ãƒ¥ãƒ¼ãƒ“ãƒƒã‚¯
     public static float EaseInOutCubic(float t)
     {
         if (t < 0.5f)
@@ -83,19 +89,19 @@ public static class Easing
         }
     }
 
-    // ƒC[ƒYƒCƒ“EƒNƒH[ƒeƒBƒbƒN
+    // ã‚¤ãƒ¼ã‚ºã‚¤ãƒ³ãƒ»ã‚¯ã‚©ãƒ¼ãƒ†ã‚£ãƒƒã‚¯
     public static float EaseInQuart(float t)
     {
         return t * t * t * t;
     }
 
-    // ƒC[ƒYƒAƒEƒgEƒNƒH[ƒeƒBƒbƒN
+    // ã‚¤ãƒ¼ã‚ºã‚¢ã‚¦ãƒˆãƒ»ã‚¯ã‚©ãƒ¼ãƒ†ã‚£ãƒƒã‚¯
     public static float EaseOutQuart(float t)
     {
         return 1.0f - Mathf.Pow(1.0f - t, 4.0f);
     }
 
-    // ƒC[ƒYƒCƒ“EƒAƒEƒgEƒNƒH[ƒeƒBƒbƒN
+    // ã‚¤ãƒ¼ã‚ºã‚¤ãƒ³ãƒ»ã‚¢ã‚¦ãƒˆãƒ»ã‚¯ã‚©ãƒ¼ãƒ†ã‚£ãƒƒã‚¯
     public static float EaseInOutQuart(float t)
     {
         if (t < 0.5f)
@@ -108,19 +114,19 @@ public static class Easing
         }
     }
 
-    // ƒC[ƒYƒCƒ“EƒTƒCƒNƒ‹
+    // ã‚¤ãƒ¼ã‚ºã‚¤ãƒ³ãƒ»ã‚µã‚¤ã‚¯ãƒ«
     public static float EaseInCirc(float t)
     {
         return 1.0f - Mathf.Sqrt(1.0f - Mathf.Pow(t, 2.0f));
     }
 
-    // ƒC[ƒYƒAƒEƒgEƒTƒCƒNƒ‹
+    // ã‚¤ãƒ¼ã‚ºã‚¢ã‚¦ãƒˆãƒ»ã‚µã‚¤ã‚¯ãƒ«
     public static float EaseOutCirc(float t)
     {
         return Mathf.Sqrt(1.0f - Mathf.Pow(t - 1.0f, 2.0f));
     }
 
-    // ƒC[ƒYƒCƒ“EƒAƒEƒgEƒTƒCƒNƒ‹
+    // ã‚¤ãƒ¼ã‚ºã‚¤ãƒ³ãƒ»ã‚¢ã‚¦ãƒˆãƒ»ã‚µã‚¤ã‚¯ãƒ«
     public static float EaseInOutCirc(float t)
     {
         if (t < 0.5f)
@@ -133,7 +139,7 @@ public static class Easing
         }
     }
 
-    // ƒC[ƒYƒCƒ“EƒoƒbƒN
+    // ã‚¤ãƒ¼ã‚ºã‚¤ãƒ³ãƒ»ãƒãƒƒã‚¯
     public static float EaseInBack(float t)
     {
         const float c1 = 1.70158f;
@@ -141,7 +147,7 @@ public static class Easing
         return c3 * t * t * t - c1 * t * t;
     }
 
-    // ƒC[ƒYƒAƒEƒgEƒoƒbƒN
+    // ã‚¤ãƒ¼ã‚ºã‚¢ã‚¦ãƒˆãƒ»ãƒãƒƒã‚¯
     public static float EaseOutBack(float t)
     {
         const float c1 = 1.70158f;
@@ -150,7 +156,7 @@ public static class Easing
         return 1.0f + c3 * Mathf.Pow(t - 1.0f, 3.0f) + c1 * Mathf.Pow(t - 1.0f, 2.0f);
     }
 
-    // ƒC[ƒYƒCƒ“ƒAƒEƒgEƒoƒbƒN
+    // ã‚¤ãƒ¼ã‚ºã‚¤ãƒ³ã‚¢ã‚¦ãƒˆãƒ»ãƒãƒƒã‚¯
     public static float EaseInOutBack(float t)
     {
         const float c1 = 1.70158f;
@@ -165,7 +171,7 @@ public static class Easing
         }
     }
 
-    // ƒC[ƒYƒCƒ“EƒGƒ‰ƒXƒeƒBƒbƒN
+    // ã‚¤ãƒ¼ã‚ºã‚¤ãƒ³ãƒ»ã‚¨ãƒ©ã‚¹ãƒ†ã‚£ãƒƒã‚¯
     public static float EaseInElastic(float t)
     {
         const float c4 = (2.0f * PI) / 3;
@@ -173,14 +179,14 @@ public static class Easing
         return Mathf.Pow(2.0f, 10.0f * t - 10.0f) * Mathf.Sin((t * 10.0f - 10.75f) * c4);
     }
 
-    // ƒC[ƒYƒAƒEƒgEƒGƒ‰ƒXƒeƒBƒbƒN
+    // ã‚¤ãƒ¼ã‚ºã‚¢ã‚¦ãƒˆãƒ»ã‚¨ãƒ©ã‚¹ãƒ†ã‚£ãƒƒã‚¯
     public static float EaseOutElastic(float t)
     {
         const float c4 = (2.0f * PI) / 3;
         return 1.0f - Mathf.Pow(2.0f, -10.0f * t) * Mathf.Sin((t * 10.0f - 0.75f) * c4);
     }
 
-    // ƒC[ƒYƒCƒ“EƒAƒEƒgEƒGƒ‰ƒXƒeƒBƒbƒN
+    // ã‚¤ãƒ¼ã‚ºã‚¤ãƒ³ãƒ»ã‚¢ã‚¦ãƒˆãƒ»ã‚¨ãƒ©ã‚¹ãƒ†ã‚£ãƒƒã‚¯
     public static float EaseInOutElastic(float t)
     {
         const float c5 = (2.0f * PI) / 4.5f;
@@ -194,7 +200,7 @@ public static class Easing
         }
     }
 
-    // ƒC[ƒYƒAƒEƒgEƒoƒEƒ“ƒX
+    // ã‚¤ãƒ¼ã‚ºã‚¢ã‚¦ãƒˆãƒ»ãƒã‚¦ãƒ³ã‚¹
     public static float EaseOutBounce(float t)
     {
         const float n1 = 7.5625f;
@@ -218,13 +224,13 @@ public static class Easing
         }
     }
 
-    // ƒC[ƒYƒCƒ“EƒoƒEƒ“ƒX
+    // ã‚¤ãƒ¼ã‚ºã‚¤ãƒ³ãƒ»ãƒã‚¦ãƒ³ã‚¹
     public static float EaseInBounce(float t)
     {
         return 1.0f - EaseOutBounce(1.0f - t);
     }
 
-    // ƒC[ƒYƒCƒ“EƒAƒEƒgEƒoƒEƒ“ƒX
+    // ã‚¤ãƒ¼ã‚ºã‚¤ãƒ³ãƒ»ã‚¢ã‚¦ãƒˆãƒ»ãƒã‚¦ãƒ³ã‚¹
     public static float EaseInOutBounce(float t)
     {
         if (t < 0.5f)

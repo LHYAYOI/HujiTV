@@ -16,6 +16,12 @@ namespace hatake
     public enum BookCoverState { Open, FrontCover, BackCover }
 
     /// <summary>
+    /// 本文の紙の仕上げ。シェーダーのバリアント（_PAPERFINISH_MATTE / _PAPERFINISH_GLOSS）を切り替える。
+    /// FromMaterial = マテリアルの Paper Finish のまま
+    /// </summary>
+    public enum BookPaperFinish { FromMaterial, Matte, Gloss }
+
+    /// <summary>
     /// 暗転中に明るく残す範囲。area は見開き全体を0〜1とした範囲（左下原点）。
     /// cornerRadius / feather はページ幅 = 1 の長さ。
     /// </summary>
@@ -69,8 +75,29 @@ namespace hatake
         [SerializeField] private RawImage m_display;
         [Tooltip("作成する出力の大きさ。表示先がある場合は高さだけ使い、幅は表示先の縦横比に合わせる")]
         [SerializeField] private Vector2Int m_outputSize = new Vector2Int(1600, 1000);
+        [Tooltip("ON：出力の高さを表示先の実際の画素数に合わせる（Output Size の高さは使わない）。" +
+                 "出力を縮小して表示すると細かな模様と文字がちらつくので、通常はON")]
+        [SerializeField] private bool m_fitDisplayResolution = true;
         [Tooltip("ONで出力をHDRのまま渡す（トーンマップしない）。別のカメラのBloomで光らせる場合用。通常はOFFで、下の Bloom を使う")]
         [SerializeField] private bool m_hdrOutput;
+
+        [Header("負荷（モバイル向け）")]
+        [Tooltip("ON：見た目に関わる値が変わったフレームだけ描き直す。静止している間は前の絵をそのまま見せ、GPU を使わない。" +
+                 "めくり・燃焼・復活・暗転・魔法の縁取りの間は毎フレーム描く。OFF：毎フレーム描く（従来）")]
+        [SerializeField] private bool m_redrawOnlyOnChange = true;
+        [Tooltip("静止中も、時間で動く模様（表紙の金具・金の罫の光）を描き直す回数（毎秒）。0 で静止中は描かない")]
+        [SerializeField, Min(0)] private float m_idleRefreshRate;
+        [Tooltip("モバイルで、暗転・魔法の縁取りなど時間でゆっくり動く演出の間に描き直す回数（毎秒）。0 で毎フレーム。" +
+                 "めくり・燃焼・復活・フェードは常に毎フレーム")]
+        [SerializeField, Min(0)] private float m_ambientRefreshRateMobile = 30f;
+        [Tooltip("出力（合成）の高さの上限（画素）。0 で上限なし。表示先より小さいと拡大して表示する（ちらつきは出ない）")]
+        [SerializeField, Min(0)] private int m_maxOutputHeight;
+        [Tooltip("モバイル（Android / iOS）での出力の高さの上限（画素）。合成シェーダーの負荷は画素数に比例する")]
+        [SerializeField, Min(0)] private int m_maxOutputHeightMobile = 720;
+        [Tooltip("モバイルでの Bloom の段数の上限。段ごとに描画の切り替えが1回増える")]
+        [SerializeField, Range(1, 8)] private int m_bloomIterationsMobile = 3;
+        [Tooltip("ON：エディターでもモバイルの設定（出力の上限・Bloom の段数）を使う。実機の見た目の確認用")]
+        [SerializeField] private bool m_forceMobileSettings;
 
         [Header("HDR・Bloom（本の中で完結。Overlay UIにはカメラのBloomが効かないため）")]
         [Tooltip("Hidden/Book/Page Flip Post。未設定なら Bloom・ぼかし無しでそのまま出力")]
@@ -137,6 +164,19 @@ namespace hatake
         [Tooltip("小口が下へずれる割合（斜め上から見た厚み）")]
         [SerializeField, Range(0, 2)] private float m_stackDrop = 0.6f;
 
+        [Header("本の姿勢（ライティング）")]
+        [Tooltip("本の姿勢（オイラー角、度。Unity の向き）。姿勢 0 で本は正面（カメラ側、-Z）を向いている。" +
+                 "光の向き（マテリアルの Light Direction）は一定のまま、本から見た光と目の向きが変わり、明暗・照り返し・映り込みが変わる")]
+        [SerializeField] private Vector3 m_bookPose;
+
+        [Header("紙の仕上げ")]
+        [Tooltip("FromMaterial：マテリアルの Paper Finish のまま。Matte / Gloss：実行時にシェーダーのバリアントを切り替える")]
+        [SerializeField] private BookPaperFinish m_paperFinish = BookPaperFinish.FromMaterial;
+
+        [Header("画面フェード")]
+        [Tooltip("0 = 通常の表示、1 = 出力全体が Fade Color（マテリアル）で塗りつぶされる。FadeScreen で時間をかけて動かせる")]
+        [SerializeField, Range(0, 1)] private float m_screenFade;
+
         private static readonly int s_curLeftTex = Shader.PropertyToID("_CurLeftTex");
         private static readonly int s_curRightTex = Shader.PropertyToID("_CurRightTex");
         private static readonly int s_dstLeftTex = Shader.PropertyToID("_DstLeftTex");
@@ -153,6 +193,14 @@ namespace hatake
         private static readonly int s_turnGlowId = Shader.PropertyToID("_TurnGlow");
         private static readonly int s_stack = Shader.PropertyToID("_Stack");
         private static readonly int s_dim = Shader.PropertyToID("_Dim");
+        private static readonly int s_screenFade = Shader.PropertyToID("_ScreenFade");
+        private static readonly int s_fadeColor = Shader.PropertyToID("_FadeColor");
+        private static readonly int s_paperFinish = Shader.PropertyToID("_PaperFinish");
+        private static readonly int s_bookPoseInv = Shader.PropertyToID("_BookPoseInv");
+        private static readonly int s_pageLod = Shader.PropertyToID("_PageLod");
+        private static readonly int s_prefilterSpread = Shader.PropertyToID("_PrefilterSpread");
+        private static readonly int s_coverLod = Shader.PropertyToID("_CoverLod");
+        private static readonly int s_pagePixels = Shader.PropertyToID("_PagePixels");
         private static readonly int s_spotCount = Shader.PropertyToID("_SpotCount");
         private static readonly int s_spots = Shader.PropertyToID("_Spots");
         private static readonly int s_spotParams = Shader.PropertyToID("_SpotParams");
@@ -225,6 +273,17 @@ namespace hatake
         private int m_progressCount;   // 0 = 枚数が未設定（進み具合の割合で厚みを決める）
         private float m_dim;
         private Coroutine m_dimRoutine;
+        private Coroutine m_screenFadeRoutine;
+        // 描き直しの判定：前回描いたときの状態の要約。MarkDirty で m_contentVersion を進める
+        private Hash128 m_lastSignature;
+        private bool m_hasRendered;
+        private int m_contentVersion;
+        private float m_nextIdleRefresh;
+        private float m_nextAmbientRefresh;
+        private int m_renderCount;
+        private UnityEngine.Rendering.LocalKeyword m_glossKeyword;
+        private UnityEngine.Rendering.LocalKeyword m_matteKeyword;
+        private bool m_hasPaperKeywords;
         private readonly BookFlipSpot?[] m_spots = new BookFlipSpot?[MaxSpots];
         private readonly Vector4[] m_spotData = new Vector4[MaxSpots];
         private readonly Vector4[] m_spotParamData = new Vector4[MaxSpots];
@@ -278,6 +337,16 @@ namespace hatake
             float aspect = DisplayAspect;
             if (aspect <= 0f || !m_ownsOutput || m_outputTexture == null) return;
             int height = Mathf.Max(16, m_outputSize.y);
+            // 表示先の実際の画素数に合わせる（縮小して表示しない）
+            if (m_fitDisplayResolution)
+            {
+                Canvas canvas = m_display.canvas;
+                float scale = canvas != null ? canvas.scaleFactor : 1f;
+                height = Mathf.Clamp(Mathf.RoundToInt(m_display.rectTransform.rect.height * scale), 16, 4096);
+            }
+            // 合成の画素数を抑える（モバイルは既定 720）。表示では拡大されるだけなので、ちらつきは出ない
+            int maxHeight = UsesMobileSettings ? m_maxOutputHeightMobile : m_maxOutputHeight;
+            if (maxHeight > 0) height = Mathf.Min(height, Mathf.Max(16, maxHeight));
             int width = Mathf.Clamp(Mathf.RoundToInt(height * aspect), 16, 8192);
             if (m_outputTexture.width == width && m_outputTexture.height == height) return;
             RenderTexture old = m_outputTexture;
@@ -344,6 +413,7 @@ namespace hatake
         /// </summary>
         public void SetCoverInsides(Texture spread, bool leftIsFrontInside, bool rightIsBackInside)
         {
+            MarkDirty();
             if (spread == null) return;
             m_coverInsides[spread] = new Vector2(leftIsFrontInside ? 1f : 0f, rightIsBackInside ? 1f : 0f);
         }
@@ -376,6 +446,7 @@ namespace hatake
 
         public void StopDisplay()
         {
+            MarkDirty();
             m_displayFlag = false;
             m_turning = false;
             m_dragPending = false;
@@ -650,6 +721,12 @@ namespace hatake
         /// <summary>暗転量を duration 秒で target へ（timeScaleに依存しない）</summary>
         public Coroutine FadeDim(float target, float duration)
         {
+            // 0 秒なら即座に（終わったコルーチンを残さない。残ると描き直しの判定が演出中のままになる）
+            if (duration <= 0f)
+            {
+                SetDim(target);
+                return null;
+            }
             if (m_dimRoutine != null) StopCoroutine(m_dimRoutine);
             m_dimRoutine = StartCoroutine(FadeDimRoutine(Mathf.Clamp01(target), duration));
             return m_dimRoutine;
@@ -665,6 +742,99 @@ namespace hatake
             }
             m_dim = target;
             m_dimRoutine = null;
+        }
+
+        // ------------------------------------------------------------------
+        // 画面フェード（出力全体を Fade Color へ。0 通常 〜 1 完全に暗転）
+        // ------------------------------------------------------------------
+        public float ScreenFade => m_screenFade;
+
+        /// <summary>合成を描き直した回数（計測用。静止中に増えなければ描画を止められている）</summary>
+        public int RenderCount => m_renderCount;
+
+        /// <summary>モバイル向けの設定（出力の上限・Bloom の段数）を使っているか</summary>
+        public bool UsesMobileSettings => Application.isMobilePlatform || m_forceMobileSettings;
+
+        /// <summary>
+        /// 次のフレームで必ず描き直す。撮影テクスチャの中身だけが変わった（同じテクスチャへ撮り直した）ときなどに呼ぶ
+        /// </summary>
+        public void MarkDirty() => m_contentVersion++;
+
+        /// <summary>本の姿勢（オイラー角、度）。外から毎フレーム渡してよい（例：本のオブジェクトの transform.eulerAngles）</summary>
+        public Vector3 BookPose
+        {
+            get => m_bookPose;
+            set => m_bookPose = value;
+        }
+
+        public void SetBookPose(Vector3 eulerAngles) => m_bookPose = eulerAngles;
+
+        public void SetBookPose(Quaternion rotation) => m_bookPose = rotation.eulerAngles;
+
+        // 世界の向き → 本の座標への回転をシェーダーへ渡す。
+        // 本の座標は z が紙の表から手前（Unity の -Z）なので、Z を反転して Unity の回転をはさむ
+        private void ApplyBookPose(Material material)
+        {
+            Matrix4x4 flipZ = Matrix4x4.Scale(new Vector3(1f, 1f, -1f));
+            Matrix4x4 inverse = Matrix4x4.Rotate(Quaternion.Inverse(Quaternion.Euler(m_bookPose)));
+            material.SetMatrix(s_bookPoseInv, flipZ * inverse * flipZ);
+        }
+
+        /// <summary>本文の紙の仕上げ（マット／グロス）。毎フレーム、合成のマテリアルのキーワードに反映する</summary>
+        public BookPaperFinish PaperFinish
+        {
+            get => m_paperFinish;
+            set => m_paperFinish = value;
+        }
+
+        // 紙の仕上げのキーワード（BookFlipComposite の multi_compile_local_fragment）
+        private void ApplyPaperFinish(Material material)
+        {
+            if (m_paperFinish == BookPaperFinish.FromMaterial) return;
+            bool gloss = m_paperFinish == BookPaperFinish.Gloss;
+            // キーワードは一度だけ引く（毎フレーム名前から探さない）
+            if (!m_hasPaperKeywords)
+            {
+                m_glossKeyword = new UnityEngine.Rendering.LocalKeyword(material.shader, "_PAPERFINISH_GLOSS");
+                m_matteKeyword = new UnityEngine.Rendering.LocalKeyword(material.shader, "_PAPERFINISH_MATTE");
+                m_hasPaperKeywords = true;
+            }
+            material.SetKeyword(m_glossKeyword, gloss);
+            material.SetKeyword(m_matteKeyword, !gloss);
+            // マテリアルの KeywordEnum の値もそろえる（インスペクターの表示が食い違わないように）
+            material.SetFloat(s_paperFinish, gloss ? 1f : 0f);
+        }
+
+        public void SetScreenFade(float amount)
+        {
+            if (m_screenFadeRoutine != null) StopCoroutine(m_screenFadeRoutine);
+            m_screenFadeRoutine = null;
+            m_screenFade = Mathf.Clamp01(amount);
+        }
+
+        /// <summary>画面フェードを duration 秒で target（0 通常 〜 1 暗転）へ（timeScaleに依存しない）</summary>
+        public Coroutine FadeScreen(float target, float duration)
+        {
+            if (duration <= 0f)
+            {
+                SetScreenFade(target);
+                return null;
+            }
+            if (m_screenFadeRoutine != null) StopCoroutine(m_screenFadeRoutine);
+            m_screenFadeRoutine = StartCoroutine(FadeScreenRoutine(Mathf.Clamp01(target), duration));
+            return m_screenFadeRoutine;
+        }
+
+        private IEnumerator FadeScreenRoutine(float target, float duration)
+        {
+            float start = m_screenFade;
+            for (float elapsed = 0f; elapsed < duration; elapsed += Time.unscaledDeltaTime)
+            {
+                m_screenFade = Mathf.Lerp(start, target, Mathf.SmoothStep(0f, 1f, elapsed / duration));
+                yield return null;
+            }
+            m_screenFade = target;
+            m_screenFadeRoutine = null;
         }
 
         public void SetSpot(int index, BookFlipSpot spot)
@@ -691,6 +861,10 @@ namespace hatake
         {
             if (!m_displayFlag || (m_current == null && m_currentCover == BookCoverState.Open) || !Initialize()) return;
             MatchDisplayAspect();
+            UpdateLayout();
+            // 見た目が前に描いたときと同じなら描かない（出力には前の絵が残っている）
+            if (!NeedsRedraw()) return;
+            m_renderCount++;
 #if UNITY_EDITOR
             // 再生中にマテリアルアセットを調整したら、すぐ反映する
             if (m_material != null) m_runtimeMaterial.CopyPropertiesFromMaterial(m_material);
@@ -705,6 +879,96 @@ namespace hatake
             Graphics.Blit((Texture)null, m_compositeTexture, m_runtimeMaterial, 0);
             RenderPost();
         }
+
+        // ------------------------------------------------------------------
+        // 描き直しの判定
+        // ------------------------------------------------------------------
+        private bool NeedsRedraw()
+        {
+            if (!m_redrawOnlyOnChange) return true;
+            // 時間で動く演出の間は毎フレーム描く。終わった次のフレームは必ず描き直す（ドラッグを戻した場合など、
+            // 状態が始める前と同じでも、出力にはめくりの途中の絵が残っているため）
+            if (m_turning || m_effect != BookPageEffect.None || m_dimRoutine != null || m_screenFadeRoutine != null)
+            {
+                m_hasRendered = false;
+                return true;
+            }
+            // 暗転のルーン・魔法の縁取りの脈動はゆっくり動くので、モバイルでは回数を抑える
+            float magic = m_hasMagicStyle ? m_magicStrength : m_baseMagicStrength;
+            if (m_dim > 0f || magic > 0f)
+            {
+                m_hasRendered = false;
+                if (!UsesMobileSettings || m_ambientRefreshRateMobile <= 0f) return true;
+                if (Time.unscaledTime < m_nextAmbientRefresh) return false;
+                m_nextAmbientRefresh = Time.unscaledTime + 1f / m_ambientRefreshRateMobile;
+                return true;
+            }
+            Hash128 signature = ComputeSignature();
+            bool redraw = !m_hasRendered || signature != m_lastSignature || !m_outputTexture.IsCreated() ||
+                          (m_idleRefreshRate > 0f && Time.unscaledTime >= m_nextIdleRefresh);
+            if (!redraw) return false;
+            m_lastSignature = signature;
+            m_hasRendered = true;
+            if (m_idleRefreshRate > 0f) m_nextIdleRefresh = Time.unscaledTime + 1f / m_idleRefreshRate;
+            return true;
+        }
+
+        // 見た目に関わる状態の要約。ここに無い値を変えたら MarkDirty を呼ぶ
+        private Hash128 ComputeSignature()
+        {
+            Hash128 h = new Hash128();
+            h.Append(m_contentVersion);
+            h.Append(m_current != null ? m_current.GetInstanceID() : 0);
+            h.Append(m_destination != null ? m_destination.GetInstanceID() : 0);
+            h.Append(m_frontCover != null ? m_frontCover.GetInstanceID() : 0);
+            h.Append(m_backCover != null ? m_backCover.GetInstanceID() : 0);
+            h.Append(m_outputTexture != null ? m_outputTexture.GetInstanceID() : 0);
+            h.Append((int)m_currentCover);
+            h.Append((int)m_destinationCover);
+            h.Append(m_turnSide);
+            h.Append((int)m_corner);
+            h.Append(ref m_foldPoint);
+            h.Append(m_turnAmount);
+            h.Append(ref m_bookRect);
+            h.Append(m_pageAspect);
+            h.Append(m_readingProgress);
+            h.Append(m_progressIndex);
+            h.Append(m_progressCount);
+            h.Append(m_screenFade);
+            h.Append(ref m_bookPose);
+            h.Append((int)m_paperFinish);
+            h.Append(m_hasLightDirection ? 1 : 0);
+            h.Append(ref m_lightDirection);
+            h.Append(m_hasMagicStyle ? 1 : 0);
+            h.Append(ref m_magicColor);
+            h.Append(ref m_paperTint);
+            for (int i = 0; i < MaxSpots; i++)
+            {
+                if (m_spots[i] is not BookFlipSpot spot)
+                {
+                    h.Append(-1);
+                    continue;
+                }
+                h.Append(ref spot.area);
+                h.Append((int)spot.shape);
+                h.Append(spot.cornerRadius);
+                h.Append(spot.feather);
+                h.Append(spot.strength);
+            }
+#if UNITY_EDITOR
+            // エディターでマテリアルアセットを調整したら描き直す
+            if (m_material != null) h.Append(UnityEditor.EditorUtility.GetDirtyCount(m_material));
+#endif
+            return h;
+        }
+
+        // アプリが裏から戻ると RenderTexture の中身が消えることがあるので描き直す
+        private void OnApplicationPause(bool paused)
+        {
+            if (!paused) MarkDirty();
+        }
+
+        private void OnValidate() => MarkDirty();
 
         private void EnsureCompositeTexture()
         {
@@ -722,6 +986,10 @@ namespace hatake
         private static RenderTextureFormat HdrFormat =>
             SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.ARGBHalf) ? RenderTextureFormat.ARGBHalf : RenderTextureFormat.ARGB32;
 
+        // Bloom の縮小・拡大の画像は不透明度が要らないので、半分の大きさの HDR 形式（R11G11B10）を使う
+        private static RenderTextureFormat BloomFormat =>
+            SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.RGB111110Float) ? RenderTextureFormat.RGB111110Float : HdrFormat;
+
         // HDRの合成結果 → Bloom（縮小・拡大の連鎖）・暗転時のぼかし → トーンマップして出力
         private void RenderPost()
         {
@@ -730,25 +998,32 @@ namespace hatake
             RenderTextureFormat format = HdrFormat;
             int width = Mathf.Max(1, source.width / 2);
             int height = Mathf.Max(1, source.height / 2);
+            // Bloom：モバイルは 1/4 の大きさから始め、段数を抑える。縮小・拡大の画像は軽い形式
+            bool mobile = UsesMobileSettings;
+            RenderTextureFormat bloomFormat = BloomFormat;
+            int bloomWidth = Mathf.Max(1, source.width / (mobile ? 4 : 2));
+            int bloomHeight = Mathf.Max(1, source.height / (mobile ? 4 : 2));
+            int iterations = mobile ? Mathf.Min(m_bloomIterations, m_bloomIterationsMobile) : m_bloomIterations;
 
             RenderTexture bloom = null;
             if (m_bloomIntensity > 0f)
             {
                 post.SetVector(s_bloomThreshold, new Vector4(m_bloomThreshold, m_bloomKnee * Mathf.Max(m_bloomThreshold, 1e-3f),
                     m_bloomClamp, m_bloomScatter));
+                post.SetFloat(s_prefilterSpread, mobile ? 1f : 0.5f);
                 int count = 0;
-                m_bloomMips[count] = RenderTexture.GetTemporary(width, height, 0, format);
+                m_bloomMips[count] = RenderTexture.GetTemporary(bloomWidth, bloomHeight, 0, bloomFormat);
                 Graphics.Blit(source, m_bloomMips[count++], post, PassPrefilter);
-                for (int w = width / 2, h = height / 2; count < m_bloomIterations && w >= 8 && h >= 8; w /= 2, h /= 2)
+                for (int w = bloomWidth / 2, h = bloomHeight / 2; count < iterations && w >= 8 && h >= 8; w /= 2, h /= 2)
                 {
-                    m_bloomMips[count] = RenderTexture.GetTemporary(w, h, 0, format);
+                    m_bloomMips[count] = RenderTexture.GetTemporary(w, h, 0, bloomFormat);
                     Graphics.Blit(m_bloomMips[count - 1], m_bloomMips[count], post, PassDown);
                     count++;
                 }
                 for (int i = count - 2; i >= 0; i--)
                 {
                     RenderTexture higher = m_bloomMips[i];
-                    RenderTexture result = RenderTexture.GetTemporary(higher.width, higher.height, 0, format);
+                    RenderTexture result = RenderTexture.GetTemporary(higher.width, higher.height, 0, bloomFormat);
                     post.SetTexture(s_higherTex, higher);
                     Graphics.Blit(m_bloomMips[i + 1], result, post, PassUpAdd);
                     RenderTexture.ReleaseTemporary(m_bloomMips[i + 1]);
@@ -830,6 +1105,9 @@ namespace hatake
             material.SetFloat(s_rigidCover, turningCover == BookCoverState.BackCover ? 2f : 1f);
             material.SetVector(s_bookRect, m_bookRect);
             material.SetFloat(s_pageAspect, m_pageAspect);
+            ApplyResolution(material);
+            ApplyPaperFinish(material);
+            ApplyBookPose(material);
             material.SetFloat(s_turnSide, m_turnSide);
             material.SetFloat(s_turning, m_turning ? 1f : 0f);
             Vector2 origin = CornerPosition(m_corner);
@@ -867,6 +1145,14 @@ namespace hatake
             material.SetVector(s_fxOrigin, new Vector4(m_effectOrigin.x, m_effectOrigin.y, far, m_effectSeed));
 
             material.SetFloat(s_dim, m_dim);
+            // 画面フェードは最後の段で1回だけ掛ける：後処理があれば後処理、無ければ合成
+            float screenFade = Mathf.Clamp01(m_screenFade);
+            material.SetFloat(s_screenFade, m_postMaterial == null ? screenFade : 0f);
+            if (m_postMaterial != null)
+            {
+                m_postMaterial.SetFloat(s_screenFade, screenFade);
+                m_postMaterial.SetColor(s_fadeColor, material.GetColor(s_fadeColor));
+            }
             int count = 0;
             for (int i = 0; i < MaxSpots; i++)
             {
@@ -907,6 +1193,21 @@ namespace hatake
                 material.SetColor(s_paperTint, m_basePaperTint);
                 material.SetFloat(s_magicStrength, m_baseMagicStrength);
             }
+        }
+
+        // 縮小表示でのちらつき対策：出力でのページの画素数から、撮影テクスチャ・表紙の絵を読むミップの段と、
+        // 紙の細かな模様をどこまで描くかを決める（シェーダーは分岐内で読むので、微分の代わりにこの値を使う）
+        private void ApplyResolution(Material material)
+        {
+            float outWidth = m_outputTexture != null ? m_outputTexture.width : m_outputSize.x;
+            float pagePixels = Mathf.Max(1f, (m_bookRect.z - m_bookRect.x) * 0.5f * outWidth);
+            material.SetFloat(s_pagePixels, pagePixels);
+            float pageTexels = m_current != null ? m_rightCrop.z * m_current.width : pagePixels;
+            material.SetFloat(s_pageLod, Mathf.Max(0f, Mathf.Log(pageTexels / pagePixels, 2f)));
+            Texture cover = m_frontCover != null ? m_frontCover : m_backCover;
+            // 閉じた表紙の板の幅はページ幅の約 1.1 倍
+            float coverLod = cover != null ? Mathf.Log(cover.width / (pagePixels * 1.1f), 2f) : 0f;
+            material.SetFloat(s_coverLod, Mathf.Max(0f, coverLod));
         }
 
         // シェーダーの面の種類：0 ページ、1 表紙、2 裏表紙、3 何も無い（閉じた本の反対側）
@@ -985,6 +1286,7 @@ namespace hatake
         {
             StopDisplay();
             m_dimRoutine = null;
+            m_screenFadeRoutine = null;
         }
 
         private void OnDestroy()

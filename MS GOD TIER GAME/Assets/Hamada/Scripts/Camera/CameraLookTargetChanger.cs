@@ -8,13 +8,15 @@ public class CameraLookTargetChanger : MonoBehaviour
 {
     [SerializeField] private CinemachineCamera m_cinemachineCamera;
 
-    [SerializeField] private float m_defaultTargetTransitionTime = .5f;
-
     [SerializeField] private GameObject m_anchor;
+
+    [SerializeField] private GameObject m_resetLookPoint;
 
     Vector3 m_anchorDefaultPosition;
 
     GameObject m_currentLookTarget;
+
+    GameObject m_lookTarget;
 
     Coroutine m_transitionCoroutine;
 
@@ -26,19 +28,28 @@ public class CameraLookTargetChanger : MonoBehaviour
         }
     }
 
-    public void SetLookTarget(GameObject target) 
+    public void ResetOrientation() 
     {
-        SetLookTarget(target, m_defaultTargetTransitionTime);
+        m_cinemachineCamera.LookAt = null;
+
+        m_currentLookTarget = null;
+
+        m_cinemachineCamera.transform.rotation = m_resetLookPoint.transform.rotation;
     }
 
-    public void SetLookTarget(GameObject target, float duration = 0.5f)
+    public void RegisterLookTarget(GameObject target) 
+    {
+        m_lookTarget = target;
+    }
+
+    public void SetLookTarget(float duration = 0.5f)
     {
         if (m_cinemachineCamera == null)
         {
             return;
         }
 
-        if (m_currentLookTarget == target) 
+        if (m_currentLookTarget == m_lookTarget) 
         {
             return;
         }
@@ -53,16 +64,16 @@ public class CameraLookTargetChanger : MonoBehaviour
         //アンカーない場合
         if (m_anchor == null)
         {
-            m_cinemachineCamera.LookAt = (target != null) ? target.transform : null;
-            m_currentLookTarget = target;
+            m_cinemachineCamera.LookAt = (m_lookTarget != null) ? m_lookTarget.transform : null;
+            m_currentLookTarget = m_lookTarget;
             return;
         }
 
         //ターゲット解除
-        if (target == null)
+        if (m_lookTarget == null)
         {
             m_cinemachineCamera.LookAt = null;
-            m_currentLookTarget = target;
+            m_currentLookTarget = m_lookTarget;
             return;
         }
 
@@ -71,30 +82,23 @@ public class CameraLookTargetChanger : MonoBehaviour
         {
             //トランジション前のアンカーの初期位置設定
             {
-                Transform previousLookTarget = m_cinemachineCamera.LookAt;
+                Transform cam = m_cinemachineCamera.transform;
 
-                if (previousLookTarget != null)
-                {
-                    m_anchor.transform.position = previousLookTarget.transform.position;
-                }
-                else
-                {
-                    m_anchor.transform.position = m_anchorDefaultPosition;
-                }
+                m_anchor.transform.position = cam.position + cam.forward * 10f;
 
                 m_cinemachineCamera.LookAt = m_anchor.transform;
             }
         }
 
-        m_currentLookTarget = target;
+        m_currentLookTarget = m_lookTarget;
 
         if (duration <= 0) 
         {
-            m_anchor.transform.position = target.transform.position;
+            m_anchor.transform.position = m_lookTarget.transform.position;
             return;
         }
 
-        m_transitionCoroutine = StartCoroutine(TargetTransitionRoutine(duration, target));
+        m_transitionCoroutine = StartCoroutine(TargetTransitionRoutine(duration, m_lookTarget));
     }
 
     private IEnumerator TargetTransitionRoutine(float duration, GameObject target)

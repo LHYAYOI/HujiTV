@@ -6,6 +6,11 @@ Shader "Book/Page Flip Composite"
     {
         [Header(Paper)]
         _PaperTint ("Paper tint", Color) = (1, 0.96, 0.88, 1)
+        _EndpaperColor ("Endpaper color (inside of covers)", Color) = (0.86, 0.8, 0.68, 1)
+        // 紙の仕上げ：シェーダーのバリアント（_PAPERFINISH_MATTE / _PAPERFINISH_GLOSS）で切り分ける
+        [KeywordEnum(Matte, Gloss)] _PaperFinish ("Paper finish (Matte coated / Gloss coated)", Float) = 0
+        _GlossStrength ("Gloss reflection strength", Range(0, 1)) = 0.25
+        _GlossSharpness ("Gloss reflection sharpness", Range(4, 256)) = 48
         _PaperTex ("Paper texture (optional)", 2D) = "white" {}
         _PaperTexStrength ("Paper texture strength", Range(0, 1)) = 0
         _PaperGrain ("Paper grain", Range(0, 0.5)) = 0.08
@@ -15,13 +20,14 @@ Shader "Book/Page Flip Composite"
         _PaperBumpScale ("Paper fiber scale", Range(20, 600)) = 160
         [Normal] _PaperNormalTex ("Paper normal map (optional)", 2D) = "bump" {}
         _PaperNormalStrength ("Paper normal map strength", Range(0, 2)) = 0
-        _InkBleed ("Ink bleed", Range(0, 1)) = 0.45
+        _InkBleed ("Ink bleed (matte coated: 0)", Range(0, 1)) = 0
         _InkBleedRadius ("Ink bleed radius (page UV)", Range(0.001, 0.02)) = 0.006
 
         [Header(Gutter and Light)]
         _GutterWidth ("Gutter width", Range(0.01, 0.5)) = 0.14
         _GutterDark ("Gutter darkness", Range(0, 1)) = 0.35
-        _LightDir ("Light direction", Vector) = (5, 3, 1, 0)
+        _LightDir ("Light direction (world, constant)", Vector) = (5, 3, 1, 0)
+        _PoseShading ("Pose shading (book facing the light)", Range(0, 1)) = 0.5
         _SpecPower ("Specular shininess", Range(1, 128)) = 16
         _SpecStrength ("Specular strength", Range(0, 2)) = 0.35
 
@@ -65,6 +71,9 @@ Shader "Book/Page Flip Composite"
         _SpotRuneWidth ("Spot rune ring width", Range(0.01, 0.15)) = 0.07
         _SpotRuneSpeed ("Spot rune ring speed", Range(-1, 1)) = 0.04
 
+        [Header(Screen Fade)]
+        _FadeColor ("Fade color", Color) = (0, 0, 0, 1)
+
         [Header(Burn and Revive)]
         _BurnCharColor ("Burn char color", Color) = (0.07, 0.04, 0.03, 1)
         [HDR] _BurnEmberColor ("Burn ember color", Color) = (3.2, 1.1, 0.25, 1)
@@ -97,6 +106,7 @@ Shader "Book/Page Flip Composite"
         [HideInInspector] _TurnGlow ("Turn glow", Float) = 0
         [HideInInspector] _Stack ("Stack", Vector) = (0.02, 0.02, 14, 0.6)
         [HideInInspector] _Dim ("Dim", Float) = 0
+        [HideInInspector] _ScreenFade ("Screen fade", Float) = 0
         [HideInInspector] _SpotCount ("Spot count", Float) = 0
         [HideInInspector] _Rigid ("Rigid cover turn", Float) = 0
         [HideInInspector] _RigidCover ("Rigid cover", Float) = 1
@@ -121,9 +131,10 @@ Shader "Book/Page Flip Composite"
             #pragma vertex Vert
             #pragma fragment Frag
             #pragma target 3.5
-
+            // 紙の仕上げのバリアント。実行時にも切り替えられるよう両方を必ず含める（shader_feature だと
+            // ビルドでマテリアルが使っていない方が削られ、BookFlipView.PaperFinish で切り替えられない）
+            #pragma multi_compile_local_fragment _PAPERFINISH_MATTE _PAPERFINISH_GLOSS
             #include "UnityCG.cginc"
-
             #include "BookFlipCore.cginc"
             #include "BookFlipLook.cginc"
             #include "BookFlipEffects.cginc"
@@ -141,15 +152,21 @@ Shader "Book/Page Flip Composite"
 
             float3 ShadePage(BookFlipHit h, float3 c, float2 extraTilt)
             {
-                // 表紙・裏表紙は硬い板：紙の質感・ノドの陰は付けない
-                bool cover = (h.kind > 0.5 && h.kind < 2.5) || h.kind > 4.5;
+                // 表紙・裏表紙の表側（絵の面）は硬い板：紙の質感・ノドの陰は付けない。
+                // 表紙・裏表紙は片面印刷なので、内側（最初の左ページ・最後の右ページの位置）は
+                // 絵を出さず、見返しの紙（印刷の無い色紙）を貼った面として描く
+                bool printedCover = h.kind > 0.5 && h.kind < 2.5;
+                bool endpaper = h.kind > 4.5;
+                bool cover = printedCover || endpaper;
+                // 絵を貼った表紙（c が負でない）はマットPP貼りとして弱いつやにする。強い照り返しは革だけ
+                bool coverPicture = printedCover && c.r >= 0;
                 float3 normal = float3(0, 0, 1);
-                if (h.kind > 4.5)
+                if (endpaper)
                 {
-                    // 表紙・裏表紙の内側（最初の左ページ・最後の右ページの位置）
-                    c = BookBoardInside(h.kind < 5.5, h.flatPos);
+                    c = BookPaperBase(c, h.flatPos, true);
+                    c = BookGutter(c, h.flatPos.x, normal);
                 }
-                else if (cover)
+                else if (printedCover)
                 {
                     float2 boxCenter, boxHalf;
                     BookCoverBox(h.kind < 1.5, boxCenter, boxHalf);
@@ -198,11 +215,12 @@ Shader "Book/Page Flip Composite"
 
                 // 紙の繊維の凹凸（と燃える縁の反り）で法線を傾け、光の向きで明暗を付ける
                 float3 baseNormal = normal;
-                float2 paperTilt = cover ? float2(0, 0) : BookPaperTilt(h.flatPos);
+                float2 paperTilt = printedCover ? float2(0, 0) : BookPaperTilt(h.flatPos);
                 normal = normalize(normal + float3(paperTilt + extraTilt, 0));
                 c *= BookRelief(baseNormal, normal);
 
-                c += min(1, BookSpecular(normal, float3(0, 0, 1)));
+                // つや：革の表紙は板の照り返し、絵を貼った表紙と見返しはマットの弱いつや、本文の紙は紙の仕上げ（マット／グロス）のつや
+                c += min(1, printedCover && !coverPicture ? BookSpecular(normal, BookViewDir()) : BookPaperSheen(normal, h.flatPos, !cover));
                 return c;
             }
 
@@ -268,6 +286,9 @@ Shader "Book/Page Flip Composite"
                     col.rgb = BookCornerMetal(col.rgb, p - boxCenter, boxHalf, boxSd);
                 }
 
+                // 本の姿勢による明暗（光の向きは一定、本が光へ向く・背ける）。魔法の光・暗転・燃えかすはこの後に重ねる（自ら光るので暗くしない）
+                col.rgb *= BookPoseShade();
+
                 // めくれた紙が下の紙・表紙・背景に落とす影
                 if (h.layer != BOOK_LAYER_BACK && h.flapOutside < 1e2)
                 {
@@ -296,7 +317,9 @@ Shader "Book/Page Flip Composite"
                 float3 particles = BookFxParticles(p);
                 col.rgb += particles;
                 col.a = max(col.a, saturate(max(particles.r, max(particles.g, particles.b))));
-                return col;
+
+                // 画面フェード（後処理を使うときは BookFlipView が 0 にし、後処理の最後で掛ける）
+                return BookApplyScreenFade(col);
             }
             ENDCG
         }

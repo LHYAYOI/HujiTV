@@ -1,50 +1,13 @@
 ﻿using UnityEngine;
 
-public class testHitSender : MonoBehaviour
+public class testHitSender : HitSenderBase
 {
-    private void OnCollisionEnter(Collision collision)
+    protected override HitData CreateHitData()
     {
-        SendHit(collision.gameObject);
-    }
+        HitData data = new HitData();
 
-    private void OnTriggerEnter(Collider other)
-    {
-        SendHit(other.gameObject);
-    }
+        data.SetHitObject(gameObject);
 
-    private void SendHit(GameObject target)
-    {
-        HitReceiverController hitReceiver = GetHitReceiverController(target);
-
-        if (hitReceiver == null)
-        {
-            return;
-        }
-
-        HitData hitData = CreateHitData();
-
-        hitReceiver.OnHit(hitData);
-    }
-
-    private HitReceiverController GetHitReceiverController(GameObject target)
-    {
-        HitReceiverController hitReceiver = target.GetComponent<HitReceiverController>();
-
-        if (hitReceiver == null)
-        {
-            return null;
-        }
-
-        return hitReceiver;
-    }
-
-    private HitData CreateHitData()
-    {
-        HitData hitData = new HitData();
-
-        hitData.SetHitObject(gameObject);
-        hitData.SetTag(gameObject.tag);
-
-        return hitData;
+        return data;
     }
 }

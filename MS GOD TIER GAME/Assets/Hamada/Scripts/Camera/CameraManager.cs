@@ -38,17 +38,12 @@ public class CameraManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.P)) 
         {
+            SwitchCamera("BattleCamera");
+        }
+
+        if (Input.GetKeyDown(KeyCode.O))
+        {
             SwitchCamera("FPSCamera");
-        }
-
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            DollyCamera(1, 40, 1);
-        }
-
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            DollyCamera(1, 60, 0);
         }
     }
 
@@ -63,7 +58,6 @@ public class CameraManager : MonoBehaviour
                 if (virtualCamera != null) 
                 {
                     virtualCamera.Priority = 0;
-                    virtualCamera.gameObject.SetActive(false);
                 }
 
                 continue;
@@ -80,7 +74,6 @@ public class CameraManager : MonoBehaviour
 
         CinemachineCamera virtualCamera = camera.GetCamera();
 
-        virtualCamera.gameObject.SetActive(true);
         virtualCamera.Priority = 10;
 
         m_currentCamera = camera;
@@ -109,7 +102,7 @@ public class CameraManager : MonoBehaviour
     }
 
     //縦と横の強さを指定できるカメラシェイク
-    public void ShakeCameraInVH(float duration, float horizontalIntensity, float verticalIntensity) 
+    public void ShakeCameraInVHF(float duration, float verticalIntensity, float horizontalIntensity, float forwardIntensity) 
     {
         CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
 
@@ -125,7 +118,7 @@ public class CameraManager : MonoBehaviour
             return;
         }
 
-        shake.VHShake(duration, horizontalIntensity, verticalIntensity);
+        shake.VHShake(duration, horizontalIntensity, verticalIntensity, forwardIntensity);
     }
 
     //カメラシェイク
@@ -208,23 +201,79 @@ public class CameraManager : MonoBehaviour
         zoom.ChangeFOV(duration, FOV);
     }
 
-    public void SetLookTarget(GameObject lookTarget, float duration)
+    public void ChangeCameraFOV010(float duration, float maxFOV)
     {
-        CinemachineCamera targetCamera = GetCameraByName("BattleCamera").GetCamera();
+        CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
 
-        if (targetCamera == null) 
+        if (currentVirtualCamera == null)
         {
             return;
         }
 
-        CameraLookTargetChanger lookTargetChanger = targetCamera.GetComponent<CameraLookTargetChanger>();
+        CameraZoom zoom = currentVirtualCamera.GetComponent<CameraZoom>();
+
+        if (zoom == null)
+        {
+            return;
+        }
+
+        zoom.ChangeFOV010(duration, maxFOV);
+    }
+
+    public void ResetCameraOrientation() 
+    {
+        CinemachineCamera battleCamera = GetCameraByName("BattleCamera").GetCamera();
+
+        if (battleCamera == null)
+        {
+            return;
+        }
+
+        CameraLookTargetChanger lookTargetChanger = battleCamera.GetComponent<CameraLookTargetChanger>();
+
+        if (lookTargetChanger == null)
+        {
+            return;
+        }
+
+       lookTargetChanger.ResetOrientation();
+    }
+
+    public void RegisterLookTarget(GameObject lookTarget)
+    {
+        CinemachineCamera battleCamera = GetCameraByName("BattleCamera").GetCamera();
+
+        if (battleCamera == null)
+        {
+            return;
+        }
+        CameraLookTargetChanger lookTargetChanger = battleCamera.GetComponent<CameraLookTargetChanger>();
 
         if (lookTargetChanger == null) 
         {
             return;
         }
 
-        lookTargetChanger.SetLookTarget(lookTarget, duration);
+        lookTargetChanger.RegisterLookTarget(lookTarget);
+    }
+
+    public void SetLookTarget(float duration)
+    {
+        CinemachineCamera battleCamera = GetCameraByName("BattleCamera").GetCamera();
+
+        if (battleCamera == null)
+        {
+            return;
+        }
+
+        CameraLookTargetChanger lookTargetChanger = battleCamera.GetComponent<CameraLookTargetChanger>();
+
+        if (lookTargetChanger == null) 
+        {
+            return;
+        }
+
+        lookTargetChanger.SetLookTarget(duration);
     }
 
     public void DollyCamera(float duration, float zoomValue, float pullBackAmount) 

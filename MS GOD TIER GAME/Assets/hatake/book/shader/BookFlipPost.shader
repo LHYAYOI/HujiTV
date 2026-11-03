@@ -1,6 +1,6 @@
 Shader "Hidden/Book/Page Flip Post"
 {
-    // BookFlipView の後処理。HDRで合成した本に、Bloom・暗転時のぼかし・トーンマップをかける。
+    // BookFlipView の後処理。HDRで合成した本に、Bloom・暗転時のぼかし・トーンマップ・画面フェードをかける。
     // 本の表示は Screen Space Overlay のUIなので、カメラのポストエフェクト（Volume）は効かない。
     // そのため本の中で完結させる。
     Properties
@@ -17,6 +17,7 @@ Shader "Hidden/Book/Page Flip Post"
     float4 _BloomThreshold;   // x 閾値, y ニー, z 上限, w 散乱（上位レベルへの足し込み）
     float4 _BloomTint;        // rgb 色, a 強さ
     float _DimBlur, _Tonemap, _Exposure;
+    float _PrefilterSpread; // 最初の縮小で読む範囲（元の画素の何個分ずらすか）。1/2 へ縮めるなら 0.5、1/4 なら 1
 
     struct VertexInput { float4 vertex : POSITION; float2 uv : TEXCOORD0; };
     struct VertexOutput { float4 vertex : SV_POSITION; float2 uv : TEXCOORD0; };
@@ -31,10 +32,10 @@ Shader "Hidden/Book/Page Flip Post"
 
     float4 Tap(sampler2D_float tex, float2 uv) { return tex2Dlod(tex, float4(uv, 0, 0)); }
 
-    // 縮小（Dual filter）：中央と斜め4点
-    float4 Down(float2 uv)
+    // 縮小（Dual filter）：中央と斜め4点。spread は斜めの点のずれ（元の画素の何個分か）
+    float4 DownSpread(float2 uv, float spread)
     {
-        float2 o = _MainTex_TexelSize.xy * 0.5;
+        float2 o = _MainTex_TexelSize.xy * spread;
         float4 c = Tap(_MainTex, uv) * 4;
         c += Tap(_MainTex, uv + float2(-o.x, -o.y));
         c += Tap(_MainTex, uv + float2(o.x, -o.y));
@@ -42,6 +43,8 @@ Shader "Hidden/Book/Page Flip Post"
         c += Tap(_MainTex, uv + float2(o.x, o.y));
         return c / 8;
     }
+
+    float4 Down(float2 uv) { return DownSpread(uv, 0.5); }
 
     // 拡大（Dual filter）：周囲8点
     float4 Up(float2 uv)
@@ -61,7 +64,8 @@ Shader "Hidden/Book/Page Flip Post"
 
     float4 FragPrefilter(VertexOutput i) : SV_Target
     {
-        float4 c = Down(i.uv);
+        // 1/4 へ一度に縮めるとき（モバイル）は、斜めの点を元の1画素分ずらして 4x4 の範囲を読む（間引きのちらつきを防ぐ）
+        float4 c = DownSpread(i.uv, max(_PrefilterSpread, 0.5));
         // 本の外（透明）の色は使わない
         c.rgb *= saturate(c.a * 4);
         float bright = max(c.r, max(c.g, c.b));
@@ -104,7 +108,8 @@ Shader "Hidden/Book/Page Flip Post"
         c.a = saturate(max(c.a, max(bloom.r, max(bloom.g, bloom.b))));
         c.rgb *= _Exposure;
         if (_Tonemap > 0.5) c.rgb = SoftClip(c.rgb);
-        return c;
+        // 画面フェードは最後に掛ける（Bloom の光も一緒に暗くなる）
+        return BookApplyScreenFade(c);
     }
     ENDCG
 

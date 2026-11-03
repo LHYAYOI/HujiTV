@@ -19,6 +19,11 @@ sampler2D_float _PaperNormalTex;
 float4 _PaperNormalTex_ST;
 float _PaperNormalStrength, _PaperBump, _PaperBumpScale;
 float _InkBleed, _InkBleedRadius;
+float4 _EndpaperColor; // 見返し（表紙・裏表紙の内側に貼る紙）の色
+
+// 画面フェード：0 通常 〜 1 完全に _FadeColor
+float _ScreenFade;
+float4 _FadeColor;
 
 // 表紙の角金具
 float4 _CornerColor; // a = 表示
@@ -28,6 +33,43 @@ float _CornerSize;
 float _GutterWidth, _GutterDark;
 float4 _LightDir;
 float _SpecPower, _SpecStrength;
+
+// ---------------------------------------------------------------------
+// 本の姿勢とライティング
+// 光の向き（_LightDir）は今まで通り一定（世界の向き）。本の姿勢（BookFlipView.BookPose）が変わると、
+// 本から見た光と目の向きが変わるので、それで明暗・照り返し・映り込みを計算する。
+// _BookPoseInv は世界の向き → 本の座標（x 右, y 上, z 紙の表から手前）への回転。BookFlipView が毎フレーム設定する
+// ---------------------------------------------------------------------
+float4x4 _BookPoseInv;
+float _PoseShading; // 本が光の方を向く・背ける明暗の強さ（0 で姿勢による明暗なし）
+
+float3 BookToBookSpace(float3 worldDir)
+{
+    float3 d = mul((float3x3)_BookPoseInv, worldDir);
+    // 未設定（全部 0）なら姿勢なし（正面向き）として扱う
+    return dot(d, d) > 1e-8 ? normalize(d) : normalize(worldDir);
+}
+
+// 本の座標での光の向き（光へ向かう向き）
+float3 BookLightDir()
+{
+    return BookToBookSpace(normalize(_LightDir.xyz));
+}
+
+// 本の座標での目の向き（目へ向かう向き）。見る人は世界で常に手前（0, 0, 1）
+float3 BookViewDir()
+{
+    return BookToBookSpace(float3(0, 0, 1));
+}
+
+// 姿勢による明暗：本の面が光の方を向くほど明るく、背けるほど暗い。正面向き（今までの見た目）で 1
+float BookPoseShade()
+{
+    float k = saturate(_PoseShading);
+    float lit = 1 - k + k * saturate(BookLightDir().z);
+    float reference = 1 - k + k * saturate(normalize(_LightDir.xyz).z);
+    return clamp(lit / max(reference, 1e-3), 0.25, 2);
+}
 
 // めくり
 float _CurlWidth, _CurlDark, _CurlSpec, _ShowThrough;
@@ -90,43 +132,115 @@ float BookSdRoundBox(float2 p, float2 halfSize, float radius)
 }
 
 // ---------------------------------------------------------------------
-// 紙の凹凸
-// 法線テクスチャ（任意）と手続きの繊維
-// 法線の傾き（xy）を返す
+// 紙：絵本の本文に使う塗工紙。仕上げはシェーダーのバリアントで切り分ける
+// （BookFlipComposite の multi_compile_local_fragment _PAPERFINISH_MATTE _PAPERFINISH_GLOSS）
+//
+// マットコート紙（_PAPERFINISH_MATTE、既定）：
+//   塗工層が繊維を埋めるので、紙の目は見えず粉のような細かな粒だけが残る。
+//   インクは表面に留まって輪郭は鋭いが、光を散らすので黒が締まり切らず色は少し落ち着く。つやは広くて弱い。
+// グロスコート紙・アート紙（_PAPERFINISH_GLOSS）：
+//   塗工を厚くして磨いた（カレンダー掛けした）面。粒も凹凸もほとんど無い。
+//   光をそろえて返すので、色は鮮やかで黒は深く、灯りがはっきり映り込む（めくりで紙が曲がると光が走る）。
 // ---------------------------------------------------------------------
-float BookPaperHeight(float2 local)
+float _GlossStrength, _GlossSharpness;
+
+#if defined(_PAPERFINISH_GLOSS)
+#define BOOK_PAPER_BUMP_HEIGHT 0.08
+#define BOOK_PAPER_GRAIN 0.08
+#else
+#define BOOK_PAPER_BUMP_HEIGHT 0.25
+#define BOOK_PAPER_GRAIN 0.25
+#endif
+
+// 紙の座標（ページごとに 0〜1。テクスチャはこれで読む）。
+// 左右のページは別の紙なので鏡像にしない
+float2 BookPaperLocal(float2 flatPos)
 {
-    float2 q = local * _PaperBumpScale;
-    // 縦に長い繊維と細かな粒
-    return BookLookFbm(q * float2(0.35, 1.6)) * 0.6 + BookLookNoise(q * 1.7) * 0.4;
+    return flatPos.x >= 0 ? flatPos : float2(flatPos.x + 1, flatPos.y);
 }
 
+// 手続きの模様の座標：左ページは少しずらして別の模様にする。
+// 見開きで描いた絵や目次で、ノドを挟んで同じ模様・左右対称の模様が見えないようにする。
+// ずらす量は小さく保つ（大きな座標はハッシュの sin の精度が落ちる GPU がある）
+float2 BookPaperNoisePos(float2 flatPos)
+{
+    return BookPaperLocal(flatPos) + (flatPos.x >= 0 ? float2(0, 0) : float2(0.37, 0.61));
+}
+
+// 凹凸の細かさ（_PaperBumpScale に掛ける）。高さ（_PaperBump に掛ける）は上の BOOK_PAPER_BUMP_HEIGHT
+#define BOOK_PAPER_BUMP_FREQ 1.0
+
+// 模様の細かさ freq（ページ幅あたりの周期の数）が出力の画素で描ける細かさか。
+// 画素の半分より細かい模様は描けずにちらつく（めくりで動くと特に目立つ）ので、描ける細かさまでに弱める
+float BookPaperOctaveWeight(float freq)
+{
+    float nyquist = _PagePixels > 0 ? _PagePixels * 0.5 : 1e5;
+    return saturate((nyquist - freq) / (nyquist * 0.5));
+}
+
+// 紙の凹凸。高さ 0〜1（平均 0.5）
+float BookPaperHeight(float2 local)
+{
+    float freq = _PaperBumpScale * BOOK_PAPER_BUMP_FREQ;
+    float2 q = local * freq;
+    return 0.5 + (BookLookNoise(q) - 0.5) * 0.6 * BookPaperOctaveWeight(freq)
+               + (BookLookNoise(q * 2.13) - 0.5) * 0.4 * BookPaperOctaveWeight(freq * 2.13);
+}
+
+// 法線の傾き（xy）を返す。法線テクスチャ（任意）と手続きの粒
 float2 BookPaperTilt(float2 flatPos)
 {
-    float2 local = float2(abs(flatPos.x), flatPos.y);
+    float2 local = BookPaperLocal(flatPos);
+    float2 pos = BookPaperNoisePos(flatPos);
     float2 tilt = 0;
     if (_PaperBump > 0)
     {
-        float e = 0.5 / max(_PaperBumpScale, 1);
-        float h = BookPaperHeight(local);
-        float2 grad = float2(BookPaperHeight(local + float2(e, 0)) - h,
-                             BookPaperHeight(local + float2(0, e)) - h) / e;
-        tilt -= grad * _PaperBump / max(_PaperBumpScale, 1);
+        float scale = max(_PaperBumpScale * BOOK_PAPER_BUMP_FREQ, 1);
+        float e = 0.5 / scale;
+        float h = BookPaperHeight(pos);
+        float2 grad = float2(BookPaperHeight(pos + float2(e, 0)) - h,
+                             BookPaperHeight(pos + float2(0, e)) - h) / e;
+        tilt -= grad * _PaperBump * BOOK_PAPER_BUMP_HEIGHT / scale;
     }
     if (_PaperNormalStrength > 0)
     {
         float3 n = UnpackNormal(tex2Dlod(_PaperNormalTex, float4(local * _PaperNormalTex_ST.xy + _PaperNormalTex_ST.zw, 0, 0)));
         tilt += n.xy * _PaperNormalStrength;
     }
-    // 左ページは鏡像なので横の傾きを反転
-    tilt.x *= flatPos.x >= 0 ? 1 : -1;
     return tilt;
+}
+
+// 紙のつや。p は本の座標（平らに置いた位置）。
+// glossAllowed = false の面（見返し・絵を貼った表紙）は紙の仕上げに関係なくマットの弱いつや
+float3 BookPaperSheen(float3 normal, float2 p, bool glossAllowed)
+{
+    // マット：光を散らす、広くて弱い照り返し
+    float3 halfV = normalize(BookLightDir() + BookViewDir());
+    float3 sheen = pow(max(dot(normal, halfV), 0), 4) * 0.08;
+#if defined(_PAPERFINISH_GLOSS)
+    if (glossAllowed)
+    {
+        // グロス：部屋の灯りの映り込み。本の上の目と、光の向きへ寄せた灯りの位置から、
+        // 紙の上の場所ごとに反射の向きを求める（平らな紙でも映り込みの明るい所ができ、曲がると動く）。
+        // 目と灯りは世界に固定なので、本の姿勢で本の座標へ回す（本を傾けると映り込みが動く）
+        float3 pos = float3(p, 0);
+        float3 center = float3(0, _PageAspect * 0.5, 0);
+        float2 toward = normalize(_LightDir.xy + float2(1e-4, 0));
+        float3 eye = center + BookToBookSpace(float3(0, 0, 1)) * 3.0;
+        float3 lampOffset = float3(toward * 0.9, 2.2);
+        float3 lamp = center + BookToBookSpace(normalize(lampOffset)) * length(lampOffset);
+        float3 h = normalize(normalize(eye - pos) + normalize(lamp - pos));
+        float spec = pow(saturate(dot(normal, h)), max(_GlossSharpness, 1)) * _GlossStrength;
+        sheen = sheen * 0.4 + spec;
+    }
+#endif
+    return sheen;
 }
 
 // 光の向きに対する凹凸の明暗。base は凹凸を入れる前の法線
 float BookRelief(float3 base, float3 bumped)
 {
-    float3 l = normalize(_LightDir.xyz);
+    float3 l = BookLightDir();
     return 1 + (dot(bumped, l) - dot(base, l)) * 1.6;
 }
 
@@ -140,7 +254,9 @@ float BookLuma(float3 c)
 
 float3 BookInkBleed(float3 c, BookFlipHit h)
 {
-    if (_InkBleed <= 0)
+    // 塗工紙（マット・グロス）はインクがにじまないので既定は 0。古い紙の表現などで使うときだけ上げる
+    float bleed = _InkBleed;
+    if (bleed <= 0)
         return c;
     float lum = BookLuma(c);
     float darkest = lum;
@@ -162,29 +278,54 @@ float3 BookInkBleed(float3 c, BookFlipHit h)
     }
     float spread = saturate((lum - darkest) * 2.5);
     float fiber = BookLookFbm(h.uv * float2(70, 95) + h.right * 13);
-    float amount = spread * _InkBleed * smoothstep(0.25, 0.75, fiber);
+    float amount = spread * bleed * smoothstep(0.25, 0.75, fiber);
     return lerp(c, lerp(ink, c, 0.45), amount);
 }
 
 // ---------------------------------------------------------------------
 // 紙の質感
 // ---------------------------------------------------------------------
-float3 BookPaper(float3 c, BookFlipHit h)
+// 色の鮮やかさを下げる（amount 0 そのまま 〜 1 灰色）
+float3 BookDesaturate(float3 c, float amount)
 {
-    float2 p = h.flatPos;
-    float2 local = float2(abs(p.x), p.y);
-    float3 tint = _PaperTint.rgb;
+    return lerp(c, BookLuma(c).xxx, amount);
+}
+
+// 印刷の載り方。c は印刷の色（白 = インク無し）
+float3 BookPaperPrint(float3 c)
+{
+#if defined(_PAPERFINISH_GLOSS)
+    // グロス：光をそろえて返すので、色は少し鮮やかに、暗部は深く締まる
+    c = saturate(BookDesaturate(c, -0.06));
+    return lerp(c, c * c, 0.12);
+#else
+    // マット：光を散らす面なので、色を少し落ち着かせ、黒をわずかに浮かせる
+    c = BookDesaturate(c, 0.06);
+    return c * 0.965 + 0.035;
+#endif
+}
+
+// 紙の地と印刷。endpaper = 見返し（印刷の無い色紙。c は無視して _EndpaperColor）
+float3 BookPaperBase(float3 c, float2 p, bool endpaper)
+{
+    float2 local = BookPaperLocal(p);
+    float3 tint = endpaper ? _EndpaperColor.rgb : _PaperTint.rgb;
     float3 tex = tex2Dlod(_PaperTex, float4(local * _PaperTex_ST.xy + _PaperTex_ST.zw, 0, 0)).rgb;
     tint *= lerp(1, tex, _PaperTexStrength);
-    float grain = BookLookNoise(local * 420) * 0.6 + BookLookFbm(local * float2(9, 60)) * 0.4;
-    tint *= 1 - _PaperGrain * (grain - 0.5);
-    c *= tint;
+    // 地のむら：凹凸と同じ細かな粒を弱く
+    tint *= 1 - _PaperGrain * BOOK_PAPER_GRAIN * (BookPaperHeight(BookPaperNoisePos(p)) - 0.5);
+    c = endpaper ? tint : BookPaperPrint(c) * tint;
 
     // 外周の焼け：ページ端ほど古い紙の色に寄せる
     // 背側は焼けないので、外側・上下の端だけを見る
     float edge = min(1 - abs(p.x), min(p.y, _PageAspect - p.y));
     float age = (1 - smoothstep(0, 0.16, edge + (BookLookFbm(p * 7) - 0.5) * 0.08)) * _PaperAge;
-    c = lerp(c, c * _AgeColor.rgb, saturate(age));
+    return lerp(c, c * _AgeColor.rgb, saturate(age));
+}
+
+float3 BookPaper(float3 c, BookFlipHit h)
+{
+    c = BookPaperBase(c, h.flatPos, false);
 
     // 魔導書の縁取り（BookModelAtlas と同じ意匠）
     if (_MagicStrength > 0)
@@ -207,7 +348,7 @@ float3 BookPaper(float3 c, BookFlipHit h)
 // ---------------------------------------------------------------------
 float3 BookSpecular(float3 normal, float3 viewDir)
 {
-    float3 halfV = normalize(normalize(_LightDir.xyz) + viewDir);
+    float3 halfV = normalize(BookLightDir() + viewDir);
     return pow(max(dot(normal, halfV), 0), _SpecPower) * _SpecStrength;
 }
 
@@ -320,7 +461,7 @@ float3 BookCornerMetal(float3 c, float2 local, float2 halfSize, float coverSd)
 
     float2 dirToCorner = sign(local);
     float3 normal = normalize(float3(dirToCorner * 0.35 * (1 - smoothstep(0, 0.02, plate)), 1));
-    float3 l = normalize(_LightDir.xyz);
+    float3 l = BookLightDir();
     float scratch = BookLookNoise(float2((q.x - q.y) * 260, (q.x + q.y) * 18)) * 0.25;
     float diffuse = 0.55 + 0.45 * saturate(dot(normal, l)) - scratch * 0.3;
     float sweep = pow(saturate(1 - abs(frac((q.x - q.y) * 3 + _Time.y * 0.15) - 0.5) * 2), 8);
@@ -335,25 +476,47 @@ float3 BookCornerMetal(float3 c, float2 local, float2 halfSize, float coverSd)
     return lerp(c, metal, edgeFade * _CornerColor.a);
 }
 
-// 表紙の面：絵（あれば）に革の質感を重ねる。絵が無ければ革の色
+// 表紙の地の色：絵のある表紙の外周の色（絵の地の色）。どちらの表紙にも絵が無ければ _CoverColor。
+// 絵の無い側の表紙（裏表紙など）・板の小口・開いた本の板の縁はこの色で塗り、表紙と裏表紙の色をそろえる
+float3 BookCoverBaseColor()
+{
+    bool front = _CoverFlags.x > 0.5;
+    if (!front && _CoverFlags.y < 0.5)
+        return _CoverColor.rgb;
+    // 外周に沿った8点を、ぼかした段（ミップ5）で読んで平均する
+    float3 sum = 0;
+    [unroll]
+    for (int i = 0; i < 8; i++)
+    {
+        float t = (i & 3) / 3.0;
+        float2 uv = i < 4 ? float2(lerp(0.08, 0.92, t), (i & 1) ? 0.04 : 0.96)
+                          : float2((i & 1) ? 0.04 : 0.96, lerp(0.08, 0.92, t));
+        sum += front ? tex2Dlod(_FrontCoverTex, float4(uv, 0, 5)).rgb : tex2Dlod(_BackCoverTex, float4(uv, 0, 5)).rgb;
+    }
+    return sum / 8;
+}
+
+// 金の罫を引くか：どちらの表紙にも絵が無いときだけ（絵の意匠を優先し、表紙と裏表紙で意匠をそろえる）
+bool BookCoverTrimEnabled()
+{
+    return _CoverFlags.x < 0.5 && _CoverFlags.y < 0.5;
+}
+
+// 表紙の面：絵（あれば）に革の質感を重ねる。絵が無ければ表紙の地の色の革
 float3 BookCoverSurface(float3 picture, float2 local)
 {
-    float leather = BookLookFbm(local * 18) * 0.6 + BookLookNoise(local * 140) * 0.4;
-    float3 c = picture.r < 0 ? _CoverColor.rgb * tex2Dlod(_CoverTex, float4(local * _CoverTex_ST.xy + _CoverTex_ST.zw, 0, 0)).rgb
+    float leather = BookLookFbm(local * 18) * 0.6 + BookLookNoise(local * 140) * BookPaperOctaveWeight(140) * 0.4;
+    float3 c = picture.r < 0 ? BookCoverBaseColor() * tex2Dlod(_CoverTex, float4(local * _CoverTex_ST.xy + _CoverTex_ST.zw, 0, 0)).rgb
                              : picture;
     float grain = picture.r < 0 ? _CoverLeather : _CoverLeather * 0.35;
     return c * (1 - grain * (leather - 0.5));
 }
 
-// 表紙の板の内側の色（表紙の絵の色をならしたもの。絵が無ければ革）
+// 表紙の板の内側の縁（見返しの外に見える、表紙の材料の折り返し）。表紙・裏表紙とも表紙の地の色の革。
+// 表紙は片面印刷なので、内側に絵は出さない
 float3 BookBoardInside(bool frontCover, float2 p)
 {
-    float3 picture = float3(-1, -1, -1);
-    float2 uv = BookCoverUV(float2(-p.x, p.y), frontCover);
-    if ((frontCover ? _CoverFlags.x : _CoverFlags.y) > 0.5)
-        picture = (frontCover ? tex2Dlod(_FrontCoverTex, float4(uv, 0, 7)).rgb
-                              : tex2Dlod(_BackCoverTex, float4(uv, 0, 7)).rgb) * 0.8;
-    return BookCoverSurface(picture, p);
+    return BookCoverSurface(float3(-1, -1, -1), p) * 0.85;
 }
 
 // 表紙の板の範囲。開いた本は見開き全体、閉じた本は片側
@@ -379,9 +542,10 @@ float3 BookCoverTrim(float3 c, float2 p, float sd)
 // 表紙の板の小口（厚みの面）の色。along は辺に沿った位置
 float3 BookBoardEdgeColor(float along, float across)
 {
-    float3 c = _CoverColor.rgb * 0.45 * (0.85 + 0.15 * BookLookNoise(float2(along * 60, across * 4)));
+    float3 baseColor = BookCoverBaseColor();
+    float3 c = baseColor * 0.45 * (0.85 + 0.15 * BookLookNoise(float2(along * 60, across * 4)));
     // 表側の角に細い明るい線
-    c += _CoverColor.rgb * 0.35 * (1 - smoothstep(0, 0.25, across));
+    c += baseColor * 0.35 * (1 - smoothstep(0, 0.25, across));
     return c;
 }
 
@@ -392,7 +556,7 @@ float3 BookBoardFinish(float3 c, float2 p, float2 center, float2 halfSize, bool 
     float sd = BookSdRoundBox(p - center, halfSize, _CoverRadius);
     float bevel = smoothstep(-0.03, 0, sd);
     c *= lerp(1, 0.55, bevel);
-    c += _CoverColor.rgb * 0.25 * (1 - smoothstep(-0.012, -0.004, sd)) * smoothstep(-0.03, -0.012, sd);
+    c += BookCoverBaseColor() * 0.25 * (1 - smoothstep(-0.012, -0.004, sd)) * smoothstep(-0.03, -0.012, sd);
     c *= lerp(0.6, 1, smoothstep(0, 0.06, abs(p.x)));
     // deco は金の罫の濃さ（閉じかけで下の板の罫を消す）。四隅の角金具は常に残す
     if (trim)
@@ -409,10 +573,10 @@ float3 BookClosedBoardColor(float2 p, bool rightSide)
     if ((rightSide ? _CoverFlags.x : _CoverFlags.y) > 0.5)
     {
         float2 uv = BookCoverUV(p, rightSide);
-        picture = rightSide ? tex2Dlod(_FrontCoverTex, float4(uv, 0, 0)).rgb : tex2Dlod(_BackCoverTex, float4(uv, 0, 0)).rgb;
+        picture = rightSide ? tex2Dlod(_FrontCoverTex, float4(uv, 0, _CoverLod)).rgb : tex2Dlod(_BackCoverTex, float4(uv, 0, _CoverLod)).rgb;
     }
-    // 絵を貼った表紙には金の罫を引かない（絵の意匠を優先）
-    return BookBoardFinish(BookCoverSurface(picture, p - center), p, center, halfSize, picture.r < 0, 1);
+    // 絵を貼った本には金の罫を引かない（絵の意匠を優先。絵の無い裏表紙も表紙にそろえる）
+    return BookBoardFinish(BookCoverSurface(picture, p - center), p, center, halfSize, BookCoverTrimEnabled(), 1);
 }
 
 // 開いた本の板の縁＝表紙の内側（左は表紙、右は裏表紙）。表紙の絵の色だけを使う（文字や模様は内側に出ない）。
@@ -422,8 +586,7 @@ float3 BookOpenBoardColorDeco(float2 p, float deco)
     float2 center = float2(0, _PageAspect * 0.5);
     float2 halfSize = float2(1 + _CoverMargin.x, _PageAspect * 0.5 + _CoverMargin.y);
     bool front = p.x < 0;
-    bool trim = (front ? _CoverFlags.x : _CoverFlags.y) < 0.5;
-    return BookBoardFinish(BookBoardInside(front, p), p, center, halfSize, trim, deco);
+    return BookBoardFinish(BookBoardInside(front, p), p, center, halfSize, BookCoverTrimEnabled(), deco);
 }
 
 float3 BookOpenBoardColor(float2 p)
@@ -604,6 +767,23 @@ float BookDimBlurMask(float2 p)
         return 0;
     float rim;
     return _Dim * (1 - BookSpotMask(p, rim));
+}
+
+// ---------------------------------------------------------------------
+// 画面フェード：出力全体（本の外の透明な部分も）を _FadeColor へ寄せる。
+// 出力は不透明度を別に持つ（UIで背景に重ねる）ので、背景に重ねた後の見た目が
+// lerp(元の見た目, _FadeColor, _ScreenFade) になるよう色と不透明度を決める
+// ---------------------------------------------------------------------
+float4 BookApplyScreenFade(float4 col)
+{
+    float fade = saturate(_ScreenFade);
+    if (fade <= 0)
+        return col;
+    float a = saturate(col.a);
+    float alpha = 1 - (1 - fade) * (1 - a);
+    col.rgb = (col.rgb * a * (1 - fade) + _FadeColor.rgb * fade) / max(alpha, 1e-5);
+    col.a = alpha;
+    return col;
 }
 
 #endif
