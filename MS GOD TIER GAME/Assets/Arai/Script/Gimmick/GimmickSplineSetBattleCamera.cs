@@ -2,10 +2,11 @@
 
 public class GimmickSplineSetBattleCamera : GimmickSpline
 {
-    [SerializeField] private GimmickSplineRange m_range;
-    [SerializeField] private GameObject m_lookTarget;
-    [SerializeField] private float m_duration = 0.5f;
+    static private GimmickSplineSetBattleCamera m_settingScript;
 
+
+    [SerializeField] private GimmickSplineRange m_range;
+    
     private bool m_isLookFlag;
 
 
@@ -34,8 +35,8 @@ public class GimmickSplineSetBattleCamera : GimmickSpline
         }
 
         m_isLookFlag = true;
+        m_settingScript = this;
 
-        CameraManager.Instance.SetLookTarget(m_lookTarget, m_duration);
         CameraManager.Instance.SwitchCamera("BattleCamera");
     }
 
@@ -48,7 +49,12 @@ public class GimmickSplineSetBattleCamera : GimmickSpline
 
         m_isLookFlag = false;
 
-        CameraManager.Instance.SwitchCamera("FPSCamera");
+
+        if(m_settingScript == this)
+        {
+            m_settingScript = null;
+            CameraManager.Instance.SwitchCamera("FPSCamera");
+        }
     }
 
 
@@ -56,14 +62,5 @@ public class GimmickSplineSetBattleCamera : GimmickSpline
 
     private void OnDrawGizmos()
     {
-        OnGizmosMyPosition();
-
-        if(m_lookTarget == null)
-        {
-            return;
-        }
-
-        Gizmos.color = Color.skyBlue;
-        Gizmos.DrawLine( m_range.transform.position, m_lookTarget.transform.position);
     }
 }

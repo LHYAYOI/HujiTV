@@ -4,6 +4,7 @@ public class StageSpline : MonoBehaviour
 {
     [SerializeField] private SplineController2 m_startSplineController;
     [SerializeField] private float m_startOffset = 0.0f;
+    [SerializeField] private float m_startSpeed = 1f;
 
     [SerializeField] private CartController m_cart;
 
@@ -12,5 +13,6 @@ public class StageSpline : MonoBehaviour
     private void Start()
     {
         m_cart.SetSpline(m_startSplineController.Spline, m_startOffset, m_startSplineController.LoopFlag,true);
+        m_cart.SetSpeed(m_startSpeed);
     }
 }

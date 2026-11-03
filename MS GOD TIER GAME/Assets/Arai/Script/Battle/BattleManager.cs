@@ -100,6 +100,8 @@ public class BattleManager : MonoBehaviour
 
         while(true)
         {
+            yield return null;
+
             // 全ての敵が倒された場合はバトル終了イベントを呼び出す
             if (m_activeEnemyManager.GetActiveEnemies().Count() == 0)
             {
@@ -118,7 +120,6 @@ public class BattleManager : MonoBehaviour
                 break;
             }
 
-            yield return null;
         }
         
 
