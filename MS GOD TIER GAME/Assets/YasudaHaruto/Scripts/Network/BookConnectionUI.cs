@@ -32,6 +32,7 @@ public class BookConnectionUI : MonoBehaviour
     private ServerDiscoveryClient m_discovery;
     private string m_initialIp;
     private bool m_ipEdited;
+    private bool m_connectAfterDiscovery;
 
     private int m_testPingValue;
     private bool m_shouldLoadBookScene;
@@ -53,6 +54,7 @@ public class BookConnectionUI : MonoBehaviour
                 m_initialIp = m_ipInputField.text;
                 m_ipInputField.onValueChanged.AddListener(OnIpEdited);
             }
+            UpdateConnectButtonLabel();
             OnSearchServerButtonPressed();
         }
     }
@@ -62,18 +64,45 @@ public class BookConnectionUI : MonoBehaviour
     {
         if (m_discovery == null || m_networkClient == null ||
             m_networkClient.ConnectionState != BOOK_CONNECTION_STATE.DISCONNECTED || m_networkClient.IsReconnecting) return;
+        m_connectAfterDiscovery = false;
+        BeginDiscovery();
+    }
+
+    private void BeginDiscovery()
+    {
         m_ipEdited = false;
+        UpdateConnectButtonLabel();
         if (m_ipInputField != null) m_initialIp = m_ipInputField.text;
         m_discovery.BeginSearch();
         if (m_discovery.IsSearching && m_statusText != null)
             m_statusText.text = "Searching server... (manual IP available)";
     }
 
-    private void OnIpEdited(string value) { m_ipEdited = true; }
+    private void OnIpEdited(string value)
+    {
+        m_ipEdited = true;
+        m_connectAfterDiscovery = false;
+        m_discovery?.StopSearch();
+        UpdateConnectButtonLabel();
+    }
+
+    private void UpdateConnectButtonLabel()
+    {
+        if (m_connectButton == null) return;
+        TMP_Text label = m_connectButton.GetComponentInChildren<TMP_Text>(true);
+        if (label != null) label.text = m_ipEdited ? "Connect to entered IP" : "Find Server & Connect";
+    }
 
     private void OnServerFound(string address)
     {
         if (m_networkClient == null || m_networkClient.ConnectionState != BOOK_CONNECTION_STATE.DISCONNECTED) return;
+        if (m_connectAfterDiscovery)
+        {
+            m_connectAfterDiscovery = false;
+            if (m_ipInputField != null) m_ipInputField.SetTextWithoutNotify(address);
+            ConnectToAddress(address);
+            return;
+        }
         if (m_ipInputField != null && !m_ipEdited && m_ipInputField.text == m_initialIp)
         {
             m_ipInputField.SetTextWithoutNotify(address);
@@ -85,9 +114,10 @@ public class BookConnectionUI : MonoBehaviour
 
     private void OnSearchFinished(string message)
     {
+        m_connectAfterDiscovery = false;
         if (m_statusText != null && m_networkClient != null &&
             m_networkClient.ConnectionState == BOOK_CONNECTION_STATE.DISCONNECTED)
-            m_statusText.text = message;
+            m_statusText.text = message + " Start the PC server, then press Find Server & Connect again.";
     }
 
     private void LateUpdate()
@@ -109,12 +139,24 @@ public class BookConnectionUI : MonoBehaviour
             return;
         }
 
+        if (m_networkClient.ConnectionState != BOOK_CONNECTION_STATE.DISCONNECTED || m_networkClient.IsReconnecting) return;
+        if (m_ipEdited)
+        {
+            ConnectToAddress(m_ipInputField.text);
+            return;
+        }
+        if (m_discovery == null) return;
+        // BeginSearch may synchronously fail; record intent before opening the socket.
+        m_connectAfterDiscovery = true;
+        BeginDiscovery();
+    }
+
+    private void ConnectToAddress(string address)
+    {
+        if (m_networkClient == null || m_playerDropdown == null) return;
         m_discovery?.StopSearch();
-        string ipAddress = m_ipInputField.text;
-
         PLAYER_SLOT playerSlot = (PLAYER_SLOT)(m_playerDropdown.value + 1);
-
-        m_networkClient.Connect(ipAddress, playerSlot);
+        m_networkClient.Connect(address, playerSlot);
     }
 
     private void OnConnectionStateChanged(BOOK_CONNECTION_STATE state)

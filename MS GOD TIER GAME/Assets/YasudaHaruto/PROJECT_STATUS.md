@@ -1,5 +1,19 @@
 # Project Status
 
+## ワンボタンのサーバー探索・接続（2026-11-03）
+- ユーザー指示：タブレット先起動／PCサーバー後起動で、毎回IPを入力せずボタン1回で探索・接続したい。BookConnectionUIの既存接続ボタンを、IP未編集時は新しく4秒探索→発見IPへ選択中Playerで接続する処理へ変更。起動時の探索は従来どおりIP補完のみ。探索終了後も同じボタンで再探索できる。
+- ボタンのTMP表示をFind Server & Connectへ変更。IPを編集した場合は探索・自動接続予約を止め、Connect to entered IPとして手入力先へ接続する。OnSearchServerButtonPressedは補完専用のまま維持。登録・PC開始待ち・Scene遷移の既存処理は維持。Scene配線変更なし、元CP932文字コードを保持。
+- 現行RuntimeソースをUnity同版Roslyn／Bee参照設定で別出力コンパイル成功、既存警告3件。初回は古いrspの移動済みソース参照で失敗したため一覧を現行へ再生成、Unityが無視する末尾~バックアップを除外して成功。Unity Play Mode、ボタンの目視、PC／Android実通信は未確認。クライアントAPK再ビルドが必要。同一ネットワークのServer1台想定、探索UDP7776／本通信7777は従来どおり。
+
+## 次期ゲーム連携の現状確認（2026-11-03）
+- ユーザー指示：本シェーダー／Android負荷対策はいったん保留。敵撃破によるページドロップ・獲得、敵のお邪魔行動、途中の通信対応を進める前の現状調査を実施。今回の変更は本記録のみ。
+- ページ：BookInventory／BookGameControllerに追加・削除・同種複数所持・満杯時の入れ替え／辞退が実装済み。BookSceneは初期3見開き、上限8、受信待ち最大16。SendAddPage→ADD_PAGE→BookGameBootstrap→BookPageRequestQueueの受信経路も存在する。Assets内C#検索でSendAddPageの外部呼出しは見つからず、敵撃破→ドロップ生成→回収→獲得先決定の連携は未実装と判断。PageFactoryがページのMagicDataを発動コマンドへ接続するため、魔法ページ追加の基盤は再利用できる。
+- お邪魔：4枠状態、左右擦り／スクラッチ、4番枠の通常操作制限、見開きごとの保持、通信受信・めくり中予約は実装済み。SendObstacleの実呼出しはServer.UpdateのSpaceキー→PLAYER1／種類1のみ確認。敵の攻撃からの送信、対象選択・頻度等の管理は未接続。仮素材・画面Overlay表示、解除通知／再接続同期なしという制約も残る。
+- 通信：登録承認／拒否、開始通知、Serverロビー、Scene跨ぎ維持、自動再接続、自動探索のコードが存在。古いSERVER_DISCOVERY.mdの「登録承認なし」は後続SERVER_LOBBY.mdの実装で更新済み。ロビー追加後のPlay Mode統合検証・実機検証は過去記録で未完了。共有EditorBuildSettingsはClient起点とBookSceneのみ有効で、Server用Scene追加は未反映（個別Build Profileは今回未確認）。
+- 獲得通信はPageIdのみで要求ID・適用確認・切断中保存・再接続時の所持同期がない。Clientイベント購読前の受信保持もない。ドロップ回収の重複・取りこぼし防止には獲得イベントの設計が必要。SendAddPageはEndSend結果を戻り値へ反映しておらず、trueを本への獲得成立として扱わない。
+- 推奨順：獲得先／回収方式／ドロップ内容を設計→既存ページ管理へ接続→敵のお邪魔発生と対象管理→ロビー検証と獲得通信の確認応答・再接続対応。MiniGhostは時間経過でもBeginDyingへ進むため、Destroyや死亡演出だけを撃破報酬の条件にしない。他メンバーの敵コード／共有資産の変更範囲は実装案で明示する。
+- 確認は保存済みコード・Scene・資料の静的調査のみ。今回Unity起動／Play Mode／実機検証なし。Gitは通常権限で親パス解決失敗後、承認付きstatus・fetch・追跡先比較に成功。MS-88/Feature/USBTransmissionは調査開始時クリーン、追跡先からの追加コミット・ファイル差分なし。履歴操作は行っていない。
+
 ## Android本表示の負荷調査・実装保留（2026-11-02）
 - ユーザー指示により今回は調査と解決案のみ。コード・Scene・Material・共有設定は変更していない。実機の本画面はユーザーが開き、ADBで読み取り計測を行った。
 - Mi A3/Adreno610/OpenGLESで通常ページを表示した最新60フレームの平均1455.93ms（0.687FPS、最小766.22ms、最大1800.06ms）。同時期のUnityMainは0〜2%、UnityGfxDeviceWは0〜1%で、CPU計算過多よりGPU/描画ドライバー側の完了待ちを強く示唆。GPU個別パスの時間は未取得で、本合成/Bloom/撮影の寄与割合やドライバー固有問題は未確定。
