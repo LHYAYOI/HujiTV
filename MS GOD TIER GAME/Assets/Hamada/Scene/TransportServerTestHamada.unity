@@ -1586,6 +1586,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Chandelier
       objectReference: {fileID: 0}
+    - target: {fileID: 2508558017856968225, guid: a63cac2fd8edca14d947b464a2abaaa6, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2833334610759478036, guid: a63cac2fd8edca14d947b464a2abaaa6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
