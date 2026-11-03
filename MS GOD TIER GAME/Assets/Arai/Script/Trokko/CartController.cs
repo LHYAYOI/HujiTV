@@ -137,7 +137,11 @@ public class CartController : MonoBehaviour
         float3 position, tangent, up;
         m_spline.Evaluate(0, value, out position, out tangent, out up);
 
-        transform.rotation = Quaternion.LookRotation(tangent,up);
+        transform.rotation = 
+            Quaternion.Lerp(
+                transform.rotation,
+                Quaternion.LookRotation(tangent,up),
+                Time.deltaTime);
         transform.position = position;
 
     }
