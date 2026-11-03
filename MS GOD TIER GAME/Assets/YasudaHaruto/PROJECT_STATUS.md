@@ -666,3 +666,29 @@ $12026-10-29：お邪魔4枠の初期実装。左右擦り・スクラッチ、�
 - Runtime／Editorの別出力コンパイル成功、既存Runtime警告3件。Unityバッチは検証コード開始前に終了コード1で停止し原因未特定。Play Mode・UI目視・Android実機は未確認。ServerLobbyValidationの専用統合検証と既存NetworkRecoveryValidationの登録応答対応を追加。
 - 起動方法・PC／タブレット別Build Profile設定・確認手順・検証の未確認範囲はSERVER_LOBBY.md。共有Build Settingsは未変更。PC側ではBookServerLobbyとBookServerGameをScene Listへ追加してビルドする。
 - ゲーム終了／ロビー復帰／セッションリセットは未実装。正式Sceneへの統合と実機確認が残る。
+
+## AndroidシェーダーのDevelop履歴比較（2026-11-02）
+- ユーザー依頼は調査のみ。ゲームコード・Scene・Prefab・共有設定・元ShaderCacheは変更していない。Git fetch・履歴確認のみ実施、履歴変更操作なし。作業終了前のstatusは既存ブランチMS-88/Feature/USBTransmission、未コミット変更なし（本記録追記前）。
+- Androidは9/3初期設定からVulkan＋OpenGLES3、Auto OFF。最近Vulkan必須へ変わった履歴はない。現行4f95829で11/2にGLES3のみへ変更。fetch後origin/Develop 95c241fは従来設定。Git記録のUnity6000.3.23f1／URP17.3.0も初期から同一。
+- 外部ShaderProbeへGit原本を取り出し、同一Unity・Android・Tier2・キーワードなしで比較。10/27 Developマージd730e2e（PR#62、変更本体fda5d2f）の第1親はVulkan成功・生成GLES構文検証成功、マージ後は2905行u_xlat10_1未宣言エラーを再現。11/2 f360183のsampler2D_float変更後は両方成功。GLESはUnityのSuccessだけでは不正GLSLを検出できず、抽出GLSLをNDK glslcで別途検証。Fragment指定0バイトのSuccessは証拠に含めない。
+- コンパイル不具合の導入境界は10/27マージへ絞れた。float/intの演算不一致ではなく精度を扱うGLSL変換不整合。変更内の単一行の特定、現在の重さとの因果、旧APKの実行APIは未確認。現行コードのVulkan/GLES実機比較は未実施・設定変更もなし。
+- 詳細・生データは外部成果物ルート C:/Users/ths30546/.codex/visualizations/2026/11/02/01a19b7c-e5ee-7a51-9572-bcb6ef59b35a/vulkan-merge-investigation.md およびShaderProbe/RegressionResultsに保存。
+- 11/3追加確認：現在の本シェーダーにskip_optimizations、Vulkan専用条件、exclude/only_renderers等の指定は見つからない。現在保存済みソースについて「Vulkan時の最適化無効化が重さの原因」とする証拠はない。端末のAPKと保存済みソースの一致は未確認。sampler2D_floatは精度指定であり、紙質・にじみ・Bloom等の効果を追加する修正ではないが、精度変更の実機性能影響は未測定。コード上の描画負荷と異常な実機フレーム時間の主原因は区別し、Android/API/ドライバー特有の影響も未確定として扱う。今回も実装・設定変更なし。
+
+## 元コード無変更の実機GPU比較（2026-11-03）
+- 外部EGL/GLES計測プログラムをNDKで作成しMi A3の/data/local/tmpへ配置。元アプリは一時HOMEへ退避、終了後既存Activityを前面に復帰。ゲームコード・Scene・Material・共有設定・元ShaderCache・APKは変更なし。元アプリはユーザーによる今日00:28更新のもの。
+- 現行アプリ単独の本画面は最新60間隔平均408.885ms（2.446FPS）。UnityMain/Gfxは約1.5〜2.5%、CPU余裕あり。前回11/2測定とはAPK・条件が異なり、短縮理由は未確定。
+- 生成GLSLをUnity外で同条件比較（1600×1000 RGBA16F、2×2合成テクスチャ、通常紙2面、7回中央値、glFinish完了待ち込み）。10/27前336.7ms、現行341.8ms、局所halfのみ340.6msで同程度。現行のにじみOFF291.8ms、凹凸OFF297.7ms、紙の主要効果OFF256.2ms。800×500では88.8ms、単純表示3.8ms。
+- 基準でもFxMode=0のところ、外部GLSLでconst 0へ変えると165.9ms、さらにめくり等の静止条件もconst化すると129.6ms。未使用機能を含む大きなシェーダーと端末GL最適化の相互作用を示唆。内部のレジスター割当等は未測定。Vulkanで同じ計測はしておらず、OpenGLESだけの問題／旧APKが軽かった理由は未確定。
+- 合成単体に大きな負荷を再現できたが、Unity外の合成入力・時計計測でありゲーム全体のパス時間と同一視しない。実装提案はAPI比較、効果別バリアントの隔離検証、合成解像度調整。未実装。詳細と測定条件は外部成果物android-gpu-isolation-results.md、gpu-probe/summary.jsonに保存。
+
+## 燃焼・復活描画の一時除外スイッチ（2026-11-03）
+- ユーザー承認でhatake/book/shader/BookFlipEffects.cgincのみ実装変更。BOOK_DISABLE_PAGE_EFFECTSを1とし、_FxModeをコンパイル時定数0に置換。全プラットフォームで燃焼・復活の見た目を一時的に除外する。ゲーム側のイベント・待機時間・ページ切替処理は維持。
+- 戻し方：同ファイルの #define BOOK_DISABLE_PAGE_EFFECTS 1 を0へ変更し、再インポート／再ビルド。演出コードは削除していない。Scene・Material・共有設定は変更なし。開始時からのBookServerGame.unityと.utmp/configure_fingerprint.binの変更は保持。
+- 外部ShaderProbeのDisableEffectsProbeでAndroid Vulkanコンパイル成功、生成OpenGLES GLSLのNDK glslc構文検証成功・未宣言変数なし。生成GLSLからuniform _FxModeが除去されたことも確認。既存の未初期化警告は残る。APKの再ビルド・インストール・ゲーム全体の実機性能比較は今回未実施。
+
+## 旧モデルFPSと次の軽量化調査（2026-11-03）
+- ユーザー報告：除外版で少し改善したがモデル方式より重い。旧APKは残っていないと思うとの回答。Desktop/MS_ANDOROID_TEST/Test.apkは11/3 00:46更新、他に見つかったゲームAPKも現行Gradle出力。旧FPSの実測値は取得できておらず、当時の構成を別プロジェクトへ復元して再計測が必要。復元・旧版ビルドは今回未実施。
+- 10/20方式変更直前のBookModelViewは3Dモデル＋めくりアニメーション、BookModelAtlasは領域ごとのテクスチャ参照が中心。現行の手続き的な本合成とは異なる。旧方式でもモデル撮影カメラはあり、無負荷ではない。
+- 現行の実際のHLSL除外スイッチから生成したGLSLを外部実機ベンチで追加比較：1600×1000で中央値164.379ms、800×500で36.509ms（同じ紙効果）。ゲーム全体のFPSではない。800×500かつ紙主要効果OFFは35〜76msと変動し、追加効果は未確定。
+- 次の提案は合成解像度の調整を最優先、次いで通常／めくり／演出のバリアント分離、Bloomのみ停止の寄与測定。解像度縮小はにじみ・文字の鮮明さと比較する。今回コード・Scene・設定は追加変更なし。現在の元アプリは測定時に終了しており、新しいAPKの実FPSは未取得。
