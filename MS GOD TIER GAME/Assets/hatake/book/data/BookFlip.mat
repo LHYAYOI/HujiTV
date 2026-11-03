@@ -11,7 +11,8 @@ Material:
   m_Shader: {fileID: 4800000, guid: ad04cfc886e4c5e469445ae7c780b92f, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _PAPERFINISH_MATTE
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -57,6 +58,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _BoardMode: 0
+    - _BoardOpen: 1
     - _BoardThickness: 0.02
     - _BookShadow: 0.5
     - _BurnCurl: 0.8
@@ -80,21 +83,26 @@ Material:
     - _FxParticles: 0.55
     - _FxProgress: 0
     - _FxSide: 1
+    - _GlossSharpness: 48
+    - _GlossStrength: 0.25
     - _GutterDark: 0.35
     - _GutterWidth: 0.14
-    - _InkBleed: 0.45
+    - _InkBleed: 0
     - _InkBleedRadius: 0.006
     - _MagicStrength: 0
     - _PageAspect: 1.2
     - _PaperAge: 0.45
     - _PaperBump: 0.22
     - _PaperBumpScale: 160
+    - _PaperFinish: 0
     - _PaperGrain: 0.08
     - _PaperNormalStrength: 0
     - _PaperTexStrength: 0
+    - _PoseShading: 0.5
     - _ReviveEdgeWidth: 0.04
     - _Rigid: 0
     - _RigidCover: 1
+    - _ScreenFade: 0
     - _ShowThrough: 0.12
     - _SpecPower: 16
     - _SpecStrength: 0.35
@@ -120,6 +128,8 @@ Material:
     - _DimColor: {r: 0.059999965, g: 0.049999982, b: 0.089999996, a: 1}
     - _DstLeftRect: {r: 0, g: 0, b: 0.5, a: 1}
     - _DstRightRect: {r: 0.5, g: 0, b: 0.5, a: 1}
+    - _EndpaperColor: {r: 0.86, g: 0.8, b: 0.68, a: 1}
+    - _FadeColor: {r: 0, g: 0, b: 0, a: 1}
     - _Fold: {r: 1, g: 0, b: 1, a: 0}
     - _FoldGlowColor: {r: 1.6, g: 1.1, b: 0.45, a: 1}
     - _FxOrigin: {r: 0.5, g: 0.5, b: 1, a: 0}

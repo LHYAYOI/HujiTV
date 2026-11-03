@@ -34,6 +34,8 @@ public sealed class BookData : ScriptableObject
 
     private List<BookPageData> m_expandedPages;
     private List<BookSpreadData> m_expandedSets;
+    // 展開したときの、本の中でデータより前に置く枠の数（表紙の内側の枠など）
+    private int m_expandedLeading;
 
     public string BookTitle => m_bookTitle;
     public int PageCount { get { Expand(); return m_expandedPages.Count; } }
@@ -89,18 +91,26 @@ public sealed class BookData : ScriptableObject
         return true;
     }
 
-    /// <summary>実行時のページ一覧へ書き出す（pages と sets は同じ長さ）</summary>
-    public void CopyTo(List<BookPageData> pages, List<BookSpreadData> sets)
+    /// <summary>
+    /// 実行時のページ一覧へ書き出す（pages と sets は同じ長さ）。
+    /// leadingSlots は本の中でデータより前に置く枠の数（表紙の内側の枠なら 1）。
+    /// 見開きセット（目次など）が本の中で必ず見開きの左から始まるよう、この数を含めて左右をそろえる
+    /// </summary>
+    public void CopyTo(List<BookPageData> pages, List<BookSpreadData> sets, int leadingSlots = 0)
     {
         m_expandedPages = null;   // セット側のアセットが編集されていても最新を読む
-        Expand();
+        Expand(leadingSlots);
         pages.AddRange(m_expandedPages);
         sets.AddRange(m_expandedSets);
     }
 
-    private void Expand()
+    private void Expand() => Expand(0);
+
+    private void Expand(int leadingSlots)
     {
-        if (m_expandedPages != null) return;
+        leadingSlots = Mathf.Max(0, leadingSlots);
+        if (m_expandedPages != null && m_expandedLeading == leadingSlots) return;
+        m_expandedLeading = leadingSlots;
         m_expandedPages = new List<BookPageData>();
         m_expandedSets = new List<BookSpreadData>();
         if (m_contents == null || m_contents.Count == 0)
@@ -116,8 +126,8 @@ public sealed class BookData : ScriptableObject
         {
             if (entry is BookSpreadData spread)
             {
-                // 見開きセットは左ページから始める
-                if (m_expandedPages.Count % 2 == 1)
+                // 見開きセットは左ページから始める（本の中での位置で数える）
+                if ((leadingSlots + m_expandedPages.Count) % 2 == 1)
                 {
                     m_expandedPages.Add(null);
                     m_expandedSets.Add(null);
