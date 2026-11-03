@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8741494951507019425}
   - component: {fileID: 1808252473823512446}
   - component: {fileID: 2876499638195616828}
+  - component: {fileID: 8893701895886477800}
   - component: {fileID: 7192441285650405134}
   - component: {fileID: 510379350772446738}
   - component: {fileID: 6427638907401506824}
@@ -53,7 +54,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineCamera
   Priority:
     Enabled: 1
-    m_Value: 10
+    m_Value: 11
   OutputChannel: 1
   StandbyUpdate: 2
   m_StreamingVersion: 20241001
@@ -144,6 +145,19 @@ MonoBehaviour:
   m_cinemachineRotationExtension: {fileID: 510379350772446738}
   m_amplitudeGain: 0
   m_frequencyGain: 0
+--- !u!114 &8893701895886477800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6667048728300016894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 082badb01def8514b8121f976c8a6ba1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraZoom
+  m_cinemachineCamera: {fileID: 4686803459807104785}
 --- !u!114 &7192441285650405134
 MonoBehaviour:
   m_ObjectHideFlags: 0

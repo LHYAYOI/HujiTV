@@ -106,6 +106,8 @@ public class MagicBulletController : MonoBehaviour
         m_trail.transform.parent = null;
 
         //ヒットエフェクト
+
+        Destroy(gameObject);
     }
 
     //発射音再生 

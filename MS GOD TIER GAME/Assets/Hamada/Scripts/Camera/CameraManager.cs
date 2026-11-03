@@ -45,21 +45,6 @@ public class CameraManager : MonoBehaviour
         {
             SwitchCamera("FPSCamera");
         }
-
-        if (Input.GetKeyDown(KeyCode.I)) 
-        {
-            ResetCameraOrientation();
-        }
-
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            DollyCamera(1, 40, 1);
-        }
-
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            DollyCamera(1, 60, 0);
-        }
     }
 
     public void SwitchCamera(string cameraName)
@@ -117,7 +102,7 @@ public class CameraManager : MonoBehaviour
     }
 
     //縦と横の強さを指定できるカメラシェイク
-    public void ShakeCameraInVH(float duration, float horizontalIntensity, float verticalIntensity) 
+    public void ShakeCameraInVHF(float duration, float verticalIntensity, float horizontalIntensity, float forwardIntensity) 
     {
         CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
 
@@ -133,7 +118,7 @@ public class CameraManager : MonoBehaviour
             return;
         }
 
-        shake.VHShake(duration, horizontalIntensity, verticalIntensity);
+        shake.VHShake(duration, horizontalIntensity, verticalIntensity, forwardIntensity);
     }
 
     //カメラシェイク
@@ -214,6 +199,25 @@ public class CameraManager : MonoBehaviour
         }
 
         zoom.ChangeFOV(duration, FOV);
+    }
+
+    public void ChangeCameraFOV010(float duration, float maxFOV)
+    {
+        CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
+
+        if (currentVirtualCamera == null)
+        {
+            return;
+        }
+
+        CameraZoom zoom = currentVirtualCamera.GetComponent<CameraZoom>();
+
+        if (zoom == null)
+        {
+            return;
+        }
+
+        zoom.ChangeFOV010(duration, maxFOV);
     }
 
     public void ResetCameraOrientation() 
