@@ -1,16 +1,10 @@
-﻿using Unity.VisualScripting;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class BulletHitSenderController : MonoBehaviour
+public abstract class HitSenderBase : MonoBehaviour
 {
-    [SerializeField] GameObject m_parentObject;
-    [SerializeField] MagicBulletController m_magicBulletController;
-
     private void OnCollisionEnter(Collision collision)
     {
         SendHit(collision.gameObject);
-
-        Destroy(m_parentObject);
     }
 
     private void OnCollisionStay(Collision collision)
@@ -26,8 +20,6 @@ public class BulletHitSenderController : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         SendHit(other.gameObject);
-
-        Destroy(m_parentObject);
     }
 
     private void OnTriggerStay(Collider other)
@@ -40,7 +32,7 @@ public class BulletHitSenderController : MonoBehaviour
         SendExit(other.gameObject);
     }
 
-    private void SendHit(GameObject target) 
+    public void SendHit(GameObject target) 
     {
         HitReceiverController hitReceiver = GetHitReceiverController(target);
 
@@ -54,7 +46,7 @@ public class BulletHitSenderController : MonoBehaviour
         hitReceiver.OnHit(hitData);
     }
 
-    private void SendStay(GameObject target)
+    public void SendStay(GameObject target)
     {
         HitReceiverController hitReceiver = GetHitReceiverController(target);
 
@@ -68,7 +60,7 @@ public class BulletHitSenderController : MonoBehaviour
         hitReceiver.OnStay(hitData);
     }
 
-    private void SendExit(GameObject target)
+    public void SendExit(GameObject target)
     {
         HitReceiverController hitReceiver = GetHitReceiverController(target);
 
@@ -82,7 +74,7 @@ public class BulletHitSenderController : MonoBehaviour
         hitReceiver.OnStay(hitData);
     }
 
-    private HitReceiverController GetHitReceiverController(GameObject target) 
+    public HitReceiverController GetHitReceiverController(GameObject target) 
     {
         HitReceiverController hitReceiver = target.GetComponent<HitReceiverController>();
 
@@ -94,17 +86,5 @@ public class BulletHitSenderController : MonoBehaviour
         return hitReceiver;
     }
 
-    private HitData CreateHitData() 
-    {
-        HitData hitData = new HitData();
-
-        MagicData magicData = m_magicBulletController.GetMagicData();
-
-        //hitData.SetDamage(attackData.GetDamage);
-        hitData.SetHitObject(gameObject);
-        hitData.SetMagicData(magicData);
-        hitData.SetTag(gameObject.tag);
-
-        return hitData;
-    }
+    protected abstract HitData CreateHitData();
 }

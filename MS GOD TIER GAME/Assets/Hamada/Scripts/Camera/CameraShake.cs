@@ -23,7 +23,7 @@ public class CameraShake : MonoBehaviour
         m_multiChannelPerlin.FrequencyGain = m_frequencyGain;
     }
 
-    IEnumerator ShakeRoutine(float duration, float horizontalIntensity, float verticalIntensity, Vector2 frequencyRange)
+    IEnumerator ShakeRoutine(float duration, float horizontalIntensity, float verticalIntensity, float forwardIntensity, Vector2 frequencyRange)
     {
         float elapsedTime = 0.0f;
 
@@ -49,8 +49,9 @@ public class CameraShake : MonoBehaviour
             // 各軸の回転量を計算
             float xRotation = Mathf.Sin(elapsedTime * frequency + phaseX) * verticalIntensity * damper;
             float yRotation = Mathf.Cos(elapsedTime * frequency + phaseY) * horizontalIntensity * damper;
+            float zRotation = Mathf.Cos(elapsedTime * frequency + phaseY) * forwardIntensity * damper;
 
-            Vector3 currentOffset = new Vector3(xRotation, yRotation, 0);
+            Vector3 currentOffset = new Vector3(xRotation, yRotation, zRotation);
 
             m_totalShakeOffset -= previousShake; // 前回のオフセットを打ち消す
 
@@ -69,14 +70,14 @@ public class CameraShake : MonoBehaviour
         m_cinemachineRotationExtension.SetShakeRotationOffset(m_totalShakeOffset);
     }
 
-    public void VHShake(float duration, float horizontalIntensity, float verticalIntensity) 
+    public void VHShake(float duration, float horizontalIntensity = 0, float verticalIntensity = 0, float forwardIntensity = 0) 
     {
-        StartCoroutine(ShakeRoutine(duration, horizontalIntensity, verticalIntensity, new Vector2(25f, 80f)));
+        StartCoroutine(ShakeRoutine(duration, horizontalIntensity, verticalIntensity, forwardIntensity, new Vector2(25f, 80f)));
     }
 
     public void ShakeCamera(float intensity, float duration)
     {
-        StartCoroutine(ShakeRoutine(duration, intensity, intensity, new Vector2(25f, 40f)));
+        StartCoroutine(ShakeRoutine(duration, intensity, intensity, intensity, new Vector2(25f, 40f)));
     }
 
     public void SetRateOnTrolleyShake(float rate) 
