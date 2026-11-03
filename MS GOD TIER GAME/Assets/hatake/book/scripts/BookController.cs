@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Rendering.Universal;
 
 /// <summary>
 /// BookControllerは、BookDataの見開きを撮影し、表示するためのコンポーネント
@@ -36,6 +37,13 @@ namespace hatake
         [Header("めくり中のページ更新")]
         [Tooltip("めくり・燃焼・復活の間も、元の見開き（持っているページ）を撮影し続ける。撮影Cameraと撮影用Canvasを実行時に複製する")]
         [SerializeField] private bool m_liveTurningPages = true;
+        [Header("撮影の負荷（モバイル向け）")]
+        [Tooltip("ページを撮り直す回数（毎秒）。0：見開きを表示・めくる・燃やすときだけ撮影し、終わったら撮影カメラを止める（最も軽い）。" +
+                 "ページに動く素材（アニメーションするマテリアルなど）があるなら 10〜30")]
+        [SerializeField, Min(0)] private float m_pageRefreshRate;
+        [Tooltip("ON：撮影カメラ（めくり中の複製も）のポストエフェクト・MSAA・影を切る。ページの UI の撮影には要らない。" +
+                 "ページの色が URP のトーンマップ・色調整に頼っている場合は OFF")]
+        [SerializeField] private bool m_lightweightCapture = true;
 
         private int m_spreadIndex;
         private bool m_captureFlag;
@@ -89,13 +97,17 @@ namespace hatake
 
         private void Awake()
         {
-            if (m_bookData != null) m_bookData.CopyTo(m_runtimePages, m_runtimeSets);
-            if (CoversEnabled && m_coverInsides)
+            // 表紙の内側の枠を先頭に入れるときは、その分を含めて見開きセット（目次など）を左ページからそろえる
+            int leadingSlots = CoversEnabled && m_coverInsides ? 1 : 0;
+            if (m_bookData != null) m_bookData.CopyTo(m_runtimePages, m_runtimeSets, leadingSlots);
+            if (leadingSlots > 0)
             {
                 InsertRuntime(0, null, null);
                 m_frontInsideSlot = true;
             }
             if (m_startClosed && CoversEnabled) m_coverState = BookCoverState.FrontCover;
+            // 撮影カメラを軽くする（めくり中の複製はこれを複製するので、複製より先に）
+            if (m_lightweightCapture && m_captureCamera != null) MakeCaptureLightweight(m_captureCamera);
             // ページを表示する前（OnEnable より前）に複製する
             if (m_liveTurningPages && Application.isPlaying) CreateLiveRig();
         }
@@ -105,7 +117,11 @@ namespace hatake
         /// <summary>index が表紙の内側の枠（最初の見開きの左）か。ページではないので燃焼・挿入・削除できない</summary>
         public bool IsCoverInside(int pageIndex) => m_frontInsideSlot && pageIndex == 0;
 
-        /// <summary>データ上のページ番号（BookData の順、0始まり）→ 本の中の番号</summary>
+        /// <summary>
+        /// データ上のページ番号（BookData の順、0始まり）→ 本の中の番号。
+        /// 見開きセット（目次など）を表紙の内側の枠に合わせてそろえるときに白紙が入る位置が BookData 単体の並びと変わるので、
+        /// 最初の見開きセットより後ろのページは GetPage（本の中の番号）で引くこと
+        /// </summary>
         public int ToBookIndex(int dataIndex) => dataIndex + (m_frontInsideSlot ? 1 : 0);
 
         // 撮影した見開きの左右が表紙・裏表紙の内側かを Flip View に伝える
@@ -324,6 +340,7 @@ namespace hatake
             Canvas.ForceUpdateCanvases();
             m_captureCamera.enabled = true;
             yield return WaitForCameraFrame(m_captureCamera);
+            AfterCapture();
             TagCoverInsides(targetTexture, newSpread, PageCount + pageDelta);
 
             if (m_flipView != null)
@@ -606,6 +623,7 @@ namespace hatake
             Canvas.ForceUpdateCanvases();
             m_captureCamera.enabled = true;
             yield return WaitForCameraFrame(m_captureCamera);
+            AfterCapture();
             TagCoverInsides(targetTexture, spreadIndex, PageCount);
             m_previousTexture = m_currentTexture;
             m_currentTexture = targetTexture;
@@ -716,9 +734,10 @@ namespace hatake
 
             m_captureCamera.enabled = true;
             yield return WaitForCameraFrame(m_captureCamera);
+            AfterCapture();
             TagCoverInsides(targetTexture, spreadIndex, PageCount);
 
-            // Keep the source camera live for animated page materials.
+            // 動く素材のページは Page Refresh Rate で撮り直す（Update）
 
             if (m_flipView != null)
             {
@@ -785,6 +804,81 @@ namespace hatake
             m_clearDissolveAfterCapture = false;
             SpreadShown?.Invoke(spreadIndex);
             ResumePendingSpread();
+        }
+
+        // ------------------------------------------------------------------
+        // 撮影カメラの負荷
+        // ------------------------------------------------------------------
+        private float m_nextPageRefresh;
+        private bool m_pageRefreshing;
+
+        // 撮影が1枚終わった：撮り直さない設定なら撮影カメラを止める。合成には撮影し直した中身を描き直させる
+        private void AfterCapture()
+        {
+            if (m_pageRefreshRate <= 0f) m_captureCamera.enabled = false;
+            if (m_flipView != null) m_flipView.MarkDirty();
+        }
+
+        private bool m_liveForRemoval;
+
+        // 撮影カメラを必要なときだけ動かす：
+        //   ・ノイズ消去の演出中：撮影中のページが毎フレーム変わるので撮り続け、合成も毎フレーム描き直す
+        //   ・Page Refresh Rate > 0：その間隔で、表示中の見開きを1フレームだけ撮り直す（動く素材のページ）
+        //   ・アプリが裏から戻ったとき：撮影テクスチャの中身が消えていることがあるので1度撮り直す
+        private void Update()
+        {
+            if (m_captureCamera == null) return;
+            if (m_removingNoise && m_captureCamera.targetTexture == m_currentTexture && m_currentTexture != null)
+            {
+                m_captureCamera.enabled = true;
+                m_liveForRemoval = true;
+                if (m_flipView != null) m_flipView.MarkDirty();
+                return;
+            }
+            if (m_liveForRemoval)
+            {
+                // 消去の演出が終わった：最後の撮影を描かせてから止める
+                m_liveForRemoval = false;
+                if (!m_captureFlag && m_pageRefreshRate <= 0f) m_captureCamera.enabled = false;
+                if (m_flipView != null) m_flipView.MarkDirty();
+                return;
+            }
+            if (m_pageRefreshing)
+            {
+                // 前のフレームで撮り直した
+                m_pageRefreshing = false;
+                if (!m_captureFlag) m_captureCamera.enabled = false;
+                if (m_flipView != null) m_flipView.MarkDirty();
+                return;
+            }
+            if (m_pageRefreshRate <= 0f || Time.unscaledTime < m_nextPageRefresh) return;
+            m_nextPageRefresh = Time.unscaledTime + 1f / m_pageRefreshRate;
+            RequestRecapture();
+        }
+
+        // 表示中の見開きを、このフレームの終わりに1度だけ撮り直す（撮影中の処理が無いときだけ）
+        private void RequestRecapture()
+        {
+            if (m_captureCamera == null || m_captureFlag || m_currentTexture == null ||
+                m_captureCamera.targetTexture != m_currentTexture) return;
+            m_captureCamera.enabled = true;
+            m_pageRefreshing = true;
+        }
+
+        private void OnApplicationPause(bool paused)
+        {
+            if (!paused) RequestRecapture();
+        }
+
+        // ページの UI の撮影に要らない処理を切る（URP）
+        private static void MakeCaptureLightweight(Camera camera)
+        {
+            camera.allowMSAA = false;
+            UniversalAdditionalCameraData data = camera.GetUniversalAdditionalCameraData();
+            if (data == null) return;
+            data.renderPostProcessing = false;
+            data.antialiasing = AntialiasingMode.None;
+            data.renderShadows = false;
         }
 
         private static IEnumerator WaitForCameraFrame(Camera camera)
