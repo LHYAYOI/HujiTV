@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\aeito\\desktop\\hujitv\\ms god tier game\\assets\\arai\\sugu_kesu\\minigorst_autorotation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\arai\\sugu_kesu\\minigorst_autorotation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\users\\aeito\\desktop\\hujitv\\ms god tier game\\assets\\arai\\script\\gimmick\\gimmicksplinesetlooktarget.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\arai\\script\\gimmick\\gimmicksplinesetlooktarget.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -149,12 +153,12 @@
       "VerticalTabListWidth": 256,
       "DocumentGroups": [
         {
-          "DockedWidth": 71,
+          "DockedWidth": 206,
           "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "ConductorGhost.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\Conductor\\ConductorGhost.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\Conductor\\ConductorGhost.cs",
@@ -167,7 +171,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "ChestShaker.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\Conductor\\ChestShaker.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\Conductor\\ChestShaker.cs",
@@ -180,7 +184,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "SwarmGhostManager.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmGhostManager.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmGhostManager.cs",
@@ -193,7 +197,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "ConductorGhostManager.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\Conductor\\ConductorGhostManager.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\Conductor\\ConductorGhostManager.cs",
@@ -206,7 +210,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "SwarmGhost.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmGhost.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\SwarmGhost.cs",
@@ -224,6 +228,19 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "minigorst_autoRotation.cs",
+              "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Sugu_Kesu\\minigorst_autoRotation.cs",
+              "RelativeDocumentMoniker": "Assets\\Arai\\Sugu_Kesu\\minigorst_autoRotation.cs",
+              "ToolTip": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Sugu_Kesu\\minigorst_autoRotation.cs",
+              "RelativeToolTip": "Assets\\Arai\\Sugu_Kesu\\minigorst_autoRotation.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAABKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-04T07:32:04.711Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "GimmickSplineSetLookTarget.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Gimmick\\GimmickSplineSetLookTarget.cs",
               "RelativeDocumentMoniker": "Assets\\Arai\\Script\\Gimmick\\GimmickSplineSetLookTarget.cs",
@@ -236,7 +253,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "CartController.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Trokko\\CartController.cs",
               "RelativeDocumentMoniker": "Assets\\Arai\\Script\\Trokko\\CartController.cs",
@@ -248,7 +265,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "CameraManager.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
@@ -260,7 +277,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "CameraLookTargetChanger.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CameraLookTargetChanger.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Camera\\CameraLookTargetChanger.cs",
@@ -272,7 +289,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "StageSpline.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Trokko\\StageSpline.cs",
               "RelativeDocumentMoniker": "Assets\\Arai\\Script\\Trokko\\StageSpline.cs",
@@ -284,7 +301,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "GimmickSplineStop.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Gimmick\\GimmickSplineStop.cs",
               "RelativeDocumentMoniker": "Assets\\Arai\\Script\\Gimmick\\GimmickSplineStop.cs",
@@ -296,7 +313,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "GimmickSplineAnimPlayer.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Gimmick\\GimmickSplineAnimPlayer.cs",
               "RelativeDocumentMoniker": "Assets\\Arai\\Script\\Gimmick\\GimmickSplineAnimPlayer.cs",
@@ -308,7 +325,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "PlayerController.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Player\\PlayerController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Player\\PlayerController.cs",
@@ -320,7 +337,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "MouseClick.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Sugu_Kesu\\MouseClick.cs",
               "RelativeDocumentMoniker": "Assets\\Arai\\Sugu_Kesu\\MouseClick.cs",
@@ -332,7 +349,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 20,
               "Title": "EnemySpawnManager.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemySpawnManager.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\EnemySpawnManager.cs",
@@ -344,7 +361,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 19,
               "Title": "BattleData.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Battle\\BattleData.cs",
               "RelativeDocumentMoniker": "Assets\\Arai\\Script\\Battle\\BattleData.cs",
@@ -356,7 +373,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 18,
               "Title": "ActiveEnemyManager.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\ActiveEnemyManager.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\ActiveEnemyManager.cs",
@@ -368,7 +385,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 17,
               "Title": "ChestDrawer.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\Conductor\\ChestDrawer.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\Conductor\\ChestDrawer.cs",
@@ -380,7 +397,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 21,
               "Title": "MiniGhostDyingState.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostDyingState.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostDyingState.cs",
@@ -392,7 +409,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 23,
               "Title": "MiniGhostEnemy.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\MiniGhostEnemy.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\MiniGhostEnemy.cs",
@@ -404,7 +421,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 22,
               "Title": "MiniGhostSpawnState.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostSpawnState.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostSpawnState.cs",
@@ -416,7 +433,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 24,
               "Title": "BattleManager.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Battle\\BattleManager.cs",
               "RelativeDocumentMoniker": "Assets\\Arai\\Script\\Battle\\BattleManager.cs",
@@ -428,7 +445,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 25,
               "Title": "GimmickSplineBattle.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Gimmick\\GimmickSplineBattle.cs",
               "RelativeDocumentMoniker": "Assets\\Arai\\Script\\Gimmick\\GimmickSplineBattle.cs",
@@ -440,7 +457,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 27,
               "Title": "MiniGhostMoveState.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostMoveState.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostMoveState.cs",
@@ -452,7 +469,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 26,
               "Title": "MiniGhostAttackState.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostAttackState.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostAttackState.cs",
@@ -464,7 +481,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 28,
               "Title": "TeamToonMaterialBlend.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\hatake\\chara\\script\\TeamToonMaterialBlend.cs",
               "RelativeDocumentMoniker": "Assets\\hatake\\chara\\script\\TeamToonMaterialBlend.cs",
@@ -476,7 +493,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
+              "DocumentIndex": 29,
               "Title": "MagicBulletController.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletController.cs",
@@ -488,7 +505,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 30,
               "Title": "BookPageView.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\hatake\\book\\scripts\\BookPageView.cs",
               "RelativeDocumentMoniker": "Assets\\hatake\\book\\scripts\\BookPageView.cs",
@@ -500,7 +517,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 32,
+              "DocumentIndex": 33,
               "Title": "BookGameDragInput.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookGameDragInput.cs",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookGameDragInput.cs",
@@ -512,7 +529,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 33,
+              "DocumentIndex": 34,
               "Title": "BookFlipCoordinateTest.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookFlipCoordinateTest.cs",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\Input\\BookFlipCoordinateTest.cs",
@@ -524,7 +541,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 34,
+              "DocumentIndex": 35,
               "Title": "BookGameBootstrap.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookGameBootstrap.cs",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookGameBootstrap.cs",
@@ -536,7 +553,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 31,
               "Title": "PageInstance.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Page\\PageInstance.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Page\\PageInstance.cs",
@@ -548,7 +565,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 31,
+              "DocumentIndex": 32,
               "Title": "PageData.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Page\\Data\\PageData.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Page\\Data\\PageData.cs",
@@ -560,7 +577,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 35,
+              "DocumentIndex": 36,
               "Title": "BookTestBootstrap.cs",
               "DocumentMoniker": "C:\\Users\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookTestBootstrap.cs",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\ths31021\\Documents\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookTestBootstrap.cs",
@@ -573,12 +590,12 @@
           ]
         },
         {
-          "DockedWidth": 293,
+          "DockedWidth": 158,
           "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "GimmickSplineSetBattleCamera.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Gimmick\\GimmickSplineSetBattleCamera.cs",
               "RelativeDocumentMoniker": "Assets\\Arai\\Script\\Gimmick\\GimmickSplineSetBattleCamera.cs",
@@ -591,7 +608,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "GimmickSplineRange.cs",
               "DocumentMoniker": "C:\\Users\\aeito\\Desktop\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Gimmick\\GimmickSplineRange.cs",
               "RelativeDocumentMoniker": "Assets\\Arai\\Script\\Gimmick\\GimmickSplineRange.cs",
