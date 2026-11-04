@@ -26,23 +26,21 @@ public class BookGameController : MonoBehaviour
     private BookInventory m_inventory;
     private bool m_editing;
     private Func<bool> m_canEdit;
-    private PageData m_pendingPage;
-    private PageInstance m_insertionAnchor;
     private int m_maxPageCount;
     private int m_maxPendingRequests;
     public IReadOnlyList<PageInstance> Pages => m_inventory?.Pages;
-    public bool IsInputBlocked => !m_initialized || m_editing || m_pendingPage != null;
+    public bool IsInputBlocked => !m_initialized || m_editing;
     public bool IsInitialized => m_initialized;
     public bool CanRemoveObstacles => m_initialized && isActiveAndEnabled && !IsInputBlocked &&
         m_bookController != null && m_bookController.IsReady && !m_bookController.IsClosed;
     public bool CanNavigate => m_initialized && isActiveAndEnabled && !IsInputBlocked &&
         m_bookController != null && m_bookController.IsReady && !(m_currentPage?.Obstacles.BlocksActions ?? false);
     public bool IsEditing => m_editing;
-    public PageData PendingPage => m_pendingPage;
+    public PageData PendingPage => null;
     public int MaxPageCount => m_maxPageCount;
     public int MaxPendingRequests => m_maxPendingRequests;
-    public event Action ReplacementRequested;
-    public event Action ReplacementDismissed;
+    public event Action ReplacementRequested { add { } remove { } }
+    public event Action ReplacementDismissed { add { } remove { } }
     public event Action<bool> InventoryEditFinished;
     private PageInstance m_currentPage;
     private bool m_initialized;
@@ -149,76 +147,39 @@ public class BookGameController : MonoBehaviour
         m_bookController.CoverChanged -= OnCoverChanged;
 
         EndCurrentInteraction();
-        m_pendingPage = null;
-        m_insertionAnchor = null;
         m_editing = false;
         m_initialized = false;
     }
 
 
 
-    private bool Ready => CanRemoveObstacles && !(m_currentPage?.Obstacles.BlocksActions ?? false) &&
-        (m_canEdit == null || m_canEdit());
-
-    private bool CanConfirmReplacement => m_initialized && isActiveAndEnabled && !m_editing &&
-        m_bookController.IsReady && !m_bookController.IsClosed &&
-        (m_canEdit == null || m_canEdit());
-
-    public PAGE_ADD_RESULT RequestAdd(PageData data)
+    public PAGE_ADD_RESULT RequestAdd(PageData data, bool present = true)
     {
         if (!BookInventory.CanAdd(data)) return PAGE_ADD_RESULT.INVALID;
-        if (!Ready || m_pendingPage != null) return PAGE_ADD_RESULT.BUSY;
-        if (Pages.Count >= MaxPageCount)
+        if (!m_initialized) return PAGE_ADD_RESULT.BUSY;
+        if (m_inventory.Contains(data.PageId)) return PAGE_ADD_RESULT.INVALID;
+        if (m_editing || !m_bookController.IsReady || (m_canEdit != null && !m_canEdit()))
+            return PAGE_ADD_RESULT.BUSY;
+        if (present && m_bookController.IsClosed)
         {
-            m_pendingPage = data;
-            m_insertionAnchor = m_currentPage;
-            EndCurrentInteraction();
-            ReplacementRequested?.Invoke();
-            return PAGE_ADD_RESULT.NEEDS_SELECTION;
+            m_bookController.OpenBook();
+            return PAGE_ADD_RESULT.BUSY;
         }
-        var candidate = m_inventory.Add(data, m_currentPage, m_bookController.CurrentSpread == 0);
-        return Apply(candidate, m_currentPage, null) ? PAGE_ADD_RESULT.ACCEPTED : PAGE_ADD_RESULT.BUSY;
-    }
 
-    public bool ReplacePending(PageInstance selected)
-    {
-        if (!CanConfirmReplacement || m_pendingPage == null || selected == null) return false;
-        var candidate = m_inventory.Replace(m_pendingPage, selected, m_insertionAnchor,
-            m_bookController.CurrentSpread == 0, out PageInstance visible);
-        return Apply(candidate, visible, () => { m_pendingPage = null; m_insertionAnchor = null; });
-    }
-
-    public bool DeclinePending()
-    {
-        if (m_editing || m_pendingPage == null) return false;
-        m_pendingPage = null;
-        m_insertionAnchor = null;
-        ActivateSpread(m_bookController.CurrentSpread);
-        ReplacementDismissed?.Invoke();
-        return true;
-    }
-
-    public bool Remove(PageInstance selected)
-    {
-        if (!Ready || m_pendingPage != null || selected == null) return false;
-        var candidate = m_inventory.Remove(selected, m_currentPage, out PageInstance visible);
-        return Apply(candidate, visible, null);
-    }
-
-    private bool Apply(List<PageInstance> candidate, PageInstance visible, Action committed)
-    {
-        if (candidate == null || candidate.Count > MaxPageCount) return false;
+        var candidate = m_inventory.Add(data, out PageInstance added);
         var visuals = m_inventory.BuildVisualPages(candidate);
-        int spread = visible != null ? candidate.IndexOf(visible) + 1 :
-            (candidate.Count == 0 || m_bookController.CurrentSpread == 0 ? 0 : candidate.Count + 1);
+        int currentSpread = m_bookController.CurrentSpread;
+        int spread = present ? candidate.IndexOf(added) + 1 :
+            m_currentPage != null ? candidate.IndexOf(m_currentPage) + 1 :
+            currentSpread == 0 ? 0 : currentSpread + 1;
         m_editing = true;
         EndCurrentInteraction();
-        bool accepted = m_bookController.TryApplyInventory(visuals, spread, success =>
+        bool accepted = m_bookController.TryApplyInventory(visuals, spread, present, success =>
         {
             if (success)
             {
                 m_inventory.Commit(candidate);
-                committed?.Invoke();
+                if (present) m_bookController.PlayAcquisitionEffect();
             }
             m_editing = false;
             if (isActiveAndEnabled && m_initialized && m_bookController.IsReady && !m_bookController.IsClosed)
@@ -230,8 +191,13 @@ public class BookGameController : MonoBehaviour
             m_editing = false;
             ActivateSpread(m_bookController.CurrentSpread);
         }
-        return accepted;
+        return accepted ? PAGE_ADD_RESULT.ACCEPTED : PAGE_ADD_RESULT.BUSY;
     }
+
+    // Compatibility for the legacy validation scene and its panel.
+    public bool ReplacePending(PageInstance selected) => false;
+    public bool DeclinePending() => false;
+    public bool Remove(PageInstance selected) => false;
 
     private void OnDestroy()
     {

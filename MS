@@ -1,0 +1,26 @@
+[Licensing::Module] Trying to connect to existing licensing client channel...
+Built from '6000.3/staging' branch; Version is '6000.3.23f1 (09d2ecc7fb28) revision 643820'; Using compiler version '194234433'; Build Type 'Release'
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-ths30546" at "2026-11-02T05:51:50.4119588Z"
+OS: 'Windows 11  (10.0.26200) Professional' Language: 'ja' Physical Memory: 16085 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
+System  architecture: x64
+Process architecture: x64
+Date: 2026-11-02T05:51:50Z
+
+COMMAND LINE ARGUMENTS:
+C:\Program Files\Unity\Hub\Editor\6000.3.23f1\Editor\Unity.exe
+-batchmode
+-projectPath
+C:/Users/ths30546/Documents/GitHub/HujiTV/MS
+GOD
+TIER
+GAME
+-executeMethod
+YasudaHaruto.BookValidation.Editor.ServerLobbyValidation.RunBatch
+-logFile
+C:/Users/ths30546/Documents/GitHub/HujiTV/MS
+GOD
+TIER
+GAME/Temp/ServerLobbyValidation/unity.log
+Couldn't set project path to: C:/Users/ths30546/Documents/GitHub/HujiTV/MS GOD TIER GAME/C:/Users/ths30546/Documents/GitHub/HujiTV/MS
+Exiting without the bug reporter. Application will terminate with return code 1

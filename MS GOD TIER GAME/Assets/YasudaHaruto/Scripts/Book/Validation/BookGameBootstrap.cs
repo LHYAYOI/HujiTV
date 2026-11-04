@@ -69,6 +69,9 @@ public class BookGameBootstrap : MonoBehaviour
         if (m_networkClient != null)
         {
             m_networkClient.AddPageReceived += m_pageRequests.Receive;
+            m_networkClient.AcquiredPageReceived += m_pageRequests.ReceiveAcquired;
+            foreach (byte pageId in m_networkClient.AcquiredPageIds)
+                m_pageRequests.ReceiveAcquired(pageId, false);
             m_networkClient.ObstacleReceived += m_obstacleController.Receive;
             m_networkClient.OnConnectionStateChanged += OnConnectionStateChanged;
             OnConnectionStateChanged(m_networkClient.ConnectionState);
@@ -91,7 +94,11 @@ public class BookGameBootstrap : MonoBehaviour
     {
         if (m_networkClient != null)
         {
-            if (m_pageRequests != null) m_networkClient.AddPageReceived -= m_pageRequests.Receive;
+            if (m_pageRequests != null)
+            {
+                m_networkClient.AddPageReceived -= m_pageRequests.Receive;
+                m_networkClient.AcquiredPageReceived -= m_pageRequests.ReceiveAcquired;
+            }
             if (m_obstacleController != null) m_networkClient.ObstacleReceived -= m_obstacleController.Receive;
             m_networkClient.OnConnectionStateChanged -= OnConnectionStateChanged;
         }

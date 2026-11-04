@@ -29,66 +29,30 @@ namespace YasudaHaruto.BookValidation
             foreach (PageData data in initialPages)
             {
                 if (!HasVisuals(data)) throw new ArgumentException("Initial page has no left/right visual.");
-                pages.Add(m_factory.Create(data));
+                if (!pages.Exists(page => page.Data.PageId == data.PageId))
+                    pages.Add(m_factory.Create(data));
             }
+            pages.Sort((left, right) => left.Data.PageId.CompareTo(right.Data.PageId));
             Commit(pages);
         }
 
         public static bool HasVisuals(PageData data) => data != null &&
             data.LeftVisualData != null && data.RightVisualData != null;
 
-        public static bool CanAdd(PageData data) => HasVisuals(data) &&
-            (data.InsertType == PAGE_INSERT_TYPE.END || data.InsertType == PAGE_INSERT_TYPE.AFTER_CURRENT);
+        public static bool CanAdd(PageData data) => HasVisuals(data) && data.PageId != 0;
 
         public PageInstance GetPageAtSpread(int spread) =>
             spread > 0 && spread <= m_pages.Count ? m_pages[spread - 1] : null;
 
-        public List<PageInstance> Add(PageData data, PageInstance anchor, bool atFront)
-        {
-            if (!CanAdd(data) || m_pages.Count >= MaxPageCount) return null;
-            var candidate = new List<PageInstance>(m_pages);
-            candidate.Insert(InsertionIndex(candidate, data, anchor, atFront), m_factory.Create(data));
-            return candidate;
-        }
+        public bool Contains(byte pageId) => m_pages.Exists(page => page.Data.PageId == pageId);
 
-        public List<PageInstance> Replace(PageData data, PageInstance selected, PageInstance anchor,
-            bool atFront, out PageInstance visible)
+        public List<PageInstance> Add(PageData data, out PageInstance added)
         {
-            visible = anchor;
-            int removed = m_pages.IndexOf(selected);
-            if (!CanAdd(data) || removed < 0) return null;
+            added = m_factory.Create(data);
             var candidate = new List<PageInstance>(m_pages);
-            candidate.RemoveAt(removed);
-            var added = m_factory.Create(data);
-            int at = ReferenceEquals(selected, anchor) && data.InsertType == PAGE_INSERT_TYPE.AFTER_CURRENT
-                ? removed : InsertionIndex(candidate, data, anchor, atFront);
-            candidate.Insert(at, added);
-            if (ReferenceEquals(selected, anchor)) visible = added;
+            int index = candidate.FindIndex(page => page.Data.PageId > data.PageId);
+            candidate.Insert(index < 0 ? candidate.Count : index, added);
             return candidate;
-        }
-
-        public List<PageInstance> Remove(PageInstance selected, PageInstance current, out PageInstance visible)
-        {
-            visible = current;
-            int at = m_pages.IndexOf(selected);
-            if (at < 0) return null;
-            var candidate = new List<PageInstance>(m_pages);
-            candidate.RemoveAt(at);
-            if (ReferenceEquals(current, selected))
-                visible = candidate.Count == 0 ? null : candidate[Math.Min(at, candidate.Count - 1)];
-            return candidate;
-        }
-
-        private static int InsertionIndex(List<PageInstance> pages, PageData data, PageInstance anchor, bool atFront)
-        {
-            if (data.InsertType == PAGE_INSERT_TYPE.END) return pages.Count;
-            if (anchor != null)
-            {
-                int index = pages.IndexOf(anchor);
-                if (index < 0) throw new InvalidOperationException("Insertion anchor is no longer owned.");
-                return index + 1;
-            }
-            return atFront ? 0 : pages.Count;
         }
 
         public List<BookPageData> BuildVisualPages(IReadOnlyList<PageInstance> pages)
@@ -107,7 +71,7 @@ namespace YasudaHaruto.BookValidation
         // Commit only after the view has accepted and captured the complete candidate.
         public void Commit(List<PageInstance> candidate)
         {
-            if (candidate == null || candidate.Count > MaxPageCount) throw new ArgumentException("Invalid inventory candidate.");
+            if (candidate == null) throw new ArgumentException("Invalid inventory candidate.");
             m_pages = new List<PageInstance>(candidate);
             Pages = m_pages.AsReadOnly();
         }
