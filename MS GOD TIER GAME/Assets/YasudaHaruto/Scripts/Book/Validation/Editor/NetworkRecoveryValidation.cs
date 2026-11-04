@@ -22,6 +22,7 @@ namespace YasudaHaruto.BookValidation.Editor
         private static RuneData s_data;
         private static NetworkDriver s_server;
         private static NetworkConnection s_connection;
+        private static NetworkPipeline s_pipeline;
         private static int s_step;
         private static int s_registrations;
         private static double s_deadline;
@@ -123,7 +124,7 @@ namespace YasudaHaruto.BookValidation.Editor
                         if (s_client.ConnectionState != BOOK_CONNECTION_STATE.CONNECTING) break;
                         Require(Time.unscaledTime - s_mark >= 0.9f, "Retry waits its one second interval using unscaled time");
                         s_server = NetworkDriver.Create();
-                        s_server.CreatePipeline(typeof(ReliableSequencedPipelineStage));
+                        s_pipeline = s_server.CreatePipeline(typeof(ReliableSequencedPipelineStage));
                         Require(s_server.Bind(NetworkEndpoint.AnyIpv4.WithPort(7777)) == 0 && s_server.Listen() == 0,
                             "Late-started local server binds successfully");
                         s_step++;
@@ -194,6 +195,10 @@ namespace YasudaHaruto.BookValidation.Editor
                 Require(reader.Length == 2 && reader.ReadByte() == (byte)BOOK_MESSAGE_TYPE.REGISTER_CONTROLLER &&
                     reader.ReadByte() == (byte)PLAYER_SLOT.PLAYER2, "Each connection sends the original player registration");
                 s_registrations++;
+                Require(s_server.BeginSend(s_pipeline, s_connection, out var writer) == 0,
+                    "Registration acknowledgement can be queued");
+                writer.WriteByte((byte)BOOK_MESSAGE_TYPE.REGISTRATION_ACCEPTED);
+                s_server.EndSend(writer);
             }
         }
 

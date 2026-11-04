@@ -6,7 +6,7 @@
 #define BOOK_LAYER_BACK  3  // めくっているページの裏（＝移動先の反対側ページ）
 #define BOOK_LAYER_UNDER 4  // めくった下から見える移動先ページ
 
-sampler2D _CurLeftTex, _CurRightTex, _DstLeftTex, _DstRightTex;
+sampler2D_float _CurLeftTex, _CurRightTex, _DstLeftTex, _DstRightTex;
 float4 _CurLeftRect, _CurRightRect, _DstLeftRect, _DstRightRect; // 各テクスチャ内のページ範囲 XYWH
 float4 _BookRect; // 出力UV内の見開き範囲 (xMin, yMin, xMax, yMax)
 float _PageAspect; // ページ高さ / ページ幅
@@ -17,7 +17,7 @@ float4 _Fold; // xy 角の元位置, zw 角の現在位置（Turn space）
 
 // 面の種類（現在の左, 現在の右, 移動先の左, 移動先の右）：0 ページ, 1 表紙, 2 裏表紙, 3 何も無い
 float4 _SlotKinds;
-sampler2D _FrontCoverTex, _BackCoverTex;
+sampler2D_float _FrontCoverTex, _BackCoverTex;
 float4 _CoverFlags; // x 表紙の絵あり, y 裏表紙の絵あり
 float4 _CoverMargin; // x 横, y 縦（表紙の板がページからはみ出す幅）
 float _Rigid; // 1 = 硬い表紙のめくり（曲がらずに背を軸に回る）。_Fold.z が板の外側の位置（cos）

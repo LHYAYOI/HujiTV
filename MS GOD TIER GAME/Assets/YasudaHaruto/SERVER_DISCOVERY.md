@@ -1,0 +1,36 @@
+# Server Discovery（2026-11-02）
+
+## 実際の構成
+- Unity 6000.3.23f1。接続画面はTransportClientTest、接続後はBookConnectionUI.LateUpdateでBookSceneをロードする。Build Settingsもこの2つが有効。
+- TransportClientTestのBookConnectionUIにはClient、IP欄、Status、Connect、Player Dropdownが割当済み。BookNetworkClientはsingleton / DontDestroyOnLoadで本Sceneへ持ち越す。
+- BookSceneはBookGameBootstrap → BookGameController → YasudaBookViewControllerを中心に本を管理。hatake.BookControllerも別資産用に残る。
+- ServerはAnyIpv4:7777で待受。TransportServerTestに直接配置され、BookSystem.prefab経由でMain_Game_Scene / Main_Game_Scene_Alphaにも参照される。共有Scene・Prefabは今回変更していない。
+- ServerはNativeListの接続一覧とConnection→PLAYER_SLOTのDictionaryを持つ。REGISTER_CONTROLLERはreliable送信。重複Slotは切断し、承認／拒否メッセージは返さない。Clientは登録完了前のTransport接続時点でCONNECTEDとなる。
+- Clientには1〜8秒の待機による再接続と明示Disconnectによる停止が既にある。初回失敗・重複Slot拒否も再試行する。今回この仕様とUpdateのイベント→タイムアウト順序は変更しない。
+- 魔法はRuneTraceController → CastMagicCommand → BookNetworkService → SendCastSkill → CAST_MAGIC（byte SkillId＋byte方向）→ Server.CastMagicReceived。Hamada/PlayerControllerが購読し、現行メソッドはSlotを使わず弾を発射する。Player別MagicSystem完成とは判断できない。
+- BookInputState.csはBOOK_INPUT_STATE enumのみ。MagicSystem.csはクラス全体がコメントアウト。PageChangedパケットは現行enum・送受信コードに存在しない。
+- Server→ClientのADD_PAGEとAPPLY_OBSTACLEはBootstrapの購読からページ追加・お邪魔へ接続済み。
+- CURSOR_POSITIONはfloat×2の送受信あり。Server保存先は単一Vector2でPlayer別ではない。PhoneAttitudeControllerのSendVector2呼出しはコメントアウトされている。
+
+## 最小変更の責務
+- ServerDiscoveryProtocol：探索用ポート7776、プロトコル識別子・版、既存ゲームポート7777。
+- ServerDiscoveryClient：一時ポートからbroadcast＋loopbackへ0.75秒間隔で最大4秒探索。応答元IPを通知する。nonce一致と返信元ポートを検査する。最初の有効応答を採用するため、同一LANではServer1台を想定する。認証機能ではない。
+- ServerDiscoveryResponder：Any IPv4:7776で探索にunicast返信。Serverの待受成功後だけ開始する。Server無効時は返信しない。
+- BookNetworkServer：待受成功後にResponderを実行時追加し、破棄時に停止する。
+- BookConnectionUI：起動時に探索しIPを補完。Player選択・Connectは従来どおり。探索中に編集された手入力は保持する。探索失敗もManual IP接続を妨げない。OnSearchServerButtonPressedを任意の再探索ボタンに割当可能。今回ボタン自体の追加やScene保存はしていない。
+- BookNetworkClientと本・魔法のゲーム処理は変更しない。UDPソケットはメインスレッドでnonblocking処理し、1フレーム最大16パケット。終了・無効化時に解放する。
+
+## Unity確認手順
+1. Unityでスクリプトを再読込しConsoleにコンパイルエラーがないことを確認。
+2. PC側でTransportServerTestまたはServer配置済みのゲームSceneを起動。Serverの7777待受成功を確認。PCファイアウォールのUnity／ゲーム実行ファイルへのUDP 7776と7777の受信許可を確認する。
+3. 別PCまたはAndroidでTransportClientTestから起動。同一LANで4秒以内にServer foundとPCのIP補完が表示されることを確認。
+4. Player1→ConnectでBookSceneへ移動し、魔法送信を確認。2台目はPlayer2で確認する。
+5. 探索中にIPを編集し、発見時に上書きされないことを確認。探索完了前でも手入力からConnectできることを確認。
+6. Serverなしで起動し約4秒後の案内を確認。Server起動後、手入力接続または接続画面の再起動で探索を確認。探索のみ失敗する環境でもManual IP接続を確認する。
+7. 本Sceneで切断・復旧し従来の再接続を確認。Slot重複は既存の再試行課題があるため、正常試験では必ず別Slotを選ぶ。
+8. Android USBテザリングを有効にし、PCに追加されたネットワークインターフェースで同じ手順を試す。端末・OS・経路によってbroadcastが届かなければPCのUSB側IPv4を手入力する。本通信は同じUnity Transportを使用する。複数Android同時テザリング時の経路は別途実機確認が必要。
+
+## 検証範囲と次段階
+- 既存UnityのBee応答ファイルと同版Roslynで、出力先をTemp/ServerDiscoveryValidationへ分けて全Runtimeコードをコンパイル。成功、既存の未使用メンバー警告3件。Unity起動・Scene再保存・Play Mode・実UDP探索・Android通信は今回未実施。
+- 次段階はRegistrationAccepted/Rejectedを先に設計し、CONNECTEDを登録承認後へ変更、拒否理由と再試行可否を区別する。その後、再接続の状態復元、複数Server選択、必要ならPlayer別Vector2／ページ同期を扱う。
+- USB専用Transportは追加しない。実機でテザリングによるIP通信が成立しない場合に限って再検討する。

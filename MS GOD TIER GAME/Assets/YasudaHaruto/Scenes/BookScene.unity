@@ -167,6 +167,13 @@ MonoBehaviour:
   m_runeTraceView: {fileID: 1457169296}
   m_runeCooldownSeconds: 5
   m_gameDragInput: {fileID: 8271864336177666055}
+  m_obstacles: []
+  m_rightObstacleArea:
+    serializedVersion: 2
+    x: 0.1
+    y: 0.15
+    width: 0.8
+    height: 0.7
   m_pageDatabase: {fileID: 11400000, guid: 262c5c96532bc7b4aaf8fbc2bbe1eda6, type: 2}
 --- !u!1 &92516299
 GameObject:
@@ -1423,7 +1430,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81094a86de454abeb100ecc8447431fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::YasudaHaruto.BookValidation.YasudaBookViewController
-  m_bookData: {fileID: 11400000, guid: 7425eee5918961e4fae7064b2d6a77f5, type: 2}
   m_leftPageView: {fileID: 7635606618658084902}
   m_rightPageView: {fileID: 4345863370804085185}
   m_captureCamera: {fileID: 7369026162671368223}
@@ -1714,7 +1720,15 @@ MonoBehaviour:
   m_outputTexture: {fileID: 0}
   m_display: {fileID: 0}
   m_outputSize: {x: 1600, y: 1000}
+  m_fitDisplayResolution: 1
   m_hdrOutput: 0
+  m_redrawOnlyOnChange: 1
+  m_idleRefreshRate: 0
+  m_ambientRefreshRateMobile: 30
+  m_maxOutputHeight: 0
+  m_maxOutputHeightMobile: 720
+  m_bloomIterationsMobile: 3
+  m_forceMobileSettings: 0
   m_postShader: {fileID: 4800000, guid: 5578288a7a21cc74e94534d3c228798e, type: 3}
   m_bloomIntensity: 0.9
   m_bloomThreshold: 0.95
@@ -1770,6 +1784,9 @@ MonoBehaviour:
   m_leafThickness: 0.0025
   m_stackLayers: 14
   m_stackDrop: 0.6
+  m_bookPose: {x: 0, y: 0, z: 0}
+  m_paperFinish: 0
+  m_screenFade: 0
 --- !u!1 &5909681140942768519
 GameObject:
   m_ObjectHideFlags: 0
@@ -2043,6 +2060,25 @@ MonoBehaviour:
   m_castPulseSpeed: 1
   m_castPulseAmount: 0.08
   m_castArrowWidth: 0.2
+  m_spellSettings:
+    m_floatDuration: 0.35
+    m_gatherDuration: 0.55
+    m_floatHeight: 0.12
+    m_traceParticleCount: 220
+    m_traceParticleSize: 0.009
+    m_coreSize: 0.045
+    m_orbitRadius: 0.055
+    m_orbitParticleCount: 36
+    m_orbitSpeed: 1.3
+    m_orbitParticleSize: 0.006
+    m_fallbackColor: {r: 0.35, g: 0.8, b: 1, a: 1}
+    m_dragFollow: 0.4
+    m_dragLimit: 0.65
+    m_flightDuration: 0.4
+    m_trailParticleCount: 40
+    m_arrowSprite: {fileID: 0}
+    m_arrowLength: 0.24
+    m_arrowIdleAlpha: 0.3
 --- !u!1 &8669757447175594567
 GameObject:
   m_ObjectHideFlags: 0

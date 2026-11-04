@@ -11,11 +11,11 @@
 
 // 紙
 float4 _PaperTint;
-sampler2D _PaperTex;
+sampler2D_float _PaperTex;
 float4 _PaperTex_ST;
 float _PaperTexStrength, _PaperGrain, _PaperAge;
 float4 _AgeColor;
-sampler2D _PaperNormalTex;
+sampler2D_float _PaperNormalTex;
 float4 _PaperNormalTex_ST;
 float _PaperNormalStrength, _PaperBump, _PaperBumpScale;
 float _InkBleed, _InkBleedRadius;
@@ -84,7 +84,7 @@ float _StackLineDark;
 
 // 表紙
 float4 _CoverColor;
-sampler2D _CoverTex;
+sampler2D_float _CoverTex;
 float4 _CoverTex_ST;
 
 

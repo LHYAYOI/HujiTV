@@ -6,7 +6,8 @@ namespace YasudaHaruto.BookValidation
     // Network IDs are resolved here; inventory rules remain in BookGameController.
     public sealed class BookPageRequestQueue
     {
-        private readonly Queue<PageData> m_requests = new Queue<PageData>();
+        private readonly Queue<(PageData Data, bool Present)> m_requests = new();
+        private readonly HashSet<byte> m_pendingIds = new();
         private readonly PageDatabase m_database;
         private readonly BookGameController m_game;
 
@@ -16,23 +17,32 @@ namespace YasudaHaruto.BookValidation
             m_game = game;
         }
 
-        public void Receive(byte id)
+        public void Receive(byte id) => ReceiveAcquired(id, true);
+
+        public void ReceiveAcquired(byte id, bool present)
         {
             if (m_database == null) { Debug.LogWarning("Page database is not configured."); return; }
             PageData data = m_database.GetPage(id);
             if (!BookInventory.CanAdd(data)) { Debug.LogWarning("Unsupported page request: " + id); return; }
-            if (m_requests.Count >= m_game.MaxPendingRequests)
-            { Debug.LogWarning("Page request queue is full; incoming request rejected."); return; }
-            m_requests.Enqueue(data);
+            if (m_pendingIds.Add(id)) m_requests.Enqueue((data, present));
         }
 
         public void Tick()
         {
             if (m_requests.Count == 0 || m_game == null || m_game.IsInputBlocked) return;
-            var result = m_game.RequestAdd(m_requests.Peek());
-            if (result != PAGE_ADD_RESULT.BUSY) m_requests.Dequeue();
+            var request = m_requests.Peek();
+            // Keep the request until the captured inventory has committed.
+            if (m_game.RequestAdd(request.Data, request.Present) == PAGE_ADD_RESULT.INVALID)
+            {
+                m_requests.Dequeue();
+                m_pendingIds.Remove(request.Data.PageId);
+            }
         }
 
-        public void Clear() => m_requests.Clear();
+        public void Clear()
+        {
+            m_requests.Clear();
+            m_pendingIds.Clear();
+        }
     }
 }
