@@ -71,6 +71,11 @@ public class MagicBulletController : MonoBehaviour
 
         while (deltaTime < duration)
         {
+            if (target == null) 
+            {
+                yield break;
+            }
+
             deltaTime += Time.deltaTime;
 
             float rate = deltaTime / duration;
