@@ -70,6 +70,8 @@ public class SwarmGhost : MonoBehaviour
 
     private bool m_isChargingFlag = false; // 突撃中フラグ
 
+    private bool m_turnToPlayerFlag = true; // プレイヤーの方向を向くフラグ
+
     private void Awake()
     {
         m_initialPosition = transform.position;
@@ -97,7 +99,10 @@ public class SwarmGhost : MonoBehaviour
 
         if(!m_isChargingFlag)
         {
-           TurnToPlayer();
+            if (m_turnToPlayerFlag)
+            {
+                TurnToPlayer();
+            }
         }
     }
 
@@ -576,5 +581,10 @@ public class SwarmGhost : MonoBehaviour
 
         // パーティクルのサイズを半分にする
         m_spawnedDeathParticle.transform.localScale *= 0.5f;
+    }
+
+    public void SetTurnToPlayerFlag(bool flag)
+    {
+        m_turnToPlayerFlag = flag;
     }
 }

@@ -200,6 +200,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostSpawnState
   m_spawnDuration: 3
+  m_materialBlend: 0.2
 --- !u!114 &2846553606419501028
 MonoBehaviour:
   m_ObjectHideFlags: 0
