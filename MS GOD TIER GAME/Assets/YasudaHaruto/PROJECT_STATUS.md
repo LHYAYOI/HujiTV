@@ -1,5 +1,15 @@
 # Project Status
 
+## トロッコステージ設定ガイド（2026-11-04）
+- TROLLEY_STAGE_SETUP.md に、Arai のスプライン・分岐・停止・速度変更、Hamada の衝突イベント・カメラ、戦闘開始から再発進までの設定手順をまとめた。
+- Main_Game_Scene_Alpha、Arai の分岐サンプルと Stage Prefab、関連 C# の静的調査。Unity Play Mode は未確認。今回の変更は資料と作業記録。
+- Git fetch と追跡先比較を実施。現在のブランチと追跡先のコミット・ファイル差分はなく、作業開始時に共有設定・本関連アセット・本記録などに既存の未コミット変更があった。
+
+## 泡の仮Prefabと獲得プレビュー（2026-11-04）
+- BookSceneを開き、Play Modeに入る前に Tools > YasudaHaruto > Preview Page Drop and Acquisition を選ぶ。Gameビュー右上に仮Prefabの落下と回収、本側にID 5への自動めくりと獲得演出が出る構成。ID 5の泡を2つ落とし、実際のローカルUDP接続を通して本が1回だけ追加・表示することを確認する。結果は右上とConsoleに表示。
+- PreviewPageBubble.prefabは仮の透明球・紙片・インク線で構成。検証用ステージ・カメラ・サーバー・クライアントはPlay Mode中に生成する。既存のScene、敵、戦闘管理の保存データは編集していない。ローカルUDP 7777を使うため、同じPCでゲームサーバーを起動中なら停止してから試す。
+- プレビューコード単体のEditor向けC#コンパイル成功。UnityバッチはPlay Mode開始前に終了コード1で停止したため、PrefabのUnity上でのインポート、Gameビューの表示とE2E動作は未確認。
+
 ## ページドロップ・獲得基盤（2026-11-04）
 - Assets/YasudaHaruto内にBattlePageDropsを追加。PC側のオブジェクトに付けて、撃破確定時にReportEnemyDefeated(enemyId, worldPosition)、戦闘から次へ進む時にCollectBattleDrops(cartTarget)を呼ぶ。後者は最後の泡の落下を待って一斉回収する。敵／戦闘コードと保存済みScene・Prefabへの配線は未変更。
 - InspectorのAssignmentsで敵IDからPageIdを割り当てる。MiniGhost_A/B/CはID 5が初期値。Bubble Prefab、Bubble Material、Ground Layersは任意。Prefab未指定時は透明球と紙片の仮表示。Play ModeでPreview Cart Targetを指定し、コンポーネントの「Preview / Drop Page Bubbles」「Preview / Collect Page Bubbles」で手動検証できる。両者への送信を試す場合はBookNetworkServerでゲーム開始済みの状態にする。
