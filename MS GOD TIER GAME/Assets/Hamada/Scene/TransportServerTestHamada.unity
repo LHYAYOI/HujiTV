@@ -1658,7 +1658,7 @@ PrefabInstance:
     - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
       propertyPath: magicData
       value: 
-      objectReference: {fileID: 11400000, guid: fd84468c9ad10ad489611b6288bb8c24, type: 2}
+      objectReference: {fileID: 11400000, guid: 1fc6fe6d07825934aa2aa07117f42783, type: 2}
     - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
       propertyPath: m_bulletManager
       value: 
