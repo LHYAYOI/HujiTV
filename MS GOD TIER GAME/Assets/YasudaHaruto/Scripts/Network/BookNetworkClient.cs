@@ -42,6 +42,9 @@ public class BookNetworkClient : MonoBehaviour
     public BOOK_CONNECTION_STATE ConnectionState { get; private set; } = BOOK_CONNECTION_STATE.DISCONNECTED;
 
     public event Action<BOOK_CONNECTION_STATE> OnConnectionStateChanged;
+    private readonly System.Collections.Generic.HashSet<byte> m_acquiredPageIds = new();
+    public System.Collections.Generic.IEnumerable<byte> AcquiredPageIds => m_acquiredPageIds;
+    public event Action<byte, bool> AcquiredPageReceived;
     public event System.Action<byte> AddPageReceived;
     public event System.Action<uint, byte> ObstacleReceived;
 
@@ -140,6 +143,7 @@ public class BookNetworkClient : MonoBehaviour
 
         InitializeDriver();
         LastConnectionError = null;
+        m_acquiredPageIds.Clear();
         m_playerSlot = playerSlot;
         m_endpoint = endpoint;
         m_shouldReconnect = true;
@@ -434,6 +438,13 @@ public class BookNetworkClient : MonoBehaviour
 
         Debug.Log($"AddPageéÛêM : PageId={pageId}");
 
+        if (reader.GetBytesRead() < reader.Length)
+        {
+            bool present = reader.ReadByte() != 0;
+            if (pageId != 0 && m_acquiredPageIds.Add(pageId))
+                AcquiredPageReceived?.Invoke(pageId, present);
+            return;
+        }
         AddPageReceived?.Invoke(pageId);
     }
     private void OnDestroy()

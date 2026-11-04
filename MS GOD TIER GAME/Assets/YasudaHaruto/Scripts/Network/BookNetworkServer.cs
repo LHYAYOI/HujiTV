@@ -22,6 +22,17 @@ public class BookNetworkServer : MonoBehaviour
     public bool IsListening => Owner.m_isListening;
     public bool IsGameStarted => Owner.m_isGameStarted;
     private readonly Dictionary<NetworkConnection, BOOK_MESSAGE_TYPE> m_registrationReplies = new();
+    private readonly List<byte> m_acquiredPages = new();
+    private readonly Dictionary<NetworkConnection, (int Next, int ReplayCount)> m_pageDelivery = new();
+
+    public bool AcquirePageForBoth(byte pageId)
+    {
+        if (Owner != this) return Owner.AcquirePageForBoth(pageId);
+        if (!m_isGameStarted || pageId == 0 || m_acquiredPages.Contains(pageId)) return false;
+        m_acquiredPages.Add(pageId);
+        return true;
+    }
+
     private readonly HashSet<NetworkConnection> m_startNotified = new();
     private readonly List<NetworkConnection> m_replyBuffer = new();
     private System.Action<PLAYER_SLOT, byte, MAGIC_CAST_DIRECTION> m_castMagicReceived;
@@ -126,6 +137,7 @@ public class BookNetworkServer : MonoBehaviour
         AcceptClients();
         ProcessEvents();
         SendSessionMessages();
+        SendAcquiredPages();
     }
 
     private void RemoveDisconnectedClients()
@@ -182,6 +194,7 @@ public class BookNetworkServer : MonoBehaviour
 
                         m_registrationReplies.Remove(connection);
                         m_startNotified.Remove(connection);
+                        m_pageDelivery.Remove(connection);
                         m_connections[i] = default;
                         break;
                 }
@@ -467,7 +480,31 @@ public class BookNetworkServer : MonoBehaviour
         foreach (var pair in m_playerSlots)
         {
             if (m_registrationReplies.ContainsKey(pair.Key) || m_startNotified.Contains(pair.Key)) continue;
-            if (SendSessionMessage(pair.Key, BOOK_MESSAGE_TYPE.GAME_STARTED)) m_startNotified.Add(pair.Key);
+            if (SendSessionMessage(pair.Key, BOOK_MESSAGE_TYPE.GAME_STARTED))
+            {
+                m_startNotified.Add(pair.Key);
+                m_pageDelivery[pair.Key] = (0, m_acquiredPages.Count);
+            }
+        }
+    }
+
+    private void SendAcquiredPages()
+    {
+        foreach (var pair in m_playerSlots)
+        {
+            NetworkConnection connection = pair.Key;
+            if (!m_pageDelivery.TryGetValue(connection, out var delivery)) continue;
+            while (delivery.Next < m_acquiredPages.Count)
+            {
+                if (!IsConnectionAlive(connection) ||
+                    m_driver.BeginSend(m_reliablePipeline, connection, out DataStreamWriter writer) != 0) break;
+                writer.WriteByte((byte)BOOK_MESSAGE_TYPE.ADD_PAGE);
+                writer.WriteByte(m_acquiredPages[delivery.Next]);
+                writer.WriteByte(delivery.Next < delivery.ReplayCount ? (byte)0 : (byte)1);
+                if (m_driver.EndSend(writer) < 0) break;
+                delivery.Next++;
+            }
+            m_pageDelivery[connection] = delivery;
         }
     }
 

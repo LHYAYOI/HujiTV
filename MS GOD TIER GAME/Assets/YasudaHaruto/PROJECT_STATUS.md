@@ -1,5 +1,18 @@
 # Project Status
 
+## ページドロップ・獲得基盤（2026-11-04）
+- Assets/YasudaHaruto内にBattlePageDropsを追加。PC側のオブジェクトに付けて、撃破確定時にReportEnemyDefeated(enemyId, worldPosition)、戦闘から次へ進む時にCollectBattleDrops(cartTarget)を呼ぶ。後者は最後の泡の落下を待って一斉回収する。敵／戦闘コードと保存済みScene・Prefabへの配線は未変更。
+- InspectorのAssignmentsで敵IDからPageIdを割り当てる。MiniGhost_A/B/CはID 5が初期値。Bubble Prefab、Bubble Material、Ground Layersは任意。Prefab未指定時は透明球と紙片の仮表示。Play ModeでPreview Cart Targetを指定し、コンポーネントの「Preview / Drop Page Bubbles」「Preview / Collect Page Bubbles」で手動検証できる。両者への送信を試す場合はBookNetworkServerでゲーム開始済みの状態にする。
+- PCは到着したページをセッション内にID単位で保持し、両プレイヤーへ送信。後から接続したプレイヤーには過去分を演出なしで送る。クライアントはScene初期化前の受信も保持する。履歴はPC側サーバーの稼働中のみ保持。
+- 本は所持ページだけをID順に表示。追加先へ自動めくりし、表示時に短い金色の演出を再生。重複は初期所持も含めて拒否し、削除／入れ替え／辞退処理は停止。旧検証用の呼び出し口はコンパイル互換のため残しており、旧仕様を検証するメニューは現仕様の確認には使えない。
+- Unity同梱RoslynとBeeの参照設定でRuntimeの別出力コンパイル成功（既存警告3件）。Play Mode、仮素材の見え方、PCとタブレット2台の通信・再接続は未確認。Git statusで担当フォルダ内の変更のみ確認。
+
+## 敵撃破によるページドロップの現状確認（2026-11-04）
+- 保存済みコードとSceneを静的調査。BattleManagerはアクティブ敵0件と制限時間切れを同じ終了イベントに流す。MiniGhostの個別時間切れからBeginDyingを呼ぶ箇所は現行ではコメントアウトされている。SwarmGhostはEnemyBaseを継承せず独自のDieを持つ。
+- BookSceneの初期見開きはID 2・3・4。現在参照するTestPageDatabaseの登録はID 2・3・4・5（TestPage 3）で、初期所持を重複扱いにすると現登録で新規候補はID 5のみ。現行の所持追加は同種複数所持を許容する。SendAddPageの戦闘側呼び出しは未接続。
+- 現在のBookServerLobbyはBookServerGameを指定する。保存済みBookServerGameにはBattleManager／CartControllerの直接記述が見つからず、Main_Game_Scene_Alphaで両方の配置を確認。統合先、対象敵・固定ページ割り当て、時間切れと重複／未接続時の扱いは確認待ち。
+- ゲームコード・Scene・Prefabの変更、Unity実行なし。調査開始時のGit statusはクリーン。fetchと追跡先との比較を実施し、コミット・ファイル差分なし。
+
 ## ワンボタンのサーバー探索・接続（2026-11-03）
 - ユーザー指示：タブレット先起動／PCサーバー後起動で、毎回IPを入力せずボタン1回で探索・接続したい。BookConnectionUIの既存接続ボタンを、IP未編集時は新しく4秒探索→発見IPへ選択中Playerで接続する処理へ変更。起動時の探索は従来どおりIP補完のみ。探索終了後も同じボタンで再探索できる。
 - ボタンのTMP表示をFind Server & Connectへ変更。IPを編集した場合は探索・自動接続予約を止め、Connect to entered IPとして手入力先へ接続する。OnSearchServerButtonPressedは補完専用のまま維持。登録・PC開始待ち・Scene遷移の既存処理は維持。Scene配線変更なし、元CP932文字コードを保持。
