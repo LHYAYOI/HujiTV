@@ -17,6 +17,8 @@ public class MagicBulletController : MonoBehaviour
 
     [SerializeField] GameObject m_trail;
 
+    [SerializeField] GameObject m_hitEffect;
+
     [SerializeField] float m_moveSpeed;
 
     [SerializeField] List<BezierControlPoint> m_bezierControlPoints;
@@ -111,6 +113,8 @@ public class MagicBulletController : MonoBehaviour
         m_trail.transform.parent = null;
 
         //ヒットエフェクト
+        Instantiate(m_hitEffect, transform.position, quaternion.identity);
+
 
         Destroy(gameObject);
     }
