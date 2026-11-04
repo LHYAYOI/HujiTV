@@ -1,53 +1,53 @@
-using System.Collections;
+ï»¿using System.Collections;
 using TeamToon;
 using UnityEngine;
 using UnityEngine.Splines;
 
-public enum MINI_GHOST_STATE_TYPE // ƒ~ƒj‚¨‰»‚¯‚ÌƒXƒe[ƒgƒ^ƒCƒv
+public enum MINI_GHOST_STATE_TYPE // ãƒŸãƒ‹ãŠåŒ–ã‘ã®ã‚¹ãƒ†ãƒ¼ãƒˆã‚¿ã‚¤ãƒ—
 {
     NONE,
-    IDLE,   // ‘Ò‹@
-    SPAWN,  // oŒ»
-    MOVE,   // ˆÚ“®
-    ATTACK, // UŒ‚
-    DYING   // €–S
+    IDLE,   // å¾…æ©Ÿ
+    SPAWN,  // å‡ºç¾
+    MOVE,   // ç§»å‹•
+    ATTACK, // æ”»æ’ƒ
+    DYING   // æ­»äº¡
 }
 
 public class MiniGhostEnemy : SplineMoveEnemy
 {
-    [Header("§ŒÀŠÔ")]
+    [Header("åˆ¶é™æ™‚é–“")]
     [SerializeField] private float m_timeLimit = 15.0f;
 
-    [Header("R‚è‚Ì’e‚Ì”­ËˆÊ’u")]
+    [Header("è¹´ã‚Šã®å¼¾ã®ç™ºå°„ä½ç½®")]
     [SerializeField] private Transform m_kickFirePoint;
 
-    [Header("“Š‚°‚Ì’e‚Ì”­ËˆÊ’u")]
+    [Header("æŠ•ã’ã®å¼¾ã®ç™ºå°„ä½ç½®")]
     [SerializeField] private Transform m_throwFirePoint;
 
-    [Header("ƒJƒƒ‰‚ğŒü‚­‚‚³‚Ì•â³")]
+    [Header("ã‚«ãƒ¡ãƒ©ã‚’å‘ãé«˜ã•ã®è£œæ­£")]
     [SerializeField] private float m_cameraHeightOffset = 1.5f;
 
-    [Header("–ˆƒtƒŒ[ƒ€ƒvƒŒƒCƒ„[‚ÉŒü‚­Šp“x")]
+    [Header("æ¯ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«å‘ãè§’åº¦")]
     [SerializeField] private float m_turnSpeed = 60f;
 
-    [Header("ƒ‚ƒfƒ‹’PˆÊ‚Ìƒ}ƒeƒŠƒAƒ‹ƒuƒŒƒ“ƒh")]
+    [Header("ãƒ¢ãƒ‡ãƒ«å˜ä½ã®ãƒãƒ†ãƒªã‚¢ãƒ«ãƒ–ãƒ¬ãƒ³ãƒ‰")]
     [SerializeField] private TeamToonMaterialBlend m_toonMaterialBlend;
 
-    [Header("ƒ}ƒeƒŠƒAƒ‹ƒuƒŒƒ“ƒh‚ÌŠÔ")]
+    [Header("ãƒãƒ†ãƒªã‚¢ãƒ«ãƒ–ãƒ¬ãƒ³ãƒ‰ã®æ™‚é–“")]
     [SerializeField] private float m_toonMaterialBlendDuration = 1.0f;
 
-    private MiniGhostIdleState m_idleState;     // ‘Ò‹@ƒXƒe[ƒg
-    private MiniGhostSpawnState m_spawnState;   // oŒ»ƒXƒe[ƒg
-    private MiniGhostMoveState m_moveState;     // ˆÚ“®ƒXƒe[ƒg
-    private MiniGhostAttackState m_attackState; // UŒ‚ƒXƒe[ƒg
-    private MiniGhostDyingState m_dyingState;   // €–SƒXƒe[ƒg
+    private MiniGhostIdleState m_idleState;     // å¾…æ©Ÿã‚¹ãƒ†ãƒ¼ãƒˆ
+    private MiniGhostSpawnState m_spawnState;   // å‡ºç¾ã‚¹ãƒ†ãƒ¼ãƒˆ
+    private MiniGhostMoveState m_moveState;     // ç§»å‹•ã‚¹ãƒ†ãƒ¼ãƒˆ
+    private MiniGhostAttackState m_attackState; // æ”»æ’ƒã‚¹ãƒ†ãƒ¼ãƒˆ
+    private MiniGhostDyingState m_dyingState;   // æ­»äº¡ã‚¹ãƒ†ãƒ¼ãƒˆ
 
-    private MINI_GHOST_STATE_TYPE m_currentStateType = MINI_GHOST_STATE_TYPE.NONE; // Œ»İ‚ÌƒXƒe[ƒgƒ^ƒCƒv
-    private MiniGhostState m_currentState;  // Œ»İ‚ÌƒXƒe[ƒgƒRƒ“ƒ|[ƒlƒ“ƒg
+    private MINI_GHOST_STATE_TYPE m_currentStateType = MINI_GHOST_STATE_TYPE.NONE; // ç¾åœ¨ã®ã‚¹ãƒ†ãƒ¼ãƒˆã‚¿ã‚¤ãƒ—
+    private MiniGhostState m_currentState;  // ç¾åœ¨ã®ã‚¹ãƒ†ãƒ¼ãƒˆã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ
 
-    private bool m_isInitialized;       // ‰Šú‰»Ï‚İƒtƒ‰ƒO
-    private bool m_timeLimitStarted;    // §ŒÀŠÔŠJnƒtƒ‰ƒO
-    private bool m_isDying;             // €–S’†ƒtƒ‰ƒO
+    private bool m_isInitialized;       // åˆæœŸåŒ–æ¸ˆã¿ãƒ•ãƒ©ã‚°
+    private bool m_timeLimitStarted;    // åˆ¶é™æ™‚é–“é–‹å§‹ãƒ•ãƒ©ã‚°
+    private bool m_isDying;             // æ­»äº¡ä¸­ãƒ•ãƒ©ã‚°
 
 
     public override void Initialize()
@@ -76,43 +76,43 @@ public class MiniGhostEnemy : SplineMoveEnemy
         //    }
         //}
 
-        // Œ»İ‚Ìó‘Ô‚¾‚¯‚ğXV‚·‚éB
+        // ç¾åœ¨ã®çŠ¶æ…‹ã ã‘ã‚’æ›´æ–°ã™ã‚‹ã€‚
         if (m_currentState != null)
         {
             m_currentState.UpdateState();
         }
 
-        // ƒvƒŒƒCƒ„[‚Ì•ûŒü‚ğŒü‚­
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æ–¹å‘ã‚’å‘ã
         TurnToPlayer();
     }
 
-    // ƒvƒŒƒCƒ„[‚Ì•ûŒü‚ğŒü‚­
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æ–¹å‘ã‚’å‘ã
     private void TurnToPlayer()
     {
         Vector3 playerPosition = m_playerPosition.position;
 
-        // ƒvƒŒƒCƒ„[‚Ì‘_‚¤ˆÊ’u‚ğ’²®
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç‹™ã†ä½ç½®ã‚’èª¿æ•´
         playerPosition.y -= m_cameraHeightOffset;
 
         Vector3 direction = playerPosition - transform.position;
 
-        // •ûŒüƒxƒNƒgƒ‹‚ª‚Ù‚Úƒ[ƒ‚È‚ç‰ñ“]‚µ‚È‚¢
+        // æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ãŒã»ã¼ã‚¼ãƒ­ãªã‚‰å›è»¢ã—ãªã„
         if (direction.sqrMagnitude <= 0.0001f)
         {
             return;
         }
 
-        // ƒvƒŒƒCƒ„[‚Ì•ûŒü‚ğŒü‚­‰ñ“]
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æ–¹å‘ã‚’å‘ãå›è»¢
         Quaternion targetRotation = Quaternion.LookRotation(-direction.normalized, Vector3.up);
 
-        // –ˆƒtƒŒ[ƒ€­‚µ‚¸‚Â‰ñ“]‚·‚é
+        // æ¯ãƒ•ãƒ¬ãƒ¼ãƒ å°‘ã—ãšã¤å›è»¢ã™ã‚‹
         transform.rotation = Quaternion.RotateTowards(
             transform.rotation,
             targetRotation,
             m_turnSpeed * Time.deltaTime
         );
     }
-    // Šeó‘ÔƒRƒ“ƒ|[ƒlƒ“ƒg‚ğæ“¾‚·‚éB
+    // å„çŠ¶æ…‹ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’å–å¾—ã™ã‚‹ã€‚
     private void ResolveStateComponents()
     {
         m_idleState = GetComponent<MiniGhostIdleState>();
@@ -122,7 +122,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
         m_dyingState = GetComponent<MiniGhostDyingState>();
     }
 
-    // Šeó‘ÔƒRƒ“ƒ|[ƒlƒ“ƒg‚ğ‰Šú‰»‚·‚éB
+    // å„çŠ¶æ…‹ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
     private void InitializeStateComponents()
     {
         InitializeComponent(m_idleState);
@@ -132,7 +132,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
         InitializeComponent(m_dyingState);
     }
 
-    // Šeó‘ÔƒRƒ“ƒ|[ƒlƒ“ƒg‚ğ‰Šú‰»‚·‚éB
+    // å„çŠ¶æ…‹ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
     private void InitializeComponent(MiniGhostState state)
     {
         if (state != null)
@@ -141,10 +141,10 @@ public class MiniGhostEnemy : SplineMoveEnemy
         }
     }
 
-    // ƒXƒe[ƒg‚ğ•ÏX
+    // ã‚¹ãƒ†ãƒ¼ãƒˆã‚’å¤‰æ›´
     public void ChangeState(MINI_GHOST_STATE_TYPE nextStateType)
     {
-        // €–SŒã‚É‚Ù‚©‚Ìó‘Ô‚Ö–ß‚é‚±‚Æ‚ğ–h‚®B
+        // æ­»äº¡å¾Œã«ã»ã‹ã®çŠ¶æ…‹ã¸æˆ»ã‚‹ã“ã¨ã‚’é˜²ãã€‚
         if (m_isDying && nextStateType != MINI_GHOST_STATE_TYPE.DYING)
         {
             return;
@@ -171,7 +171,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
         m_currentState.EnterState();
     }
 
-    // ŠeƒXƒe[ƒg‚ğæ“¾
+    // å„ã‚¹ãƒ†ãƒ¼ãƒˆã‚’å–å¾—
     private MiniGhostState GetStateComponent(MINI_GHOST_STATE_TYPE stateType)
     {
         switch (stateType)
@@ -185,7 +185,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
         }
     }
 
-    // €–Sˆ—‚ğŠJn‚·‚é
+    // æ­»äº¡å‡¦ç†ã‚’é–‹å§‹ã™ã‚‹
     public void BeginDying()
     {
         if (m_isDying)
@@ -204,7 +204,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
         ChangeState(MINI_GHOST_STATE_TYPE.DYING);
     }
 
-    // ƒ}ƒeƒŠƒAƒ‹ƒuƒŒƒ“ƒh‚ÌƒRƒ‹[ƒ`ƒ“
+    // ãƒãƒ†ãƒªã‚¢ãƒ«ãƒ–ãƒ¬ãƒ³ãƒ‰ã®ã‚³ãƒ«ãƒ¼ãƒãƒ³
     public IEnumerator SwitchMaterialBlendCoroutine(float startValue, float endValue)
     {
         float duration = GetToonMaterialBlendDuration();
@@ -226,99 +226,99 @@ public class MiniGhostEnemy : SplineMoveEnemy
         SetToonMaterialBlendValue(endValue);
     }
 
-    // Œ»İ‚ÌƒXƒe[ƒgƒ^ƒCƒv‚ğæ“¾‚·‚é
+    // ç¾åœ¨ã®ã‚¹ãƒ†ãƒ¼ãƒˆã‚¿ã‚¤ãƒ—ã‚’å–å¾—ã™ã‚‹
     public MINI_GHOST_STATE_TYPE GetCurrentStateType()
     {
         return m_currentStateType;
     }
 
-    // €–S’†‚©‚Ç‚¤‚©‚ğæ“¾‚·‚é
+    // æ­»äº¡ä¸­ã‹ã©ã†ã‹ã‚’å–å¾—ã™ã‚‹
     public bool GetIsDying()
     {
         return m_isDying;
     }
 
-    // R‚è‚Ì’e‚Ì”­ËˆÊ’u‚ğæ“¾‚·‚é
+    // è¹´ã‚Šã®å¼¾ã®ç™ºå°„ä½ç½®ã‚’å–å¾—ã™ã‚‹
     public Transform GetKickFirePoint()
     {
         return m_kickFirePoint;
     }
 
-    // “Š‚°‚Ì’e‚Ì”­ËˆÊ’u‚ğæ“¾‚·‚é
+    // æŠ•ã’ã®å¼¾ã®ç™ºå°„ä½ç½®ã‚’å–å¾—ã™ã‚‹
     public Transform GetThrowFirePoint()
     {
         return m_throwFirePoint;
     }
 
-    // SplineMoveEnemy‚ÌˆÚ“®XV
+    // SplineMoveEnemyã®ç§»å‹•æ›´æ–°
     public void UpdateSplineMove()
     {
         base.Update();
     }
 
-    // ƒXƒvƒ‰ƒCƒ“‚Ìƒ^[ƒQƒbƒg‚ğæ“¾‚·‚é
+    // ã‚¹ãƒ—ãƒ©ã‚¤ãƒ³ã®ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’å–å¾—ã™ã‚‹
     public SplineContainer GetTargetSpline()
     {
         return m_targetSpline;
     }
 
-    // ƒXƒ|[ƒ“ˆÊ’u‚ğæ“¾‚·‚é
+    // ã‚¹ãƒãƒ¼ãƒ³ä½ç½®ã‚’å–å¾—ã™ã‚‹
     public Vector3 GetSpawnPosition()
     {
         return m_spawnPosition;
     }
 
-    // ƒvƒŒƒCƒ„[‚ÌˆÊ’u‚ğæ“¾‚·‚é
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä½ç½®ã‚’å–å¾—ã™ã‚‹
     public Vector3 GetPlayerPosition()
     {
         return m_playerPosition.position;
     }
 
-    // ˆÚ“®‘¬“x‚ğæ“¾‚·‚é
+    // ç§»å‹•é€Ÿåº¦ã‚’å–å¾—ã™ã‚‹
     public float GetMoveSpeed()
     {
         return m_moveSpeed;
     }
 
-    // ƒ}ƒeƒŠƒAƒ‹’PˆÊ‚ÌƒuƒŒƒ“ƒh‚ğæ“¾‚·‚é
+    // ãƒãƒ†ãƒªã‚¢ãƒ«å˜ä½ã®ãƒ–ãƒ¬ãƒ³ãƒ‰ã‚’å–å¾—ã™ã‚‹
     public TeamToonMaterialBlend GetToonMaterialBlend()
     {
         return m_toonMaterialBlend;
     }
 
-    // ƒ}ƒeƒŠƒAƒ‹ƒuƒŒƒ“ƒh‚ÌŠÔ‚ğæ“¾‚·‚é
+    // ãƒãƒ†ãƒªã‚¢ãƒ«ãƒ–ãƒ¬ãƒ³ãƒ‰ã®æ™‚é–“ã‚’å–å¾—ã™ã‚‹
     public float GetToonMaterialBlendDuration()
     {
         return m_toonMaterialBlendDuration;
     }
 
 
-    // ˆÚ“®‘¬“x‚ğİ’è‚·‚é
+    // ç§»å‹•é€Ÿåº¦ã‚’è¨­å®šã™ã‚‹
     public void SetMoveSpeed(float speed)
     {
         m_moveSpeed = speed;
     }
 
-    // ƒXƒvƒ‰ƒCƒ“‚É‡‚í‚¹‚Ä‰ñ“]‚·‚é‚©‚Ìƒtƒ‰ƒO‚ğİ’è‚·‚é
+    // ã‚¹ãƒ—ãƒ©ã‚¤ãƒ³ã«åˆã‚ã›ã¦å›è»¢ã™ã‚‹ã‹ã®ãƒ•ãƒ©ã‚°ã‚’è¨­å®šã™ã‚‹
     public void SetRotateWithSplineFlag(bool flag)
     {
         m_rotateWithSplineFlag = flag;
     }
 
-    // ˆÚ“®‹——£‚ğİ’è‚·‚é
+    // ç§»å‹•è·é›¢ã‚’è¨­å®šã™ã‚‹
     public void SetDistanceTraveled(float distance)
     {
         m_distanceTraveled = distance;
     }
 
-    // ƒ}ƒeƒŠƒAƒ‹’PˆÊ‚ÌƒuƒŒƒ“ƒh‚Ì’l‚ğİ’è‚·‚é
+    // ãƒãƒ†ãƒªã‚¢ãƒ«å˜ä½ã®ãƒ–ãƒ¬ãƒ³ãƒ‰ã®å€¤ã‚’è¨­å®šã™ã‚‹
     public void SetToonMaterialBlendValue(float value)
     {
         m_toonMaterialBlend.blend = value;
     }
 
 
-    // §ŒÀŠÔ‚ğŠJn‚·‚é
+    // åˆ¶é™æ™‚é–“ã‚’é–‹å§‹ã™ã‚‹
     public void StartTimeLimit()
     {
         if (!m_timeLimitStarted && !m_isDying)
