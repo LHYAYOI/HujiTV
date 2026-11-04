@@ -1,5 +1,12 @@
 # Project Status
 
+## BookScene のターゲット演出（2026-11-04）
+
+- 参考動画の白い渦に合わせ、作業中に保存された BookScene の `TargetCircle/visual` に `ターゲット_064.png` と BookTarget マテリアルを割り当てた。2層の UV 歪みと加算合成で、輪郭の揺れと白い発光を表示する。
+- BookTargetMotion は有効化時に2倍から0.6秒で縮め、4秒周期の時計回り回転をイージングする。歪み・流速・発光はマテリアル、縮小・回転はコンポーネントで調整できる。親の配置は保存時の X=-20.9 を維持。
+- Unity 6000.3.23f1 の別プロジェクトで D3D12 シェーダーパスのコンパイル、Sprite のローカル ID と4頂点メッシュを確認。C# の単体コンパイルと Scene の参照も確認。BookScene の Play Mode 表示と Android 実機は未確認。
+- Git fetch と追跡先比較を実施し、開始時点で追跡先とのコミット・ファイル差分なし。既存の未コミット変更と作業中に保存された TargetCircle の構成を維持。
+
 ## トロッコステージ設定ガイド（2026-11-04）
 - TROLLEY_STAGE_SETUP.md に、Arai のスプライン・分岐・停止・速度変更、Hamada の衝突イベント・カメラ、戦闘開始から再発進までの設定手順をまとめた。
 - Main_Game_Scene_Alpha、Arai の分岐サンプルと Stage Prefab、関連 C# の静的調査。Unity Play Mode は未確認。今回の変更は資料と作業記録。
