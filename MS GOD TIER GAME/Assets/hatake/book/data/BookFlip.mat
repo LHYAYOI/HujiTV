@@ -84,16 +84,16 @@ Material:
     - _FxProgress: 0
     - _FxSide: 1
     - _GlossSharpness: 48
-    - _GlossStrength: 0.25
-    - _GutterDark: 0.35
-    - _GutterWidth: 0.14
+    - _GlossStrength: 0
+    - _GutterDark: 0.49
+    - _GutterWidth: 0.5
     - _InkBleed: 0
     - _InkBleedRadius: 0.006
     - _MagicStrength: 0
     - _PageAspect: 1.2
     - _PaperAge: 0.45
-    - _PaperBump: 0.22
-    - _PaperBumpScale: 160
+    - _PaperBump: 0
+    - _PaperBumpScale: 20
     - _PaperFinish: 0
     - _PaperGrain: 0.08
     - _PaperNormalStrength: 0
@@ -115,7 +115,7 @@ Material:
     - _TurnSide: 1
     - _Turning: 0
     m_Colors:
-    - _AgeColor: {r: 0.78, g: 0.58, b: 0.35999998, a: 1}
+    - _AgeColor: {r: 1, g: 1, b: 1, a: 1}
     - _BookRect: {r: 0.08, g: 0.1, b: 0.92, a: 0.9}
     - _BurnCharColor: {r: 0.06999998, g: 0.04, b: 0.03, a: 1}
     - _BurnEmberColor: {r: 3.2, g: 1.1, b: 0.25, a: 1}
@@ -128,7 +128,7 @@ Material:
     - _DimColor: {r: 0.059999965, g: 0.049999982, b: 0.089999996, a: 1}
     - _DstLeftRect: {r: 0, g: 0, b: 0.5, a: 1}
     - _DstRightRect: {r: 0.5, g: 0, b: 0.5, a: 1}
-    - _EndpaperColor: {r: 0.86, g: 0.8, b: 0.68, a: 1}
+    - _EndpaperColor: {r: 1, g: 1, b: 1, a: 1}
     - _FadeColor: {r: 0, g: 0, b: 0, a: 1}
     - _Fold: {r: 1, g: 0, b: 1, a: 0}
     - _FoldGlowColor: {r: 1.6, g: 1.1, b: 0.45, a: 1}

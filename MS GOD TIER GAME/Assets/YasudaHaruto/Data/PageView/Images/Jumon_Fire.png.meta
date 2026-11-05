@@ -126,15 +126,15 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Jumon_Fire_0
+      name: Jumon_Fire_Left
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 2425
+        width: 1212
         height: 1435
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -147,11 +147,33 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Jumon_Fire_Right
+      rect:
+        serializedVersion: 2
+        x: 1212
+        y: 0
+        width: 1212
+        height: 1435
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 09efe9e1034aee84fb8e4f323a2dc83a
+      internalID: 550648560
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: eb4c63c1f5445f149b12df2308b0c118
     internalID: 0
     vertices: []
     indices: 
@@ -161,7 +183,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Jumon_Fire_0: 2495772032312817475
+      Jumon_Fire_Left: 2495772032312817475
+      Jumon_Fire_Right: 550648560
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

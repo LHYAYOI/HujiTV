@@ -43,6 +43,8 @@ public class BookGameBootstrap : MonoBehaviour
 
         m_runeTraceView.ConfigureCooldownImage(() => m_gameController != null ? m_gameController.GetCurrentRuneImage() : null);
         m_runeTraceView.ConfigureScreenProjection(m_gameDragInput.GetRuneScreenRect, m_gameDragInput.GetGraphicScreenRect);
+        var captureRefresh = gameObject.AddComponent<BookRuneCaptureRefresh>();
+        captureRefresh.Configure(m_runeTraceView, m_gameController.BookView);
         m_gameDragInput.SetInventoryOwner(m_gameController);
         m_gameDragInput.ConfigureSpellPresentation(m_runeTraceView);
 
