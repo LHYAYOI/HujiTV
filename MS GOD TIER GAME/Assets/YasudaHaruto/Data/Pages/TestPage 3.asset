@@ -13,14 +13,15 @@ MonoBehaviour:
   m_Name: TestPage 3
   m_EditorClassIdentifier: Assembly-CSharp::PageData
   m_pageId: 5
-  m_insertType: 1
-  m_displayName: Test04
-  m_pageType: 0
+  m_insertType: 0
+  m_displayName: Obake
+  m_pageType: 1
   m_interaction:
-    m_type: 1
-    m_runeData: {fileID: 11400000, guid: 133157a7fbbb91f4984f0dd557eff6b5, type: 2}
+    m_type: 0
+    m_runeData: {fileID: 0}
+    m_runeImageIndex: -1
   m_action:
-    m_type: 1
-    m_magicData: {fileID: 11400000, guid: 17ef150f604effd4e91c6dfb9950d6c0, type: 2}
-  m_leftVisualData: {fileID: 11400000, guid: aa578b02a4de86d42bb71958c283cf2a, type: 2}
-  m_rightVisualData: {fileID: 11400000, guid: 264d2370acd2bbb4cb0a4ae4702d382d, type: 2}
+    m_type: 0
+    m_magicData: {fileID: 0}
+  m_leftVisualData: {fileID: 11400000, guid: 6d0e908a2f377ec4fad8531e89adb765, type: 2}
+  m_rightVisualData: {fileID: 11400000, guid: c5f3f108a0821c646b4d26c7c8af5beb, type: 2}

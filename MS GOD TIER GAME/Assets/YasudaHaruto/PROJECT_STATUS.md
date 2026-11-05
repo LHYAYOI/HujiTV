@@ -736,3 +736,13 @@ $12026-10-29：お邪魔4枠の初期実装。左右擦り・スクラッチ、�
 - 10/20方式変更直前のBookModelViewは3Dモデル＋めくりアニメーション、BookModelAtlasは領域ごとのテクスチャ参照が中心。現行の手続き的な本合成とは異なる。旧方式でもモデル撮影カメラはあり、無負荷ではない。
 - 現行の実際のHLSL除外スイッチから生成したGLSLを外部実機ベンチで追加比較：1600×1000で中央値164.379ms、800×500で36.509ms（同じ紙効果）。ゲーム全体のFPSではない。800×500かつ紙主要効果OFFは35〜76msと変動し、追加効果は未確定。
 - 次の提案は合成解像度の調整を最優先、次いで通常／めくり／演出のバリアント分離、Bloomのみ停止の寄与測定。解像度縮小はにじみ・文字の鮮明さと比較する。今回コード・Scene・設定は追加変更なし。現在の元アプリは測定時に終了しており、新しいAPKの実FPSは未取得。
+
+## なぞり線の表示復旧（2026-11-05）
+- ユーザー報告：他担当のシェーダー軽量化で重さが改善。今回の許可範囲は描いた線の表示復旧。位置調整とフチの機能は、表示を確認した後に進める。最新はMS-119/Feature/RoomGhost / b20af58、9d7afc3由来の分割パス・紙質LUT・めくりキャッシュ等を維持。
+- 現行BookSceneのRuneArea / PlayerRuneGraphic / 撮影ページはLayer8（BookModel）、撮影CameraのCulling Maskは256で対象に含まれる。レイヤー変更は不要。入力先はBookGameBootstrapのm_runeTraceView。Live Turn用の複製にもRunePageViewがあるため、検証でFindFirstObjectByTypeだけを使うと入力先と異なる複製を取得する場合がある。
+- 原因を外部コピーの実BookSceneで再現。線メッシュ82頂点、撮影RTに約20,700画素の緑線が入るが、最終出力の線0画素・RenderCount増加0。BookFlipViewの静止時キャッシュはRTの同一性とcontentVersion等で判断し、RuneLineGraphicの変更がMarkDirtyへ接続されていなかった。
+- 担当側のBookRuneCaptureRefreshを追加し、BookGameBootstrap.Startで入力先RunePageViewと専用BookViewへ接続。線Graphicの頂点／Material変更を保留し、現在の撮影RTへのカメラ描画終了後にMarkDirtyを1回通知する。URPはendCameraRendering、Built-inはCamera.onPostRenderに対応。無効化時はコールバックを解除。毎フレーム無条件に本を再描画する方式へ戻していない。
+- 外部コピーのUnity6000.3.23f1 / Windows D3D11 / Play Modeで修正前後を比較。PC設定・モバイル設定とも、修正後は1回の変更通知で最終画像に線を確認（4,515 / 4,846画素）。消去も確認。更新停止後30フレームの追加再描画0回。保存画像を目視確認。元のShader・Scene・Prefab・レイヤー設定は未変更。検証側はカメラを明示描画し、実際の入力先Viewへ線を渡す再現テストであり、物理的なマウス／タッチ入力やAndroid実機の確認とは区別する。
+- 外部検証成果物：C:/Users/ths30546/.codex/visualizations/2026/11/02/01a19b7c-e5ee-7a51-9572-bcb6ef59b35a/trace-before-results.json、trace-after-results.json、trace-after-output-mobile.png、trace-before.log / trace-after.log。最初の補助検証のGetMesh呼び出しと対象View取得を修正後、上記の比較を実施した。
+- 開始時からのMobile_Renderer.asset、UniversalRenderPipelineGlobalSettings.asset、number.png.meta、.utmp配下の変更は保持。今回の変更は担当側Bootstrap、新規更新通知スクリプトと.meta、本記録のみ。次はユーザーによるBookSceneでの実操作確認。その後に位置調整・フチの仕様／実装へ進む。
+- ユーザー実操作で線の表示を確認。その後のOnPostRender引数エラーを修正。Unityの引数なしメッセージOnPostRenderと、Camera.onPostRenderイベント用のCamera引数付きハンドラーが同名だったため、後者をHandleCameraRenderedへ改名し、購読・解除・URP側からの呼び出しも更新。Camera引数と再描画通知の動作は維持。参照の静的確認を実施し、この改名後のUnity再生確認は未実施。位置・フチは未変更。

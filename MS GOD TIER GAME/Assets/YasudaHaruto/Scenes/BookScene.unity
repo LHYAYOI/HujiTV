@@ -507,10 +507,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RuneLineGraphic
   m_Material: {fileID: 0}
-  m_Color: {r: 0.21698111, g: 0.14021893, b: 0.20101874, a: 1}
+  m_Color: {r: 0.21698111, g: 0.14021893, b: 0.20101874, a: 0.60784316}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_lineWidth: 20
+  m_lineWidth: 10
   m_edgeSoftness: 1
 --- !u!1 &1077514521
 GameObject:
@@ -742,8 +742,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -20}
-  m_SizeDelta: {x: 250, y: 250}
+  m_AnchoredPosition: {x: 5, y: -35}
+  m_SizeDelta: {x: 165, y: 165}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1457169298
 MonoBehaviour:
@@ -1010,6 +1010,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a20ef9d774043e844a1606179b63f096, type: 2}
   - {fileID: 11400000, guid: 45ba07eb8d1192145bc513df592c55bf, type: 2}
   - {fileID: 11400000, guid: db87baf7c5fe808489ccceb30c994698, type: 2}
+  - {fileID: 11400000, guid: 4b2373ead7ba72c4bb031c0a0826e418, type: 2}
   m_inventorySettings: {fileID: 11400000, guid: 3734ec477f6e93a428f87450c7a2f0f8, type: 2}
 --- !u!1 &1948617070
 GameObject:
@@ -1729,6 +1730,8 @@ MonoBehaviour:
   m_maxOutputHeightMobile: 720
   m_bloomIterationsMobile: 3
   m_forceMobileSettings: 0
+  m_splitPassesMobile: 1
+  m_turnCacheMobile: 1
   m_postShader: {fileID: 4800000, guid: 5578288a7a21cc74e94534d3c228798e, type: 3}
   m_bloomIntensity: 0.9
   m_bloomThreshold: 0.95
@@ -1787,6 +1790,11 @@ MonoBehaviour:
   m_bookPose: {x: 0, y: 0, z: 0}
   m_paperFinish: 0
   m_screenFade: 0
+  m_animationScaleMobile: 0.8
+  m_progressiveStepsMobile: 6
+  m_coverDestStepsMobile: 10
+  m_prerenderCoverMobile: 1
+  m_turnDestStepsMobile: 10
 --- !u!1 &5909681140942768519
 GameObject:
   m_ObjectHideFlags: 0
