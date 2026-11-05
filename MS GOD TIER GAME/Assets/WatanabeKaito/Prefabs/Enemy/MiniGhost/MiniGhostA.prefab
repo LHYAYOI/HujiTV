@@ -235,6 +235,7 @@ GameObject:
   - component: {fileID: 1547004853171550175}
   - component: {fileID: 7345820583372488224}
   - component: {fileID: 9170967074312127478}
+  - component: {fileID: 3388504342455075104}
   m_Layer: 0
   m_Name: MiniGhostA
   m_TagString: Target
@@ -422,6 +423,18 @@ CapsuleCollider:
   m_Height: 1
   m_Direction: 1
   m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!114 &3388504342455075104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309553552582454145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cbaad71236fc3847a357071779833c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TargetableObject
 --- !u!1 &5747816450418076520
 GameObject:
   m_ObjectHideFlags: 0

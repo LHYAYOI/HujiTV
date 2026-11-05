@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ChandelierController : TargetableObject
 {
+    [SerializeField] GroupLeader m_groupLeader;
     [SerializeField] ChandelierImpactEffect m_effect;
     [SerializeField] ChandelierBreakable m_chandelierBreakable;
     [SerializeField] ShakeObject m_shakeObject;
@@ -22,6 +23,11 @@ public class ChandelierController : TargetableObject
         if (data.GetHitObject.CompareTag("MagicBullet")) 
         {
             StartCoroutine(FallRoutine());
+        }
+
+        if (data.GetHitObject.CompareTag("Floor")) 
+        {
+            m_groupLeader.RemoveAllOyoguSwarmGhosts();
         }
     }
 
