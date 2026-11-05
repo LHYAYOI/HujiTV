@@ -54,6 +54,45 @@ namespace hatake
         [Header("操作の説明")]
         [SerializeField] private bool m_showHelp = true;
 
+        [Header("フレームレート")]
+        [Tooltip("モバイルの目標のフレームレート（Application.targetFrameRate）。0 以下なら変えない（モバイルの既定は 30）")]
+        [SerializeField] private int m_targetFrameRate = 60;
+
+        private void Awake()
+        {
+            if (m_targetFrameRate > 0 && Application.isMobilePlatform)
+            {
+                // モバイルは targetFrameRate で上限が決まる（既定は 30）
+                QualitySettings.vSyncCount = 0;
+                Application.targetFrameRate = m_targetFrameRate;
+            }
+            if (m_lightweightCameraMobile && Application.isMobilePlatform) MakeMainCameraLightweight();
+        }
+
+        [Tooltip("モバイルで、画面を描くカメラの要らない処理を切る：HDR・カメラの後処理（本は自前で HDR・Bloom を描く）、" +
+                 "描画の縮小（Render Scale 0.8 の中間画像と拡大）。実行中だけで、アセットは変えない")]
+        [SerializeField] private bool m_lightweightCameraMobile = true;
+
+        private static void MakeMainCameraLightweight()
+        {
+            Camera camera = Camera.main;
+            if (camera != null)
+            {
+                camera.allowHDR = false;
+                camera.allowMSAA = false;
+                var data = camera.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+                if (data != null)
+                {
+                    data.renderPostProcessing = false;
+                    data.antialiasing = UnityEngine.Rendering.Universal.AntialiasingMode.None;
+                    data.renderShadows = false;
+                }
+            }
+            // 本は UI に表示するだけなので、縮小して描いて拡大する必要がない（実行中の値だけ変える）
+            if (UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline is UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset urp)
+                urp.renderScale = 1f;
+        }
+
         private void Start()
         {
             if (m_flipView == null)
@@ -147,8 +186,12 @@ namespace hatake
         }
 #endif
 
+        // 計測用：画面の説明・姿勢のパネルを出さない（IMGUI の負荷を除いて測る）
+        internal static bool HideGui;
+
         private void OnGUI()
         {
+            if (HideGui) return;
             if (m_showHelp)
             {
                 string finish = m_flipView != null && m_flipView.PaperFinish == BookPaperFinish.Gloss ? "gloss" : "matte";

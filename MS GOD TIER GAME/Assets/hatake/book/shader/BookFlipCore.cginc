@@ -1,12 +1,29 @@
 #ifndef BOOK_FLIP_CORE_INCLUDED
 #define BOOK_FLIP_CORE_INCLUDED
+// テクスチャの宣言と読み出し。既定は高精度の sampler2D_float + tex2Dlod
+// （BOOK_DX_SAMPLERS / BOOK_LOWP_SAMPLERS は計測用の切り替え：Debug/Resources/BookBenchCut.shader）
+#if defined(BOOK_DX_SAMPLERS)
+#define BOOK_DECLARE_TEX(n) Texture2D<float4> n; SamplerState sampler##n;
+#define BOOK_TEX_LOD(n, uvl) n.SampleLevel(sampler##n, (uvl).xy, (uvl).w)
+#elif defined(BOOK_DXH_SAMPLERS)
+#define BOOK_DECLARE_TEX(n) Texture2D<half4> n; SamplerState sampler##n;
+#define BOOK_TEX_LOD(n, uvl) ((float4)n.SampleLevel(sampler##n, (uvl).xy, (uvl).w))
+#elif defined(BOOK_LOWP_SAMPLERS)
+#define BOOK_DECLARE_TEX(n) sampler2D n;
+#define BOOK_TEX_LOD(n, uvl) ((float4)tex2Dlod(n, uvl))
+#else
+#define BOOK_DECLARE_TEX(n) sampler2D_float n;
+#define BOOK_TEX_LOD(n, uvl) tex2Dlod(n, uvl)
+#endif
+
 #define BOOK_LAYER_NONE  0  // ページ外（表紙・小口・背景）
 #define BOOK_LAYER_FLAT  1  // 現在の見開きの平らなページ
 #define BOOK_LAYER_FRONT 2  // めくっているページの表
 #define BOOK_LAYER_BACK  3  // めくっているページの裏（＝移動先の反対側ページ）
 #define BOOK_LAYER_UNDER 4  // めくった下から見える移動先ページ
 
-sampler2D_float _CurLeftTex, _CurRightTex, _DstLeftTex, _DstRightTex;
+// テクスチャは高精度で読む（sampler2D はモバイルで低精度（fixed）になり、Vulkan 向けの変換で不正なコードが出るため）
+BOOK_DECLARE_TEX(_CurLeftTex) BOOK_DECLARE_TEX(_CurRightTex) BOOK_DECLARE_TEX(_DstLeftTex) BOOK_DECLARE_TEX(_DstRightTex)
 float4 _CurLeftRect, _CurRightRect, _DstLeftRect, _DstRightRect; // 各テクスチャ内のページ範囲 XYWH
 float4 _BookRect; // 出力UV内の見開き範囲 (xMin, yMin, xMax, yMax)
 float _PageAspect; // ページ高さ / ページ幅
@@ -17,7 +34,7 @@ float4 _Fold; // xy 角の元位置, zw 角の現在位置（Turn space）
 
 // 面の種類（現在の左, 現在の右, 移動先の左, 移動先の右）：0 ページ, 1 表紙, 2 裏表紙, 3 何も無い
 float4 _SlotKinds;
-sampler2D_float _FrontCoverTex, _BackCoverTex;
+BOOK_DECLARE_TEX(_FrontCoverTex) BOOK_DECLARE_TEX(_BackCoverTex)
 float4 _CoverFlags; // x 表紙の絵あり, y 裏表紙の絵あり
 float4 _CoverMargin; // x 横, y 縦（表紙の板がページからはみ出す幅）
 float _Rigid; // 1 = 硬い表紙のめくり（曲がらずに背を軸に回る）。_Fold.z が板の外側の位置（cos）
@@ -104,6 +121,8 @@ BookFlipHit BookFlipResolve(float2 p)
     float len = length(axis);
     h.foldLength = len;
 
+#if !defined(BOOK_NO_RIGID)
+    // BOOK_NO_RIGID：本文のめくり専用のシェーダー（表紙の板の回転のコードを書き出さない）
     if (_Turning > 0.5 && _Rigid > 0.5)
     {
         // 表紙
@@ -223,6 +242,7 @@ BookFlipHit BookFlipResolve(float2 p)
             BookSetFlat(h, BOOK_LAYER_FLAT, 0, p);
         return h;
     }
+#endif
 
     if (_Turning > 0.5 && len > 1e-4)
     {
@@ -292,7 +312,7 @@ float2 BookCropUV(float2 uv, float4 rect)
 // 分岐内でも微分に依存しないよう、ミップの段は BookFlipView が計算した値（_PageLod）で読む
 float4 BookSamplePage(float dest, float right, float2 uv)
 {
-    float4 c;
+    float4 c = 0;
     float kind = BookSlotKind(dest, right);
     if (kind > 0.5 && kind < 2.5)
     {
@@ -301,22 +321,22 @@ float4 BookSamplePage(float dest, float right, float2 uv)
         bool front = kind < 1.5;
         float2 coverUV = BookCoverUV(p, front);
         float has = front ? _CoverFlags.x : _CoverFlags.y;
-        float4 t = front ? tex2Dlod(_FrontCoverTex, float4(coverUV, 0, _CoverLod)) : tex2Dlod(_BackCoverTex, float4(coverUV, 0, _CoverLod));
+        float4 t = front ? BOOK_TEX_LOD(_FrontCoverTex, float4(coverUV, 0, _CoverLod)) : BOOK_TEX_LOD(_BackCoverTex, float4(coverUV, 0, _CoverLod));
         return has > 0.5 ? t : float4(-1, -1, -1, 1); // 負 < 絵なし（革で塗る）
     }
     if (dest < 0.5)
     {
         if (right > 0.5)
-            c = tex2Dlod(_CurRightTex, float4(BookCropUV(uv, _CurRightRect), 0, _PageLod));
+            c = BOOK_TEX_LOD(_CurRightTex, float4(BookCropUV(uv, _CurRightRect), 0, _PageLod));
         else
-            c = tex2Dlod(_CurLeftTex, float4(BookCropUV(uv, _CurLeftRect), 0, _PageLod));
+            c = BOOK_TEX_LOD(_CurLeftTex, float4(BookCropUV(uv, _CurLeftRect), 0, _PageLod));
     }
     else
     {
         if (right > 0.5)
-            c = tex2Dlod(_DstRightTex, float4(BookCropUV(uv, _DstRightRect), 0, _PageLod));
+            c = BOOK_TEX_LOD(_DstRightTex, float4(BookCropUV(uv, _DstRightRect), 0, _PageLod));
         else
-            c = tex2Dlod(_DstLeftTex, float4(BookCropUV(uv, _DstLeftRect), 0, _PageLod));
+            c = BOOK_TEX_LOD(_DstLeftTex, float4(BookCropUV(uv, _DstLeftRect), 0, _PageLod));
     }
     return c;
 }

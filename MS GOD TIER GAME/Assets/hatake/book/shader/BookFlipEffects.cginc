@@ -77,9 +77,18 @@ float BookFxCurl(float2 p, float e, out float2 uvShift, out float2 tilt)
     return lift;
 }
 
+float3 BookFxShadePageN(float3 c, float e, float flicker, float lipNoise);
+
 float3 BookFxShadePage(float3 c, float2 p, float e)
 {
     float flicker = 0.6 + 0.4 * BookLookNoise(p * 40 + _Time.y * 8);
+    float lipNoise = _FxMode < 1.5 ? BookLookNoise(p * 23 + _FxOrigin.w) : 0;
+    return BookFxShadePageN(c, e, flicker, lipNoise);
+}
+
+// ノイズを外で求めて渡す版（モバイルは焼き込んだテクスチャから読む）
+float3 BookFxShadePageN(float3 c, float e, float flicker, float lipNoise)
+{
     if (_FxMode < 1.5)
     {
         float w = max(_BurnEdgeWidth, 1e-4);
@@ -88,7 +97,7 @@ float3 BookFxShadePage(float3 c, float2 p, float e)
             // 穴の下のページ：縁に煤の陰と、反り返った縁の影
             c *= lerp(0.25, 1, smoothstep(0, w * (1.6 + 1.2 * _BurnCurl), e));
             // 反った縁の裏側が穴へせり出して見える
-            float lip = w * 0.55 * _BurnCurl * (0.5 + BookLookNoise(p * 23 + _FxOrigin.w));
+            float lip = w * 0.55 * _BurnCurl * (0.5 + lipNoise);
             if (e < lip)
             {
                 float k = e / max(lip, 1e-5);
@@ -139,9 +148,10 @@ float4 BookFxAsh(float2 p)
     float t = BookFxThreshold();
     float4 acc = 0;
     float2 base = floor(p / cell);
-    [unroll] for (int oy = -4; oy <= 0; oy++)
+    // 展開しない：15 回分のコードを書き出すとモバイルの GPU で命令キャッシュに収まらず極端に遅くなる
+    [loop] for (int oy = -4; oy <= 0; oy++)
     {
-        [unroll] for (int ox = -1; ox <= 1; ox++)
+        [loop] for (int ox = -1; ox <= 1; ox++)
         {
             float2 id = base + float2(ox, oy);
             float h1 = BookLookHash(id * 1.31 + _FxOrigin.w + 5.7);
@@ -184,9 +194,10 @@ float3 BookFxParticles(float2 p)
     float t = BookFxThreshold();
     float3 sum = 0;
     float2 base = floor(p / cell);
-    [unroll] for (int oy = -4; oy <= 0; oy++)
+    // 展開しない：15 回分のコードを書き出すとモバイルの GPU で命令キャッシュに収まらず極端に遅くなる
+    [loop] for (int oy = -4; oy <= 0; oy++)
     {
-        [unroll] for (int ox = -1; ox <= 1; ox++)
+        [loop] for (int ox = -1; ox <= 1; ox++)
         {
             float2 id = base + float2(ox, oy);
             float h1 = BookLookHash(id + _FxOrigin.w);
