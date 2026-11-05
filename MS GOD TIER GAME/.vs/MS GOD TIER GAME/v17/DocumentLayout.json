@@ -3,7 +3,15 @@
   "WorkspaceRootPath": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\player\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\chandeliercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\chandeliercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\test\\shakeobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\test\\shakeobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\github\\hujitv\\ms god tier game\\assets\\hamada\\scripts\\player\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\player\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -11,16 +19,8 @@
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\magicbullet\\magicbulletcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|c:\\github\\hujitv\\ms god tier game\\assets\\hamada\\scripts\\chandeliercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\chandeliercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hatake\\chandelier\\scripts\\chandelierfallsample.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hatake\\chandelier\\scripts\\chandelierfallsample.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\test\\shakeobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\test\\shakeobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hatake\\chandelier\\scripts\\chandelierbreakable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -166,7 +166,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 168,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
@@ -235,20 +235,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "ChandelierController.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\ChandelierController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\ChandelierController.cs",
               "ToolTip": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\ChandelierController.cs",
               "RelativeToolTip": "Assets\\Hamada\\Scripts\\ChandelierController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAANAAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAB0AAABBAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-11-04T08:08:39.203Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "MagicBulletController.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletController.cs",
@@ -256,12 +256,11 @@
               "RelativeToolTip": "Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletController.cs",
               "ViewState": "AgIAAFoAAAAAAAAAAAAAAHMAAABKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-21T06:16:47.66Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-21T06:16:47.66Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "PlayerController.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Player\\PlayerController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Player\\PlayerController.cs",
@@ -270,6 +269,19 @@
               "ViewState": "AgIAACcAAAAAAAAAAADwvzgAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-11-01T14:47:51.444Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ShakeObject.cs",
+              "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\test\\ShakeObject.cs",
+              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\test\\ShakeObject.cs",
+              "ToolTip": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\test\\ShakeObject.cs",
+              "RelativeToolTip": "Assets\\Hamada\\Scripts\\test\\ShakeObject.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-04T10:04:47.494Z",
               "EditorCaption": ""
             },
             {
@@ -286,7 +298,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "ChandelierFallSample.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\hatake\\chandelier\\scripts\\ChandelierFallSample.cs",
               "RelativeDocumentMoniker": "Assets\\hatake\\chandelier\\scripts\\ChandelierFallSample.cs",
@@ -295,18 +307,6 @@
               "ViewState": "AgIAABUAAAAAAAAAAAAAAB4AAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-11-04T05:37:44.826Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "ShakeObject.cs",
-              "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\test\\ShakeObject.cs",
-              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\test\\ShakeObject.cs",
-              "ToolTip": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\test\\ShakeObject.cs",
-              "RelativeToolTip": "Assets\\Hamada\\Scripts\\test\\ShakeObject.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-11-04T10:04:47.494Z"
             },
             {
               "$type": "Document",

@@ -14,11 +14,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f3b1029481dc4475b7f1a50fe014e0ff, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 7.95
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f3b1029481dc4475b7f1a50fe014e0ff, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 12.22
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f3b1029481dc4475b7f1a50fe014e0ff, type: 3}
       propertyPath: m_LocalRotation.w
@@ -30,7 +30,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f3b1029481dc4475b7f1a50fe014e0ff, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f3b1029481dc4475b7f1a50fe014e0ff, type: 3}
       propertyPath: m_LocalRotation.z
@@ -54,15 +54,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: f3b1029481dc4475b7f1a50fe014e0ff, type: 3}
       propertyPath: m_TagString
-      value: Target
+      value: Untagged
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f3b1029481dc4475b7f1a50fe014e0ff, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7706172344831728400}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f3b1029481dc4475b7f1a50fe014e0ff, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8390135258165959292}
@@ -71,41 +68,13 @@ PrefabInstance:
       addedObject: {fileID: 7238593105136130902}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f3b1029481dc4475b7f1a50fe014e0ff, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6386576919511869708}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f3b1029481dc4475b7f1a50fe014e0ff, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3113058711952396796}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f3b1029481dc4475b7f1a50fe014e0ff, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6384647891589525021}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f3b1029481dc4475b7f1a50fe014e0ff, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8629203805090655769}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f3b1029481dc4475b7f1a50fe014e0ff, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2131642521795640235}
+      addedObject: {fileID: 3784232223222537982}
   m_SourcePrefab: {fileID: 100100000, guid: f3b1029481dc4475b7f1a50fe014e0ff, type: 3}
 --- !u!1 &4929250110318693209 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: f3b1029481dc4475b7f1a50fe014e0ff, type: 3}
   m_PrefabInstance: {fileID: 5235820538593867272}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7706172344831728400
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4929250110318693209}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9b81b05cff9928428e236be0ac6b564, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ChandelierController
-  m_effect: {fileID: 7238593105136130902}
-  m_chandelierBreakable: {fileID: 8390135258165959292}
-  m_shakeObject: {fileID: 6384647891589525021}
-  m_rigidbody: {fileID: 8629203805090655769}
 --- !u!114 &8390135258165959292
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,53 +128,7 @@ MonoBehaviour:
   m_flashDuration: 0.25
   m_audio: {fileID: 0}
   m_impactClip: {fileID: 0}
---- !u!114 &6386576919511869708
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4929250110318693209}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46213a3a69f972a4ebe338b14fa0c50b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ChandelierHitSender
-  m_parentObject: {fileID: 4929250110318693209}
---- !u!114 &3113058711952396796
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4929250110318693209}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ced5332850543c24ca276d1983454a1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HitReceiverController
-  m_onHit:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7706172344831728400}
-        m_TargetAssemblyTypeName: ChandelierController, Assembly-CSharp
-        m_MethodName: HitProcess
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  m_onStay:
-    m_PersistentCalls:
-      m_Calls: []
-  m_onExit:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &6384647891589525021
+--- !u!114 &3784232223222537982
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -216,52 +139,4 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5e6de5c90ae118b439e42b13cf6d533e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: '::'
---- !u!54 &8629203805090655769
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4929250110318693209}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!135 &2131642521795640235
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4929250110318693209}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.03
-  m_Center: {x: 0, y: 0, z: 0}
+  m_EditorClassIdentifier: Assembly-CSharp::ShakeObject
