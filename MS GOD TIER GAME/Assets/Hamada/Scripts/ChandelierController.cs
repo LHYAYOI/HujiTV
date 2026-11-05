@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class ChandelierController : MonoBehaviour
+public class ChandelierController : TargetableObject
 {
     [SerializeField] ChandelierImpactEffect m_effect;
     [SerializeField] ChandelierBreakable m_chandelierBreakable;

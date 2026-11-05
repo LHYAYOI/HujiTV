@@ -172,21 +172,27 @@ public class TargetSelector : MonoBehaviour
 
     private void CheckIfAddToTargetList() 
     {
-        GameObject[] targets = GameObject.FindGameObjectsWithTag("Target");
+        TargetableObject[] targets = FindObjectsByType<TargetableObject>(FindObjectsSortMode.None);
 
-        foreach (GameObject target in targets)
+        foreach (TargetableObject target in targets)
         {
             if (target == null)
             {
                 continue;
             }
 
-            Vector3 viewPos = Camera.main.WorldToViewportPoint(target.transform.position);
+            if (!target.IsTargetable()) 
+            {
+                continue;
+            }
+
+            Vector3 viewPos = Camera.main.WorldToViewportPoint(target.gameObject.transform.position);
 
             //範囲内か
-            if (IsInsideScreen(viewPos) && IsTargetInRange(target))
+            if (IsInsideScreen(viewPos) && IsTargetInRange(target.gameObject))
             {
-                m_targetList.Add(new TargetInfo(target, viewPos));
+                Debug.Log("範囲内よー");
+                m_targetList.Add(new TargetInfo(target.gameObject, viewPos));
             }
         }
     }

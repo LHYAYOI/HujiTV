@@ -139,6 +139,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   m_magicData: {fileID: 11400000, guid: fd84468c9ad10ad489611b6288bb8c24, type: 2}
   m_trail: {fileID: 7039418750288848135}
+  m_hitEffect: {fileID: 888282901553999714, guid: dfb6b4b86c6de9f4299373af8344de92, type: 3}
   m_moveSpeed: 5
   m_bezierControlPoints:
   - m_curveHeight: {x: 1, y: 3}
