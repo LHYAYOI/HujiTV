@@ -1,24 +1,37 @@
-﻿using UnityEngine;
+﻿using hatake;
+using System.Collections;
+using UnityEngine;
 
 public class ChandelierController : MonoBehaviour
 {
+    [SerializeField] ChandelierImpactEffect m_effect;
+    [SerializeField] ChandelierBreakable m_chandelierBreakable;
+    [SerializeField] ShakeObject m_shakeObject;
     [SerializeField] Rigidbody m_rigidbody;
+
+    [SerializeField] float m_shakeIntensity = 1.0f;
+    [SerializeField] float m_shakeDuration = 1.0f;
+
+    private void Start()
+    {
+        m_chandelierBreakable.SetEffect(m_effect);
+    }
 
     public void HitProcess(HitData data) 
     {
         if (data.GetHitObject.CompareTag("MagicBullet")) 
         {
-            m_rigidbody.isKinematic = false;
-            m_rigidbody.useGravity = true;
+            StartCoroutine(FallRoutine());
         }
+    }
 
-        if (data.GetHitObject.CompareTag("Floor")) 
-        {
-            CameraManager.Instance.ShakeCameraInVHF(2.0f, 1.0f, 1.0f, 3.0f);
+    private IEnumerator FallRoutine() 
+    {
+        yield return m_shakeObject.ShakeCoroutine(m_shakeDuration, m_shakeIntensity);
 
-            CameraManager.Instance.ChangeCameraFOV010(3.0f, 70);
+        m_rigidbody.isKinematic = false;
+        m_rigidbody.useGravity = true;
 
-            Debug.Log("Chandelier hit the floor");
-        }
+        m_chandelierBreakable.Drop();
     }
 }

@@ -123,203 +123,513 @@ Shader "Book/Page Flip Composite"
         Cull Off
         ZWrite Off
         ZTest Always
-        Blend [_SrcBlend] [_DstBlend]
 
+
+        // 0：1パスで全部を描く（PC）
         Pass
         {
+            Blend [_SrcBlend] [_DstBlend]
             CGPROGRAM
+            #pragma target 3.5
             #pragma vertex Vert
             #pragma fragment Frag
-            #pragma target 3.5
             // 紙の仕上げのバリアント。実行時にも切り替えられるよう両方を必ず含める（shader_feature だと
             // ビルドでマテリアルが使っていない方が削られ、BookFlipView.PaperFinish で切り替えられない）
             #pragma multi_compile_local_fragment _PAPERFINISH_MATTE _PAPERFINISH_GLOSS
-            #include "UnityCG.cginc"
-            #include "BookFlipCore.cginc"
-            #include "BookFlipLook.cginc"
-            #include "BookFlipEffects.cginc"
+            #define BOOK_FX
 
-            struct VertexInput { float4 vertex : POSITION; float2 uv : TEXCOORD0; };
-            struct VertexOutput { float4 vertex : SV_POSITION; float2 uv : TEXCOORD0; };
-
-            VertexOutput Vert(VertexInput input)
-            {
-                VertexOutput output;
-                output.vertex = UnityObjectToClipPos(input.vertex);
-                output.uv = input.uv;
-                return output;
-            }
-
-            float3 ShadePage(BookFlipHit h, float3 c, float2 extraTilt)
-            {
-                // 表紙・裏表紙の表側（絵の面）は硬い板：紙の質感・ノドの陰は付けない。
-                // 表紙・裏表紙は片面印刷なので、内側（最初の左ページ・最後の右ページの位置）は
-                // 絵を出さず、見返しの紙（印刷の無い色紙）を貼った面として描く
-                bool printedCover = h.kind > 0.5 && h.kind < 2.5;
-                bool endpaper = h.kind > 4.5;
-                bool cover = printedCover || endpaper;
-                // 絵を貼った表紙（c が負でない）はマットPP貼りとして弱いつやにする。強い照り返しは革だけ
-                bool coverPicture = printedCover && c.r >= 0;
-                float3 normal = float3(0, 0, 1);
-                if (endpaper)
-                {
-                    c = BookPaperBase(c, h.flatPos, true);
-                    c = BookGutter(c, h.flatPos.x, normal);
-                }
-                else if (printedCover)
-                {
-                    float2 boxCenter, boxHalf;
-                    BookCoverBox(h.kind < 1.5, boxCenter, boxHalf);
-                    c = BookCoverSurface(c, h.flatPos - boxCenter);
-                }
-                else
-                {
-                    c = BookInkBleed(c, h);
-                    c = BookPaper(c, h);
-                    c = BookGutter(c, h.flatPos.x, normal);
-                }
-
-                bool turning = h.fold < 1e2;
-                // めくり始めは角だけが小さく反るので、カールの幅を角の移動量に合わせる
-                float curlWidth = max(_CurlWidth * saturate(h.foldLength * 1.5), 1e-4);
-                float turnFade = saturate(h.foldLength * 4);
-
-                if (h.layer == BOOK_LAYER_BACK)
-                {
-                    // 裏から透ける表面の印刷（紙の元の位置で読む）
-                    float frontRight = h.sheetPos.x >= 0 ? 1 : 0;
-                    if (!cover && BookSlotKind(0, frontRight) < 0.5)
-                    {
-                        float3 through = BookSamplePage(0, frontRight, saturate(BookPageUV(h.sheetPos))).rgb;
-                        c *= lerp(1, saturate(through * 1.15), _ShowThrough);
-                    }
-
-                    float dd = h.rigid > 0.5 ? 1e3 : -h.fold;   // 硬い板は曲がらない
-                    float bend = 1 - smoothstep(0, curlWidth, dd);
-                    c *= lerp(1, _CurlDark, bend * bend * turnFade);
-                    normal = normalize(float3(h.foldNormal * bend * 1.2, 1));
-                    float band = (dd - curlWidth * 0.45) / (curlWidth * 0.22);
-                    c += _CurlSpec * exp(-band * band) * turnFade;
-                    if (h.rigid < 0.5) c *= lerp(0.85, 1, smoothstep(0, 0.012, h.flapInside));
-                }
-                else if (h.layer == BOOK_LAYER_FRONT && turning)
-                {
-                    // 折り目の手前で紙が持ち上がり始める
-                    float bend = 1 - smoothstep(0, curlWidth * 0.6, -h.fold);
-                    c *= lerp(1, 0.8, bend * turnFade);
-                }
-                else if (h.layer == BOOK_LAYER_UNDER && turning)
-                {
-                    c *= 1 - _FoldShadow * exp(-h.fold / _FoldShadowWidth) * turnFade;
-                }
-
-                // 紙の繊維の凹凸（と燃える縁の反り）で法線を傾け、光の向きで明暗を付ける
-                float3 baseNormal = normal;
-                float2 paperTilt = printedCover ? float2(0, 0) : BookPaperTilt(h.flatPos);
-                normal = normalize(normal + float3(paperTilt + extraTilt, 0));
-                c *= BookRelief(baseNormal, normal);
-
-                // つや：革の表紙は板の照り返し、絵を貼った表紙と見返しはマットの弱いつや、本文の紙は紙の仕上げ（マット／グロス）のつや
-                c += min(1, printedCover && !coverPicture ? BookSpecular(normal, BookViewDir()) : BookPaperSheen(normal, h.flatPos, !cover));
-                return c;
-            }
+            #include "BookFlipCompositeCommon.cginc"
 
             float4 Frag(VertexOutput input) : SV_Target
             {
                 float2 p = BookFromUV(input.uv);
+                BookPrepareCover();
+                bool fxPage; float fxEdge; float2 curlTilt;
+                BookFlipHit h = BookResolveHit(p, fxPage, fxEdge, curlTilt);
+                return BookFinish(BookBaseColor(h, p, fxPage, fxEdge, curlTilt), h, p);
+            }
+            ENDCG
+        }
+
+        // 1〜4：モバイル用の分割パス。1本の大きなシェーダーはモバイルの GPU で極端に遅くなる
+        // （レジスタが足りずに退避する）ので、面の種類ごとの小さなシェーダーに分けて描く。
+        // 1〜3 は面の色を _BookBaseTex へ（担当外の画素は捨てる）、4 がそれを読んで仕上げを重ねて出力する
+        // 1：本の外（小口・表紙の板・背景の影）
+        Pass
+        {
+            Blend One Zero
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex Vert
+            #pragma fragment FragOutside
+            #define BOOK_SPLIT
+            #include "BookFlipCompositeCommon.cginc"
+
+            float4 FragOutside(VertexOutput input) : SV_Target
+            {
+                float2 p = BookFromUV(input.uv);
+                // 本より十分外は何も無い（透明）
+                if (BookFarOutside(p)) return 0;
                 BookFlipHit h = BookFlipResolve(p);
-                // 閉じた本の反対側（何も無い面）は本の外として描く
                 h.kind = h.layer == BOOK_LAYER_NONE ? 0 : BookSlotKind(h.dest, h.right);
                 if ((h.layer == BOOK_LAYER_FLAT || h.layer == BOOK_LAYER_UNDER) && abs(h.kind - BOOK_SLOT_EMPTY) < 0.5) h.layer = BOOK_LAYER_NONE;
+                if (h.layer != BOOK_LAYER_NONE) discard;
+                BookPrepareCover();
+                return BookOutside(p);
+            }
+            ENDCG
+        }
 
-                // 燃焼／復活：境界の内側は変化後の見開きを見せる
-                bool fxPage = h.layer == BOOK_LAYER_FLAT && BookFxOnPage(p);
-                float fxEdge = fxPage ? BookFxEdge(p) : 0;
-                if (fxPage && fxEdge > 0) h.dest = 1;
-                float2 curlShift = 0, curlTilt = 0;
-                if (fxPage)
-                {
-                    // && は短絡しないので、対象ページ以外で勾配を計算しないよう分ける
-                    if (BookFxCurl(p, fxEdge, curlShift, curlTilt) > 0) h.uv = saturate(h.uv + curlShift);
-                }
+        // 2：ページ（本文・見返し）
+        Pass
+        {
+            Blend One Zero
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex Vert
+            #pragma fragment FragPage
+            #define BOOK_SPLIT
+            #pragma multi_compile_local_fragment _PAPERFINISH_MATTE _PAPERFINISH_GLOSS
+            #pragma multi_compile_local_fragment _ BOOK_FX
+            #define BOOK_PASS_PAGE
+            #define BOOK_PAPER_LUT
+            #include "BookFlipCompositeCommon.cginc"
 
+            float4 FragPage(VertexOutput input) : SV_Target
+            {
+                float2 p = BookFromUV(input.uv);
+                if (BookFarOutside(p)) discard;
+                bool fxPage; float fxEdge; float2 curlTilt;
+                BookFlipHit h = BookResolveHit(p, fxPage, fxEdge, curlTilt);
+                if (h.layer == BOOK_LAYER_NONE || BookIsCoverPixel(h)) discard;
+                return BookBaseColor(h, p, fxPage, fxEdge, curlTilt);
+            }
+            ENDCG
+        }
+
+        // 3：表紙（印刷した表紙、回る板の小口・縁、角金具）
+        Pass
+        {
+            Blend One Zero
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex Vert
+            #pragma fragment FragCover
+            #define BOOK_SPLIT
+            #define BOOK_PASS_COVER
+            #include "BookFlipCompositeCommon.cginc"
+
+            float4 FragCover(VertexOutput input) : SV_Target
+            {
+                float2 p = BookFromUV(input.uv);
+                if (BookFarOutside(p)) discard;
+                bool fxPage; float fxEdge; float2 curlTilt;
+                BookFlipHit h = BookResolveHit(p, fxPage, fxEdge, curlTilt);
+                if (h.layer == BOOK_LAYER_NONE || !BookIsCoverPixel(h)) discard;
+                BookPrepareCover();
+                return BookBaseColor(h, p, fxPage, fxEdge, curlTilt);
+            }
+            ENDCG
+        }
+
+        // 4：仕上げ（面の色 + 姿勢の明暗・落ち影・魔法の光・暗転・燃えかす・フェード）
+        Pass
+        {
+            Blend [_SrcBlend] [_DstBlend]
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex Vert
+            #pragma fragment FragFinish
+            #define BOOK_SPLIT
+            #pragma multi_compile_local_fragment _ BOOK_FX
+            #include "BookFlipCompositeCommon.cginc"
+
+            float4 FragFinish(VertexOutput input) : SV_Target
+            {
+                float2 p = BookFromUV(input.uv);
+            #if !defined(BOOK_FX)
+                // 本より十分外：暗転と画面フェードだけ（燃焼の粒は本の外にも出るので、演出中は省かない）
+                if (BookFarOutside(p)) return BookApplyScreenFade(BookApplyDim(float4(0, 0, 0, 0), p));
+            #endif
+                float4 col = BOOK_TEX_LOD(_BookBaseTex, float4(input.uv, 0, 0));
+                BookFlipHit h = BookFlipResolve(p);
+                h.kind = h.layer == BOOK_LAYER_NONE ? 0 : BookSlotKind(h.dest, h.right);
+                if ((h.layer == BOOK_LAYER_FLAT || h.layer == BOOK_LAYER_UNDER) && abs(h.kind - BOOK_SLOT_EMPTY) < 0.5) h.layer = BOOK_LAYER_NONE;
+                return BookFinish(col, h, p);
+            }
+            ENDCG
+        }
+
+        // 5：表紙の地の色（表紙の絵の外周の平均）を1画素に求める。分割パスはこれを読む（画素ごとに8回読まない）
+        Pass
+        {
+            Blend One Zero
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex Vert
+            #pragma fragment FragCoverBase
+            #include "BookFlipCompositeCommon.cginc"
+
+            float4 FragCoverBase(VertexOutput input) : SV_Target
+            {
+                return float4(BookCoverBaseColorCompute(), 1);
+            }
+            ENDCG
+        }
+
+        // 6・7：紙の模様の焼き込み（BookFlipView が紙の設定・出力の大きさが変わったときだけ描く）
+        // 6：紙の地に掛ける色
+        Pass
+        {
+            Blend One Zero
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex Vert
+            #pragma fragment FragPaperLut
+            #pragma multi_compile_local_fragment _PAPERFINISH_MATTE _PAPERFINISH_GLOSS
+            #include "BookFlipCompositeCommon.cginc"
+
+            float4 FragPaperLut(VertexOutput input) : SV_Target
+            {
+                float2 p = float2(input.uv.x * 2 - 1, input.uv.y * _PageAspect);
+                return float4(BookPaperMulCompute(p), 1);
+            }
+            ENDCG
+        }
+
+        // 7：紙の法線の傾き
+        Pass
+        {
+            Blend One Zero
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex Vert
+            #pragma fragment FragPaperTiltLut
+            #pragma multi_compile_local_fragment _PAPERFINISH_MATTE _PAPERFINISH_GLOSS
+            #include "BookFlipCompositeCommon.cginc"
+
+            float4 FragPaperTiltLut(VertexOutput input) : SV_Target
+            {
+                float2 p = float2(input.uv.x * 2 - 1, input.uv.y * _PageAspect);
+                return float4(BookPaperTiltCompute(p), 0, 1);
+            }
+            ENDCG
+        }
+
+        // 8：本文のめくり（モバイル）。めくり始めに、今の見開きの静止画（_BookTurnCacheTex：仕上げ済み）と
+        // 移動先の見開きのページ（_BookTurnDestTex：面の色）を1度だけ描いておき、毎フレームはそれを読んで
+        // 折り目・めくった紙の裏・影だけを計算する（毎フレームの処理を小さく保つ）
+        Pass
+        {
+            Blend [_SrcBlend] [_DstBlend]
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex Vert
+            #pragma fragment FragTurn
+            #define BOOK_SPLIT
+            #define BOOK_NO_RIGID
+            #include "BookFlipCompositeCommon.cginc"
+            BOOK_DECLARE_TEX(_BookTurnCacheTex)
+            BOOK_DECLARE_TEX(_BookTurnDestTex)
+
+            // 本の座標 → 出力の UV（BookFromUV の逆）
+            float2 BookToOutputUV(float2 flat)
+            {
+                float2 t = float2((flat.x + 1) * 0.5, flat.y / max(_PageAspect, 1e-5));
+                return _BookRect.xy + t * (_BookRect.zw - _BookRect.xy);
+            }
+
+            float4 FragTurn(VertexOutput input) : SV_Target
+            {
+                float2 p = BookFromUV(input.uv);
+                BookFlipHit h = BookFlipResolve(p);
+                h.kind = h.layer == BOOK_LAYER_NONE ? 0 : BookSlotKind(h.dest, h.right);
+                if ((h.layer == BOOK_LAYER_FLAT || h.layer == BOOK_LAYER_UNDER) && abs(h.kind - BOOK_SLOT_EMPTY) < 0.5) h.layer = BOOK_LAYER_NONE;
                 float4 col;
-                if (h.layer == BOOK_LAYER_NONE) col = BookOutside(p);
-                else if (h.rigidEdge > 0.5)
+                float turnFade = saturate(h.foldLength * 4);
+                float curlWidth = max(_CurlWidth * saturate(h.foldLength * 1.5), 1e-4);
+                if (h.layer == BOOK_LAYER_UNDER || h.layer == BOOK_LAYER_BACK)
                 {
-                    // 回っている板の小口
-                    col = float4(BookBoardEdgeColor(h.sheetPos.x + h.sheetPos.y, saturate(h.flapInside)), 1);
-                }
-                else if (h.rigidMargin > 0.5)
-                {
-                    // 硬い表紙の板のページより外：表側なら閉じた表紙の縁、内側なら開いた本の縁（着地した位置で）。
-                    // 置いてある板と同じ関数で描くので、金の罫・角金具・革の模様が着地の前後で変わらない
-                    // 内側の縁には、その側のページの束（小口）も板に載って一緒に回る
-                    bool coverFace = h.kind > 0.5 && h.kind < 2.5;
-                    float4 carried = coverFace ? float4(0, 0, 0, 0) : BookStackCarried(h.flatPos);
-                    col = carried.a > 0 ? carried
-                        : float4(coverFace ? BookClosedBoardColor(h.flatPos, h.kind < 1.5)
-                                           : BookOpenBoardColor(h.flatPos), 1);
-                }
-                else col = float4(ShadePage(h, BookSamplePage(h.dest, h.right, h.uv).rgb, curlTilt), 1);
-                // 角金具は表紙・裏表紙の板に付いて一緒に回る。表側（絵の面）は全体、内側は縁の部分だけ
-                // （縁は上の BookClosedBoardColor / BookOpenBoardColor が描く。ここは表側のページの範囲）
-                if (h.rigid > 0.5 && h.rigidEdge < 0.5 && h.rigidMargin < 0.5)
-                {
-                    bool coverFace = h.kind > 0.5 && h.kind < 2.5;
-                    if (coverFace)
+                    // 移動先のページ（裏面は、めくり終えたときの位置で読む）
+                    float2 uv = h.layer == BOOK_LAYER_BACK ? BookToOutputUV(h.flatPos) : input.uv;
+                    col = BOOK_TEX_LOD(_BookTurnDestTex, float4(uv, 0, 0));
+                    // 移動先の絵はページの外が透明。ページの縁で混ざった分を戻す（半分の解像度の仮の絵で縁が暗くならない）
+                    float3 c = col.rgb / max(col.a, 1e-3);
+                    if (h.layer == BOOK_LAYER_BACK)
                     {
-                        float2 boxCenter, boxHalf;
-                        BookCoverBox(h.flatPos.x >= 0, boxCenter, boxHalf);
-                        float boxSd = BookSdRoundBox(h.flatPos - boxCenter, boxHalf, _CoverRadius);
-                        col.rgb = BookCornerMetal(col.rgb, h.flatPos - boxCenter, boxHalf, boxSd);
+                        // ShadePage の裏面の処理と同じ：表の印刷の透け、カールの陰と照り返し、縁の陰
+                        bool cover = h.kind > 0.5 && h.kind < 2.5 || h.kind > 4.5;
+                        float frontRight = h.sheetPos.x >= 0 ? 1 : 0;
+                        if (!cover && BookSlotKind(0, frontRight) < 0.5)
+                        {
+                            float3 through = BookSamplePage(0, frontRight, saturate(BookPageUV(h.sheetPos))).rgb;
+                            c *= lerp(1, saturate(through * 1.15), _ShowThrough);
+                        }
+                        float dd = -h.fold;
+                        float bend = 1 - smoothstep(0, curlWidth, dd);
+                        c *= lerp(1, _CurlDark, bend * bend * turnFade);
+                        float band = (dd - curlWidth * 0.45) / (curlWidth * 0.22);
+                        c += _CurlSpec * exp(-band * band) * turnFade;
+                        c *= lerp(0.85, 1, smoothstep(0, 0.012, h.flapInside));
+                    }
+                    else
+                    {
+                        c *= 1 - _FoldShadow * exp(-h.fold / _FoldShadowWidth) * turnFade;
+                    }
+                    col.rgb = c * BookPoseShade();
+                    col.a = 1;
+                }
+                else
+                {
+                    col = BOOK_TEX_LOD(_BookTurnCacheTex, float4(input.uv, 0, 0));
+                    if (h.layer == BOOK_LAYER_FRONT)
+                    {
+                        // 折り目の手前で紙が持ち上がり始める（ShadePage の表の処理と同じ）
+                        float bend = 1 - smoothstep(0, curlWidth * 0.6, -h.fold);
+                        col.rgb *= lerp(1, 0.8, bend * turnFade);
                     }
                 }
-                if (h.rigid > 0.5) col.rgb *= h.rigidShade;
-                if (fxPage) col.rgb = BookFxShadePage(col.rgb, p, fxEdge);
-                // 閉じた表紙の上の角金具（板の縁はページの外で BookCover が描く）
-                if (h.layer == BOOK_LAYER_FLAT && h.kind > 0.5 && h.kind < 2.5)
+                bool destination = h.layer == BOOK_LAYER_UNDER || h.layer == BOOK_LAYER_BACK;
+                col = BookTurnOverlay(col, h, p);
+                // 静止画には暗転が入っているので、移動先のページだけに掛ける
+                if (destination) col = BookApplyDim(col, p);
+                return col;
+            }
+            ENDCG
+        }
+
+        // 9：暗転だけが動いている間（モバイル）。暗転の前の静止画（_BookDimBaseTex）に暗転・スポット・ルーンだけを重ねる
+        Pass
+        {
+            Blend [_SrcBlend] [_DstBlend]
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex Vert
+            #pragma fragment FragDim
+            #define BOOK_SPLIT
+            #include "BookFlipCompositeCommon.cginc"
+            BOOK_DECLARE_TEX(_BookDimBaseTex)
+
+            float4 FragDim(VertexOutput input) : SV_Target
+            {
+                float2 p = BookFromUV(input.uv);
+                float4 col = BOOK_TEX_LOD(_BookDimBaseTex, float4(input.uv, 0, 0));
+                return BookApplyScreenFade(BookApplyDim(col, p));
+            }
+            ENDCG
+        }
+
+        // 10：表紙の開け閉め（モバイル）。めくる前と後の静止画（_BookTurnCacheTex：今、_BookTurnDestTex：移動先）を読み、
+        // 回る板のめくり始めに上を向いていた面は今の静止画、反対の面は移動先の静止画の、板が寝た位置の絵を貼る。
+        // 毎フレームは板の向き・影だけを計算する
+        Pass
+        {
+            Blend [_SrcBlend] [_DstBlend]
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex Vert
+            #pragma fragment FragCoverTurn
+            #define BOOK_SPLIT
+            #include "BookFlipCompositeCommon.cginc"
+            // どの静止画を読むかは BookFlipView が選んで渡す（移動先を描き終えるまでは今の静止画で代用）
+            BOOK_DECLARE_TEX(_BookTurnCacheTex) // 今
+            BOOK_DECLARE_TEX(_BookTurnDestTex)  // 移動先
+            float _BookOpening; // 1 = 閉じた本を開く（今の静止画が閉じた本）、0 = 閉じる
+
+            float2 BookToOutputUV(float2 flat)
+            {
+                float2 t = float2((flat.x + 1) * 0.5, flat.y / max(_PageAspect, 1e-5));
+                return _BookRect.xy + t * (_BookRect.zw - _BookRect.xy);
+            }
+
+            // 移動先の静止画のうち描き終えた範囲（出力の UV の x の範囲。z = 1 なら全体を描き終えてミップもある）。
+            // 描き終えていない所は、半分の解像度の仮の絵（w = 1 で描き終えている）、それも無ければ今の静止画で代用する
+            float4 _BookDestReady;
+            BOOK_DECLARE_TEX(_BookTurnDestLowTex)
+            bool DestReady(float2 uv) { return _BookDestReady.z > 0.5 || (uv.x >= _BookDestReady.x && uv.x <= _BookDestReady.y); }
+            float4 Cur(float2 uv, float lod) { return BOOK_TEX_LOD(_BookTurnCacheTex, float4(uv, 0, lod)); }
+            float4 Dst(float2 uv, float lod)
+            {
+                if (!DestReady(uv)) return _BookDestReady.w > 0.5 ? BOOK_TEX_LOD(_BookTurnDestLowTex, float4(uv, 0, 0)) : Cur(uv, lod);
+                return BOOK_TEX_LOD(_BookTurnDestTex, float4(uv, 0, _BookDestReady.z > 0.5 ? lod : 0));
+            }
+            // dest：0 = めくる前の状態（今の静止画）、1 = めくった後の状態（移動先の静止画）
+            float4 StateImage(float dest, float2 uv, float lod) { return dest < 0.5 ? Cur(uv, lod) : Dst(uv, lod); }
+
+            float4 FragCoverTurn(VertexOutput input) : SV_Target
+            {
+                float2 p = BookFromUV(input.uv);
+                // 本より十分外は変わらない
+                if (BookFarOutside(p)) return Cur(input.uv, 0);
+                BookFlipHit h = BookFlipResolve(p);
+
+                h.kind = h.layer == BOOK_LAYER_NONE ? 0 : BookSlotKind(h.dest, h.right);
+                if ((h.layer == BOOK_LAYER_FLAT || h.layer == BOOK_LAYER_UNDER) && abs(h.kind - BOOK_SLOT_EMPTY) < 0.5) h.layer = BOOK_LAYER_NONE;
+                float4 col;
+                if (h.rigid > 0.5)
                 {
-                    float2 boxCenter, boxHalf;
-                    BookCoverBox(h.kind < 1.5, boxCenter, boxHalf);
-                    float boxSd = BookSdRoundBox(p - boxCenter, boxHalf, _CoverRadius);
-                    col.rgb = BookCornerMetal(col.rgb, p - boxCenter, boxHalf, boxSd);
+                    if (h.rigidEdge > 0.5)
+                    {
+                        // 回っている板の小口（BookBoardEdgeColor のノイズを省いた版。小口は細いので見分けがつかない）
+                        float3 baseColor = BOOK_TEX_LOD(_BookCoverBaseTex, float4(0.5, 0.5, 0, 0)).rgb;
+                        float across = saturate(h.flapInside);
+                        float3 edgeColor = baseColor * 0.45 * 0.92 + baseColor * 0.35 * (1 - smoothstep(0, 0.25, across));
+                        col = float4(edgeColor * BookPoseShade(), 1);
+                    }
+                    // 板の面：めくり始めに上を向いていた面（dest 0）は今の静止画、反対の面（dest 1）は移動先の静止画の、
+                    // 板が寝たときの位置の絵を貼る（開くときは表紙→見返し、閉じるときは見返し→表紙）。
+                    // 板が立つほど絵を横に縮めて読むので、縮む分だけ粗いミップで読む
+                    else
+                    {
+                        float lod = clamp(log2(1 / max(abs(_Fold.z), 0.02)), 0, 6);
+                        col = StateImage(h.dest, BookToOutputUV(h.flatPos), lod);
+                    }
+                    col.rgb *= h.rigidShade;
+                    col.a = 1;
                 }
-
-                // 本の姿勢による明暗（光の向きは一定、本が光へ向く・背ける）。魔法の光・暗転・燃えかすはこの後に重ねる（自ら光るので暗くしない）
-                col.rgb *= BookPoseShade();
-
-                // めくれた紙が下の紙・表紙・背景に落とす影
-                if (h.layer != BOOK_LAYER_BACK && h.flapOutside < 1e2)
+                else if (h.layer == BOOK_LAYER_UNDER || h.layer == BOOK_LAYER_FLAT) col = StateImage(h.dest, input.uv, 0);
+                else
                 {
-                    float shadow = (1 - smoothstep(0, _DropShadowWidth, h.flapOutside)) * _DropShadow * saturate(h.foldLength * 4);
-                    col.rgb *= 1 - shadow;
-                    col.a = max(col.a, shadow);
+                    // 本の外：動かない側の板・小口は開き具合で入れ替え、着地する側は閉じた本（背景）のまま
+                    float stillSide = _RigidCover < 1.5 ? 1 : -1;
+                    float4 closedCol = _BookOpening > 0.5 ? Cur(input.uv, 0) : Dst(input.uv, 0);
+                    if (p.x * stillSide >= 0)
+                    {
+                        float4 openCol = _BookOpening > 0.5 ? Dst(input.uv, 0) : Cur(input.uv, 0);
+                        col = lerp(closedCol, openCol, saturate(_BoardOpen));
+                    }
+                    else col = closedCol;
                 }
+                return BookTurnOverlay(col, h, p);
+            }
+            ENDCG
+        }
 
-                // 魔法の光：折り目とめくれた紙の縁
-                if (_TurnGlow > 0 && h.fold < 1e2 && h.layer != BOOK_LAYER_NONE)
+        // 11：燃焼・復活（モバイル）。演出の前の静止画（_BookTurnCacheTex）と変化後のページ（_BookTurnDestTex）を、
+        // 焼き込んだ境界（_BookFxLut）で切り替える。燃えかす・粒はパス 13・14 で四角形として描く
+        Pass
+        {
+            Blend [_SrcBlend] [_DstBlend]
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex Vert
+            #pragma fragment FragFx
+            #define BOOK_SPLIT
+            #include "BookFlipCompositeCommon.cginc"
+            BOOK_DECLARE_TEX(_BookTurnCacheTex)
+            BOOK_DECLARE_TEX(_BookTurnDestTex)
+            BOOK_DECLARE_TEX(_BookFxLut) // r 境界の値, gb 進む向き, a ノイズ
+
+            float4 FragFx(VertexOutput input) : SV_Target
+            {
+                float2 p = BookFromUV(input.uv);
+                if (!BookFxOnPage(p)) return BOOK_TEX_LOD(_BookTurnCacheTex, float4(input.uv, 0, 0));
+                float4 lut = BOOK_TEX_LOD(_BookFxLut, float4(BookPaperLutUV(p), 0, 0));
+                float e = BookFxThreshold() - lut.r;
+                float2 shiftUV = 0;
+                float2 tilt = 0;
+                if (_FxMode < 1.5 && _BurnCurl > 0 && e <= 0)
                 {
-                    float glow = exp(-abs(h.fold) / 0.012);
-                    if (h.layer == BOOK_LAYER_BACK) glow = max(glow, exp(-h.flapInside / 0.008));
-                    float along = dot(p, float2(-h.foldNormal.y, h.foldNormal.x));
-                    float sparkle = BookLookNoise(float2(along * 38 - _Time.y * 5, _Time.y * 0.7));
-                    col.rgb += _FoldGlowColor.rgb * _TurnGlow * glow * (0.35 + 0.65 * sparkle * sparkle);
+                    // 燃えている縁の反り返り（BookFxCurl と同じ）
+                    float width = max(_BurnEdgeWidth * 3.5, 1e-4) * (0.7 + 0.6 * lut.a);
+                    float lift = 1 - smoothstep(0, width, -e);
+                    lift *= lift * _BurnCurl;
+                    float2 dir = lut.gb / max(length(lut.gb), 1e-5);
+                    float2 shift = -dir * lift * width * 0.6 * max(_FxOrigin.z, 1e-3);
+                    shiftUV = shift * float2(0.5 * (_BookRect.z - _BookRect.x), (_BookRect.w - _BookRect.y) / max(_PageAspect, 1e-5));
+                    tilt = -dir * lift * 1.4;
                 }
+                float4 col;
+                if (e > 0)
+                {
+                    col = BOOK_TEX_LOD(_BookTurnDestTex, float4(input.uv, 0, 0));
+                    col.rgb = col.rgb / max(col.a, 1e-3) * BookPoseShade();
+                    col.a = 1;
+                    // 静止画には暗転が入っているので、変化後のページにも掛ける
+                    col = BookApplyDim(col, p);
+                }
+                else col = BOOK_TEX_LOD(_BookTurnCacheTex, float4(input.uv + shiftUV, 0, 0));
+                float3 l = BookLightDir();
+                col.rgb *= 1 + (dot(normalize(float3(tilt, 1)), l) - l.z) * 1.6;
+                // 火の縁のゆらぎ（1次元の安いゆらぎ）
+                float flicker = 0.6 + 0.4 * (0.5 + 0.5 * sin(p.x * 40 + _Time.y * 8) * sin(p.y * 37 - _Time.y * 6.3));
+                col.rgb = BookFxShadePageN(col.rgb, e, flicker, lut.a);
+                return col;
+            }
+            ENDCG
+        }
 
-                col = BookApplyDim(col, p);
+        // 12：燃焼・復活の境界の焼き込み（演出の始めに1度）
+        Pass
+        {
+            Blend One Zero
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex Vert
+            #pragma fragment FragFxLut
+            #include "BookFlipCompositeCommon.cginc"
 
-                // 燃えかすと粒は暗転の上に描く
-                float4 ash = BookFxAsh(p);
-                col.rgb = col.rgb * (1 - ash.a) + ash.rgb;
-                col.a = max(col.a, ash.a);
+            float4 FragFxLut(VertexOutput input) : SV_Target
+            {
+                float2 p = float2(input.uv.x * 2 - 1, input.uv.y * _PageAspect);
+                float2 dir = BookFxDirection(p);
+                return float4(BookFxField(p), dir, BookLookNoise(p * 9 + _FxOrigin.w));
+            }
+            ENDCG
+        }
 
-                float3 particles = BookFxParticles(p);
-                col.rgb += particles;
-                col.a = max(col.a, saturate(max(particles.r, max(particles.g, particles.b))));
+        // 13・14：燃えかす・粒（モバイル）。BookFlipView が1枚ずつ四角形で描く（画面全体で毎画素ループしない）。
+        // TEXCOORD0 本の座標での中心からのずれ, TEXCOORD1 (cos, sin) 回転・裏返り・大きさ, TEXCOORD2 濃さ・光・種類, TEXCOORD3 ノイズの種
 
-                // 画面フェード（後処理を使うときは BookFlipView が 0 にし、後処理の最後で掛ける）
-                return BookApplyScreenFade(col);
+        // 13：燃えかすの紙片（乗算済みの色で重ねる。BookFxAsh と同じ形）
+        Pass
+        {
+            Blend One OneMinusSrcAlpha
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex FxVert
+            #pragma fragment FragAsh
+            #include "BookFlipFxQuads.cginc"
+            float4 FragAsh(FxVertexOutput input) : SV_Target
+            {
+                float2 q = input.local.xy;
+                float cs = input.shape.x, sn = input.shape.y;
+                q = float2(q.x * cs - q.y * sn, q.x * sn + q.y * cs);
+                q.x /= input.shape.z;
+                float size = input.shape.w;
+                float shape = length(q) / size + (FxNoise(q / size * 1.8 + input.seed.xy) - 0.5) * 0.9;
+                float body = 1 - smoothstep(0.82, 1, shape);
+                float edge = smoothstep(0.5, 0.95, shape) * body;
+                float a = body * input.look.x;
+                float3 color = _BurnCharColor.rgb * 1.5 + _BurnEmberColor.rgb * edge * input.look.y;
+                return float4(color * a, a);
+            }
+            ENDCG
+        }
+
+        // 14：火の粉・光の粒（足して重ねる。BookFxParticles と同じ形）
+        Pass
+        {
+            Blend One One, One One
+            BlendOp Add, Max
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex FxVert
+            #pragma fragment FragSpark
+            #include "BookFlipFxQuads.cginc"
+            float4 FragSpark(FxVertexOutput input) : SV_Target
+            {
+                float2 d = input.local.xy;
+                float r = input.shape.w;
+                float glow = exp(-dot(d, d) / (r * r));
+                if (input.look.z > 0.5)
+                {
+                    // 十字のきらめき（復活）
+                    float2 a = abs(d);
+                    glow += (exp(-a.x / (r * 0.3)) * exp(-a.y / (r * 3.5)) + exp(-a.y / (r * 0.3)) * exp(-a.x / (r * 3.5))) * 0.6;
+                }
+                float3 c = input.seed.xyz * glow * input.look.x;
+                return float4(c, saturate(max(c.r, max(c.g, c.b))));
             }
             ENDCG
         }

@@ -86,9 +86,9 @@ namespace YasudaHaruto.BookValidation
         public void EndPageDrag() => m_flipView?.EndDrag();
 
         // The inventory owner supplies a complete candidate; no partial pair edits escape.
-        internal bool TryApplyInventory(IReadOnlyList<BookPageData> pages, int targetSpread, Action<bool> completed)
+        internal bool TryApplyInventory(IReadOnlyList<BookPageData> pages, int targetSpread, bool present, Action<bool> completed)
         {
-            if (!Application.isPlaying || !isActiveAndEnabled || IsBusy || IsClosed ||
+            if (!Application.isPlaying || !isActiveAndEnabled || IsBusy || (present && IsClosed) ||
                 m_currentTexture == null || m_flipView == null || m_flipView.IsTurning ||
                 pages == null || pages.Count < 3 || (pages.Count & 1) == 0 ||
                 targetSpread < 0 || targetSpread >= (pages.Count + 1) / 2 ||
@@ -98,11 +98,11 @@ namespace YasudaHaruto.BookValidation
             var candidate = new List<BookPageData>(pages.Count);
             for (int i = 0; i < pages.Count; i++) candidate.Add(pages[i]);
             m_inventoryCompletion = completed;
-            StartCoroutine(ApplyInventory(candidate, targetSpread));
+            StartCoroutine(ApplyInventory(candidate, targetSpread, present));
             return true;
         }
 
-        private IEnumerator ApplyInventory(List<BookPageData> candidate, int targetSpread)
+        private IEnumerator ApplyInventory(List<BookPageData> candidate, int targetSpread, bool present)
         {
             m_captureFlag = true;
             RenderTexture target = m_currentTexture == m_textureA ? m_textureB : m_textureA;
@@ -115,6 +115,12 @@ namespace YasudaHaruto.BookValidation
             yield return WaitForCameraFrame(m_captureCamera);
             TagCoverInsides(target, targetSpread, candidate.Count);
 
+            if (present)
+            {
+                PrepareFlipDisplay();
+                yield return m_flipView.PlayTurn(m_currentTexture, target, targetSpread > m_spreadIndex);
+            }
+
             // Commit both display inventory and logical inventory without a yield between them.
             m_runtimePages.Clear();
             m_runtimePages.AddRange(candidate);
@@ -122,7 +128,7 @@ namespace YasudaHaruto.BookValidation
             m_currentTexture = target;
             m_spreadIndex = targetSpread;
             m_flipView.SetDisplay(m_displayImage);
-            m_flipView.ShowSpread(target);
+            if (!IsClosed) m_flipView.ShowSpread(target);
             m_flipView.SetReadingProgress(targetSpread, SpreadCount);
             m_displayImage.texture = m_flipView.OutputTexture;
             m_displayImage.enabled = true;
@@ -134,6 +140,39 @@ namespace YasudaHaruto.BookValidation
             SpreadShown?.Invoke(targetSpread);
             ResumePendingSpread();
         }
+        private Coroutine m_acquisitionGlow;
+        private Color m_displayColorBeforeGlow;
+
+        internal void PlayAcquisitionEffect()
+        {
+            StopAcquisitionGlow();
+            m_displayColorBeforeGlow = m_displayImage.color;
+            m_acquisitionGlow = StartCoroutine(AcquisitionGlow());
+        }
+
+        private void StopAcquisitionGlow()
+        {
+            if (m_acquisitionGlow == null) return;
+            StopCoroutine(m_acquisitionGlow);
+            m_acquisitionGlow = null;
+            m_displayImage.color = m_displayColorBeforeGlow;
+        }
+
+        private IEnumerator AcquisitionGlow()
+        {
+            const float duration = 0.65f;
+            Color original = m_displayColorBeforeGlow;
+            Color gold = new Color(1f, 0.76f, 0.34f, original.a);
+            for (float elapsed = 0; elapsed < duration; elapsed += Time.unscaledDeltaTime)
+            {
+                float strength = Mathf.Sin(elapsed / duration * Mathf.PI) * 0.65f;
+                m_displayImage.color = Color.Lerp(original, gold, strength);
+                yield return null;
+            }
+            m_displayImage.color = original;
+            m_acquisitionGlow = null;
+        }
+
         private BookCoverState m_coverState;
         // 最初の見開きの左（index 0）に置いた、表紙の内側の枠（ページではない）
         private bool m_frontInsideSlot;
@@ -590,6 +629,7 @@ namespace YasudaHaruto.BookValidation
 
         private void OnDisable()
         {
+            StopAcquisitionGlow();
             StopAllCoroutines();
             var completion = m_inventoryCompletion;
             m_inventoryCompletion = null;

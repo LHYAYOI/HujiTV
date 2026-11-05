@@ -1,5 +1,90 @@
 # Project Status
 
+## トロッコステージ設定ガイド（2026-11-04）
+- TROLLEY_STAGE_SETUP.md に、Arai のスプライン・分岐・停止・速度変更、Hamada の衝突イベント・カメラ、戦闘開始から再発進までの設定手順をまとめた。
+- Main_Game_Scene_Alpha、Arai の分岐サンプルと Stage Prefab、関連 C# の静的調査。Unity Play Mode は未確認。今回の変更は資料と作業記録。
+- Git fetch と追跡先比較を実施。現在のブランチと追跡先のコミット・ファイル差分はなく、作業開始時に共有設定・本関連アセット・本記録などに既存の未コミット変更があった。
+
+## 泡の仮Prefabと獲得プレビュー（2026-11-04）
+- BookSceneを開き、Play Modeに入る前に Tools > YasudaHaruto > Preview Page Drop and Acquisition を選ぶ。Gameビュー右上に仮Prefabの落下と回収、本側にID 5への自動めくりと獲得演出が出る構成。ID 5の泡を2つ落とし、実際のローカルUDP接続を通して本が1回だけ追加・表示することを確認する。結果は右上とConsoleに表示。
+- PreviewPageBubble.prefabは仮の透明球・紙片・インク線で構成。検証用ステージ・カメラ・サーバー・クライアントはPlay Mode中に生成する。既存のScene、敵、戦闘管理の保存データは編集していない。ローカルUDP 7777を使うため、同じPCでゲームサーバーを起動中なら停止してから試す。
+- プレビューコード単体のEditor向けC#コンパイル成功。UnityバッチはPlay Mode開始前に終了コード1で停止したため、PrefabのUnity上でのインポート、Gameビューの表示とE2E動作は未確認。
+
+## ページドロップ・獲得基盤（2026-11-04）
+- Assets/YasudaHaruto内にBattlePageDropsを追加。PC側のオブジェクトに付けて、撃破確定時にReportEnemyDefeated(enemyId, worldPosition)、戦闘から次へ進む時にCollectBattleDrops(cartTarget)を呼ぶ。後者は最後の泡の落下を待って一斉回収する。敵／戦闘コードと保存済みScene・Prefabへの配線は未変更。
+- InspectorのAssignmentsで敵IDからPageIdを割り当てる。MiniGhost_A/B/CはID 5が初期値。Bubble Prefab、Bubble Material、Ground Layersは任意。Prefab未指定時は透明球と紙片の仮表示。Play ModeでPreview Cart Targetを指定し、コンポーネントの「Preview / Drop Page Bubbles」「Preview / Collect Page Bubbles」で手動検証できる。両者への送信を試す場合はBookNetworkServerでゲーム開始済みの状態にする。
+- PCは到着したページをセッション内にID単位で保持し、両プレイヤーへ送信。後から接続したプレイヤーには過去分を演出なしで送る。クライアントはScene初期化前の受信も保持する。履歴はPC側サーバーの稼働中のみ保持。
+- 本は所持ページだけをID順に表示。追加先へ自動めくりし、表示時に短い金色の演出を再生。重複は初期所持も含めて拒否し、削除／入れ替え／辞退処理は停止。旧検証用の呼び出し口はコンパイル互換のため残しており、旧仕様を検証するメニューは現仕様の確認には使えない。
+- Unity同梱RoslynとBeeの参照設定でRuntimeの別出力コンパイル成功（既存警告3件）。Play Mode、仮素材の見え方、PCとタブレット2台の通信・再接続は未確認。Git statusで担当フォルダ内の変更のみ確認。
+
+## 敵撃破によるページドロップの現状確認（2026-11-04）
+- 保存済みコードとSceneを静的調査。BattleManagerはアクティブ敵0件と制限時間切れを同じ終了イベントに流す。MiniGhostの個別時間切れからBeginDyingを呼ぶ箇所は現行ではコメントアウトされている。SwarmGhostはEnemyBaseを継承せず独自のDieを持つ。
+- BookSceneの初期見開きはID 2・3・4。現在参照するTestPageDatabaseの登録はID 2・3・4・5（TestPage 3）で、初期所持を重複扱いにすると現登録で新規候補はID 5のみ。現行の所持追加は同種複数所持を許容する。SendAddPageの戦闘側呼び出しは未接続。
+- 現在のBookServerLobbyはBookServerGameを指定する。保存済みBookServerGameにはBattleManager／CartControllerの直接記述が見つからず、Main_Game_Scene_Alphaで両方の配置を確認。統合先、対象敵・固定ページ割り当て、時間切れと重複／未接続時の扱いは確認待ち。
+- ゲームコード・Scene・Prefabの変更、Unity実行なし。調査開始時のGit statusはクリーン。fetchと追跡先との比較を実施し、コミット・ファイル差分なし。
+
+## ワンボタンのサーバー探索・接続（2026-11-03）
+- ユーザー指示：タブレット先起動／PCサーバー後起動で、毎回IPを入力せずボタン1回で探索・接続したい。BookConnectionUIの既存接続ボタンを、IP未編集時は新しく4秒探索→発見IPへ選択中Playerで接続する処理へ変更。起動時の探索は従来どおりIP補完のみ。探索終了後も同じボタンで再探索できる。
+- ボタンのTMP表示をFind Server & Connectへ変更。IPを編集した場合は探索・自動接続予約を止め、Connect to entered IPとして手入力先へ接続する。OnSearchServerButtonPressedは補完専用のまま維持。登録・PC開始待ち・Scene遷移の既存処理は維持。Scene配線変更なし、元CP932文字コードを保持。
+- 現行RuntimeソースをUnity同版Roslyn／Bee参照設定で別出力コンパイル成功、既存警告3件。初回は古いrspの移動済みソース参照で失敗したため一覧を現行へ再生成、Unityが無視する末尾~バックアップを除外して成功。Unity Play Mode、ボタンの目視、PC／Android実通信は未確認。クライアントAPK再ビルドが必要。同一ネットワークのServer1台想定、探索UDP7776／本通信7777は従来どおり。
+
+## 次期ゲーム連携の現状確認（2026-11-03）
+- ユーザー指示：本シェーダー／Android負荷対策はいったん保留。敵撃破によるページドロップ・獲得、敵のお邪魔行動、途中の通信対応を進める前の現状調査を実施。今回の変更は本記録のみ。
+- ページ：BookInventory／BookGameControllerに追加・削除・同種複数所持・満杯時の入れ替え／辞退が実装済み。BookSceneは初期3見開き、上限8、受信待ち最大16。SendAddPage→ADD_PAGE→BookGameBootstrap→BookPageRequestQueueの受信経路も存在する。Assets内C#検索でSendAddPageの外部呼出しは見つからず、敵撃破→ドロップ生成→回収→獲得先決定の連携は未実装と判断。PageFactoryがページのMagicDataを発動コマンドへ接続するため、魔法ページ追加の基盤は再利用できる。
+- お邪魔：4枠状態、左右擦り／スクラッチ、4番枠の通常操作制限、見開きごとの保持、通信受信・めくり中予約は実装済み。SendObstacleの実呼出しはServer.UpdateのSpaceキー→PLAYER1／種類1のみ確認。敵の攻撃からの送信、対象選択・頻度等の管理は未接続。仮素材・画面Overlay表示、解除通知／再接続同期なしという制約も残る。
+- 通信：登録承認／拒否、開始通知、Serverロビー、Scene跨ぎ維持、自動再接続、自動探索のコードが存在。古いSERVER_DISCOVERY.mdの「登録承認なし」は後続SERVER_LOBBY.mdの実装で更新済み。ロビー追加後のPlay Mode統合検証・実機検証は過去記録で未完了。共有EditorBuildSettingsはClient起点とBookSceneのみ有効で、Server用Scene追加は未反映（個別Build Profileは今回未確認）。
+- 獲得通信はPageIdのみで要求ID・適用確認・切断中保存・再接続時の所持同期がない。Clientイベント購読前の受信保持もない。ドロップ回収の重複・取りこぼし防止には獲得イベントの設計が必要。SendAddPageはEndSend結果を戻り値へ反映しておらず、trueを本への獲得成立として扱わない。
+- 推奨順：獲得先／回収方式／ドロップ内容を設計→既存ページ管理へ接続→敵のお邪魔発生と対象管理→ロビー検証と獲得通信の確認応答・再接続対応。MiniGhostは時間経過でもBeginDyingへ進むため、Destroyや死亡演出だけを撃破報酬の条件にしない。他メンバーの敵コード／共有資産の変更範囲は実装案で明示する。
+- 確認は保存済みコード・Scene・資料の静的調査のみ。今回Unity起動／Play Mode／実機検証なし。Gitは通常権限で親パス解決失敗後、承認付きstatus・fetch・追跡先比較に成功。MS-88/Feature/USBTransmissionは調査開始時クリーン、追跡先からの追加コミット・ファイル差分なし。履歴操作は行っていない。
+
+## Android本表示の負荷調査・実装保留（2026-11-02）
+- ユーザー指示により今回は調査と解決案のみ。コード・Scene・Material・共有設定は変更していない。実機の本画面はユーザーが開き、ADBで読み取り計測を行った。
+- Mi A3/Adreno610/OpenGLESで通常ページを表示した最新60フレームの平均1455.93ms（0.687FPS、最小766.22ms、最大1800.06ms）。同時期のUnityMainは0〜2%、UnityGfxDeviceWは0〜1%で、CPU計算過多よりGPU/描画ドライバー側の完了待ちを強く示唆。GPU個別パスの時間は未取得で、本合成/Bloom/撮影の寄与割合やドライバー固有問題は未確定。
+- 撮影A/Bは現状800×450だが、本合成の出力高さ1000と毎フレーム処理は残る。URP Render Scaleを下げても自前合成RTの寸法は連動しない。紙のにじみ6追加サンプル、手続きノイズによる凹凸等、Bloom6段（最大11 Blit）、通常時にも継続する撮影が有力候補。燃焼粒子や暗転ぼかしを通常時にも常時実行と誤認しない。
+- PSS約211MiB、SwapPSS6KB。低メモリ通知はあるが強制終了/GCが主因との証拠なし。GPU稼働率ノードはアクセス拒否、温度HALは未準備で温度要因は未判定。
+- 提案：同条件で単純合成/Bloom停止/撮影停止/合成解像度だけの変更を個別比較。その結果に応じ、静的な紙質の事前生成・再利用、表示変更時だけ更新、紙質のテクスチャ化、通常と重い演出のシェーダー分離、Bloom削減を優先。文字の撮影解像度を一律に下げる案は後回し。まだ未実装。
+- 詳細・採取データは作業用フォルダーのandroid-book-performance-investigation.md、android-book-latency.txt、android-book-cpu.txt、android-book-screen.png。Git確認/fetch/差分は既存の親パス解決エラーで失敗。履歴変更は行っていない。
+
+## Android本表示の暫定軽量化（2026-11-02）
+- 切り戻し済み：ユーザーが別の手法で対応中のため、追加したBookAndroidBuildQuality.csと.metaを撤去。Androidビルド時の軽量設定上書きを停止した。既存のシェーダーコンパイル対策と他の変更は維持。以下は撤去前の作業記録。
+- ユーザー報告：ShaderCache再生成後はAndroid実機で本が表示されたが、非常に重く操作できない。静的調査ではBookFlipViewが高さ1000の合成を毎フレーム実施し、Bloom最大11 Blit、暗転ぼかし5 Blit、紙の凹凸・インクにじみ処理を追加していた。GPU/CPUフレーム時間の実測は未実施で、支配的ボトルネックの確定とは区別する。
+- 担当側EditorにBookAndroidBuildQualityを追加。AndroidビルドのAssets/YasudaHaruto配下のSceneコピーだけに適用し、専用ControllerのFlipView出力高さを最大500へ制限、Bloom・暗転ぼかし・PaperBump・InkBleedを無効化する。Materialはビルド用に複製し、元Material・保存済みScene・Prefab・hatake原本・共有設定には変更しない。撮影元の解像度やページめくり・入力・通信は変更していない。
+- Unity同梱Roslynと現行Runtime DLL/Unity参照を使った別出力C#コンパイルは成功。ビルドScene処理の実行・端末FPS・画質・操作性は未確認。次はClean Build後にEditor.logの「Book Android quality:」で適用を確認し、実機で操作と文字の可読性を確認する。切り戻しはこのEditorスクリプトと.metaの撤去後にClean Buildする。
+- 端末ログにAPP_CMD_LOW_MEMORYがあったが、最新終了履歴はUSER REQUESTED/remove task（PSS279MB/RSS369MB）で、OSのメモリ不足強制終了とは確認されていない。
+- Git status/fetch/追跡先差分は既存の親リポジトリパス解決エラーで失敗。既存変更を維持し、Commit/Push/ブランチ操作は行っていない。
+
+## フチ撤去後も続く表示揺れの履歴調査（2026-11-02）
+- ユーザーから切り戻し後も揺れが続くとの報告。読み取り専用のGit履歴・差分調査を実施。YasudaBookViewController.csとBookScene.unityにはHEADとの差分なし。フチ追加・撮影ポストプロセス上書きは撤去済みで、UnityのRuntime DLLの更新日時も切り戻し後だった。
+- 有力な原因候補：058b5b1（2026-10-27 21:00、Multi Resolution対応 ベース1/2 TAA）でPC_RPAssetのm_RenderScaleが1→0.5、m_UpscalingFilterが0→4へ変更。ローカルURPソースで4=STPを確認。10/29のDevelop統合履歴より前の共有描画変更で、フチ導入より前から現構成に含まれる。
+- 現在のEditor品質はPC（index1）、GraphicsSettingsとPC品質設定は該当PC_RPAssetを使用。本の撮影カメラは既定Renderer・ポストプロセス有効。連続撮影は20b538dd（10/21）からの処理。URPローカルソースはSTP時に投影へjitterを適用し、STP/TAAがpostProcessEnabledに依存することを確認。
+- 前回の撮影ポストプロセス無効化はSTP停止と半解像度設定の残留を同時に起こすため、画素変動停止と可読性低下の両方を説明できる。前回の「ポストプロセスが原因」という説明は具体性が不足していた。共有設定の当該コミットを隔離したA/B実行は未実施なので、発症コミットの確定とは区別する。
+- 今回は調査のみ。ゲームコード・Scene・共有URP設定は未変更。次に検証するなら本撮影だけ等倍・時間方向の拡大なしの描画経路を用意し、同条件で可読性と揺れを比較する。ゲーム全体の描画設定を無断で変更しない。
+
+## フチ導入前の描画処理へ復帰（2026-11-02）
+- ユーザーからポストプロセス無効化後の画質低下・文字の読みにくさ・フチが本に収まらないとの報告。ユーザーが許可した切り戻しを選択し、このチャットで追加したフチ表示と撮影カメラのポストプロセス上書きを撤去。
+- YasudaBookViewControllerの通常・ライブ・取消・一覧更新の全撮影経路を元のBookPageView.ShowPage直接呼出しへ復帰。BookGameControllerのRegisterPageFrames呼出し2箇所を除去。撮影解像度・画像Importer・Scene・Prefab・hatake原本・共有設定には変更なし。
+- BookPageFrameSettings.cs、Resources/BookPageFrameSettings.asset、Editor/BookFrameValidation.csと各.metaは、作業フォルダーframe-rollback/archivedへ退避。フチ画像などユーザーが追加した画像素材は保持。修正前の担当側2スクリプトもframe-rollbackへバックアップ。
+- Runtime別出力コンパイル成功（既存警告3件）。切り戻し後のPlay Mode・実機画質は未確認。過去の画素一致検証は撮影の静止性のみを確認したもので、可読性・画質維持を保証していなかった。フチを再実装する場合は元の画質を基準にし、画像が見開き用か／紙の有効表示領域とUVの対応を先に確認する。
+
+## 開いたページの表示揺れ調査・対処（2026-11-02）
+- ユーザー報告：本を開いた後も操作せずに画像がガクガクする。既存BookSceneのPlay ModeでUI座標を採取し、本文RectTransformの移動は検出しなかった。
+- 撮影元RenderTexture（600x600）のGPU読み戻しを比較。撮影カメラのURPポストプロセス有効時は静止ページでも毎回約4.1〜5.0万画素が変化し、RGBの差が8を超える画素も約2800〜5800あった。元・ライブ撮影CameraのrenderPostProcessingを無効化すると5回の採取で差分0。比較ログは作業フォルダーframe-validation/capture-comparison.txtへ保存。
+- YasudaBookViewController.Awakeで撮影カメラのrenderPostProcessingをfalseに設定。ライブ撮影リグ複製より前に適用し、両方へ反映。Sceneアセット・hatakeコード・共有URP設定・フチの表示処理は未変更。本の合成シェーダーによる紙質・めくり・発光は維持。ポストプロセス内の個別の原因エフェクトまでは未特定。
+- Editor検証メニューVerify Page Frame Stabilityを追加。Play Modeで見開き1を開き、撮影カメラの設定・UI座標・静止テクスチャの5回の一致を検証する。診断用の自動実行と一時設定切替は最終版から除去。
+- Runtime別出力コンパイル成功（既存警告3件）。修正後にUnityのToolsメニューからVerify Page Frame Stabilityを実行し、FRAME STABILITY PASSを確認。フチ付き見開き1で5回すべて撮影画素差分0、通常・ライブ両Cameraのポストプロセス無効とUI座標の安定を検証。Play Modeを終了し、Scene保存はしていない。Git操作は行わず、既存の未コミット作業を保持。Android・別PCでの再現確認は未実施。
+
+## ページ種別ごとの下地込みフチ（2026-11-02）
+- ユーザー指示により暗転対応を後回しにし、本文より後ろへ下地込みフチを描画する処理を追加。担当側YasudaBookViewControllerとBookGameControllerのみ接続変更。hatake原本・Scene・Prefab・シェーダーは未変更。
+- BookPageFrameSettingsを追加し、Resources/BookPageFrameSettings.assetへ魔法用Jumon_Huti、攻略用Obake_HutiをTexture2Dとして設定。横長の見開き画像という前提で、左ページはUVの左半分、右ページは右半分を表示。画像交換は共通設定assetで行える。View Controller側の設定参照で上書き可能。
+- 判定元はPageData.PageType。見開きの並びに合わせて左右の種類を保持し、同じBookPageDataを異なる種類で共有しても混同しない。追加・入替候補は撮影完了時に種類一覧も確定する。固定ページ・表紙内側・OBSTACLEには専用フチを付けない。
+- 撮影用BookPageView直下の最初の子へRawImageを配置し、本文の後ろ／親の紙色より前へ描画。入力判定を無効化し、ページ内容の画像インデックスへ混入させない。通常・元ページのライブ撮影・めくり先・めくり取消・一覧更新の撮影経路へ適用。
+- Unity 6000.3.23f1同梱Roslynと既存Bee応答ファイルによるRuntime別出力コンパイル成功。既存警告3件。Play Mode、見開き画像の左右分割の目視、ページめくり・追加入替の実操作は未確認。暗転からフチを除外する処理は未実装。
+
+## フチ画像の表示設計相談（2026-11-02）
+- コード静的調査のみ。BookPageViewのUIを撮影し、YasudaBookViewControllerが現見開き・旧見開きのRenderTextureを管理する構成を確認。BookFlipComposite.shaderは合成後にBookApplyDimを適用するため、撮影元でフチのMaterialを分けるだけではこの暗転を除外できない。
+- 提案：ページ種別ごとの共通フチ設定を用意し、撮影元で本文・ゲーム状態用暗転・フチの順に合成する。ゲーム状態の暗転を撮影前へ移せる場合は既存めくり経路を再利用可能。合成後暗転を維持する場合はフチ専用テクスチャ／マスクと同じめくりUVでの処理が必要。紙の折り影・遮蔽とゲーム状態の暗転は仕様を分ける。
+- ゲームコード・Scene・Prefab・画像設定は未変更。Unity実行・表示検証は未実施。既存の未コミット変更を保持。Git status/fetch/追跡先比較を実施し、追跡先との確定差分なし。
+
 ## 現在の状態
 新しい本モデルへの統合完了。
 ルーン入力・ページめくり・魔法通信は動作確認済み。
@@ -604,3 +689,43 @@ $12026-10-29：お邪魔4枠の初期実装。左右擦り・スクラッチ、�
 ## イベント魔法受信インターフェース追加（2026-11-01）
 - ユーザー承認によりScripts/Magic/IEventMagicReceiver.csと.metaのみ追加。TryReceiveEventMagic(EVENT_MAGIC_TYPE eventMagicType)のbool戻り値は、対応する魔法を受理してアクションを実行したかを表す。
 - 既存HitData・命中経路・敵・オブジェクトへの実装や接続は変更していない。既存enumとの型名・公開メソッド命名を静的確認。Unityコンパイル・Play Mode検証は未実施。
+## Server自動探索の段階追加（2026-11-02）
+- ユーザー指示によりGit操作は一切実施しない。コード・Scene・GUID参照を静的調査後、担当フォルダのみ変更。Scene／Prefab／共有設定／他メンバーコードは未変更。
+- 現行はClientのScene跨ぎ維持・再接続が実装済み。PageChangedとPlayer別BookInputState／MagicSystemという過去会話の構成とは異なる。魔法はCAST_MAGICのSkillId＋方向でイベント配送。Vector2は送受信済みだがServerの保存先は全Player共通。
+- ServerDiscoveryProtocol／Client／Responderを追加。UDP7776で4秒探索し、BookConnectionUIが発見IPを補完。手入力編集中は保持。Manual IPと既存Connect操作は維持。Serverは7777待受成功後に応答開始。Client本体の接続・再試行処理は変更していない。
+- Unity同版Roslynと既存Bee参照設定で別出力コンパイル成功。既存警告3件。Unity Play Mode・実UDP探索・別PC／Android／USBテザリングは未確認。詳細な調査結果・設計・確認手順はSERVER_DISCOVERY.md。
+- 次段階：登録承認／拒否応答を導入して重複Slot拒否時の再試行を制御。その後に再接続状態同期・Player別データを検討。USB専用Transportは未追加。
+## Server待機画面・開始通知・Scene跨ぎ維持（2026-11-02）
+- ユーザー確定：1台でも開始可能。ゲーム中の新規接続・再接続もBookSceneへ進める。正式MainゲームSceneは直接編集せず、担当フォルダへコピーして使用する。
+- BookServerLobbyを新規作成し、Main/Main_Game_SceneからBookServerGameを新GUIDで完全コピー。コピー元・元Prefab・共有設定は未変更。コピー元／先のSHA256は0863D87D4E24E353E765ECFCC536AEC9BCCFF07B19256CD4512FFA2EA721E7E7。Git操作はユーザー指示により一切していない。
+- BookNetworkServerを永続化し、後続Sceneの既存Server参照は通信本体への転送窓口として維持。BookServerGameFlowが1台以上の登録とSceneロード完了を確認して開始する。BookServerLobbyUIはPlayer1／2登録状態と開始ボタンを実行時生成。
+- REGISTRATION_ACCEPTED=7、REGISTRATION_REJECTED=8、GAME_STARTED=9を追加（旧0〜6維持）。Clientは登録承認後にCONNECTED、拒否時は自動再試行停止。接続画面は開始通知まで待機し、通知受信後BookSceneへ遷移。開始後の登録にも開始通知を送る。ゲーム前のCAST_MAGICはServer側で抑止。
+- Runtime／Editorの別出力コンパイル成功、既存Runtime警告3件。Unityバッチは検証コード開始前に終了コード1で停止し原因未特定。Play Mode・UI目視・Android実機は未確認。ServerLobbyValidationの専用統合検証と既存NetworkRecoveryValidationの登録応答対応を追加。
+- 起動方法・PC／タブレット別Build Profile設定・確認手順・検証の未確認範囲はSERVER_LOBBY.md。共有Build Settingsは未変更。PC側ではBookServerLobbyとBookServerGameをScene Listへ追加してビルドする。
+- ゲーム終了／ロビー復帰／セッションリセットは未実装。正式Sceneへの統合と実機確認が残る。
+
+## AndroidシェーダーのDevelop履歴比較（2026-11-02）
+- ユーザー依頼は調査のみ。ゲームコード・Scene・Prefab・共有設定・元ShaderCacheは変更していない。Git fetch・履歴確認のみ実施、履歴変更操作なし。作業終了前のstatusは既存ブランチMS-88/Feature/USBTransmission、未コミット変更なし（本記録追記前）。
+- Androidは9/3初期設定からVulkan＋OpenGLES3、Auto OFF。最近Vulkan必須へ変わった履歴はない。現行4f95829で11/2にGLES3のみへ変更。fetch後origin/Develop 95c241fは従来設定。Git記録のUnity6000.3.23f1／URP17.3.0も初期から同一。
+- 外部ShaderProbeへGit原本を取り出し、同一Unity・Android・Tier2・キーワードなしで比較。10/27 Developマージd730e2e（PR#62、変更本体fda5d2f）の第1親はVulkan成功・生成GLES構文検証成功、マージ後は2905行u_xlat10_1未宣言エラーを再現。11/2 f360183のsampler2D_float変更後は両方成功。GLESはUnityのSuccessだけでは不正GLSLを検出できず、抽出GLSLをNDK glslcで別途検証。Fragment指定0バイトのSuccessは証拠に含めない。
+- コンパイル不具合の導入境界は10/27マージへ絞れた。float/intの演算不一致ではなく精度を扱うGLSL変換不整合。変更内の単一行の特定、現在の重さとの因果、旧APKの実行APIは未確認。現行コードのVulkan/GLES実機比較は未実施・設定変更もなし。
+- 詳細・生データは外部成果物ルート C:/Users/ths30546/.codex/visualizations/2026/11/02/01a19b7c-e5ee-7a51-9572-bcb6ef59b35a/vulkan-merge-investigation.md およびShaderProbe/RegressionResultsに保存。
+- 11/3追加確認：現在の本シェーダーにskip_optimizations、Vulkan専用条件、exclude/only_renderers等の指定は見つからない。現在保存済みソースについて「Vulkan時の最適化無効化が重さの原因」とする証拠はない。端末のAPKと保存済みソースの一致は未確認。sampler2D_floatは精度指定であり、紙質・にじみ・Bloom等の効果を追加する修正ではないが、精度変更の実機性能影響は未測定。コード上の描画負荷と異常な実機フレーム時間の主原因は区別し、Android/API/ドライバー特有の影響も未確定として扱う。今回も実装・設定変更なし。
+
+## 元コード無変更の実機GPU比較（2026-11-03）
+- 外部EGL/GLES計測プログラムをNDKで作成しMi A3の/data/local/tmpへ配置。元アプリは一時HOMEへ退避、終了後既存Activityを前面に復帰。ゲームコード・Scene・Material・共有設定・元ShaderCache・APKは変更なし。元アプリはユーザーによる今日00:28更新のもの。
+- 現行アプリ単独の本画面は最新60間隔平均408.885ms（2.446FPS）。UnityMain/Gfxは約1.5〜2.5%、CPU余裕あり。前回11/2測定とはAPK・条件が異なり、短縮理由は未確定。
+- 生成GLSLをUnity外で同条件比較（1600×1000 RGBA16F、2×2合成テクスチャ、通常紙2面、7回中央値、glFinish完了待ち込み）。10/27前336.7ms、現行341.8ms、局所halfのみ340.6msで同程度。現行のにじみOFF291.8ms、凹凸OFF297.7ms、紙の主要効果OFF256.2ms。800×500では88.8ms、単純表示3.8ms。
+- 基準でもFxMode=0のところ、外部GLSLでconst 0へ変えると165.9ms、さらにめくり等の静止条件もconst化すると129.6ms。未使用機能を含む大きなシェーダーと端末GL最適化の相互作用を示唆。内部のレジスター割当等は未測定。Vulkanで同じ計測はしておらず、OpenGLESだけの問題／旧APKが軽かった理由は未確定。
+- 合成単体に大きな負荷を再現できたが、Unity外の合成入力・時計計測でありゲーム全体のパス時間と同一視しない。実装提案はAPI比較、効果別バリアントの隔離検証、合成解像度調整。未実装。詳細と測定条件は外部成果物android-gpu-isolation-results.md、gpu-probe/summary.jsonに保存。
+
+## 燃焼・復活描画の一時除外スイッチ（2026-11-03）
+- ユーザー承認でhatake/book/shader/BookFlipEffects.cgincのみ実装変更。BOOK_DISABLE_PAGE_EFFECTSを1とし、_FxModeをコンパイル時定数0に置換。全プラットフォームで燃焼・復活の見た目を一時的に除外する。ゲーム側のイベント・待機時間・ページ切替処理は維持。
+- 戻し方：同ファイルの #define BOOK_DISABLE_PAGE_EFFECTS 1 を0へ変更し、再インポート／再ビルド。演出コードは削除していない。Scene・Material・共有設定は変更なし。開始時からのBookServerGame.unityと.utmp/configure_fingerprint.binの変更は保持。
+- 外部ShaderProbeのDisableEffectsProbeでAndroid Vulkanコンパイル成功、生成OpenGLES GLSLのNDK glslc構文検証成功・未宣言変数なし。生成GLSLからuniform _FxModeが除去されたことも確認。既存の未初期化警告は残る。APKの再ビルド・インストール・ゲーム全体の実機性能比較は今回未実施。
+
+## 旧モデルFPSと次の軽量化調査（2026-11-03）
+- ユーザー報告：除外版で少し改善したがモデル方式より重い。旧APKは残っていないと思うとの回答。Desktop/MS_ANDOROID_TEST/Test.apkは11/3 00:46更新、他に見つかったゲームAPKも現行Gradle出力。旧FPSの実測値は取得できておらず、当時の構成を別プロジェクトへ復元して再計測が必要。復元・旧版ビルドは今回未実施。
+- 10/20方式変更直前のBookModelViewは3Dモデル＋めくりアニメーション、BookModelAtlasは領域ごとのテクスチャ参照が中心。現行の手続き的な本合成とは異なる。旧方式でもモデル撮影カメラはあり、無負荷ではない。
+- 現行の実際のHLSL除外スイッチから生成したGLSLを外部実機ベンチで追加比較：1600×1000で中央値164.379ms、800×500で36.509ms（同じ紙効果）。ゲーム全体のFPSではない。800×500かつ紙主要効果OFFは35〜76msと変動し、追加効果は未確定。
+- 次の提案は合成解像度の調整を最優先、次いで通常／めくり／演出のバリアント分離、Bloomのみ停止の寄与測定。解像度縮小はにじみ・文字の鮮明さと比較する。今回コード・Scene・設定は追加変更なし。現在の元アプリは測定時に終了しており、新しいAPKの実FPSは未取得。

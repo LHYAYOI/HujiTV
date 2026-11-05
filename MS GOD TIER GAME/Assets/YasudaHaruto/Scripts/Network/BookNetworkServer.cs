@@ -14,7 +14,58 @@ public class BookNetworkServer : MonoBehaviour
 {
     [SerializeField] private MagicManager m_magicManager;
 
-    private const ushort Port = 7777;
+    private static BookNetworkServer s_instance;
+    public static BookNetworkServer Instance => s_instance;
+    private BookNetworkServer Owner => s_instance != null ? s_instance : this;
+    private bool m_isListening;
+    private bool m_isGameStarted;
+    public bool IsListening => Owner.m_isListening;
+    public bool IsGameStarted => Owner.m_isGameStarted;
+    private readonly Dictionary<NetworkConnection, BOOK_MESSAGE_TYPE> m_registrationReplies = new();
+    private readonly List<byte> m_acquiredPages = new();
+    private readonly Dictionary<NetworkConnection, (int Next, int ReplayCount)> m_pageDelivery = new();
+
+    public bool AcquirePageForBoth(byte pageId)
+    {
+        if (Owner != this) return Owner.AcquirePageForBoth(pageId);
+        if (!m_isGameStarted || pageId == 0 || m_acquiredPages.Contains(pageId)) return false;
+        m_acquiredPages.Add(pageId);
+        return true;
+    }
+
+    private readonly HashSet<NetworkConnection> m_startNotified = new();
+    private readonly List<NetworkConnection> m_replyBuffer = new();
+    private System.Action<PLAYER_SLOT, byte, MAGIC_CAST_DIRECTION> m_castMagicReceived;
+
+    // Scene-local servers remain as reference adapters for existing Inspector links.
+    private void Awake()
+    {
+        if (s_instance != null && s_instance != this) return;
+        s_instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    public bool IsPlayerConnected(PLAYER_SLOT slot)
+    {
+        if (Owner != this) return Owner.IsPlayerConnected(slot);
+        foreach (var pair in m_playerSlots)
+            if (pair.Value == slot && IsConnectionAlive(pair.Key)) return true;
+        return false;
+    }
+
+    private bool IsConnectionAlive(NetworkConnection connection) => m_driver.IsCreated &&
+        connection.IsCreated && m_driver.GetConnectionState(connection) == NetworkConnection.State.Connected;
+
+    // Called by the game flow only after the PC game scene has loaded.
+    public void BeginGame()
+    {
+        if (Owner != this) { Owner.BeginGame(); return; }
+        if (!m_isListening || m_isGameStarted) return;
+        m_isGameStarted = true;
+    }
+
+    private const ushort Port = ServerDiscoveryProtocol.GamePort;
+    private ServerDiscoveryResponder m_discovery;
 
     private NetworkDriver m_driver;
     private NativeList<NetworkConnection> m_connections;
@@ -25,10 +76,15 @@ public class BookNetworkServer : MonoBehaviour
 
     private Vector2 m_cursorPosition;
 
-    public event System.Action<PLAYER_SLOT, byte, MAGIC_CAST_DIRECTION> CastMagicReceived;
+    public event System.Action<PLAYER_SLOT, byte, MAGIC_CAST_DIRECTION> CastMagicReceived
+    {
+        add { Owner.m_castMagicReceived += value; }
+        remove { Owner.m_castMagicReceived -= value; }
+    }
 
     private void Start()
     {
+        if (Owner != this) return;
         m_driver = NetworkDriver.Create();
 
         // Clientと同じPipelineを同じ順番で作る
@@ -56,12 +112,16 @@ public class BookNetworkServer : MonoBehaviour
             return;
         }
 
+        m_isListening = true;
+        m_discovery = gameObject.AddComponent<ServerDiscoveryResponder>();
+        m_discovery.BeginResponding();
+
         Debug.Log($"Book Network Server開始 : Port {Port}");
     }
 
     private void Update()
     {
-        if (!m_driver.IsCreated)
+        if (Owner != this || !m_driver.IsCreated)
         {
             return;
         }
@@ -76,6 +136,8 @@ public class BookNetworkServer : MonoBehaviour
         RemoveDisconnectedClients();
         AcceptClients();
         ProcessEvents();
+        SendSessionMessages();
+        SendAcquiredPages();
     }
 
     private void RemoveDisconnectedClients()
@@ -130,6 +192,9 @@ public class BookNetworkServer : MonoBehaviour
                             Debug.Log("未登録Clientが切断しました");
                         }
 
+                        m_registrationReplies.Remove(connection);
+                        m_startNotified.Remove(connection);
+                        m_pageDelivery.Remove(connection);
                         m_connections[i] = default;
                         break;
                 }
@@ -140,6 +205,7 @@ public class BookNetworkServer : MonoBehaviour
     private uint m_obstacleEvent;
     public bool SendObstacle(PLAYER_SLOT playerSlot, byte obstacleId)
     {
+        if (Owner != this) return Owner.SendObstacle(playerSlot, obstacleId);
         if (obstacleId == 0 || !m_driver.IsCreated) return false;
         foreach (var pair in m_playerSlots)
         {
@@ -154,6 +220,7 @@ public class BookNetworkServer : MonoBehaviour
     }
     public bool SendAddPage(PLAYER_SLOT playerSlot, byte pageId)
     {
+        if (Owner != this) return Owner.SendAddPage(playerSlot, pageId);
         if (pageId == 0)
         {
             Debug.LogWarning("PageId 0は送信できません");
@@ -254,6 +321,7 @@ public class BookNetworkServer : MonoBehaviour
     // 受信したCastMagicのデータを処理する
     private void ReceiveCastMagic(NetworkConnection connection, DataStreamReader reader)
     {
+        if (!m_isGameStarted) return;
         // CastMagicのデータはSkillId(1byte) + CastDirection(1byte) = 2byte
         int remainingBytes = reader.Length - reader.GetBytesRead();
 
@@ -287,7 +355,7 @@ public class BookNetworkServer : MonoBehaviour
 
         // CastMagicの受信を通知する
         Debug.Log($"CastMagic受信 : {playerSlot} / SkillId={skillId} / Direction={direction}");
-        CastMagicReceived?.Invoke(playerSlot, skillId, direction);
+        m_castMagicReceived?.Invoke(playerSlot, skillId, direction);
     }
 
 
@@ -321,7 +389,7 @@ public class BookNetworkServer : MonoBehaviour
 
     public Vector2 GetCursorPosition()
     {
-        return m_cursorPosition;
+        return Owner.m_cursorPosition;
     }
 
     private void SendTestPong(NetworkConnection connection, int value)
@@ -382,18 +450,70 @@ public class BookNetworkServer : MonoBehaviour
             {
                 Debug.LogWarning($"{playerSlot}はすでに接続済みです");
 
-                m_driver.Disconnect(connection);
+                m_registrationReplies[connection] = BOOK_MESSAGE_TYPE.REGISTRATION_REJECTED;
                 return;
             }
         }
 
         m_playerSlots[connection] = playerSlot;
+        m_registrationReplies[connection] = BOOK_MESSAGE_TYPE.REGISTRATION_ACCEPTED;
 
         Debug.Log($"Controller登録成功 : {playerSlot}");
     }
 
+    private bool SendSessionMessage(NetworkConnection connection, BOOK_MESSAGE_TYPE type)
+    {
+        if (!IsConnectionAlive(connection) ||
+            m_driver.BeginSend(m_reliablePipeline, connection, out DataStreamWriter writer) != 0) return false;
+        writer.WriteByte((byte)type);
+        return m_driver.EndSend(writer) >= 0;
+    }
+
+    private void SendSessionMessages()
+    {
+        // Retain messages if the reliable queue is temporarily full.
+        m_replyBuffer.Clear();
+        foreach (var pair in m_registrationReplies)
+            if (SendSessionMessage(pair.Key, pair.Value)) m_replyBuffer.Add(pair.Key);
+        foreach (var connection in m_replyBuffer) m_registrationReplies.Remove(connection);
+        if (!m_isGameStarted) return;
+        foreach (var pair in m_playerSlots)
+        {
+            if (m_registrationReplies.ContainsKey(pair.Key) || m_startNotified.Contains(pair.Key)) continue;
+            if (SendSessionMessage(pair.Key, BOOK_MESSAGE_TYPE.GAME_STARTED))
+            {
+                m_startNotified.Add(pair.Key);
+                m_pageDelivery[pair.Key] = (0, m_acquiredPages.Count);
+            }
+        }
+    }
+
+    private void SendAcquiredPages()
+    {
+        foreach (var pair in m_playerSlots)
+        {
+            NetworkConnection connection = pair.Key;
+            if (!m_pageDelivery.TryGetValue(connection, out var delivery)) continue;
+            while (delivery.Next < m_acquiredPages.Count)
+            {
+                if (!IsConnectionAlive(connection) ||
+                    m_driver.BeginSend(m_reliablePipeline, connection, out DataStreamWriter writer) != 0) break;
+                writer.WriteByte((byte)BOOK_MESSAGE_TYPE.ADD_PAGE);
+                writer.WriteByte(m_acquiredPages[delivery.Next]);
+                writer.WriteByte(delivery.Next < delivery.ReplayCount ? (byte)0 : (byte)1);
+                if (m_driver.EndSend(writer) < 0) break;
+                delivery.Next++;
+            }
+            m_pageDelivery[connection] = delivery;
+        }
+    }
+
     private void OnDestroy()
     {
+        if (s_instance != this) return;
+        s_instance = null;
+        m_isListening = false;
+        if (m_discovery != null) m_discovery.StopResponding();
         if (m_driver.IsCreated)
         {
             m_driver.Dispose();
