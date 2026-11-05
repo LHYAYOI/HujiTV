@@ -37,6 +37,9 @@ namespace hatake
         [Header("めくり中のページ更新")]
         [Tooltip("めくり・燃焼・復活の間も、元の見開き（持っているページ）を撮影し続ける。撮影Cameraと撮影用Canvasを実行時に複製する")]
         [SerializeField] private bool m_liveTurningPages = true;
+        [Tooltip("モバイル（Android / iOS）でも、めくり中に元の見開きを撮影し続けるか。止まった絵のページなら不要で、" +
+                 "OFF でめくり中の撮影（毎フレーム約5ms、Adreno 610）が無くなる")]
+        [SerializeField] private bool m_liveTurningPagesMobile;
         [Header("撮影の負荷（モバイル向け）")]
         [Tooltip("ページを撮り直す回数（毎秒）。0：見開きを表示・めくる・燃やすときだけ撮影し、終わったら撮影カメラを止める（最も軽い）。" +
                  "ページに動く素材（アニメーションするマテリアルなど）があるなら 10〜30")]
@@ -109,7 +112,8 @@ namespace hatake
             // 撮影カメラを軽くする（めくり中の複製はこれを複製するので、複製より先に）
             if (m_lightweightCapture && m_captureCamera != null) MakeCaptureLightweight(m_captureCamera);
             // ページを表示する前（OnEnable より前）に複製する
-            if (m_liveTurningPages && Application.isPlaying) CreateLiveRig();
+            bool live = Application.isMobilePlatform ? m_liveTurningPages && m_liveTurningPagesMobile : m_liveTurningPages;
+            if (live && Application.isPlaying) CreateLiveRig();
         }
 
         public BookPageData GetPage(int index) => index >= 0 && index < PageCount ? m_runtimePages[index] : null;
@@ -451,7 +455,31 @@ namespace hatake
         private void OnEnable()
         {
             if (m_displayImage != null) m_displayImage.enabled = false;
+            if (m_prewarmPagesMobile && Application.isMobilePlatform && !m_prewarmed) PrewarmPages();
             ShowSpread(m_spreadIndex);
+        }
+
+        [Tooltip("モバイルで、起動時に全ページを1度ずつ撮影しておく。ページの画像のマテリアルを初めて描くときの準備" +
+                 "（Vulkan のパイプラインの作成。数十ms）が、めくりの途中で起きないようにする")]
+        [SerializeField] private bool m_prewarmPagesMobile = true;
+        private bool m_prewarmed;
+
+        private void PrewarmPages()
+        {
+            m_prewarmed = true;
+            if (m_leftPageView == null || m_rightPageView == null || m_captureCamera == null || m_textureB == null) return;
+            RenderTexture previous = m_captureCamera.targetTexture;
+            bool enabled = m_captureCamera.enabled;
+            m_captureCamera.targetTexture = m_textureB;
+            for (int i = 0; i < PageCount; i += 2)
+            {
+                m_leftPageView.ShowPage(GetPage(i));
+                m_rightPageView.ShowPage(GetPage(i + 1));
+                Canvas.ForceUpdateCanvases();
+                m_captureCamera.Render();
+            }
+            m_captureCamera.targetTexture = previous;
+            m_captureCamera.enabled = enabled;
         }
 
         public void ShowSpread(int spreadIndex)
@@ -880,6 +908,11 @@ namespace hatake
             data.antialiasing = AntialiasingMode.None;
             data.renderShadows = false;
         }
+
+        // 計測用（BookPerfProbe のベンチマーク）
+        internal Camera BenchLiveCamera => m_liveCamera;
+        internal Camera BenchCaptureCamera => m_captureCamera;
+        internal RenderTexture BenchCurrentTexture => m_currentTexture;
 
         private static IEnumerator WaitForCameraFrame(Camera camera)
         {
