@@ -1417,8 +1417,8 @@ MonoBehaviour:
   - {fileID: 2490089116785457613, guid: a8db84c7e5156ba4bb2475e500388767, type: 3}
   m_spawnCount: 100
   m_spawnInterval: 0.05
-  m_distanceMinMax: {x: 0.2, y: 2}
-  m_speedMinMax: {x: 1, y: 2}
+  m_distanceMinMax: {x: 0.5, y: 2}
+  m_speedMinMax: {x: 3, y: 2}
   m_rotateSpeedMinMax: {x: 60, y: 180}
   m_stopDistance: 0.1
 --- !u!114 &284290086
@@ -1434,7 +1434,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwarmGhostEvent
   m_splineContainer: {fileID: 1912110866}
-  m_moveSpeed: 2
+  m_moveSpeed: 3
   m_loopFlag: 0
   m_rotationOffset: {x: 0, y: 0, z: 0}
 --- !u!4 &301179721 stripped
@@ -5732,7 +5732,7 @@ Transform:
   m_GameObject: {fileID: 886480834}
   serializedVersion: 2
   m_LocalRotation: {x: -0.014820881, y: 0.95790833, z: -0.028133057, w: -0.28530777}
-  m_LocalPosition: {x: 2.7, y: 0.24, z: 9.19}
+  m_LocalPosition: {x: 4.62, y: 0.875, z: 21.171}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14925,35 +14925,35 @@ MonoBehaviour:
       TangentIn:
         x: -0
         y: -0
-        z: -2.987409
+        z: -3.740391
       TangentOut:
         x: 0
         y: 0
-        z: 2.5578878
+        z: 4.3608556
       Rotation:
         value:
           x: 0
-          y: 0.019499632
+          y: 0.10030896
           z: 0
-          w: 0.9998099
+          w: 0.99495625
     - Position:
-        x: 0.9706608
+        x: 2.592661
         y: 0
-        z: 29.399734
+        z: 36.979736
       TangentIn:
         x: -0
         y: -0
-        z: -0.7092316
+        z: -0.49003398
       TangentOut:
         x: 0
         y: 0
-        z: 1.1414751
+        z: 0.6763202
       Rotation:
         value:
-          x: -0.005014461
-          y: 0.7850238
-          z: -0.03382596
-          w: -0.618521
+          x: -0.020347552
+          y: 0.7213074
+          z: -0.05661168
+          w: -0.6899977
     - Position:
         x: 1.4068596
         y: -0.53
@@ -14961,17 +14961,17 @@ MonoBehaviour:
       TangentIn:
         x: -0
         y: -0
-        z: -2.090753
+        z: -2.850587
       TangentOut:
         x: 0
         y: 0
-        z: 2.090753
+        z: 2.850587
       Rotation:
         value:
-          x: 0.00013227957
-          y: 0.99986523
-          z: -0.012675188
-          w: 0.010434702
+          x: 0.00053509575
+          y: 0.99974024
+          z: -0.009309881
+          w: -0.020799672
     m_MetaData:
     - Mode: 0
       Tension: 0.5

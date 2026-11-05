@@ -32,6 +32,8 @@ public class GroupLeader : MonoBehaviour
     // 出現処理が重複して実行されるのを防ぐ
     private bool m_isSpawningFlag = false;
 
+    private bool m_isFollowingLeader = true; // リーダーを追従するかどうか
+
     // 個体ごとの移動情報
     private class ChildData
     {
@@ -64,6 +66,12 @@ public class GroupLeader : MonoBehaviour
         foreach (ChildData child in m_childData)
         {
             UpdateChild(child);
+        }
+
+        if (Keyboard.current != null &&
+            Keyboard.current.sKey.wasPressedThisFrame)
+        {
+            ReleaseSwarmGhosts();
         }
     }
 
@@ -124,6 +132,18 @@ public class GroupLeader : MonoBehaviour
             return;
         }
 
+        // リーダーへの追従が解除されている場合
+        if (!m_isFollowingLeader)
+        {
+            // 現在向いている方向へ直進
+            child.transform.position +=
+                child.transform.forward *
+                child.moveSpeed *
+                Time.deltaTime;
+
+            return;
+        }
+
         // 3D方向を回転させる
         child.direction = Quaternion.AngleAxis(
             child.rotateSpeed * Time.deltaTime,
@@ -131,13 +151,10 @@ public class GroupLeader : MonoBehaviour
         ) * child.direction;
 
         // リーダーの位置と回転を反映した目的地
-        Vector3 targetPosition = transform.TransformPoint(
-            child.direction * child.distance
-        );
+        Vector3 targetPosition = transform.TransformPoint(child.direction * child.distance);
 
         // お化けから目的地への方向
-        Vector3 moveDirection =
-            targetPosition - child.transform.position;
+        Vector3 moveDirection = targetPosition - child.transform.position;
 
         float distance = moveDirection.magnitude;
 
@@ -154,13 +171,10 @@ public class GroupLeader : MonoBehaviour
         // 移動方向へ向く
         if (moveDirection.sqrMagnitude > 0.001f)
         {
-            Quaternion lookRotation = Quaternion.LookRotation(
-                moveDirection.normalized
-            );
+            Quaternion lookRotation = Quaternion.LookRotation(moveDirection.normalized);
 
             // ランダムなZ軸回転を加える
-            child.transform.rotation = lookRotation *
-                Quaternion.Euler(0f, 0f, child.rotationZ);
+            child.transform.rotation = lookRotation * Quaternion.Euler(0f, 0f, child.rotationZ);
         }
     }
 
@@ -192,10 +206,7 @@ public class GroupLeader : MonoBehaviour
         for (int i = 0; i < m_spawnCount; i++)
         {
             // ランダムにお化けのプレハブを選択
-            int randomPrefabIndex = Random.Range(
-                0,
-                m_swarmGhostPrefabs.Count
-            );
+            int randomPrefabIndex = Random.Range(0, m_swarmGhostPrefabs.Count);
 
             Transform prefab = m_swarmGhostPrefabs[randomPrefabIndex];
 
@@ -203,8 +214,6 @@ public class GroupLeader : MonoBehaviour
             {
                 continue;
             }
-
-           
 
             // お化けを生成
             GameObject swarmGhost = Instantiate(
@@ -225,5 +234,11 @@ public class GroupLeader : MonoBehaviour
         }
 
         m_isSpawningFlag = false;
+    }
+
+    // 群れお化けのリーダーへの追従を解除する
+    public void ReleaseSwarmGhosts()
+    {
+        m_isFollowingLeader = false;
     }
 }

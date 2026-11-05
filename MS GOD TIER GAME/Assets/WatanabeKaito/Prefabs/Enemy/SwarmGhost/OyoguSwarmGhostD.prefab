@@ -336,9 +336,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 234324c925ad3e74eb03c1093ce95383, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TeamToon.TeamToonMaterialBlend
-  materialA: {fileID: 2100000, guid: 637b0e258e6a29e4cae96a9d9b59c376, type: 2}
-  materialB: {fileID: 2100000, guid: cba0b8ae500cdbe459f89a9f63fb7cfe, type: 2}
-  blend: 0.2
+  materialA: {fileID: 2100000, guid: bcf6f08b5015cbe45a60ed154cab9e4e, type: 2}
+  materialB: {fileID: 2100000, guid: 28d0d35f359541b4b962f79827f3fd2f, type: 2}
+  blend: 0.1
   renderers:
   - {fileID: 3526129125911758560}
   - {fileID: 1886325630481110434}
