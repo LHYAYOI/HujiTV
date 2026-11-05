@@ -1618,7 +1618,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::OyoguSwarmGhost
   m_parentAnimator: {fileID: 2397781350887678958}
   m_deadAnimator: {fileID: 8220278082892588881}
-  m_shrinkDuration: 2
+  m_shrinkDuration: 1
 --- !u!1 &7872315941357969217
 GameObject:
   m_ObjectHideFlags: 0

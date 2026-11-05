@@ -7,6 +7,8 @@ using UnityEngine.Splines;
 
 public class SwarmGhostEvent : MonoBehaviour
 {
+    [SerializeField] private GroupLeader m_groupLeader;
+
     [Header("ˆÚ“®‚³‚¹‚éƒXƒvƒ‰ƒCƒ“")]
     [SerializeField] private SplineContainer m_splineContainer;
 
@@ -32,6 +34,8 @@ public class SwarmGhostEvent : MonoBehaviour
 
     // ˆÚ“®’†‚©‚Ç‚¤‚©
     private bool m_isMovingFlag = false;
+
+    private bool m_stopFlag = false;
 
 
     void Start()
@@ -147,6 +151,12 @@ public class SwarmGhostEvent : MonoBehaviour
             {
                 m_currentDistance = m_totalLength;
                 m_isMovingFlag = false;
+
+                if (!m_stopFlag)
+                {
+                    m_groupLeader.SetStoppedDistance(true);
+                    m_stopFlag = true;
+                }
             }
         }
 
@@ -234,6 +244,9 @@ public class SwarmGhostEvent : MonoBehaviour
             targetRotation * Quaternion.Euler(m_rotationOffset);
     }
 
+    public bool GetIsMoving()
+    {
+        return m_isMovingFlag;
+    }
 
-    
 }

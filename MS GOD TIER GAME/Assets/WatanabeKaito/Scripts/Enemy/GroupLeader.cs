@@ -17,6 +17,9 @@ public class GroupLeader : MonoBehaviour
     [Header("リーダーとの距離")]
     [SerializeField] private Vector2 m_distanceMinMax = new Vector2(2f, 5f);
 
+    [Header("停止時のリーダーとの距離")]
+    [SerializeField] private Vector2 m_stopDistanceMinMax = new Vector2(0.5f, 1.5f);
+
     [Header("移動速度")]
     [SerializeField] private Vector2 m_speedMinMax = new Vector2(2f, 5f);
 
@@ -33,6 +36,8 @@ public class GroupLeader : MonoBehaviour
     private bool m_isFollowingLeader = true; // リーダーを追従するかどうか
 
     private bool m_isDead = false; // 死亡フラグ
+
+    private bool m_isStopped = false;
 
     // 個体ごとの移動情報
     private class ChildData
@@ -73,11 +78,11 @@ public class GroupLeader : MonoBehaviour
             UpdateChild(child);
         }
 
-        if (Keyboard.current != null &&
-            Keyboard.current.sKey.wasPressedThisFrame)
-        {
-            RemoveAllOyoguSwarmGhosts();
-        }
+        //if (Keyboard.current != null &&
+        //    Keyboard.current.sKey.wasPressedThisFrame)
+        //{
+        //    RemoveAllOyoguSwarmGhosts();
+        //}
     }
 
     // 生成したお化けの移動情報を登録する
@@ -183,6 +188,34 @@ public class GroupLeader : MonoBehaviour
         }
     }
 
+    // 群れお化けとリーダーとの距離を変更する
+    public void SetStoppedDistance(bool isStopped)
+    {
+        m_isStopped = isStopped;
+
+        Vector2 distanceRange = m_distanceMinMax;
+
+        if (m_isStopped)
+        {
+            distanceRange = m_stopDistanceMinMax;
+        }
+
+        // すでに生成されているお化けの距離を変更
+        foreach (ChildData child in m_childData)
+        {
+            if (child.transform == null)
+            {
+                continue;
+            }
+
+            child.distance = Random.Range(
+                distanceRange.x,
+                distanceRange.y
+            );
+        }
+    }
+
+
     // 群れお化けを出現させる
     public void SpawnAllSwarmGhost()
     {
@@ -264,5 +297,13 @@ public class GroupLeader : MonoBehaviour
     public void ReleaseSwarmGhosts()
     {
         m_isFollowingLeader = false;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Chandelier"))
+        {
+            RemoveAllOyoguSwarmGhosts();
+        }
     }
 }
