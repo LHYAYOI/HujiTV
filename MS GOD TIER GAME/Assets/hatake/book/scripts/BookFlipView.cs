@@ -98,6 +98,12 @@ namespace hatake
         [SerializeField, Range(1, 8)] private int m_bloomIterationsMobile = 3;
         [Tooltip("ON：エディターでもモバイルの設定（出力の上限・Bloom の段数）を使う。実機の見た目の確認用")]
         [SerializeField] private bool m_forceMobileSettings;
+        [Tooltip("モバイルで合成を面の種類ごとの小さなパスに分けて描く。1本の大きなシェーダーはモバイルの GPU で" +
+                 "レジスタが足りずに極端に遅くなる（Adreno 610 で1回 500ms → 分割で数十ms）")]
+        [SerializeField] private bool m_splitPassesMobile = true;
+        [Tooltip("モバイルの本文のめくりで、動かない部分（今の見開き・本の外）をめくり始めの静止画から読む。" +
+                 "毎フレーム描くのは移動先のページとめくった紙だけになる（めくりの間、表紙の金具の光などの動きは止まる）")]
+        [SerializeField] private bool m_turnCacheMobile = true;
 
         [Header("HDR・Bloom（本の中で完結。Overlay UIにはカメラのBloomが効かないため）")]
         [Tooltip("Hidden/Book/Page Flip Post。未設定なら Bloom・ぼかし無しでそのまま出力")]
@@ -534,6 +540,7 @@ namespace hatake
             Vector2 goal = new Vector2(-1f, origin.y);
             SetFoldPoint(origin);
             m_turning = true;
+            m_turnSerial++; // めくりごとに静止画を作り直す
 
             bool committed;
             if (!dragFlag)
@@ -544,6 +551,9 @@ namespace hatake
                     SetFoldPoint(AutoPath(origin, m_turnCurve.Evaluate(elapsed / duration)));
                     yield return null;
                 }
+                // 最後は必ずめくり終えた位置で1フレーム描く（モバイルはこの絵を次のめくりの静止画に使う）
+                SetFoldPoint(AutoPath(origin, m_turnCurve.Evaluate(1f)));
+                yield return null;
                 committed = true;
             }
             else
@@ -566,6 +576,8 @@ namespace hatake
                     SetFoldPoint(Vector2.Lerp(start, end, k));
                     yield return null;
                 }
+                SetFoldPoint(end);
+                yield return null;
             }
 
             m_turning = false;
@@ -600,6 +612,7 @@ namespace hatake
             m_destinationCover = BookCoverState.Open;
             m_displayFlag = true;
             m_turning = false;
+            m_effectSerial++; // 演出ごとに静止画を作り直す
             UpdateLayout();
 
             m_effect = effect;
@@ -780,6 +793,36 @@ namespace hatake
             material.SetMatrix(s_bookPoseInv, flipZ * inverse * flipZ);
         }
 
+        private static readonly int s_bookLightDirBS = Shader.PropertyToID("_BookLightDirBS");
+        private static readonly int s_bookViewDirBS = Shader.PropertyToID("_BookViewDirBS");
+        private static readonly int s_bookPoseShadeValue = Shader.PropertyToID("_BookPoseShadeValue");
+        private static readonly int s_poseShading = Shader.PropertyToID("_PoseShading");
+
+        // 画面全体で同じ値（本の座標での光・目の向き、姿勢の明暗）をここで求めて渡す。
+        // シェーダーの BookLightDir / BookViewDir / BookPoseShade と同じ計算（画素ごとにしない）
+        private void ApplyPoseLighting(Material material)
+        {
+            Quaternion toBook = Quaternion.Inverse(Quaternion.Euler(m_bookPose));
+            Vector3 light = (Vector3)material.GetVector(s_lightDir);
+            light = light.sqrMagnitude > 1e-8f ? light.normalized : Vector3.forward;
+            Vector3 lightBook = ToBookSpace(toBook, light);
+            Vector3 viewBook = ToBookSpace(toBook, new Vector3(0f, 0f, 1f));
+            material.SetVector(s_bookLightDirBS, lightBook);
+            material.SetVector(s_bookViewDirBS, viewBook);
+            float k = Mathf.Clamp01(material.GetFloat(s_poseShading));
+            float lit = 1f - k + k * Mathf.Clamp01(lightBook.z);
+            float reference = 1f - k + k * Mathf.Clamp01(light.z);
+            material.SetFloat(s_bookPoseShadeValue, Mathf.Clamp(lit / Mathf.Max(reference, 1e-3f), 0.25f, 2f));
+        }
+
+        // 本の座標は z が紙の表から手前（Unity の -Z）。ApplyBookPose の flipZ * inverse * flipZ と同じ回転
+        private static Vector3 ToBookSpace(Quaternion toBook, Vector3 direction)
+        {
+            Vector3 flipped = new Vector3(direction.x, direction.y, -direction.z);
+            Vector3 rotated = toBook * flipped;
+            return new Vector3(rotated.x, rotated.y, -rotated.z).normalized;
+        }
+
         /// <summary>本文の紙の仕上げ（マット／グロス）。毎フレーム、合成のマテリアルのキーワードに反映する</summary>
         public BookPaperFinish PaperFinish
         {
@@ -863,7 +906,41 @@ namespace hatake
             MatchDisplayAspect();
             UpdateLayout();
             // 見た目が前に描いたときと同じなら描かない（出力には前の絵が残っている）
-            if (!NeedsRedraw()) return;
+            if (!NeedsRedraw())
+            {
+                // 少しずつ描いている静止画の続き
+                if (m_progressActive)
+                {
+                    ApplyProperties();
+                    ContinueProgress();
+                    // 描いている途中も画面フェードは止めない（後処理だけで掛かる）
+                    if (m_progressActive && m_postMaterial != null && !Mathf.Approximately(m_lastPostFade, m_screenFade))
+                    {
+                        m_lastPostFade = m_screenFade;
+                        m_postMaterial.SetFloat(s_screenFade, Mathf.Clamp01(m_screenFade));
+                        m_postRect = null;
+                        RenderPost();
+                    }
+                    return;
+                }
+                // 表紙の開け閉めの移動先を、止まっている間に先に描いておく
+                ContinueCoverPrerender();
+                // 後処理があるときの画面フェードは後処理だけで掛かるので、合成は描き直さない
+                if (m_postMaterial != null && m_compositeTexture != null && m_compositeTexture.IsCreated() &&
+                    !Mathf.Approximately(m_lastPostFade, m_screenFade))
+                {
+                    m_lastPostFade = m_screenFade;
+                    m_postMaterial.SetFloat(s_screenFade, Mathf.Clamp01(m_screenFade));
+                    m_postRect = null;
+                    RenderPost();
+                }
+                return;
+            }
+            m_lastPostFade = m_screenFade;
+            if (!m_warmedUp && UsesSplitPasses) WarmUpShaders();
+            if (!m_turning) { m_turnCacheValid = false; m_coverCacheValid = false; m_coverPreStep = -1; }
+            bool wasTurning = m_lastDrawWasTurn;
+            m_lastDrawWasTurn = m_turning;
             m_renderCount++;
 #if UNITY_EDITOR
             // 再生中にマテリアルアセットを調整したら、すぐ反映する
@@ -872,11 +949,1129 @@ namespace hatake
             ApplyProperties();
             if (m_postMaterial == null)
             {
-                Graphics.Blit((Texture)null, m_outputTexture, m_runtimeMaterial, 0);
+                DrawComposite(m_outputTexture);
                 return;
             }
             EnsureCompositeTexture();
-            Graphics.Blit((Texture)null, m_compositeTexture, m_runtimeMaterial, 0);
+            // 動いている間（めくり・演出）は小さめの解像度で描き、後処理で出力の大きさへ広げる（モバイル）。
+            // 止まったら元の解像度で描き直す（数フレームに分けて）
+            bool animated = (m_turning || m_effect != BookPageEffect.None) && UsesSplitPasses && m_animationScaleMobile < 0.999f;
+            if (animated)
+            {
+                EnsureAnimTexture();
+                if (m_targetHoldsIdle == m_compositeTexture)
+                {
+                    // 静止した見開きを縮めて写し、動きの始めの静止画に使う
+                    Graphics.Blit(m_compositeTexture, m_animTexture);
+                    m_targetHoldsIdle = m_animTexture;
+                }
+                m_progressActive = false;
+                m_progressPending = false;
+                Note(GpuSync("gPre"));
+                m_lastAnimFrameExact = true;
+                DrawComposite(m_animTexture);
+                m_postSource = m_animTexture;
+                RenderPost();
+                Note(GpuSync("gPost"));
+                m_lastDrawTarget = m_animTexture;
+                return;
+            }
+            if (UsesProgressive())
+            {
+                // めくり終えた直後は、最後のめくりの絵が移動先の見開きとほぼ同じなので、次のめくりの静止画に使える
+                // 描いている途中にまた変わった（姿勢を動かし続けているなど）：今の分を描き終えてから、もう1度描く
+                if (m_progressActive) m_progressPending = true;
+                else StartProgress();
+                // めくりの最後のフレームは、移動先を描き終えていたときだけ静止画として使う（代わりの絵が残らないように）
+                if (wasTurning && m_lastAnimFrameExact)
+                {
+                    m_targetHoldsIdle = m_lastDrawTarget != null ? m_lastDrawTarget : m_compositeTexture;
+                    m_targetHoldsUndimmed = m_dim <= 0f && (m_hasMagicStyle ? m_magicStrength : m_baseMagicStrength) <= 0f;
+                }
+                ContinueProgress();
+                return;
+            }
+            m_progressActive = false;
+            m_progressPending = false;
+            DrawComposite(m_compositeTexture);
+            m_postSource = null;
+            RenderPost();
+            m_lastDrawTarget = m_compositeTexture;
+        }
+
+        // ------------------------------------------------------------------
+        // シェーダーの準備（モバイル）：使うパス・描き方・書き込み先の形式の組み合わせを最初に1度ずつ描いておく。
+        // Vulkan では組み合わせを初めて使うときにパイプラインを作るので、めくりの始めなどで数十〜百ms止まるため
+        // ------------------------------------------------------------------
+        private bool m_warmedUp;
+
+        private void WarmUpShaders()
+        {
+            m_warmedUp = true;
+            Material material = m_runtimeMaterial;
+            if (m_fxKeywordShader != material.shader)
+            {
+                m_fxKeyword = new UnityEngine.Rendering.LocalKeyword(material.shader, "BOOK_FX");
+                m_fxKeywordShader = material.shader;
+            }
+            var hdr = RenderTexture.GetTemporary(8, 8, 0, HdrFormat);
+            var bloom = RenderTexture.GetTemporary(8, 8, 0, BloomFormat);
+            var output = RenderTexture.GetTemporary(8, 8, 0, m_outputTexture.format);
+            RenderTextureFormat lutFormat = SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.RGB111110Float) ? RenderTextureFormat.RGB111110Float : HdrFormat;
+            RenderTextureFormat tiltFormat = SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.RGHalf) ? RenderTextureFormat.RGHalf : HdrFormat;
+            var lut = RenderTexture.GetTemporary(8, 8, 0, lutFormat);
+            var tilt = RenderTexture.GetTemporary(8, 8, 0, tiltFormat);
+            var rect = new Rect(0f, 0f, 1f, 1f);
+            for (int fx = 0; fx < 2; fx++)
+            {
+                material.SetKeyword(m_fxKeyword, fx == 1);
+                for (int pass = PassOutside; pass <= PassFxLut; pass++)
+                {
+                    if (pass == PassPaperLut) { Graphics.Blit((Texture)null, lut, material, pass); continue; }
+                    if (pass == PassPaperTiltLut) { Graphics.Blit((Texture)null, tilt, material, pass); continue; }
+                    Graphics.Blit((Texture)null, hdr, material, pass);
+                    DrawRect(material, pass, hdr, rect);
+                }
+            }
+            material.SetKeyword(m_fxKeyword, false);
+            // 燃えかす・粒の四角形（頂点の形式も実際と同じにする）
+            m_fxQuads ??= new BookFxQuads();
+            var settings = new BookFxQuads.Settings
+            {
+                mode = 1, side = 0f, progress = 0.5f, origin = new Vector4(0f, 0.5f, 1.5f, 1f), ash = 1f, particles = 1f,
+                pageAspect = m_pageAspect, bookRect = m_bookRect, time = 0.3f, ember = Color.white, revive = Color.white
+            };
+            m_fxQuads.Build(settings, out bool hasAsh, out bool hasSpark);
+            RenderTexture previous = RenderTexture.active;
+            RenderTexture.active = hdr;
+            GL.PushMatrix();
+            GL.LoadOrtho();
+            if (hasAsh && material.SetPass(PassAsh)) Graphics.DrawMeshNow(m_fxQuads.AshMesh, Matrix4x4.identity);
+            if (hasSpark && material.SetPass(PassSpark)) Graphics.DrawMeshNow(m_fxQuads.SparkMesh, Matrix4x4.identity);
+            GL.PopMatrix();
+            RenderTexture.active = previous;
+            // 後処理
+            if (m_postMaterial != null)
+            {
+                Material post = m_postMaterial;
+                var bloom2 = RenderTexture.GetTemporary(8, 8, 0, BloomFormat);
+                var hdr2 = RenderTexture.GetTemporary(8, 8, 0, HdrFormat);
+                Graphics.Blit(hdr, bloom, post, PassPrefilter);
+                Graphics.Blit(bloom, bloom2, post, PassDown);
+                post.SetTexture(s_higherTex, bloom);
+                Graphics.Blit(bloom2, bloom, post, PassUpAdd);
+                Graphics.Blit(hdr, hdr2, post, PassDown);
+                Graphics.Blit(hdr2, hdr, post, PassUp);
+                RenderTexture.ReleaseTemporary(bloom2);
+                RenderTexture.ReleaseTemporary(hdr2);
+                post.SetTexture(s_bloomTex, bloom);
+                post.SetTexture(s_blurTex, Texture2D.blackTexture);
+                Graphics.Blit(hdr, output, post, PassComposite);
+                post.SetTexture(s_mainTex, hdr);
+                DrawRect(post, PassComposite, output, rect);
+            }
+            // ミップの作成・テクスチャの写し（初回は準備がかかる）
+            var mip = new RenderTexture(16, 16, 0, HdrFormat) { useMipMap = true, autoGenerateMips = false, hideFlags = HideFlags.HideAndDontSave };
+            mip.Create();
+            Graphics.CopyTexture(hdr, 0, 0, 0, 0, 8, 8, mip, 0, 0, 0, 0);
+            mip.GenerateMips();
+            mip.Release();
+            ReleaseObject(mip);
+            RenderTexture.ReleaseTemporary(hdr);
+            RenderTexture.ReleaseTemporary(bloom);
+            RenderTexture.ReleaseTemporary(output);
+            RenderTexture.ReleaseTemporary(lut);
+            RenderTexture.ReleaseTemporary(tilt);
+            Note(" warmUp");
+        }
+
+        [Tooltip("モバイルで、めくり・演出の間に描く解像度の倍率（出力の大きさに対して）。止まると元の解像度で描き直す")]
+        [SerializeField, Range(0.5f, 1f)] private float m_animationScaleMobile = 0.8f;
+        private RenderTexture m_animTexture;
+        private RenderTexture m_postSource;   // 後処理が読む合成（null で m_compositeTexture）
+        private RenderTexture m_lastDrawTarget;
+
+        private void EnsureAnimTexture()
+        {
+            int w = Mathf.Max(8, Mathf.RoundToInt(m_compositeTexture.width * m_animationScaleMobile));
+            int h = Mathf.Max(8, Mathf.RoundToInt(m_compositeTexture.height * m_animationScaleMobile));
+            if (m_animTexture != null && m_animTexture.width == w && m_animTexture.height == h && m_animTexture.format == m_compositeTexture.format) return;
+            if (m_animTexture != null) { m_animTexture.Release(); ReleaseObject(m_animTexture); }
+            m_animTexture = new RenderTexture(w, h, 0, m_compositeTexture.format)
+            {
+                name = "BookFlipComposite (animation)", hideFlags = HideFlags.HideAndDontSave, filterMode = FilterMode.Bilinear
+            };
+            m_animTexture.Create();
+        }
+
+        // ------------------------------------------------------------------
+        // 静止した見開きを、数フレームに分けて描く（モバイル）。描き終えるまで出力は前の絵のまま。
+        // 1回で描くとモバイルの GPU で数十ms かかり、その1フレームだけ止まって見えるため
+        // ------------------------------------------------------------------
+        [Tooltip("モバイルで、静止した見開きの描き直し（めくり終わり・姿勢の変更など）を何フレームに分けて描くか。1 で分けない")]
+        [SerializeField, Range(1, 16)] private int m_progressiveStepsMobile = 6;
+        private bool m_progressActive;
+        private bool m_hasEverDrawn;
+        private bool m_progressPending;
+        private int m_progressStep;
+        private bool m_lastDrawWasTurn;
+        private RenderTexture m_progressBase;
+        private RenderTexture m_stripBase, m_stripBaseLow;
+        private RenderTexture m_progressBuffer;
+
+        private bool UsesProgressive()
+        {
+            if (!UsesSplitPasses || m_progressiveStepsMobile <= 1 || m_turning || m_effect != BookPageEffect.None) return false;
+            // 暗転中は暗転の静止画の仕組み（パス 9）を使う
+            float magic = m_hasMagicStyle ? m_magicStrength : m_baseMagicStrength;
+            if ((m_dim > 0f || m_dimRoutine != null) && magic <= 0f) return false;
+            // 最初の1枚は分けずに描く（前の絵が無い）
+            return m_hasEverDrawn && m_compositeTexture != null && m_compositeTexture.IsCreated();
+        }
+
+        private void StartProgress()
+        {
+            // 出力の合成は描き終えるまで前の状態のまま：静止画としては使わせない
+            m_targetHoldsIdle = null;
+            m_progressActive = true;
+            m_progressStep = 0;
+            int w = m_compositeTexture.width, h = m_compositeTexture.height;
+            if (m_progressBase == null || m_progressBase.width != w || m_progressBase.height != h)
+            {
+                if (m_progressBase != null) { m_progressBase.Release(); ReleaseObject(m_progressBase); }
+                m_progressBase = new RenderTexture(w, h, 0, HdrFormat) { name = "BookProgressBase", hideFlags = HideFlags.HideAndDontSave, filterMode = FilterMode.Point };
+                m_progressBase.Create();
+            }
+            if (m_progressBuffer == null || m_progressBuffer.width != w || m_progressBuffer.height != h || m_progressBuffer.format != m_compositeTexture.format)
+            {
+                if (m_progressBuffer != null) { m_progressBuffer.Release(); ReleaseObject(m_progressBuffer); }
+                m_progressBuffer = new RenderTexture(w, h, 0, m_compositeTexture.format) { name = "BookProgressBuffer", hideFlags = HideFlags.HideAndDontSave };
+                m_progressBuffer.Create();
+            }
+        }
+
+        private void ContinueProgress()
+        {
+            Material material = m_runtimeMaterial;
+            if (m_fxKeywordShader != material.shader)
+            {
+                m_fxKeyword = new UnityEngine.Rendering.LocalKeyword(material.shader, "BOOK_FX");
+                m_fxKeywordShader = material.shader;
+            }
+            material.SetKeyword(m_fxKeyword, false);
+            EnsurePaperLut(material);
+            if (m_coverBaseTexture == null)
+            {
+                m_coverBaseTexture = new RenderTexture(1, 1, 0, HdrFormat) { name = "BookCoverBase", hideFlags = HideFlags.HideAndDontSave };
+                m_coverBaseTexture.Create();
+            }
+            if (m_progressStep == 0) Graphics.Blit((Texture)null, m_coverBaseTexture, material, PassCoverBase);
+            material.SetTexture(s_bookCoverBaseTex, m_coverBaseTexture);
+            int steps = Mathf.Max(1, m_progressiveStepsMobile);
+            if (m_progressStep >= steps)
+            {
+                FinishProgress();
+                return;
+            }
+            Rect strip = new Rect(0f, (float)m_progressStep / steps, 1f, 1f / steps);
+            if (NotesEnabled) Note(" progress" + m_progressStep);
+            DrawRect(material, PassOutside, m_progressBase, strip);
+            DrawRect(material, PassPage, m_progressBase, strip);
+            DrawRect(material, PassCover, m_progressBase, strip);
+            material.SetTexture(s_bookBaseTex, m_progressBase);
+            DrawRect(material, PassFinish, m_progressBuffer, strip);
+            material.SetTexture(s_bookBaseTex, null);
+            m_progressStep++;
+        }
+
+        // 描き終えた：次のフレームで出力へ（最後の帯と同じフレームで後処理まで描くと重くなるため分ける）
+        private void FinishProgress()
+        {
+            Note(" progressDone");
+            m_progressActive = false;
+            Graphics.CopyTexture(m_progressBuffer, m_compositeTexture);
+            m_targetHoldsIdle = m_compositeTexture;
+            m_targetHoldsUndimmed = m_dim <= 0f && (m_hasMagicStyle ? m_magicStrength : m_baseMagicStrength) <= 0f;
+            m_lastDrawTarget = m_compositeTexture;
+            m_postRect = null;
+            m_postSource = null;
+            RenderPost();
+            if (m_progressPending)
+            {
+                m_progressPending = false;
+                StartProgress();
+            }
+        }
+
+        // ------------------------------------------------------------------
+        // 合成の描画。モバイルは面の種類ごとのパス（1 本の外・2 ページ・3 表紙）で面の色を描き、4 で仕上げを重ねる
+        // ------------------------------------------------------------------
+        private const int PassFull = 0, PassOutside = 1, PassPage = 2, PassCover = 3, PassFinish = 4, PassCoverBase = 5;
+        private static readonly int s_bookCoverBaseTex = Shader.PropertyToID("_BookCoverBaseTex");
+        private RenderTexture m_coverBaseTexture;
+        private const int PassTurn = 8;
+        private static readonly int s_bookTurnCacheTex = Shader.PropertyToID("_BookTurnCacheTex");
+        private RenderTexture m_turnCache;
+        private const int PassCoverTurn = 10;
+        private static readonly int s_bookDestReady = Shader.PropertyToID("_BookDestReady");
+        private static readonly int s_bookOpening = Shader.PropertyToID("_BookOpening");
+        private static readonly int s_bookTurnDestLowTex = Shader.PropertyToID("_BookTurnDestLowTex");
+        private Vector2 m_coverDestReady;
+        private int m_coverTurnFrames;
+        private const int CoverDestDelayFrames = 0;
+
+        // 表紙の開け閉めの移動先の静止画の i 番目の帯（出力の UV）。本の横の範囲（板の縁・小口・影の分を足す）だけを分け、
+        // 板が寝ていた側の外側から順に描く。本より十分外はシェーダーが今の静止画を使うので描かない
+        private Rect CoverDestStrip(int index, int steps)
+        {
+            float width = m_bookRect.z - m_bookRect.x;
+            float x0 = Mathf.Clamp01(m_bookRect.x - width * 0.35f);
+            float x1 = Mathf.Clamp01(m_bookRect.z + width * 0.35f);
+            float step = (x1 - x0) / steps;
+            // 板は最初 _TurnSide の側に寝ている（めくり空間の x が正の側）
+            bool fromRight = m_turnSide >= 0f;
+            float start = fromRight ? x1 - step * (index + 1) : x0 + step * index;
+            if (index == steps - 1) start = fromRight ? x0 : x1 - step;
+            return new Rect(start, 0f, step, 1f);
+        }
+        private bool m_coverCacheValid;
+        private const int PassFx = 11, PassFxLut = 12, PassAsh = 13, PassSpark = 14;
+        private static readonly int s_bookFxLut = Shader.PropertyToID("_BookFxLut");
+        private int m_effectSerial, m_effectCacheSerial = -1;
+        private RenderTexture m_effectCacheTarget;
+        private RenderTexture m_fxLut;
+        private BookFxQuads m_fxQuads;
+
+        private void DrawEffect(Material material, RenderTexture target)
+        {
+            bool fullPost = false, started = false;
+            material.SetKeyword(m_fxKeyword, false);
+            if (m_effectCacheSerial != m_effectSerial || m_effectCacheTarget != target)
+            {
+                // 演出の始め：前の静止画・変化後のページ・境界を1度だけ描く
+                m_turnCache = EnsureCacheTexture(m_turnCache, target, "BookTurnCache", target.format);
+                if (m_targetHoldsIdle == target) Graphics.CopyTexture(target, m_turnCache);
+                else
+                {
+                    RenderStateStrip(false, m_turnCache, new Rect(0f, 0f, 1f, 1f));
+                    Graphics.CopyTexture(m_turnCache, target);
+                    fullPost = true;
+                }
+                BeginTurnDestination(target);
+                if (m_fxLut == null)
+                {
+                    int w = 512, h = Mathf.Clamp(Mathf.CeilToInt(256f * Mathf.Max(m_pageAspect, 0.1f)), 64, 1024);
+                    m_fxLut = new RenderTexture(w, h, 0, HdrFormat) { name = "BookFxLut", hideFlags = HideFlags.HideAndDontSave, wrapMode = TextureWrapMode.Clamp };
+                    m_fxLut.Create();
+                }
+                Graphics.Blit((Texture)null, m_fxLut, material, PassFxLut);
+                Note(" fxStart");
+                m_effectCacheSerial = m_effectSerial;
+                m_effectCacheTarget = target;
+                started = true;
+            }
+            // 始めのフレームは静止画と境界の用意だけ。変化後のページは次のフレームから描く
+            if (!started) ContinueTurnDestination(material, 0.5f);
+            material.SetTexture(s_bookTurnCacheTex, m_turnCache);
+            material.SetTexture(s_bookTurnDestTex, TurnDestTexture);
+            material.SetTexture(s_bookFxLut, m_fxLut);
+            // 変わるのは演出のページと、その上へ舞う燃えかす・粒の範囲
+            float x0 = m_effectSide > 0.5f ? 0f : -1f, x1 = m_effectSide < -0.5f ? 0f : 1f;
+            // 燃えかすは横へ約 0.1、光の粒の十字は約 0.11 はみ出す。上へは 0.32 舞い上がる
+            Rect rect = BookToOutputRect(x0 - 0.14f, x1 + 0.14f, -0.13f, m_pageAspect + 0.45f);
+            DrawRect(material, PassFx, target, rect);
+
+            m_fxQuads ??= new BookFxQuads();
+            var settings = new BookFxQuads.Settings
+            {
+                mode = (int)m_effect,
+                side = m_effectSide,
+                progress = m_effectProgress,
+                origin = material.GetVector(s_fxOrigin),
+                ash = material.HasProperty("_FxAsh") ? material.GetFloat("_FxAsh") : 0f,
+                particles = material.HasProperty("_FxParticles") ? material.GetFloat("_FxParticles") : 0f,
+                pageAspect = m_pageAspect,
+                bookRect = m_bookRect,
+                time = Time.timeSinceLevelLoad,
+                ember = material.HasProperty("_BurnEmberColor") ? material.GetColor("_BurnEmberColor") : Color.white,
+                revive = material.HasProperty("_ReviveColor") ? material.GetColor("_ReviveColor") : Color.white,
+            };
+            var buildTimer = System.Diagnostics.Stopwatch.StartNew();
+            bool built = m_fxQuads.Build(settings, out bool hasAsh, out bool hasSpark);
+            if (NotesEnabled) Note(" fxBuild=" + buildTimer.Elapsed.TotalMilliseconds.ToString("0.0"));
+            if (built)
+            {
+                RenderTexture previous = RenderTexture.active;
+                RenderTexture.active = target;
+                GL.PushMatrix();
+                GL.LoadOrtho();
+                if (hasAsh && material.SetPass(PassAsh)) Graphics.DrawMeshNow(m_fxQuads.AshMesh, Matrix4x4.identity);
+                if (hasSpark && material.SetPass(PassSpark)) Graphics.DrawMeshNow(m_fxQuads.SparkMesh, Matrix4x4.identity);
+                GL.PopMatrix();
+                RenderTexture.active = previous;
+            }
+            m_postRect = fullPost ? (Rect?)null : rect;
+            m_targetHoldsIdle = null;
+        }
+
+        // 本の座標の範囲 → 出力の UV の矩形
+        private Rect BookToOutputRect(float bx0, float bx1, float by0, float by1)
+        {
+            float u0 = m_bookRect.x + (bx0 + 1f) * 0.5f * (m_bookRect.z - m_bookRect.x);
+            float u1 = m_bookRect.x + (bx1 + 1f) * 0.5f * (m_bookRect.z - m_bookRect.x);
+            float v0 = m_bookRect.y + by0 / Mathf.Max(m_pageAspect, 1e-5f) * (m_bookRect.w - m_bookRect.y);
+            float v1 = m_bookRect.y + by1 / Mathf.Max(m_pageAspect, 1e-5f) * (m_bookRect.w - m_bookRect.y);
+            return Rect.MinMaxRect(Mathf.Clamp01(u0), Mathf.Clamp01(v0), Mathf.Clamp01(u1), Mathf.Clamp01(v1));
+        }
+        private int m_turnSerial, m_turnCacheSerial = -1, m_coverCacheSerial = -1;
+        private int m_coverDestStep;
+        [Tooltip("モバイルで表紙を開け閉めするとき、移動先（開いた本・閉じた本）の静止画を何フレームに分けて描くか")]
+        [SerializeField, Range(1, 48)] private int m_coverDestStepsMobile = 10;
+
+        private RenderTexture EnsureCacheTexture(RenderTexture texture, int width, int height, string name, RenderTextureFormat format)
+        {
+            if (texture != null && texture.width == width && texture.height == height && texture.format == format) return texture;
+            if (texture != null) { texture.Release(); ReleaseObject(texture); }
+            texture = new RenderTexture(width, height, 0, format) { name = name, hideFlags = HideFlags.HideAndDontSave };
+            texture.Create();
+            return texture;
+        }
+
+        private RenderTexture EnsureCacheTexture(RenderTexture texture, RenderTexture like, string name, RenderTextureFormat format)
+        {
+            if (texture != null && texture.width == like.width && texture.height == like.height && texture.format == format) return texture;
+            if (texture != null) { texture.Release(); ReleaseObject(texture); }
+            texture = new RenderTexture(like.width, like.height, 0, format) { name = name, hideFlags = HideFlags.HideAndDontSave };
+            texture.Create();
+            return texture;
+        }
+
+        private RenderTexture m_coverCur, m_coverDest;
+        // 移動先の半分の解像度の仮の絵：先に数回に分けて全体を描き、元の解像度の列が描けるまでの代わりに使う
+        private RenderTexture m_coverDestLow;
+        private const int CoverDestLowSteps = 2;
+
+        // 表紙の開け閉め用の静止画はミップを持たせる：立った板では表紙の絵を横に縮めて読むので、
+        // ミップが無いと読む位置が飛び飛びになり（テクスチャのキャッシュが効かず）極端に遅くなる
+        private RenderTexture EnsureMipCache(RenderTexture texture, RenderTexture like, string name)
+        {
+            if (texture != null && texture.width == like.width && texture.height == like.height && texture.format == like.format) return texture;
+            if (texture != null) { texture.Release(); ReleaseObject(texture); }
+            texture = new RenderTexture(like.width, like.height, 0, like.format)
+            {
+                name = name, hideFlags = HideFlags.HideAndDontSave, useMipMap = true, autoGenerateMips = false,
+                filterMode = FilterMode.Trilinear, wrapMode = TextureWrapMode.Clamp
+            };
+            texture.Create();
+            return texture;
+        }
+
+        // 計測用（BookPerfProbe、端末に gpusync を置く）：GPU の処理の終わりを待ち、待った時間を返す
+        internal static bool DebugGpuSync;
+        private RenderTexture m_syncTexture;
+        private Texture2D m_syncReadback;
+        private string GpuSync(string label)
+        {
+            if (!DebugGpuSync || !NotesEnabled) return "";
+            if (m_syncTexture == null) { m_syncTexture = new RenderTexture(1, 1, 0, RenderTextureFormat.ARGB32) { hideFlags = HideFlags.HideAndDontSave }; m_syncTexture.Create(); }
+            if (m_syncReadback == null) m_syncReadback = new Texture2D(1, 1, TextureFormat.RGBA32, false) { hideFlags = HideFlags.HideAndDontSave };
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+            Graphics.Blit(Texture2D.whiteTexture, m_syncTexture);
+            RenderTexture previous = RenderTexture.active;
+            RenderTexture.active = m_syncTexture;
+            m_syncReadback.ReadPixels(new Rect(0, 0, 1, 1), 0, 0, false);
+            RenderTexture.active = previous;
+            return " " + label + "=" + timer.Elapsed.TotalMilliseconds.ToString("0.0");
+        }
+
+        private bool m_lastAnimFrameExact = true; // 最後に描いた動きのフレームが、代わりの絵を使わずに描けたか
+
+        // ------------------------------------------------------------------
+        // 表紙の開け閉めの移動先を、止まっている間に先に描く（モバイル）。
+        // 閉じた本なら開いた本、最初・最後の見開きなら閉じた本。めくりが始まったらそれを使い、
+        // めくりの間に少しずつ描く処理（と、描き終えるまでの代わりの絵）を省く
+        // ------------------------------------------------------------------
+        [Tooltip("モバイルで、表紙の開け閉めの移動先を止まっている間に先に描いておく")]
+        [SerializeField] private bool m_prerenderCoverMobile = true;
+        private RenderTexture m_coverPre;
+        private int m_coverPreStep = -1; // -1：まだ始めていない（見た目が変わったら -1 に戻す）
+        private BookCoverState m_coverPreState;
+        private Texture m_coverPreSpread;
+        private const int CoverPreSteps = 8;
+        private Hash128 m_coverPreSignature; // 描き始めたときの止まった状態の見た目（めくり始めに同じか確かめる）
+
+        // 今の状態から表紙を開け閉めしたときの移動先（無ければ false）
+        private bool CoverPrerenderTarget(out BookCoverState state)
+        {
+            state = BookCoverState.Open;
+            if (m_current == null) return false;
+            if (m_currentCover != BookCoverState.Open) return true;
+            Vector2 kinds = SlotKinds(BookCoverState.Open, m_current);
+            if (kinds.x > 4.5f) { state = BookCoverState.FrontCover; return true; }
+            if (kinds.y > 4.5f) { state = BookCoverState.BackCover; return true; }
+            return false;
+        }
+
+        private void ContinueCoverPrerender()
+        {
+            if (!m_prerenderCoverMobile || !m_turnCacheMobile || !m_rigidCovers || m_postMaterial == null || m_runtimeMaterial == null) return;
+            if (!UsesSplitPasses || m_turning || m_effect != BookPageEffect.None || m_progressActive) return;
+            if (m_compositeTexture == null || !m_compositeTexture.IsCreated() || m_animationScaleMobile >= 0.999f) return;
+            if (m_runtimeMaterial.passCount <= PassCoverTurn) return;
+            // 暗転・魔法の縁取りが動いている間は描き直しが続くので、先に描いてもすぐ無効になる
+            if (m_dim > 0f || m_dimRoutine != null || (m_hasMagicStyle ? m_magicStrength : m_baseMagicStrength) > 0f) return;
+            if (m_coverPreStep >= CoverPreSteps || !CoverPrerenderTarget(out BookCoverState state)) return;
+            if (m_coverPreStep < 0)
+            {
+                m_coverPreStep = 0;
+                m_coverPreState = state;
+                m_coverPreSpread = m_current;
+                m_coverPreSignature = ComputeSignature(true);
+            }
+            EnsureAnimTexture();
+            RenderTexture previous = m_coverPre;
+            m_coverPre = EnsureMipCache(m_coverPre, m_animTexture, "BookCoverPre");
+            // 途中で作り直した（大きさが変わった）：前に描いた帯は消えているので始めから
+            if (previous != m_coverPre && m_coverPreStep > 0) m_coverPreStep = 0;
+            // 移動先の状態として描く（表紙の開け閉めは、めくる前と後で同じ見開きを使う）
+            BookCoverState destinationCover = m_destinationCover;
+            Texture destination = m_destination;
+            m_destinationCover = m_coverPreState;
+            m_destination = m_coverPreSpread;
+            RenderStateStrip(true, m_coverPre, new Rect(0f, (float)m_coverPreStep / CoverPreSteps, 1f, 1f / CoverPreSteps));
+            m_destinationCover = destinationCover;
+            m_destination = destination;
+            m_coverPreStep++;
+            if (m_coverPreStep >= CoverPreSteps) m_coverPre.GenerateMips();
+            Note(" coverPre");
+        }
+
+        private bool CoverPrerenderMatches(RenderTexture target) =>
+            m_coverPreStep >= CoverPreSteps && m_coverPre != null && m_coverPreState == m_destinationCover &&
+            m_coverPreSpread == m_destination && m_coverPre.width == target.width && m_coverPre.height == target.height &&
+            m_coverPre.format == target.format && m_dim <= 0f && (m_hasMagicStyle ? m_magicStrength : m_baseMagicStrength) <= 0f &&
+            ComputeSignature(true) == m_coverPreSignature;
+
+        private void DrawCoverTurn(Material material, RenderTexture target)
+        {
+            Note(GpuSync("g0"));
+            int steps = Mathf.Max(1, m_coverDestStepsMobile);
+            if (m_coverCacheSerial != m_turnSerial) m_coverCacheValid = false;
+            if (!m_coverCacheValid)
+            {
+                m_coverCur = EnsureMipCache(m_coverCur, target, "BookCoverCur");
+                m_coverDest = EnsureMipCache(m_coverDest, target, "BookCoverDest");
+                m_coverDestLow = EnsureCacheTexture(m_coverDestLow, Mathf.Max(8, target.width / 2), Mathf.Max(8, target.height / 2),
+                    "BookCoverDestLow", target.format);
+                m_coverDestLow.filterMode = FilterMode.Bilinear;
+                if (m_targetHoldsIdle == target) Graphics.CopyTexture(target, 0, 0, m_coverCur, 0, 0);
+                else { RenderStateStrip(false, m_coverCur, new Rect(0f, 0f, 1f, 1f)); Note(" coverCurFull"); }
+                m_coverCur.GenerateMips();
+                Note(" coverStart");
+                m_coverDestStep = 0;
+                m_coverTurnFrames = 0;
+                if (CoverPrerenderMatches(target))
+                {
+                    // 止まっている間に描いておいた移動先を使う（描き終えていて、ミップもある）
+                    (m_coverDest, m_coverPre) = (m_coverPre, m_coverDest);
+                    m_coverDestStep = CoverDestLowSteps + steps;
+                    m_coverDestReady = new Vector2(0f, 1f);
+                    Note(" coverPreUsed");
+                }
+                m_coverPreStep = -1;
+                m_coverCacheValid = true;
+                m_coverCacheSerial = m_turnSerial;
+            }
+            // CoverDestDelayFrames：動き始めに移動先を描かないフレーム数（止まっていた GPU はクロックが低い）。
+            // 払っためくりは数フレームで終わるので、今は待たない
+            else if (m_coverDestStep < CoverDestLowSteps + steps && ++m_coverTurnFrames > CoverDestDelayFrames)
+            {
+                if (m_coverDestStep < CoverDestLowSteps)
+                {
+                    // まず半分の解像度で全体を（横の帯に分けて）描く
+                    RenderStateStrip(true, m_coverDestLow, new Rect(0f, (float)m_coverDestStep / CoverDestLowSteps, 1f, 1f / CoverDestLowSteps));
+                    Note(" coverDestLow");
+                    m_coverDestStep++;
+                }
+                else
+                {
+                    // 移動先の静止画を縦の帯で少しずつ描く（描き終えるまでは仮の絵で代用）。
+                    // 板が寝ていた側の外側から描く：板が起き上がると、そちら側の外側から順に下が見えてくる
+                    int index = m_coverDestStep - CoverDestLowSteps;
+                    Rect strip = CoverDestStrip(index, steps);
+                    RenderStateStrip(true, m_coverDest, strip);
+                    Note(" coverDestStrip");
+                    m_coverDestStep++;
+                    m_coverDestReady = index == 0 ? new Vector2(strip.xMin, strip.xMax)
+                        : new Vector2(Mathf.Min(m_coverDestReady.x, strip.xMin), Mathf.Max(m_coverDestReady.y, strip.xMax));
+                    if (index + 1 >= steps) m_coverDest.GenerateMips();
+                }
+                Note(GpuSync("gStrip"));
+            }
+            bool destComplete = m_coverDestStep >= CoverDestLowSteps + steps;
+            bool lowReady = m_coverDestStep >= CoverDestLowSteps;
+            m_lastAnimFrameExact = destComplete;
+            Vector2 ready = m_coverDestStep > CoverDestLowSteps ? m_coverDestReady : new Vector2(2f, -2f);
+            material.SetVector(s_bookDestReady, new Vector4(ready.x, ready.y, destComplete ? 1f : 0f, lowReady ? 1f : 0f));
+            material.SetTexture(s_bookTurnDestLowTex, m_coverDestLow);
+            material.SetFloat(s_bookOpening, m_currentCover != BookCoverState.Open ? 1f : 0f);
+            material.SetTexture(s_bookTurnCacheTex, m_coverCur);
+            material.SetTexture(s_bookTurnDestTex, m_coverDest);
+            if (m_coverBaseTexture != null) material.SetTexture(s_bookCoverBaseTex, m_coverBaseTexture);
+            Graphics.Blit((Texture)null, target, material, PassCoverTurn);
+            Note(GpuSync("gPass"));
+            m_targetHoldsIdle = null;
+        }
+
+        // めくっていない状態（今の見開き、または移動先）の絵の一部を描く。状態を一時的に入れ替えてプロパティを作り直す
+        private void RenderStateStrip(bool destination, RenderTexture texture, Rect strip)
+        {
+            bool turning = m_turning;
+            BookCoverState currentCover = m_currentCover;
+            Texture current = m_current;
+            if (destination)
+            {
+                m_currentCover = m_destinationCover;
+                if (m_destination != null) m_current = m_destination;
+            }
+            m_turning = false;
+            ApplyProperties();
+            Material material = m_runtimeMaterial;
+            material.SetKeyword(m_fxKeyword, false);
+            EnsurePaperLut(material);
+            if (m_coverBaseTexture == null)
+            {
+                m_coverBaseTexture = new RenderTexture(1, 1, 0, HdrFormat) { name = "BookCoverBase", hideFlags = HideFlags.HideAndDontSave };
+                m_coverBaseTexture.Create();
+            }
+            Graphics.Blit((Texture)null, m_coverBaseTexture, material, PassCoverBase);
+            material.SetTexture(s_bookCoverBaseTex, m_coverBaseTexture);
+            // 静止した見開きを少しずつ描く処理（m_progressBase、出力の解像度）とは別に持つ。
+            // 動いている間は小さめの解像度なので、共有すると毎回作り直しになる（めくり始めが重くなる）
+            // 半分の解像度の仮の絵（表紙の開け閉め）は別に持つ
+            bool low = texture == m_coverDestLow;
+            RenderTexture stripBase = low ? m_stripBaseLow : m_stripBase;
+            stripBase = EnsureCacheTexture(stripBase, texture, low ? "BookStripBaseLow" : "BookStripBase", HdrFormat);
+            stripBase.filterMode = FilterMode.Point;
+            if (low) m_stripBaseLow = stripBase; else m_stripBase = stripBase;
+            DrawRect(material, PassOutside, stripBase, strip);
+            DrawRect(material, PassPage, stripBase, strip);
+            DrawRect(material, PassCover, stripBase, strip);
+            material.SetTexture(s_bookBaseTex, stripBase);
+            DrawRect(material, PassFinish, texture, strip);
+            material.SetTexture(s_bookBaseTex, null);
+            // めくりの状態へ戻す
+            m_turning = turning;
+            m_currentCover = currentCover;
+            m_current = current;
+            ApplyProperties();
+        }
+        private const int PassDim = 9;
+        private static readonly int s_bookDimBaseTex = Shader.PropertyToID("_BookDimBaseTex");
+        private RenderTexture m_dimBase;
+        private bool m_dimBaseValid;
+        private Hash128 m_dimBaseSignature;
+        private float m_lastPostFade;
+        private Rect m_previousTurnRect;
+        private Rect? m_postRect; // このフレームで合成が変わった範囲（後処理もここだけ描く）。null で全体
+
+        private static Rect Union(Rect a, Rect b) =>
+            Rect.MinMaxRect(Mathf.Min(a.xMin, b.xMin), Mathf.Min(a.yMin, b.yMin), Mathf.Max(a.xMax, b.xMax), Mathf.Max(a.yMax, b.yMax));
+        private RenderTexture m_turnDest;
+        private static readonly int s_bookTurnDestTex = Shader.PropertyToID("_BookTurnDestTex");
+
+        // めくりで変わる範囲（出力の UV）：めくるページの矩形と、折り返した紙の範囲に、影の幅を足したもの。
+        // シェーダーの BookFlipResolve と同じ「めくり空間」（x を _TurnSide で反転）で求める
+        private static readonly int s_dropShadowWidth = Shader.PropertyToID("_DropShadowWidth");
+
+        private Rect TurnRect(Material material)
+        {
+            Vector4 fold = material.GetVector(s_fold);
+            float side = m_turnSide >= 0f ? 1f : -1f;
+            float height = m_pageAspect;
+            Vector2 a = new Vector2(fold.x, fold.y), b = new Vector2(fold.z, fold.w);
+            Vector2 axis = a - b;
+            float xMin = 0f, xMax = 1f, yMin = 0f, yMax = height;
+            if (axis.sqrMagnitude > 1e-8f)
+            {
+                Vector2 n = axis.normalized, mid = (a + b) * 0.5f;
+                Vector2[] corners = { new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(1f, height), new Vector2(0f, height) };
+                foreach (Vector2 c in corners)
+                {
+                    // 折り目より角の側（めくれた部分）の角を折り目で折り返す
+                    float d = Vector2.Dot(c - mid, n);
+                    if (d <= 0f) continue;
+                    Vector2 r = c - 2f * d * n;
+                    xMin = Mathf.Min(xMin, r.x); xMax = Mathf.Max(xMax, r.x);
+                    yMin = Mathf.Min(yMin, r.y); yMax = Mathf.Max(yMax, r.y);
+                }
+            }
+            float margin = Mathf.Max(0.12f, material.GetFloat(s_dropShadowWidth) + 0.02f); // 落ち影・折り目の光の幅
+            xMin -= margin; xMax += margin; yMin -= margin; yMax += margin;
+            // めくり空間 → 本の座標（x）→ 出力の UV
+            float bx0 = side > 0f ? xMin : -xMax, bx1 = side > 0f ? xMax : -xMin;
+            float u0 = m_bookRect.x + (bx0 + 1f) * 0.5f * (m_bookRect.z - m_bookRect.x);
+            float u1 = m_bookRect.x + (bx1 + 1f) * 0.5f * (m_bookRect.z - m_bookRect.x);
+            float v0 = m_bookRect.y + yMin / Mathf.Max(height, 1e-5f) * (m_bookRect.w - m_bookRect.y);
+            float v1 = m_bookRect.y + yMax / Mathf.Max(height, 1e-5f) * (m_bookRect.w - m_bookRect.y);
+            u0 = Mathf.Clamp01(u0); u1 = Mathf.Clamp01(u1); v0 = Mathf.Clamp01(v0); v1 = Mathf.Clamp01(v1);
+            return Rect.MinMaxRect(u0, v0, Mathf.Max(u0, u1), Mathf.Max(v0, v1));
+        }
+
+        // 出力の一部（UV の矩形）だけにパスを描く。Graphics.Blit と同じ向き（UV = 頂点の位置）
+        private static void DrawRect(Material material, int pass, RenderTexture target, Rect rect)
+        {
+            if (rect.width <= 0f || rect.height <= 0f) return;
+            RenderTexture previous = RenderTexture.active;
+            RenderTexture.active = target;
+            GL.PushMatrix();
+            GL.LoadOrtho();
+            material.SetPass(pass);
+            GL.Begin(GL.QUADS);
+            GL.TexCoord2(rect.xMin, rect.yMin); GL.Vertex3(rect.xMin, rect.yMin, 0f);
+            GL.TexCoord2(rect.xMin, rect.yMax); GL.Vertex3(rect.xMin, rect.yMax, 0f);
+            GL.TexCoord2(rect.xMax, rect.yMax); GL.Vertex3(rect.xMax, rect.yMax, 0f);
+            GL.TexCoord2(rect.xMax, rect.yMin); GL.Vertex3(rect.xMax, rect.yMin, 0f);
+            GL.End();
+            GL.PopMatrix();
+            RenderTexture.active = previous;
+        }
+
+        // 移動先に何も無い面がある（本の外が見える）めくりは、静止画を使わずに描く
+        private static bool HasEmptyDestination(Material material)
+        {
+            Vector4 kinds = material.GetVector(s_slotKinds);
+            return Mathf.Abs(kinds.z - 3f) < 0.5f || Mathf.Abs(kinds.w - 3f) < 0.5f;
+        }
+
+        // 移動先の見開きのページの面の色を、めくっていない状態として1度だけ描く（パス 2。ページ以外は描かない）
+        // 移動先の静止画は数フレームに分けて描く（めくり・演出の始めの1フレームが重くならないように）。
+        // 描き終えるまでは今の静止画で代用する（始めは移動先がほとんど見えない）
+        [Tooltip("モバイルで、めくり・演出の始めに移動先のページを何フレームに分けて描くか")]
+        [SerializeField, Range(1, 24)] private int m_turnDestStepsMobile = 10;
+        private int m_turnDestStep;
+        // 先に半分の解像度で数回に分けて描き（すぐ使える仮の絵）、その後で元の解像度の帯を描く
+        private const int TurnDestLowSteps = 1;
+        private RenderTexture m_turnDestLow;
+        private bool TurnDestReady => m_turnDestStep >= TurnDestLowSteps + Mathf.Max(1, m_turnDestStepsMobile);
+        private Texture TurnDestTexture => TurnDestReady ? m_turnDest : m_turnDestStep >= TurnDestLowSteps && m_turnDestLow != null ? m_turnDestLow : m_turnCache;
+
+        private void BeginTurnDestination(RenderTexture target)
+        {
+            if (m_turnDest == null || m_turnDest.width != target.width || m_turnDest.height != target.height)
+            {
+                if (m_turnDest != null) { m_turnDest.Release(); ReleaseObject(m_turnDest); }
+                m_turnDest = new RenderTexture(target.width, target.height, 0, HdrFormat)
+                {
+                    name = "BookTurnDest", hideFlags = HideFlags.HideAndDontSave, filterMode = FilterMode.Bilinear
+                };
+                m_turnDest.Create();
+            }
+            int lowW = Mathf.Max(1, target.width / 2), lowH = Mathf.Max(1, target.height / 2);
+            if (m_turnDestLow == null || m_turnDestLow.width != lowW || m_turnDestLow.height != lowH)
+            {
+                if (m_turnDestLow != null) { m_turnDestLow.Release(); ReleaseObject(m_turnDestLow); }
+                m_turnDestLow = new RenderTexture(lowW, lowH, 0, HdrFormat)
+                {
+                    name = "BookTurnDestLow", hideFlags = HideFlags.HideAndDontSave, filterMode = FilterMode.Bilinear
+                };
+                m_turnDestLow.Create();
+            }
+            RenderTexture previous = RenderTexture.active;
+            RenderTexture.active = m_turnDest;
+            GL.Clear(false, true, Color.clear);
+            RenderTexture.active = m_turnDestLow;
+            GL.Clear(false, true, Color.clear);
+            RenderTexture.active = previous;
+            m_turnDestStep = 0;
+        }
+
+        // 移動先の見開きのページの面の色を、めくっていない状態として描く（パス 2。ページ以外は描かない）。1回で1つの帯
+        private void ContinueTurnDestination(Material material, float firstBandY)
+        {
+            if (TurnDestReady) return;
+            bool low = m_turnDestStep < TurnDestLowSteps;
+            int steps = low ? TurnDestLowSteps : Mathf.Max(1, m_turnDestStepsMobile);
+            int index = low ? m_turnDestStep : m_turnDestStep - TurnDestLowSteps;
+            // めくり始める角に近い帯から描く
+            int first = Mathf.Clamp(Mathf.FloorToInt(firstBandY * steps), 0, steps - 1);
+            Note(low ? " destLow" : " destStrip");
+            int band = (first + index) % steps;
+            Texture destination = m_destination != null ? m_destination : m_current;
+            Vector4 kinds = material.GetVector(s_slotKinds);
+            float turning = material.GetFloat(s_turning);
+            material.SetTexture(s_curLeftTex, destination);
+            material.SetTexture(s_curRightTex, destination);
+            material.SetVector(s_slotKinds, new Vector4(kinds.z, kinds.w, kinds.z, kinds.w));
+            material.SetFloat(s_turning, 0f);
+            material.SetKeyword(m_fxKeyword, false);
+            DrawRect(material, PassPage, low ? m_turnDestLow : m_turnDest, new Rect(0f, (float)band / steps, 1f, 1f / steps));
+            // 元の状態へ戻す
+            material.SetTexture(s_curLeftTex, m_current);
+            material.SetTexture(s_curRightTex, m_current);
+            material.SetVector(s_slotKinds, kinds);
+            material.SetFloat(s_turning, turning);
+            m_turnDestStep++;
+        }
+        private bool m_turnCacheValid;
+        private RenderTexture m_targetHoldsIdle; // 静止した見開き（めくり・演出の無い状態）を最後に描いた先
+        private bool m_targetHoldsUndimmed;      // その絵に暗転・魔法の縁取りが入っていないか（暗転の静止画に使えるか）
+        private const int PassPaperLut = 6, PassPaperTiltLut = 7;
+        private static readonly int s_bookPaperLut = Shader.PropertyToID("_BookPaperLut");
+        private static readonly int s_bookPaperTiltLut = Shader.PropertyToID("_BookPaperTiltLut");
+        private static readonly string[] s_paperLutFloats =
+            { "_PaperTexStrength", "_PaperGrain", "_PaperAge", "_PaperNormalStrength", "_PaperBump", "_PaperBumpScale", "_PageAspect", "_PagePixels" };
+        private static readonly string[] s_paperLutVectors = { "_PaperTex_ST", "_AgeColor", "_PaperNormalTex_ST" };
+        private RenderTexture m_paperLut;
+        private RenderTexture m_paperTiltLut;
+        private Hash128 m_paperLutSignature;
+
+        // 紙の模様（位置だけで決まる：むら・焼け・凹凸の傾き）をテクスチャに焼く。紙の設定・出力の大きさが変わったときだけ
+        private void EnsurePaperLut(Material material)
+        {
+            var h = new Hash128();
+            foreach (string name in s_paperLutFloats) h.Append(material.HasProperty(name) ? material.GetFloat(name) : 0f);
+            foreach (string name in s_paperLutVectors)
+            {
+                Vector4 v = material.HasProperty(name) ? material.GetVector(name) : Vector4.zero;
+                h.Append(ref v);
+            }
+            Texture paper = material.HasProperty("_PaperTex") ? material.GetTexture("_PaperTex") : null;
+            Texture normal = material.HasProperty("_PaperNormalTex") ? material.GetTexture("_PaperNormalTex") : null;
+            h.Append(paper != null ? paper.GetInstanceID() : 0);
+            h.Append(normal != null ? normal.GetInstanceID() : 0);
+            h.Append(material.IsKeywordEnabled("_PAPERFINISH_GLOSS") ? 1 : 0);
+            // 見開きの幅を出力のページの画素数の 1.5 倍で焼く（ノイズは出力の画素で描ける細かさまでに抑えてある）
+            float pagePixels = material.GetFloat(s_pagePixels);
+            int width = Mathf.Clamp(Mathf.CeilToInt(Mathf.Max(pagePixels, 256f) * 1.5f) * 2, 512, 4096);
+            int height = Mathf.Clamp(Mathf.CeilToInt(width * 0.5f * Mathf.Max(m_pageAspect, 0.1f)), 64, 4096);
+            h.Append(width);
+            h.Append(height);
+            bool ready = m_paperLut != null && m_paperLut.IsCreated() && m_paperTiltLut != null && m_paperTiltLut.IsCreated();
+            if (ready && h == m_paperLutSignature)
+            {
+                material.SetTexture(s_bookPaperLut, m_paperLut);
+                material.SetTexture(s_bookPaperTiltLut, m_paperTiltLut);
+                return;
+            }
+            m_paperLutSignature = h;
+            Note(" paperLut");
+            ReleasePaperLut();
+            RenderTextureFormat colorFormat = SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.RGB111110Float)
+                ? RenderTextureFormat.RGB111110Float : HdrFormat;
+            RenderTextureFormat tiltFormat = SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.RGHalf)
+                ? RenderTextureFormat.RGHalf : HdrFormat;
+            m_paperLut = new RenderTexture(width, height, 0, colorFormat)
+            {
+                name = "BookPaperLut", hideFlags = HideFlags.HideAndDontSave, wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear
+            };
+            m_paperTiltLut = new RenderTexture(width, height, 0, tiltFormat)
+            {
+                name = "BookPaperTiltLut", hideFlags = HideFlags.HideAndDontSave, wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear
+            };
+            m_paperLut.Create();
+            m_paperTiltLut.Create();
+            Graphics.Blit((Texture)null, m_paperLut, material, PassPaperLut);
+            Graphics.Blit((Texture)null, m_paperTiltLut, material, PassPaperTiltLut);
+            material.SetTexture(s_bookPaperLut, m_paperLut);
+            material.SetTexture(s_bookPaperTiltLut, m_paperTiltLut);
+        }
+
+        private void ReleasePaperLut()
+        {
+            if (m_paperLut != null) { m_paperLut.Release(); ReleaseObject(m_paperLut); m_paperLut = null; }
+            if (m_paperTiltLut != null) { m_paperTiltLut.Release(); ReleaseObject(m_paperTiltLut); m_paperTiltLut = null; }
+        }
+        private static readonly int s_bookBaseTex = Shader.PropertyToID("_BookBaseTex");
+        private UnityEngine.Rendering.LocalKeyword m_fxKeyword;
+        private Shader m_fxKeywordShader;
+
+        private bool UsesSplitPasses => m_splitPassesMobile && UsesMobileSettings && m_runtimeMaterial.passCount > PassPaperTiltLut;
+
+        private void DrawComposite(RenderTexture target)
+        {
+            if (!UsesSplitPasses)
+            {
+                Graphics.Blit((Texture)null, target, m_runtimeMaterial, PassFull);
+                return;
+            }
+            Material material = m_runtimeMaterial;
+            m_postRect = null;
+            if (m_fxKeywordShader != material.shader)
+            {
+                m_fxKeyword = new UnityEngine.Rendering.LocalKeyword(material.shader, "BOOK_FX");
+                m_fxKeywordShader = material.shader;
+            }
+            // 燃焼・復活の演出の間だけ、その処理を含むバリアントを使う
+            material.SetKeyword(m_fxKeyword, m_effect != BookPageEffect.None);
+            EnsurePaperLut(material);
+
+            // 本文のめくり：動かない部分はめくり始めの静止画を使い、移動先のページとめくった紙だけを描く（パス 8）
+            bool pageTurn = m_turnCacheMobile && m_turning && m_effect == BookPageEffect.None && m_postMaterial != null &&
+                            m_currentCover == BookCoverState.Open && m_destinationCover == BookCoverState.Open &&
+                            material.passCount > PassTurn && !HasEmptyDestination(material);
+            if (pageTurn)
+            {
+                bool turnRebuilt = false, turnStarted = false;
+                if (m_turnCacheSerial != m_turnSerial) m_turnCacheValid = false;
+                if (!m_turnCacheValid || m_turnCache == null || m_turnCache.width != target.width || m_turnCache.height != target.height)
+                {
+                    if (m_turnCache == null || m_turnCache.width != target.width || m_turnCache.height != target.height)
+                    {
+                        if (m_turnCache != null) { m_turnCache.Release(); ReleaseObject(m_turnCache); }
+                        m_turnCache = new RenderTexture(target.width, target.height, 0, target.format)
+                        {
+                            name = "BookTurnCache", hideFlags = HideFlags.HideAndDontSave, filterMode = FilterMode.Point
+                        };
+                        m_turnCache.Create();
+                    }
+                    if (m_targetHoldsIdle == target && target.format == m_turnCache.format)
+                    {
+                        // 直前に描いた静止した見開きをそのまま使う（描き直さない）
+                        Graphics.CopyTexture(target, m_turnCache);
+                    }
+                    else
+                    {
+                        Note(" turnCurFull");
+                        // めくっていない状態で1度だけ描き、出力にも写す（以後は変わる範囲だけを描くため）
+                        material.SetFloat(s_turning, 0f);
+                        DrawSplit(material, m_turnCache);
+                        material.SetFloat(s_turning, 1f);
+                        if (target.format == m_turnCache.format) Graphics.CopyTexture(m_turnCache, target);
+                        else Graphics.Blit(m_turnCache, target);
+                        turnRebuilt = true;
+                    }
+                    m_previousTurnRect = new Rect(0f, 0f, 0f, 0f);
+                    turnStarted = true;
+                    BeginTurnDestination(target);
+                    m_turnCacheValid = true;
+                    m_turnCacheSerial = m_turnSerial;
+                }
+                // 移動先は次のフレームから1フレームに1つの帯ずつ描く（始めのフレームは止まっていた GPU のクロックが低く重い。
+                // 紙はまだほとんどめくれていない）。最初の帯は半分の解像度の仮の絵なので、2フレーム目から紙の裏が移動先になる
+                if (!turnStarted)
+                    ContinueTurnDestination(material, CornerPosition(m_corner).y / Mathf.Max(m_pageAspect, 1e-5f) *
+                        (m_bookRect.w - m_bookRect.y) + m_bookRect.y);
+                material.SetTexture(s_bookTurnCacheTex, m_turnCache);
+                material.SetTexture(s_bookTurnDestTex, TurnDestTexture);
+                m_lastAnimFrameExact = TurnDestReady;
+                // めくっている紙と、その下・影の範囲だけを描く。それ以外は出力に残っている静止画のまま。
+                // 前のフレームで描いた範囲も描き直して、前の紙の絵を消す
+                Rect rect = TurnRect(material);
+                Rect draw = m_previousTurnRect.width > 0f ? Union(rect, m_previousTurnRect) : rect;
+                m_previousTurnRect = rect;
+                DrawRect(material, PassTurn, target, draw);
+                // 静止画を作り直したフレームは、出力全体を描き直す（出力の大きさが変わった場合など）
+                m_postRect = turnRebuilt ? (Rect?)null : draw;
+                m_targetHoldsIdle = null;
+                return;
+            }
+            m_turnCacheValid = false;
+
+            // 燃焼・復活：演出の前の静止画と変化後のページを境界で切り替え、燃えかす・粒は四角形で描く（パス 11〜14）
+            bool effectCached = m_turnCacheMobile && !m_turning && m_effect != BookPageEffect.None && m_postMaterial != null &&
+                                material.passCount > PassSpark;
+            if (effectCached)
+            {
+                DrawEffect(material, target);
+                return;
+            }
+            m_effectCacheSerial = -1;
+
+            // 表紙の開け閉め：閉じた本と開いた本の静止画を読み、板の向きと影だけを描く（パス 10）
+            bool coverTurn = m_turnCacheMobile && m_turning && m_effect == BookPageEffect.None && m_postMaterial != null &&
+                             (m_currentCover != BookCoverState.Open || m_destinationCover != BookCoverState.Open) &&
+                             m_rigidCovers && material.passCount > PassCoverTurn;
+            if (coverTurn)
+            {
+                DrawCoverTurn(material, target);
+                return;
+            }
+            m_coverCacheValid = false;
+
+            // 暗転だけが動いている（暗転の出入り・ルーンの脈動）：暗転の前の絵は1度だけ描き、暗転だけを重ねる（パス 9）
+            float magic = m_hasMagicStyle ? m_magicStrength : m_baseMagicStrength;
+            bool dimOnly = (m_dim > 0f || m_dimRoutine != null) && magic <= 0f && !m_turning &&
+                           m_effect == BookPageEffect.None && material.passCount > PassDim;
+            if (dimOnly)
+            {
+                Hash128 signature = ComputeSignature();
+                if (!m_dimBaseValid || signature != m_dimBaseSignature || m_dimBase == null ||
+                    m_dimBase.width != target.width || m_dimBase.height != target.height)
+                {
+                    if (m_dimBase == null || m_dimBase.width != target.width || m_dimBase.height != target.height)
+                    {
+                        if (m_dimBase != null) { m_dimBase.Release(); ReleaseObject(m_dimBase); }
+                        m_dimBase = new RenderTexture(target.width, target.height, 0, HdrFormat)
+                        {
+                            name = "BookDimBase", hideFlags = HideFlags.HideAndDontSave, filterMode = FilterMode.Point
+                        };
+                        m_dimBase.Create();
+                    }
+                    if (m_targetHoldsIdle == target && m_targetHoldsUndimmed && target.format == m_dimBase.format)
+                    {
+                        // 暗転の前の静止画がそのまま出力に残っている（描き直さない）
+                        Graphics.CopyTexture(target, m_dimBase);
+                    }
+                    else
+                    {
+                        material.SetFloat(s_dim, 0f);
+                        float fade = material.GetFloat(s_screenFade);
+                        material.SetFloat(s_screenFade, 0f);
+                        DrawSplit(material, m_dimBase);
+                        material.SetFloat(s_dim, m_dim);
+                        material.SetFloat(s_screenFade, fade);
+                    }
+                    m_dimBaseSignature = signature;
+                    m_dimBaseValid = true;
+                }
+                material.SetTexture(s_bookDimBaseTex, m_dimBase);
+                Graphics.Blit((Texture)null, target, material, PassDim);
+                m_targetHoldsIdle = null;
+                return;
+            }
+            m_dimBaseValid = false;
+            Note(" fullSplit");
+            DrawSplit(material, target);
+            m_targetHoldsIdle = !m_turning && m_effect == BookPageEffect.None ? target : null;
+            m_targetHoldsUndimmed = m_dim <= 0f && (m_hasMagicStyle ? m_magicStrength : m_baseMagicStrength) <= 0f;
+            m_hasEverDrawn = true;
+        }
+
+        private void DrawSplit(Material material, RenderTexture target)
+        {
+            RenderTexture baseTexture = RenderTexture.GetTemporary(target.width, target.height, 0, HdrFormat);
+            baseTexture.filterMode = FilterMode.Point;
+            // 1〜3 は担当外の画素を捨てる。3つで全画素を1回ずつ塗る
+            // 表紙の地の色を1画素に求める（パス 5）
+            if (m_coverBaseTexture == null)
+            {
+                m_coverBaseTexture = new RenderTexture(1, 1, 0, HdrFormat) { name = "BookCoverBase", hideFlags = HideFlags.HideAndDontSave };
+                m_coverBaseTexture.Create();
+            }
+            Graphics.Blit((Texture)null, m_coverBaseTexture, material, PassCoverBase);
+            material.SetTexture(s_bookCoverBaseTex, m_coverBaseTexture);
+            Graphics.Blit((Texture)null, baseTexture, material, PassOutside);
+            Graphics.Blit((Texture)null, baseTexture, material, PassPage);
+            Graphics.Blit((Texture)null, baseTexture, material, PassCover);
+            material.SetTexture(s_bookBaseTex, baseTexture);
+            Graphics.Blit((Texture)null, target, material, PassFinish);
+            material.SetTexture(s_bookBaseTex, null);
+            RenderTexture.ReleaseTemporary(baseTexture);
+        }
+
+        // ------------------------------------------------------------------
+        // 計測用（BookPerfProbe のベンチマーク）：今の状態のまま、合成・後処理だけを描く
+        // ------------------------------------------------------------------
+        internal Material BenchMaterial => m_runtimeMaterial;
+        // 計測用：このフレームで行った重い処理の名前（BookPerfProbe が遅いフレームの記録に使う）
+        internal string FrameNote = "";
+        // 計測（BookPerfProbe）がいるときだけ、そのフレームの処理の名前を残す（いなければ文字列を作らない）
+        internal bool NotesEnabled;
+        private void Note(string text)
+        {
+            if (NotesEnabled) FrameNote += text;
+        }
+        // 計測で、プロパティを一時的に変えて描く（ApplyProperties の後に呼ぶ）
+        internal System.Action<Material> BenchOverride;
+        internal void BenchPostWith(System.Action<Material> setup)
+        {
+            setup?.Invoke(m_postMaterial);
+        }
+
+        internal void BenchComposite(RenderTexture target, Material material = null)
+        {
+            if (m_runtimeMaterial == null) return;
+            ApplyProperties();
+            BenchOverride?.Invoke(m_runtimeMaterial);
+            if (material != null) Graphics.Blit((Texture)null, target, material, 0);
+            else DrawComposite(target);
+        }
+
+        // 分割パスの1つだけを描く（pass 1〜3 は baseTexture へ、4 は baseTexture を読んで target へ）
+        internal void BenchSplitPass(RenderTexture baseTexture, RenderTexture target, int pass)
+        {
+            if (m_runtimeMaterial == null || m_runtimeMaterial.passCount <= PassCoverBase) return;
+            ApplyProperties();
+            if (m_coverBaseTexture != null) m_runtimeMaterial.SetTexture(s_bookCoverBaseTex, m_coverBaseTexture);
+            EnsurePaperLut(m_runtimeMaterial);
+            if (pass == PassFinish)
+            {
+                m_runtimeMaterial.SetTexture(s_bookBaseTex, baseTexture);
+                Graphics.Blit((Texture)null, target, m_runtimeMaterial, PassFinish);
+            }
+            else Graphics.Blit((Texture)null, baseTexture, m_runtimeMaterial, pass);
+        }
+
+        // 静止画を分けて描くときの1フレーム分（真ん中の帯）
+        internal void BenchProgressStrip()
+        {
+            if (m_compositeTexture == null || !UsesSplitPasses) return;
+            ApplyProperties();
+            StartProgress();
+            m_progressStep = Mathf.Max(1, m_progressiveStepsMobile) / 2;
+            int steps = Mathf.Max(1, m_progressiveStepsMobile);
+            Material material = m_runtimeMaterial;
+            EnsurePaperLut(material);
+            Rect strip = new Rect(0f, (float)m_progressStep / steps, 1f, 1f / steps);
+            DrawRect(material, PassOutside, m_progressBase, strip);
+            DrawRect(material, PassPage, m_progressBase, strip);
+            DrawRect(material, PassCover, m_progressBase, strip);
+            material.SetTexture(s_bookBaseTex, m_progressBase);
+            DrawRect(material, PassFinish, m_progressBuffer, strip);
+            material.SetTexture(s_bookBaseTex, null);
+            m_progressActive = false;
+        }
+
+        // 動いている間の1フレーム（小さめの解像度の合成 + 後処理）。実際の LateUpdate と同じ描き方
+        internal void BenchAnimFrame()
+        {
+            if (m_animTexture == null || m_runtimeMaterial == null) return;
+            ApplyProperties();
+            BenchOverride?.Invoke(m_runtimeMaterial);
+            DrawComposite(m_animTexture);
+            m_postSource = m_animTexture;
+            RenderPost();
+        }
+
+        // ------------------------------------------------------------------
+        // 見た目の比較（BookPerfProbe）：同じ状態をモバイルの描き方と PC の1パス（パス 0）で描き、並べて保存する
+        // ------------------------------------------------------------------
+        internal System.Action<Material> CompareOverride;
+        internal bool IsBusyRendering => m_progressActive || m_dimRoutine != null || m_screenFadeRoutine != null;
+
+        internal void CompareRender(RenderTexture mobileTarget, RenderTexture fullTarget, System.Action<Material> setup)
+        {
+            if (m_runtimeMaterial == null) return;
+            CompareOverride = setup;
+            ApplyProperties();
+            // 移動先の静止画を数フレームに分けて描く分も描き終える
+            for (int i = 0; i < 30; i++) DrawComposite(mobileTarget);
+            ApplyProperties();
+            Graphics.Blit((Texture)null, fullTarget, m_runtimeMaterial, PassFull);
+            CompareOverride = null;
+            ApplyProperties();
+        }
+
+        internal void BenchPostNoBloom()
+        {
+            float intensity = m_bloomIntensity;
+            m_bloomIntensity = 0f;
+            BenchPost();
+            m_bloomIntensity = intensity;
+        }
+
+        internal void BenchCopy()
+        {
+            if (m_compositeTexture == null || m_turnCache == null || m_turnCache.width != m_compositeTexture.width ||
+                m_turnCache.height != m_compositeTexture.height || m_turnCache.format != m_compositeTexture.format) return;
+            Graphics.CopyTexture(m_compositeTexture, m_turnCache);
+        }
+
+        internal void BenchPost()
+        {
+            if (m_postMaterial == null || m_outputTexture == null) return;
+            EnsureCompositeTexture();
             RenderPost();
         }
 
@@ -888,7 +2083,7 @@ namespace hatake
             if (!m_redrawOnlyOnChange) return true;
             // 時間で動く演出の間は毎フレーム描く。終わった次のフレームは必ず描き直す（ドラッグを戻した場合など、
             // 状態が始める前と同じでも、出力にはめくりの途中の絵が残っているため）
-            if (m_turning || m_effect != BookPageEffect.None || m_dimRoutine != null || m_screenFadeRoutine != null)
+            if (m_turning || m_effect != BookPageEffect.None || m_dimRoutine != null || (m_screenFadeRoutine != null && m_postMaterial == null))
             {
                 m_hasRendered = false;
                 return true;
@@ -914,27 +2109,31 @@ namespace hatake
         }
 
         // 見た目に関わる状態の要約。ここに無い値を変えたら MarkDirty を呼ぶ
-        private Hash128 ComputeSignature()
+        // stillOnly：めくりの途中だけ変わる値（移動先・角の位置など）を含めない（止まっていた状態の見た目だけ）
+        private Hash128 ComputeSignature(bool stillOnly = false)
         {
             Hash128 h = new Hash128();
             h.Append(m_contentVersion);
             h.Append(m_current != null ? m_current.GetInstanceID() : 0);
-            h.Append(m_destination != null ? m_destination.GetInstanceID() : 0);
             h.Append(m_frontCover != null ? m_frontCover.GetInstanceID() : 0);
             h.Append(m_backCover != null ? m_backCover.GetInstanceID() : 0);
             h.Append(m_outputTexture != null ? m_outputTexture.GetInstanceID() : 0);
             h.Append((int)m_currentCover);
-            h.Append((int)m_destinationCover);
-            h.Append(m_turnSide);
-            h.Append((int)m_corner);
-            h.Append(ref m_foldPoint);
-            h.Append(m_turnAmount);
+            if (!stillOnly)
+            {
+                h.Append(m_destination != null ? m_destination.GetInstanceID() : 0);
+                h.Append((int)m_destinationCover);
+                h.Append(m_turnSide);
+                h.Append((int)m_corner);
+                h.Append(ref m_foldPoint);
+                h.Append(m_turnAmount);
+            }
             h.Append(ref m_bookRect);
             h.Append(m_pageAspect);
             h.Append(m_readingProgress);
             h.Append(m_progressIndex);
             h.Append(m_progressCount);
-            h.Append(m_screenFade);
+            if (m_postMaterial == null) h.Append(m_screenFade); // 後処理があればフェードは後処理だけ（LateUpdate）
             h.Append(ref m_bookPose);
             h.Append((int)m_paperFinish);
             h.Append(m_hasLightDirection ? 1 : 0);
@@ -965,7 +2164,19 @@ namespace hatake
         // アプリが裏から戻ると RenderTexture の中身が消えることがあるので描き直す
         private void OnApplicationPause(bool paused)
         {
-            if (!paused) MarkDirty();
+            if (paused) return;
+            MarkDirty();
+            // RenderTexture の中身が消えていることがあるので、焼き込み・静止画をすべて作り直させる
+            m_paperLutSignature = new Hash128();
+            m_targetHoldsIdle = null;
+            m_hasEverDrawn = false;
+            m_progressActive = false;
+            m_progressPending = false;
+            m_turnCacheValid = false;
+            m_coverCacheValid = false;
+            m_coverPreStep = -1;
+            m_dimBaseValid = false;
+            m_effectCacheSerial = -1;
         }
 
         private void OnValidate() => MarkDirty();
@@ -994,7 +2205,7 @@ namespace hatake
         private void RenderPost()
         {
             Material post = m_postMaterial;
-            RenderTexture source = m_compositeTexture;
+            RenderTexture source = m_postSource != null ? m_postSource : m_compositeTexture;
             RenderTextureFormat format = HdrFormat;
             int width = Mathf.Max(1, source.width / 2);
             int height = Mathf.Max(1, source.height / 2);
@@ -1058,7 +2269,15 @@ namespace hatake
             post.SetFloat(s_dimBlur, blurFlag ? m_dimBlur : 0f);
             post.SetFloat(s_tonemap, m_tonemap && !m_hdrOutput ? 1f : 0f);
             post.SetFloat(s_exposure, m_exposure);
-            Graphics.Blit(source, m_outputTexture, post, PassComposite);
+            if (m_postRect is Rect postRect)
+            {
+                // 合成が変わった範囲だけ（Bloom は全体から求め直している）。Bloom の広がりの分だけ少し広げる
+                post.SetTexture(s_mainTex, source);
+                Rect grown = Rect.MinMaxRect(Mathf.Max(0f, postRect.xMin - 0.04f), Mathf.Max(0f, postRect.yMin - 0.06f),
+                                             Mathf.Min(1f, postRect.xMax + 0.04f), Mathf.Min(1f, postRect.yMax + 0.06f));
+                DrawRect(post, PassComposite, m_outputTexture, grown);
+            }
+            else Graphics.Blit(source, m_outputTexture, post, PassComposite);
 
             if (bloom != null) RenderTexture.ReleaseTemporary(bloom);
             if (blur != null) RenderTexture.ReleaseTemporary(blur);
@@ -1169,6 +2388,7 @@ namespace hatake
             material.SetVectorArray(s_spots, m_spotData);
             material.SetVectorArray(s_spotParams, m_spotParamData);
             if (m_hasLightDirection) material.SetVector(s_lightDir, m_lightDirection);
+            ApplyPoseLighting(material);
             if (m_postMaterial != null)
             {
                 // 暗転ぼかしのスポット判定に使う
@@ -1193,6 +2413,7 @@ namespace hatake
                 material.SetColor(s_paperTint, m_basePaperTint);
                 material.SetFloat(s_magicStrength, m_baseMagicStrength);
             }
+            CompareOverride?.Invoke(material);
         }
 
         // 縮小表示でのちらつき対策：出力でのページの画素数から、撮影テクスチャ・表紙の絵を読むミップの段と、
@@ -1293,6 +2514,31 @@ namespace hatake
         {
             if (m_runtimeMaterial != null) ReleaseObject(m_runtimeMaterial);
             if (m_postMaterial != null) ReleaseObject(m_postMaterial);
+            ReleasePaperLut();
+            if (m_turnCache != null) { m_turnCache.Release(); ReleaseObject(m_turnCache); m_turnCache = null; }
+            if (m_turnDest != null) { m_turnDest.Release(); ReleaseObject(m_turnDest); m_turnDest = null; }
+            if (m_turnDestLow != null) { m_turnDestLow.Release(); ReleaseObject(m_turnDestLow); m_turnDestLow = null; }
+            if (m_dimBase != null) { m_dimBase.Release(); ReleaseObject(m_dimBase); m_dimBase = null; }
+            if (m_coverCur != null) { m_coverCur.Release(); ReleaseObject(m_coverCur); m_coverCur = null; }
+            if (m_animTexture != null) { m_animTexture.Release(); ReleaseObject(m_animTexture); m_animTexture = null; }
+            if (m_coverDest != null) { m_coverDest.Release(); ReleaseObject(m_coverDest); m_coverDest = null; }
+            if (m_stripBase != null) { m_stripBase.Release(); ReleaseObject(m_stripBase); m_stripBase = null; }
+            if (m_coverPre != null) { m_coverPre.Release(); ReleaseObject(m_coverPre); m_coverPre = null; }
+            if (m_stripBaseLow != null) { m_stripBaseLow.Release(); ReleaseObject(m_stripBaseLow); m_stripBaseLow = null; }
+            if (m_coverDestLow != null) { m_coverDestLow.Release(); ReleaseObject(m_coverDestLow); m_coverDestLow = null; }
+            if (m_syncTexture != null) { m_syncTexture.Release(); ReleaseObject(m_syncTexture); m_syncTexture = null; }
+            if (m_syncReadback != null) { ReleaseObject(m_syncReadback); m_syncReadback = null; }
+            if (m_fxLut != null) { m_fxLut.Release(); ReleaseObject(m_fxLut); m_fxLut = null; }
+            m_fxQuads?.Release();
+            m_fxQuads = null;
+            if (m_progressBase != null) { m_progressBase.Release(); ReleaseObject(m_progressBase); m_progressBase = null; }
+            if (m_progressBuffer != null) { m_progressBuffer.Release(); ReleaseObject(m_progressBuffer); m_progressBuffer = null; }
+            if (m_coverBaseTexture != null)
+            {
+                m_coverBaseTexture.Release();
+                ReleaseObject(m_coverBaseTexture);
+                m_coverBaseTexture = null;
+            }
             if (m_compositeTexture != null)
             {
                 m_compositeTexture.Release();
