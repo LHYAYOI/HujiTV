@@ -12,7 +12,7 @@ Shader "Hidden/Book/Page Flip Post"
     #include "BookFlipCore.cginc"
     #include "BookFlipLook.cginc"
 
-    sampler2D_float _MainTex, _HigherTex, _BloomTex, _BlurTex;
+    sampler2D _MainTex, _HigherTex, _BloomTex, _BlurTex;
     float4 _MainTex_TexelSize;
     float4 _BloomThreshold;   // x 閾値, y ニー, z 上限, w 散乱（上位レベルへの足し込み）
     float4 _BloomTint;        // rgb 色, a 強さ
@@ -30,7 +30,7 @@ Shader "Hidden/Book/Page Flip Post"
         return output;
     }
 
-    float4 Tap(sampler2D_float tex, float2 uv) { return tex2Dlod(tex, float4(uv, 0, 0)); }
+    float4 Tap(sampler2D tex, float2 uv) { return tex2Dlod(tex, float4(uv, 0, 0)); }
 
     // 縮小（Dual filter）：中央と斜め4点。spread は斜めの点のずれ（元の画素の何個分か）
     float4 DownSpread(float2 uv, float spread)
