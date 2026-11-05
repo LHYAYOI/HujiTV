@@ -20,21 +20,6 @@ public class SwarmGhostEvent : MonoBehaviour
     // スプラインのサンプリング数
     private const int SAMPLE_COUNT = 200;
 
-    // 現在出現している群れお化け
-    private List<GameObject> m_activeSwarmGhostList =
-        new List<GameObject>();
-
-    // 現在出現している群れお化けの位置
-    private List<Transform> m_activeSpawnPositions =
-        new List<Transform>();
-
-    // まだ出現に使用していない位置
-    private List<Transform> m_availableSpawnPositions =
-        new List<Transform>();
-
-    // 出現処理が重複して実行されるのを防ぐ
-    private bool m_isSpawningFlag = false;
-
     // スプラインの位置・距離テーブル
     private Vector3[] m_samplePositions;
     private float[] m_distanceTable;

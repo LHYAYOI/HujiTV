@@ -49,8 +49,6 @@ public class SwarmGhost : MonoBehaviour
     [Header("モデル単位のマテリアルブレンド")]
     [SerializeField] private TeamToonMaterialBlend m_toonMaterialBlend;
 
-    [Header("マテリアルブレンドの時間")]
-    [SerializeField] private float m_toonMaterialBlendDuration = 1.0f;
 
 
     private Transform m_target; // プレイヤーのTransformを保持する変数

@@ -233,7 +233,6 @@ GameObject:
   - component: {fileID: 6245974616321919482}
   - component: {fileID: 8220278082892588881}
   - component: {fileID: 3094736607704599665}
-  - component: {fileID: 2251703587046052770}
   m_Layer: 0
   m_Name: ghost_mini_mdl
   m_TagString: Untagged
@@ -268,7 +267,7 @@ Animator:
   m_GameObject: {fileID: 1331158841025864762}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 123054beb99cc8941818bab32c875d1e, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -324,24 +323,6 @@ MonoBehaviour:
   externalVelocity: {x: 0, y: 0, z: 0}
   teleportDistance: 5
   boundsPadding: 0.5
---- !u!114 &2251703587046052770
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1331158841025864762}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 234324c925ad3e74eb03c1093ce95383, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TeamToon.TeamToonMaterialBlend
-  materialA: {fileID: 2100000, guid: 05510b609de88804ba50b9dc375d8738, type: 2}
-  materialB: {fileID: 2100000, guid: 9f17ab9e8654b28488552376e9bb9570, type: 2}
-  blend: 0.1
-  renderers:
-  - {fileID: 3526129125911758560}
-  - {fileID: 1886325630481110434}
 --- !u!1 &1449367721700675259
 GameObject:
   m_ObjectHideFlags: 0
@@ -462,7 +443,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9f17ab9e8654b28488552376e9bb9570, type: 2}
+  - {fileID: 2100000, guid: 05510b609de88804ba50b9dc375d8738, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1328,7 +1309,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a76f3627213218747ba40d05806de7ad, type: 2}
+  - {fileID: 2100000, guid: 178f964934ac9a141a2efa372f1d5e7c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1487,7 +1468,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9f17ab9e8654b28488552376e9bb9570, type: 2}
+  - {fileID: 2100000, guid: 05510b609de88804ba50b9dc375d8738, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1577,6 +1558,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2490089116785457613}
   - component: {fileID: 2397781350887678958}
+  - component: {fileID: 3646695538162719989}
   m_Layer: 0
   m_Name: OyoguSwarmGhostC
   m_TagString: Untagged
@@ -1594,7 +1576,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.040803637, y: -0.03222086, z: 0.0013165101, w: 0.9986467}
   m_LocalPosition: {x: 0.8623291, y: 0.9203906, z: -62.286118}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6245974616321919482}
@@ -1610,7 +1592,7 @@ Animator:
   m_GameObject: {fileID: 7530868106357607163}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: e713d76fea11b41479f805277e9d6761, type: 2}
+  m_Controller: {fileID: 9100000, guid: 70d1c46a3759e084a8d66da94a5ef729, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1622,6 +1604,21 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &3646695538162719989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7530868106357607163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64164d4a9036d4644a903b4f8e8de816, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OyoguSwarmGhost
+  m_parentAnimator: {fileID: 2397781350887678958}
+  m_deadAnimator: {fileID: 8220278082892588881}
+  m_shrinkDuration: 2
 --- !u!1 &7872315941357969217
 GameObject:
   m_ObjectHideFlags: 0

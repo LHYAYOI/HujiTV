@@ -1415,7 +1415,7 @@ MonoBehaviour:
   - {fileID: 2490089116785457613, guid: 041fda8a431249b448964b0409cf1fd1, type: 3}
   - {fileID: 2490089116785457613, guid: 48a28f93377bbbd4f892036d513b6488, type: 3}
   - {fileID: 2490089116785457613, guid: a8db84c7e5156ba4bb2475e500388767, type: 3}
-  m_spawnCount: 100
+  m_spawnCount: 150
   m_spawnInterval: 0.05
   m_distanceMinMax: {x: 0.5, y: 2}
   m_speedMinMax: {x: 3, y: 2}
@@ -14830,7 +14830,7 @@ GameObject:
   - component: {fileID: 1912110867}
   - component: {fileID: 1912110866}
   m_Layer: 0
-  m_Name: Spline (1)
+  m_Name: SwarmGhostEventSpline
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

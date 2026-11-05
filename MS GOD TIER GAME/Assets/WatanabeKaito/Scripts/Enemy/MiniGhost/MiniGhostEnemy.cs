@@ -15,9 +15,6 @@ public enum MINI_GHOST_STATE_TYPE // ミニお化けのステートタイプ
 
 public class MiniGhostEnemy : SplineMoveEnemy
 {
-    [Header("制限時間")]
-    [SerializeField] private float m_timeLimit = 15.0f;
-
     [Header("蹴りの弾の発射位置")]
     [SerializeField] private Transform m_kickFirePoint;
 

@@ -26,13 +26,13 @@ public class GroupLeader : MonoBehaviour
     [Header("目的地の手前で停止する距離")]
     [SerializeField] private float m_stopDistance = 0.1f;
 
-    // 現在出現している群れお化け
-    private List<GameObject> m_activeSwarmGhostList = new List<GameObject>();
-
-    // 出現処理が重複して実行されるのを防ぐ
-    private bool m_isSpawningFlag = false;
+    private List<GameObject> m_activeSwarmGhostList = new List<GameObject>(); // 現在出現している群れお化け
+    
+    private bool m_isSpawningFlag = false; // 出現処理が重複して実行されるのを防ぐ
 
     private bool m_isFollowingLeader = true; // リーダーを追従するかどうか
+
+    private bool m_isDead = false; // 死亡フラグ
 
     // 個体ごとの移動情報
     private class ChildData
@@ -62,6 +62,11 @@ public class GroupLeader : MonoBehaviour
 
     private void Update()
     {
+        if (m_isDead)
+        {
+            return;
+        }
+
         // 生成したお化けを移動させる
         foreach (ChildData child in m_childData)
         {
@@ -71,7 +76,7 @@ public class GroupLeader : MonoBehaviour
         if (Keyboard.current != null &&
             Keyboard.current.sKey.wasPressedThisFrame)
         {
-            ReleaseSwarmGhosts();
+            RemoveAllOyoguSwarmGhosts();
         }
     }
 
@@ -234,6 +239,25 @@ public class GroupLeader : MonoBehaviour
         }
 
         m_isSpawningFlag = false;
+    }
+
+    // すべての群れお化けを削除する
+    public void RemoveAllOyoguSwarmGhosts()
+    {
+        m_isDead = true;
+
+        for (int i = 0; i < m_activeSwarmGhostList.Count; i++)
+        {
+            OyoguSwarmGhost swarmGhost = m_activeSwarmGhostList[i].GetComponent<OyoguSwarmGhost>();
+
+            if (swarmGhost != null)
+            {
+                swarmGhost.DeadAnimation();
+            }
+        }
+
+        // お化けと出現位置の管理リストをクリア
+        m_activeSwarmGhostList.Clear();
     }
 
     // 群れお化けのリーダーへの追従を解除する
