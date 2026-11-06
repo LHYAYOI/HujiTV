@@ -5,14 +5,13 @@ using UnityEngine.UI;
 public class LockOnTargetController : MonoBehaviour
 {
     [SerializeField] Image m_targetImage;
-
-    [SerializeField] private StateMachine m_stateMachine;
-
-    [SerializeField] GameObject m_target;
+    [SerializeField] TargetableObject m_target;
 
     [SerializeField] float m_defaultRotateSpeed = 45f;
     [SerializeField] Vector2 m_defaultScale;
     [SerializeField] Color m_defaultColor;
+
+    Coroutine m_currentCoroutine;
 
     float m_rotateSpeed;
 
@@ -20,6 +19,8 @@ public class LockOnTargetController : MonoBehaviour
     {
         //ターゲットを追従
         UpdateTargetImagePosition();
+
+        //常に回転させる
         UpdateTargetImageRotation();
 
         if (Input.GetKeyDown(KeyCode.K)) 
@@ -38,17 +39,7 @@ public class LockOnTargetController : MonoBehaviour
         }
     }
 
-    public void ChangeState(string stateName)
-    {
-        if (m_stateMachine == null)
-        {
-            return;
-        }
-
-        m_stateMachine.ChangeState(stateName);
-    }
-
-    public void SetTarget(GameObject target)
+    public void SetTarget(TargetableObject target)
     {
         m_target = target;
     }
@@ -76,17 +67,32 @@ public class LockOnTargetController : MonoBehaviour
 
     public void AppearTargetUI() 
     {
-        StartCoroutine(AppearRoutine(0.3f));
+        if(m_currentCoroutine != null)
+        {
+            StopCoroutine(m_currentCoroutine);
+        }
+
+        m_currentCoroutine = StartCoroutine(AppearRoutine(0.3f));
     }
 
     public void CancelTargetUI() 
     {
-        StartCoroutine(CancellationRoutine(0.3f));
+        if (m_currentCoroutine != null)
+        {
+            StopCoroutine(m_currentCoroutine);
+        }
+
+        m_currentCoroutine = StartCoroutine(CancellationRoutine(0.3f));
     }
 
     public void SelectedTargetUI() 
     {
-        StartCoroutine(SelectedRoutine(0.3f));
+        if (m_currentCoroutine != null)
+        {
+            StopCoroutine(m_currentCoroutine);
+        }
+
+        m_currentCoroutine = StartCoroutine(SelectedRoutine(0.3f));
     }
 
     private IEnumerator AppearRoutine(float duration) 
