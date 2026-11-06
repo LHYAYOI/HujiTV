@@ -9,6 +9,8 @@ using UnityEngine;
 [ExecuteAlways]
 public class TargetSelector : MonoBehaviour
 {
+    public static TargetSelector Instance { get; private set; }
+
     [Serializable]
     private struct SelectAreaData 
     {
@@ -41,9 +43,51 @@ public class TargetSelector : MonoBehaviour
 
     [SerializeField] List<SelectAreaData> m_selectAreaDataList; 
 
+    List<TargetableObject> m_allTargetList = new List<TargetableObject>();
     List<TargetInfo> m_targetList = new List<TargetInfo>();
 
     TargetInfo[] m_targetArray = new TargetInfo[3];
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    private void Update()
+    {
+        //狙えるターゲットがあるならUIを表示する
+        SortTargets();
+    }
+
+    public void RegisterTarget(TargetableObject targetable)
+    {
+        if (targetable == null) 
+        {
+            return;
+        }
+
+        if (m_allTargetList.Contains(targetable)) 
+        {
+            return;
+        }
+
+        m_allTargetList.Add(targetable);
+    }
+
+    public void UnregisterTarget(TargetableObject targetable)
+    {
+        if (targetable == null)
+        {
+            return;
+        }
+
+        if (!m_allTargetList.Contains(targetable))
+        {
+            return;
+        }
+
+        m_allTargetList.Remove(targetable);
+    }
 
     public void SortTargets() 
     {
@@ -53,7 +97,6 @@ public class TargetSelector : MonoBehaviour
         CheckIfAddToTargetList();
 
         //ターゲットを配列に割り当てる
-
         bool assignAllFlag = m_targetList.Count == 3;
 
         if (assignAllFlag)
@@ -172,9 +215,7 @@ public class TargetSelector : MonoBehaviour
 
     private void CheckIfAddToTargetList() 
     {
-        TargetableObject[] targets = FindObjectsByType<TargetableObject>(FindObjectsSortMode.None);
-
-        foreach (TargetableObject target in targets)
+        foreach (TargetableObject target in m_allTargetList)
         {
             if (target == null)
             {
