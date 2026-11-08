@@ -39,6 +39,14 @@ public class LockOnTargetController : MonoBehaviour
         }
     }
 
+    public void Init()
+    {
+        m_targetImage.transform.localScale = m_defaultScale;
+        m_targetImage.color = new Color(1, 1, 1, 0);
+        m_rotateSpeed = m_defaultRotateSpeed;
+        m_target = null;
+    }
+
     public void SetTarget(TargetableObject target)
     {
         m_target = target;
