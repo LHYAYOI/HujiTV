@@ -284,6 +284,15 @@ public class SwarmGhostManager : MonoBehaviour
         m_currentHealth = health;
     }
 
+    public int GetCurrentHealth()
+    {
+        return m_currentHealth;
+    }
+
+    public int GetMaxHealth()
+    {
+        return m_swarmGhostData.m_maxHealth;
+    }
 
     private void OnTriggerEnter(Collider collision)
     {

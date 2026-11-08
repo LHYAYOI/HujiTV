@@ -53,60 +53,87 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
         m_conductorGhost.RemoveAllSwarmGhosts();
     }
 
-    private void OnTriggerEnter(Collider collision)
+    public void OnChestHit()
     {
-        if (collision.gameObject.CompareTag("MagicBullet"))
+
+    }
+
+    // MagicBulletが当たったときの処理
+    private void HandleMagicBulletHit(Collider collision, bool isUpperDrawer)
+    {
+        if (!m_battleStartFlag)
         {
-            if(m_conductorGhost.GetIsVisibleFlag() || !m_battleStartFlag)
+            return;
+        }
+
+        HitReceiverController hitReceiver = collision.gameObject.GetComponent<HitReceiverController>();
+
+        if (hitReceiver != null)
+        {
+            HitData hitData = new HitData();
+
+            hitData.SetHitObject(this.gameObject);
+
+            MagicData magicData = collision.gameObject.GetComponent<MagicBulletController>()?.GetMagicData();
+
+            hitData.SetMagicData(magicData);
+
+            hitReceiver.OnHit(hitData);
+
+            if (magicData != null)
             {
-                return;
-            }
+                TryReceiveEventMagic(magicData.EventMagicType);
 
-            HitReceiverController hitReceiver = collision.gameObject.GetComponent<HitReceiverController>();
-
-            if (hitReceiver != null)
-            {
-                HitData hitData = new HitData();
-
-                hitData.SetHitObject(this.gameObject);
-
-                MagicData magicData = collision.gameObject.GetComponent<MagicBulletController>()?.GetMagicData();
-
-                hitData.SetMagicData(magicData);
-
-                hitReceiver.OnHit(hitData);
-
-                if (magicData != null)
+                if (magicData.EventMagicType == EVENT_MAGIC_TYPE.CLOSE)
                 {
-                    TryReceiveEventMagic(magicData.EventMagicType);
+                    // 引き出しごとに異なる処理を追加する場合
+                    if (isUpperDrawer)
+                    {
+                        // 上の引き出しの処理
+                        StartCoroutine(m_conductorGhost.LockUpperChest());
+                    }
+                    else
+                    {
+                        // 下の引き出しの処理
+                        StartCoroutine(m_conductorGhost.LockLowerChest());
+                    }
+
                 }
             }
-
-            
         }
+
+        
     }
 
     public bool TryReceiveEventMagic(EVENT_MAGIC_TYPE eventMagicType)
     {
         if (eventMagicType == EVENT_MAGIC_TYPE.CLOSE)
         {
-            m_currentHealth--;
-
-            if (m_currentHealth == 1)
-            {
-                // 上の引き出しから閉める
-                m_conductorGhost.SetUpperDrawerLockedFlag(true);
-                StartCoroutine(m_conductorGhost.LockUpperChest());
-
-            }
-            else if (m_currentHealth <= 0)
-            {
-                // 下の引き出しを閉める
-                m_conductorGhost.SetLowerDrawerLockedFlag(true);
-                StartCoroutine(m_conductorGhost.LockLowerChest());
-            }
+            
         }
-        
+
         return false;
     }
+
+    // 上の引き出しに当たった場合
+    public void OnUpperDrawerHit(Collider collision)
+    {
+        if(!m_conductorGhost.GetIsUpperVisibleFlag())
+        {
+            // 上の引き出しが開いている場合のみ処理を行う
+            HandleMagicBulletHit(collision, true);
+        }
+    }
+
+    // 下の引き出しに当たった場合
+    public void OnLowerDrawerHit(Collider collision)
+    {
+        if(!m_conductorGhost.GetIsLowerVisibleFlag())
+        {
+            // 下の引き出しが開いている場合のみ処理を行う
+            HandleMagicBulletHit(collision, false);
+        }
+    }
+
+    
 }
