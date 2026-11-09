@@ -49,8 +49,6 @@ public class SwarmGhost : MonoBehaviour
     [Header("モデル単位のマテリアルブレンド")]
     [SerializeField] private TeamToonMaterialBlend m_toonMaterialBlend;
 
-    [Header("マテリアルブレンドの時間")]
-    [SerializeField] private float m_toonMaterialBlendDuration = 1.0f;
 
 
     private Transform m_target; // プレイヤーのTransformを保持する変数
@@ -69,6 +67,8 @@ public class SwarmGhost : MonoBehaviour
     private Vector3 m_initialPosition; // 初期位置を保存
 
     private bool m_isChargingFlag = false; // 突撃中フラグ
+
+    private bool m_turnToPlayerFlag = true; // プレイヤーの方向を向くフラグ
 
     private void Awake()
     {
@@ -97,7 +97,10 @@ public class SwarmGhost : MonoBehaviour
 
         if(!m_isChargingFlag)
         {
-           TurnToPlayer();
+            if (m_turnToPlayerFlag)
+            {
+                TurnToPlayer();
+            }
         }
     }
 
@@ -576,5 +579,10 @@ public class SwarmGhost : MonoBehaviour
 
         // パーティクルのサイズを半分にする
         m_spawnedDeathParticle.transform.localScale *= 0.5f;
+    }
+
+    public void SetTurnToPlayerFlag(bool flag)
+    {
+        m_turnToPlayerFlag = flag;
     }
 }

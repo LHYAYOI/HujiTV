@@ -10,6 +10,8 @@ public class MiniGhostSpawnState : MiniGhostState
     private Vector3 m_spawnTargetPos;   // スプライン上の出現位置
     private float m_spawnTimer;         // スプラインまでの移動時間の経過時間
 
+    [SerializeField] private float m_materialBlend = 1.0f; // マテリアルのブレンド値
+
     public override void EnterState()
     {
         m_spawnTimer = 0f;
@@ -67,7 +69,7 @@ public class MiniGhostSpawnState : MiniGhostState
     public override void ExitState()
     {
         // 透明から元のマテリアルに戻す
-        StartCoroutine(m_owner.SwitchMaterialBlendCoroutine(1, 0));
+        StartCoroutine(m_owner.SwitchMaterialBlendCoroutine(1, m_materialBlend));
     }
 
     
