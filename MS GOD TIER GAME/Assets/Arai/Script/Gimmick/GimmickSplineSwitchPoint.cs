@@ -16,7 +16,7 @@ public class GimmickSplineSwitchPoint : GimmickSpline
     // ―――――――――――――――――――――――――――――――――――――
     // Public Propaty
     // ―――――――――――――――――――――――――――――――――――――
-    public SplineController2 TargetSplineController { get { return m_targetSplineController; } }    
+    public SplineController2 TargetSplineController { get { return m_targetSplineController; } set { m_targetSplineController = value; } }    
     public SplineContainer TargetSpline { get { return m_targetSplineController?.Spline; } }
     public float SwitchOffset { get { return m_switchOffset; } }
 
