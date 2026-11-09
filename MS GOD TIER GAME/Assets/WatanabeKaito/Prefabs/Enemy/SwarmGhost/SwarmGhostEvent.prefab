@@ -1,0 +1,107 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7182638262107137001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 458357919405558988}
+  m_Layer: 0
+  m_Name: SwarmGhostEvent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &458357919405558988
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7182638262107137001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.072886, y: 0.64, z: -68.64803}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1057335739726271989}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7736310232422668931
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1057335739726271989}
+  - component: {fileID: 6506663233193547700}
+  - component: {fileID: 8255955109124711156}
+  m_Layer: 0
+  m_Name: Leader
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1057335739726271989
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7736310232422668931}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 458357919405558988}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6506663233193547700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7736310232422668931}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5eacc20af3e1ed41a23ab2e4c3c718b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GroupLeader
+  m_swarmGhostPrefabs:
+  - {fileID: 2490089116785457613, guid: 00911b7afe2cb0848ae073bf5b2cd6df, type: 3}
+  - {fileID: 2490089116785457613, guid: 5cff879c055e8a24e8844f67f47411b1, type: 3}
+  - {fileID: 2490089116785457613, guid: 041fda8a431249b448964b0409cf1fd1, type: 3}
+  - {fileID: 2490089116785457613, guid: 48a28f93377bbbd4f892036d513b6488, type: 3}
+  - {fileID: 2490089116785457613, guid: a8db84c7e5156ba4bb2475e500388767, type: 3}
+  m_spawnCount: 150
+  m_spawnInterval: 0.05
+  m_distanceMinMax: {x: 0.5, y: 2}
+  m_speedMinMax: {x: 3, y: 2}
+  m_rotateSpeedMinMax: {x: 60, y: 180}
+  m_stopDistance: 0.1
+--- !u!114 &8255955109124711156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7736310232422668931}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a39724d36af61e249b840338890c02d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SwarmGhostEvent
+  m_splineContainer: {fileID: 0}
+  m_moveSpeed: 3
+  m_loopFlag: 0
+  m_rotationOffset: {x: 0, y: 0, z: 0}
