@@ -1,24 +1,43 @@
-﻿using UnityEngine;
+﻿using hatake;
+using System.Collections;
+using UnityEngine;
 
-public class ChandelierController : MonoBehaviour
+public class ChandelierController : TargetableObject
 {
+    [SerializeField] GroupLeader m_groupLeader;
+    [SerializeField] ChandelierImpactEffect m_effect;
+    [SerializeField] ChandelierBreakable m_chandelierBreakable;
+    [SerializeField] ShakeObject m_shakeObject;
     [SerializeField] Rigidbody m_rigidbody;
+
+    [SerializeField] float m_shakeIntensity = 1.0f;
+    [SerializeField] float m_shakeDuration = 1.0f;
+
+    private void Start()
+    {
+        m_chandelierBreakable.SetEffect(m_effect);
+    }
 
     public void HitProcess(HitData data) 
     {
         if (data.GetHitObject.CompareTag("MagicBullet")) 
         {
-            m_rigidbody.isKinematic = false;
-            m_rigidbody.useGravity = true;
+            StartCoroutine(FallRoutine());
         }
 
         if (data.GetHitObject.CompareTag("Floor")) 
         {
-            CameraManager.Instance.ShakeCameraInVHF(2.0f, 1.0f, 1.0f, 3.0f);
-
-            CameraManager.Instance.ChangeCameraFOV010(3.0f, 70);
-
-            Debug.Log("Chandelier hit the floor");
+            m_groupLeader.RemoveAllOyoguSwarmGhosts();
         }
+    }
+
+    private IEnumerator FallRoutine() 
+    {
+        yield return m_shakeObject.ShakeCoroutine(m_shakeDuration, m_shakeIntensity);
+
+        m_rigidbody.isKinematic = false;
+        m_rigidbody.useGravity = true;
+
+        m_chandelierBreakable.Drop();
     }
 }

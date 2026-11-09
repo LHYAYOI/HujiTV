@@ -8,6 +8,7 @@ TagManager:
   - MagicBullet
   - Target
   - Floor
+  - Chandelier
   layers:
   - Default
   - TransparentFX
@@ -21,7 +22,7 @@ TagManager:
   - Trolley
   - MagicBullet
   - HitCollider
-  - 
+  - Breakable
   - 
   - 
   - 
