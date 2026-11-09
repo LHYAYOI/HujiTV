@@ -2,7 +2,7 @@
 
 public class TargetableObject : MonoBehaviour
 {
-    protected bool m_IsTargetableFlag = true;
+    [SerializeField] protected bool m_IsTargetableFlag = true;
 
     private void OnEnable()
     {

@@ -5,11 +5,11 @@ using UnityEngine.UI;
 public class LockOnTargetController : MonoBehaviour
 {
     [SerializeField] Image m_targetImage;
-    [SerializeField] TargetableObject m_target;
-
     [SerializeField] float m_defaultRotateSpeed = 45f;
     [SerializeField] Vector2 m_defaultScale;
     [SerializeField] Color m_defaultColor;
+
+    TargetableObject m_target;
 
     Coroutine m_currentCoroutine;
 
@@ -22,21 +22,6 @@ public class LockOnTargetController : MonoBehaviour
 
         //常に回転させる
         UpdateTargetImageRotation();
-
-        if (Input.GetKeyDown(KeyCode.K)) 
-        {
-            AppearTargetUI();
-        }
-
-        if (Input.GetKeyDown(KeyCode.J))
-        {
-            CancelTargetUI();
-        }
-
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-            SelectedTargetUI();
-        }
     }
 
     public void Init()
@@ -50,6 +35,11 @@ public class LockOnTargetController : MonoBehaviour
     public void SetTarget(TargetableObject target)
     {
         m_target = target;
+    }
+
+    public TargetableObject GetTarget() 
+    {
+        return m_target;
     }
 
     private void UpdateTargetImagePosition()

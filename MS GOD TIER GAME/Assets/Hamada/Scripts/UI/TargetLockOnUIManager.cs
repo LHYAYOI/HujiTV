@@ -70,6 +70,11 @@ public class TargetLockOnUIManager : MonoBehaviour
 
             GameObject previousTargetObj = m_previousTargets[dir];
 
+            if (uiController.GetTarget() == currentTargetable) 
+            {
+                continue;
+            }
+
             //状態の変化を検知して制御
             if (previousTargetObj == null && currentTargetObj != null)
             {
