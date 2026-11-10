@@ -1,8 +1,24 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class TargetableObject : MonoBehaviour
 {
-    protected bool m_IsTargetableFlag = true;
+    [SerializeField] protected bool m_IsTargetableFlag = true;
+
+    private void OnEnable()
+    {
+        if (TargetSelector.Instance != null) 
+        {
+            TargetSelector.Instance.RegisterTarget(this);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (TargetSelector.Instance != null)
+        {
+            TargetSelector.Instance.UnregisterTarget(this);
+        }
+    }
 
     public void SetTargetable(bool value)
     {

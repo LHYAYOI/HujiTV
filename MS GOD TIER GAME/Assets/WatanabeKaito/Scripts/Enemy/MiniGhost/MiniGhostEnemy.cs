@@ -36,6 +36,9 @@ public class MiniGhostEnemy : SplineMoveEnemy
     [Header("マテリアルブレンドの時間")]
     [SerializeField] private float m_toonMaterialBlendDuration = 1.0f;
 
+    [Header("ミニお化けのTargetable")]
+    [SerializeField] private TargetableObject m_targetableObject;
+
     private MiniGhostIdleState m_idleState;     // 待機ステート
     private MiniGhostSpawnState m_spawnState;   // 出現ステート
     private MiniGhostMoveState m_moveState;     // 移動ステート
@@ -290,6 +293,12 @@ public class MiniGhostEnemy : SplineMoveEnemy
     public float GetToonMaterialBlendDuration()
     {
         return m_toonMaterialBlendDuration;
+    }
+
+    // ミニお化けのTargetableを取得する
+    public TargetableObject GetTargetableObject()
+    {
+        return m_targetableObject;
     }
 
 

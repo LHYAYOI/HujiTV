@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-public class SwarmGhostManager : MonoBehaviour
+public class SwarmGhostManager : TargetableObject
 {
     [Header("群れお化けのデータ")]
     [SerializeField] private EnemyData m_swarmGhostData;
@@ -41,6 +40,8 @@ public class SwarmGhostManager : MonoBehaviour
     private void Start()
     {
         m_currentHealth = m_swarmGhostData.m_maxHealth;
+
+        m_IsTargetableFlag = false;
     }
 
     private void Update()
@@ -63,6 +64,7 @@ public class SwarmGhostManager : MonoBehaviour
             {
                 AttackAllSwarmGhosts();
                 m_isAttackingFlag = true;
+                m_IsTargetableFlag = false;
             }
         }
 
@@ -81,6 +83,7 @@ public class SwarmGhostManager : MonoBehaviour
             }
             if (allFinished)
             {
+                m_IsTargetableFlag = true;
                 m_isAttackingFlag = false;
                 m_attackTimer = 0.0f; // タイマーをリセット
             }
@@ -103,6 +106,8 @@ public class SwarmGhostManager : MonoBehaviour
     // 群れお化けを時間差で出現させる
     public IEnumerator SpawnAllSwarmGhostCoroutine()
     {
+        m_IsTargetableFlag = true;
+
         // 体力を最大値に設定
         SetCurrentHealth(m_swarmGhostData.m_maxHealth);
 
@@ -277,6 +282,8 @@ public class SwarmGhostManager : MonoBehaviour
         m_availableSpawnPositions.Clear();
 
         m_isActiveFlag = false;
+
+        m_IsTargetableFlag = false;
     }
 
     public void SetCurrentHealth(int health)
@@ -284,6 +291,15 @@ public class SwarmGhostManager : MonoBehaviour
         m_currentHealth = health;
     }
 
+    public int GetCurrentHealth()
+    {
+        return m_currentHealth;
+    }
+
+    public int GetMaxHealth()
+    {
+        return m_swarmGhostData.m_maxHealth;
+    }
 
     private void OnTriggerEnter(Collider collision)
     {

@@ -61,7 +61,7 @@ public class MiniGhostSpawnState : MiniGhostState
             m_owner.transform.position = m_spawnTargetPos;
             m_owner.SetDistanceTraveled(0f);
 
-            m_owner.ChangeState(MINI_GHOST_STATE_TYPE.IDLE);
+            m_owner.ChangeState(MINI_GHOST_STATE_TYPE.MOVE);
         }
 
     }
@@ -70,6 +70,8 @@ public class MiniGhostSpawnState : MiniGhostState
     {
         // “§–¾‚©‚çŒ³‚Ìƒ}ƒeƒŠƒAƒ‹‚É–ß‚·
         StartCoroutine(m_owner.SwitchMaterialBlendCoroutine(1, m_materialBlend));
+
+        m_owner.GetTargetableObject().SetTargetable(true);
     }
 
     

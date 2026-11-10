@@ -16,11 +16,6 @@ public class TargetHitUIManager : MonoBehaviour
         CreateUIs();
     }
 
-    private void Update()
-    {
-        
-    }
-
     private void CreateUIs() 
     {
         for (int i = 0; i < m_poolNum; i++) 
