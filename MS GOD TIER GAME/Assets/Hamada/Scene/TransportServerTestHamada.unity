@@ -149,6 +149,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2723047527836766935, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
+      propertyPath: m_lockOnUIManager
+      value: 
+      objectReference: {fileID: 371206898}
+    - target: {fileID: 2723047527836766935, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
       propertyPath: m_bulletSpawnPoint
       value: 
       objectReference: {fileID: 1881704420}
@@ -478,7 +482,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &568092639
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -611,17 +615,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TargetableObject
   m_IsTargetableFlag: 1
---- !u!114 &682908284 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3243614378388835543, guid: bb73fe1e7c44b8444bd4e3eac0b93414, type: 3}
-  m_PrefabInstance: {fileID: 4588339492236961774}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: febb0cbbb592f664ebf6d92028f0e598, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
 --- !u!1 &851144263
 GameObject:
   m_ObjectHideFlags: 0
@@ -708,17 +701,6 @@ Transform:
   - {fileID: 1428018234}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &876460682 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3764981811928448408, guid: bb73fe1e7c44b8444bd4e3eac0b93414, type: 3}
-  m_PrefabInstance: {fileID: 4588339492236961774}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: febb0cbbb592f664ebf6d92028f0e598, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
 --- !u!114 &933808866 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1715315696896216547, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
@@ -741,17 +723,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c9c7d274f3e9ff48a27234781c33d32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BookNetworkServer
---- !u!114 &987504546 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 79999425887721019, guid: bb73fe1e7c44b8444bd4e3eac0b93414, type: 3}
-  m_PrefabInstance: {fileID: 4588339492236961774}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: febb0cbbb592f664ebf6d92028f0e598, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
 --- !u!114 &1007278231 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2723047527836766935, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
@@ -783,7 +754,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1035992087
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1006,7 +977,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1078199874
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1802,22 +1773,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1715315696896216547, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
-      propertyPath: m_drawDebugArea
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1715315696896216547, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
-      propertyPath: m_selectAreaDataList.Array.data[1].m_hasDualityFlag
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1715315696896216547, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
-      propertyPath: m_selectAreaDataList.Array.data[3].m_hasDualityFlag
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
-      propertyPath: magicData
-      value: 
-      objectReference: {fileID: 11400000, guid: 1fc6fe6d07825934aa2aa07117f42783, type: 2}
     - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
       propertyPath: m_bulletManager
       value: 
@@ -1826,10 +1781,6 @@ PrefabInstance:
       propertyPath: m_lockOnUIManager
       value: 
       objectReference: {fileID: 371206898}
-    - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
-      propertyPath: m_bulletSpawnPoint
-      value: 
-      objectReference: {fileID: 1881704420}
     - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
       propertyPath: m_bookNetworkServer
       value: 
@@ -2009,42 +1960,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 79999425887721019, guid: bb73fe1e7c44b8444bd4e3eac0b93414, type: 3}
-      propertyPath: m_target
-      value: 
-      objectReference: {fileID: 568092645}
     - target: {fileID: 1779794954151421193, guid: bb73fe1e7c44b8444bd4e3eac0b93414, type: 3}
       propertyPath: m_Name
       value: TargetCanvas
       objectReference: {fileID: 0}
-    - target: {fileID: 3243614378388835543, guid: bb73fe1e7c44b8444bd4e3eac0b93414, type: 3}
-      propertyPath: m_target
-      value: 
-      objectReference: {fileID: 568092645}
-    - target: {fileID: 3764981811928448408, guid: bb73fe1e7c44b8444bd4e3eac0b93414, type: 3}
-      propertyPath: m_target
-      value: 
-      objectReference: {fileID: 568092645}
     - target: {fileID: 4050885996209634149, guid: bb73fe1e7c44b8444bd4e3eac0b93414, type: 3}
       propertyPath: m_targetSelector
       value: 
       objectReference: {fileID: 933808866}
-    - target: {fileID: 4050885996209634149, guid: bb73fe1e7c44b8444bd4e3eac0b93414, type: 3}
-      propertyPath: m_lockOnUIList.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 4050885996209634149, guid: bb73fe1e7c44b8444bd4e3eac0b93414, type: 3}
-      propertyPath: 'm_lockOnUIList.Array.data[0]'
-      value: 
-      objectReference: {fileID: 987504546}
-    - target: {fileID: 4050885996209634149, guid: bb73fe1e7c44b8444bd4e3eac0b93414, type: 3}
-      propertyPath: 'm_lockOnUIList.Array.data[1]'
-      value: 
-      objectReference: {fileID: 682908284}
-    - target: {fileID: 4050885996209634149, guid: bb73fe1e7c44b8444bd4e3eac0b93414, type: 3}
-      propertyPath: 'm_lockOnUIList.Array.data[2]'
-      value: 
-      objectReference: {fileID: 876460682}
     - target: {fileID: 7508356262452838786, guid: bb73fe1e7c44b8444bd4e3eac0b93414, type: 3}
       propertyPath: m_Pivot.x
       value: 0

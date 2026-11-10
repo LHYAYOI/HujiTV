@@ -6,7 +6,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private MagicDatabase m_magicDatabase;
     [SerializeField] private TargetSelector m_targetSelector;
     [SerializeField] private BookNetworkServer m_bookNetworkServer;
-    [SerializeField] private TargetLockOnUIManager m_lockOnUIManager;
 
     [SerializeField] private MagicData magicData;
 
@@ -55,8 +54,6 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
-
-        m_lockOnUIManager.PlaySelectedEffect(direction);
 
         CameraManager.Instance.ShakeCameraInVHF(.5f, 1.0f, 0.0f, 0.0f);
 

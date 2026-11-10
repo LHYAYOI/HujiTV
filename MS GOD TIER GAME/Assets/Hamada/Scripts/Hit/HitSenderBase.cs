@@ -41,6 +41,13 @@ public abstract class HitSenderBase : MonoBehaviour
             return;
         }
 
+        TargetableObject targetable = GetTargetableObject(target);
+
+        if (targetable != null)
+        {
+            targetable.SetWasHitFlag(true);
+        }
+
         HitData hitData = CreateHitData();
 
         hitReceiver.OnHit(hitData);
@@ -84,6 +91,18 @@ public abstract class HitSenderBase : MonoBehaviour
         }
 
         return hitReceiver;
+    }
+
+    public TargetableObject GetTargetableObject(GameObject target) 
+    {
+        TargetableObject targetObject = target.GetComponent<TargetableObject>();
+
+        if (targetObject == null) 
+        {
+            return null;
+        }
+
+        return targetObject;
     }
 
     protected abstract HitData CreateHitData();

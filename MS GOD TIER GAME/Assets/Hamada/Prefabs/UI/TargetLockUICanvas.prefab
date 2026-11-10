@@ -89,7 +89,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   m_targetImage: {fileID: 4191798627416457338}
-  m_target: {fileID: 0}
   m_defaultRotateSpeed: -45
   m_defaultScale: {x: 1, y: 1}
   m_defaultColor: {r: 1, g: 1, b: 1, a: 1}
@@ -211,13 +210,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   m_targetSelector: {fileID: 0}
-  m_directionUIMappings:
-  - direction: 0
-    uiController: {fileID: 79999425887721019}
-  - direction: 1
-    uiController: {fileID: 3243614378388835543}
-  - direction: 2
-    uiController: {fileID: 3764981811928448408}
+  m_lockOnUIList:
+  - {fileID: 79999425887721019}
+  - {fileID: 3243614378388835543}
+  - {fileID: 3764981811928448408}
 --- !u!1 &2654336070951255911
 GameObject:
   m_ObjectHideFlags: 0
@@ -307,7 +303,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   m_targetImage: {fileID: 1558370303905439372}
-  m_target: {fileID: 0}
   m_defaultRotateSpeed: -45
   m_defaultScale: {x: 1, y: 1}
   m_defaultColor: {r: 1, g: 1, b: 1, a: 1}
@@ -400,7 +395,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   m_targetImage: {fileID: 5156686864498659346}
-  m_target: {fileID: 0}
   m_defaultRotateSpeed: -45
   m_defaultScale: {x: 1, y: 1}
   m_defaultColor: {r: 1, g: 1, b: 1, a: 1}

@@ -6,9 +6,10 @@ using System.Collections.Generic;
 public class MagicBulletManager : MonoBehaviour
 {
     [SerializeField] TargetHitUIManager m_targetHitUIManager;
+    [SerializeField] TargetLockOnUIManager m_lockOnUIManager;
     [SerializeField] List<MagicBulletController> m_magicBulletPrefabList;
 
-    [SerializeField] private Transform m_bulletSpawnPoint;
+    [SerializeField] Transform m_bulletSpawnPoint;
 
     //弾の発射
     public void FireBullet(MagicData magicData, MAGIC_CAST_DIRECTION direction, GameObject target)
@@ -25,6 +26,7 @@ public class MagicBulletManager : MonoBehaviour
                 MagicBulletController bullet = Instantiate(prefab, m_bulletSpawnPoint.position, Quaternion.identity);
                 bullet.SetHitUIManager(m_targetHitUIManager);
                 bullet.FireBullet(target, direction);
+                m_lockOnUIManager.PlaySelectedEffect(direction, bullet);
                 break;
             }
         }

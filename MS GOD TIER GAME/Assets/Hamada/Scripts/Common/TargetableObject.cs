@@ -4,6 +4,8 @@ public class TargetableObject : MonoBehaviour
 {
     [SerializeField] protected bool m_IsTargetableFlag = true;
 
+    protected bool m_wasHit = true;
+
     private void OnEnable()
     {
         if (TargetSelector.Instance != null) 
@@ -20,6 +22,11 @@ public class TargetableObject : MonoBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        SetWasHitFlag(false);
+    }
+
     public void SetTargetable(bool value)
     {
         m_IsTargetableFlag = value;
@@ -28,5 +35,15 @@ public class TargetableObject : MonoBehaviour
     public bool IsTargetable()
     {
         return m_IsTargetableFlag;
+    }
+
+    public void SetWasHitFlag(bool flag) 
+    {
+        m_wasHit = flag;
+    }
+
+    public bool WasHit() 
+    {
+        return m_wasHit;
     }
 }

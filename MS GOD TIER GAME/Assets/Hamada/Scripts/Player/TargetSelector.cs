@@ -234,7 +234,6 @@ public class TargetSelector : MonoBehaviour
             //範囲内か
             if (IsInsideScreen(viewPos) && IsTargetInRange(target.gameObject))
             {
-                Debug.Log("範囲内よー");
                 m_targetList.Add(new TargetInfo(target, viewPos));
             }
         }
