@@ -19,6 +19,6 @@ public class testMover : MonoBehaviour
 
         float x = Mathf.Sin(m_time * m_frequency) * m_amplitude;
 
-        transform.position = m_startPosition + Vector3.right * x;
+        transform.position = new Vector3(m_startPosition.x + x, transform.position.y, transform.position.z);
     }
 }

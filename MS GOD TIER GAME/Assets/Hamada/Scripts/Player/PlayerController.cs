@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private MagicDatabase m_magicDatabase;
     [SerializeField] private TargetSelector m_targetSelector;
     [SerializeField] private BookNetworkServer m_bookNetworkServer;
+    [SerializeField] private TargetLockOnUIManager m_lockOnUIManager;
 
     [SerializeField] private MagicData magicData;
 
@@ -48,13 +49,14 @@ public class PlayerController : MonoBehaviour
     //弾の発射
     public void FireBullet(MagicData magicData, MAGIC_CAST_DIRECTION direction)
     {
-        m_targetSelector.SortTargets();
         GameObject target = m_targetSelector.GetSelectedTarget(direction);
 
         if (target == null) 
         {
             return;
         }
+
+        m_lockOnUIManager.PlaySelectedEffect(direction);
 
         CameraManager.Instance.ShakeCameraInVHF(.5f, 1.0f, 0.0f, 0.0f);
 
