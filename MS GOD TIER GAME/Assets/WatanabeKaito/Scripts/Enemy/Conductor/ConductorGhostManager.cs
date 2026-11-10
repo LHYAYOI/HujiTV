@@ -8,6 +8,8 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
 
     private bool m_battleStartFlag = false; // 戦闘開始フラグ
 
+    private bool m_isUpperFlag = false;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -59,35 +61,25 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
     }
 
     // MagicBulletが当たったときの処理
-    private void HandleMagicBulletHit(Collider collision, bool isUpperDrawer)
+    private void HandleMagicBulletHit(HitData hitData)
     {
         if (!m_battleStartFlag)
         {
             return;
         }
 
-        HitReceiverController hitReceiver = collision.gameObject.GetComponent<HitReceiverController>();
-
-        if (hitReceiver != null)
+        if (hitData != null)
         {
-            HitData hitData = new HitData();
-
-            hitData.SetHitObject(this.gameObject);
-
-            MagicData magicData = collision.gameObject.GetComponent<MagicBulletController>()?.GetMagicData();
-
-            hitData.SetMagicData(magicData);
-
-            hitReceiver.OnHit(hitData);
+            MagicData magicData = hitData.GetMagicData;
 
             if (magicData != null)
             {
                 TryReceiveEventMagic(magicData.EventMagicType);
 
-                if (magicData.EventMagicType == EVENT_MAGIC_TYPE.CLOSE)
+                //if (magicData.EventMagicType == EVENT_MAGIC_TYPE.CLOSE)
                 {
-                    // 引き出しごとに異なる処理を追加する場合
-                    if (isUpperDrawer)
+
+                    if (m_isUpperFlag)
                     {
                         // 上の引き出しの処理
                         StartCoroutine(m_conductorGhost.LockUpperChest());
@@ -97,7 +89,6 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
                         // 下の引き出しの処理
                         StartCoroutine(m_conductorGhost.LockLowerChest());
                     }
-
                 }
             }
         }
@@ -116,22 +107,24 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
     }
 
     // 上の引き出しに当たった場合
-    public void OnUpperDrawerHit(Collider collision)
+    public void OnUpperDrawerHit(HitData hitData)
     {
         if(!m_conductorGhost.GetIsUpperVisibleFlag())
         {
+            m_isUpperFlag = true;
             // 上の引き出しが開いている場合のみ処理を行う
-            HandleMagicBulletHit(collision, true);
+            HandleMagicBulletHit(hitData);
         }
     }
 
     // 下の引き出しに当たった場合
-    public void OnLowerDrawerHit(Collider collision)
+    public void OnLowerDrawerHit(HitData hitData)
     {
         if(!m_conductorGhost.GetIsLowerVisibleFlag())
         {
+            m_isUpperFlag = false;
             // 下の引き出しが開いている場合のみ処理を行う
-            HandleMagicBulletHit(collision, false);
+            HandleMagicBulletHit(hitData);
         }
     }
 

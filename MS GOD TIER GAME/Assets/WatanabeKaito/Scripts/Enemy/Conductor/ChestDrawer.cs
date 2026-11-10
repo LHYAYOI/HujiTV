@@ -117,11 +117,13 @@ public class ChestDrawer : MonoBehaviour
         return m_targetPosition;
     }
 
-    private void OnTriggerEnter(Collider collision)
-    {
-        if (collision.gameObject.CompareTag("MagicBullet"))
-        {
-            m_onHit.Invoke(collision);
-        }
-    }
+    //private void OnTriggerEnter(Collider collision)
+    //{
+    //    if (collision.gameObject.CompareTag("MagicBullet"))
+    //    {
+    //        m_onHit.Invoke(collision);
+
+    //        m_IsTargetableFlag = false;
+    //    }
+    //}
 }

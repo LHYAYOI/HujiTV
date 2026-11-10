@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-public class SwarmGhostManager : MonoBehaviour
+public class SwarmGhostManager : TargetableObject
 {
     [Header("群れお化けのデータ")]
     [SerializeField] private EnemyData m_swarmGhostData;
@@ -63,6 +62,7 @@ public class SwarmGhostManager : MonoBehaviour
             {
                 AttackAllSwarmGhosts();
                 m_isAttackingFlag = true;
+                m_IsTargetableFlag = false;
             }
         }
 
@@ -81,6 +81,7 @@ public class SwarmGhostManager : MonoBehaviour
             }
             if (allFinished)
             {
+                m_IsTargetableFlag = true;
                 m_isAttackingFlag = false;
                 m_attackTimer = 0.0f; // タイマーをリセット
             }

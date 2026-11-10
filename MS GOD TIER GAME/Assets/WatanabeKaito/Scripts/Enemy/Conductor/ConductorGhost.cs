@@ -65,6 +65,10 @@ public class ConductorGhost : MonoBehaviour
 
     private bool m_lowerDrawerLockedFlag = false; // 下の引き出しが閉まったかどうか
 
+    private bool m_isExpandingFlag = false; // 拡大中かどうか
+
+    private bool m_isShrinkingFlag = false; // 縮小中かどうか
+
     private void Start()
     {
         TurnToPlayerImmediately();
@@ -103,43 +107,56 @@ public class ConductorGhost : MonoBehaviour
 
     private void UpdateCallTimer()
     {
+        // すでに群れお化けを呼び出している場合は何もしない
+        if (m_callMiniGhostFlag)
+        {
+            return;
+        }
+
+        // 両方の引き出しがロックされている場合または群れお化けの体力が最大の場合はタイマーをリセット
+        if ((m_upperDrawerLockedFlag && m_lowerDrawerLockedFlag)
+            || m_swarmGhostManager.GetCurrentHealth() >= m_swarmGhostManager.GetMaxHealth())
+        {
+            m_callMiniGhostTimer = 0f;
+            return;
+        }
+
         m_callMiniGhostTimer += Time.deltaTime;
 
-        if (m_callMiniGhostTimer >= m_callMiniGhostInterval)
+        if (m_callMiniGhostTimer < m_callMiniGhostInterval)
         {
-            // 呼び出しフラグが立っているか、両方の引き出しが閉まっている場合は何もしない
-            if (m_callMiniGhostFlag || m_upperDrawerLockedFlag && m_lowerDrawerLockedFlag
-                || m_swarmGhostManager.GetCurrentHealth() == m_swarmGhostManager.GetMaxHealth())
-            {
-                m_callMiniGhostTimer = 0.0f;
-                return;
-            }
+            return;
+        }
 
+        bool openUpper;
 
-            if(Random.value < 0.5f)
-            {
-                if(m_lowerDrawerLockedFlag)
-                {
-                    StartCoroutine(OpenAndCloseUpperChest());
-                }
-                else
-                {
-                    StartCoroutine(OpenAndCloseLowerChest());
-                }
-            }
-            else
-            {
-                if (m_upperDrawerLockedFlag)
-                {
-                    StartCoroutine(OpenAndCloseLowerChest());
-                }
-                else
-                {
-                    StartCoroutine(OpenAndCloseUpperChest());
-                }
-            }
+        // 上がロックされている場合は下を開ける
+        if (m_upperDrawerLockedFlag)
+        {
+            openUpper = false;
+        }
+        // 下がロックされている場合は上を開ける
+        else if (m_lowerDrawerLockedFlag)
+        {
+            openUpper = true;
+        }
+        // 両方開けられる場合はランダム
+        else
+        {
+            openUpper = Random.value < 0.5f;
+        }
 
-            m_callMiniGhostFlag = true;
+        // 呼び出し中のフラグを先に立てる
+        m_callMiniGhostFlag = true;
+        m_callMiniGhostTimer = 0f;
+
+        if (openUpper)
+        {
+            StartCoroutine(OpenAndCloseUpperChest());
+        }
+        else
+        {
+            StartCoroutine(OpenAndCloseLowerChest());
         }
     }
 
@@ -428,6 +445,14 @@ public class ConductorGhost : MonoBehaviour
     // 拡大のコルーチン
     private IEnumerator ExpandCoroutine()
     {
+        if(m_isExpandingFlag)
+        {
+            Debug.Log("拡大要求を無視");
+            yield break;
+        }
+
+        m_isExpandingFlag = true;
+        Debug.Log($"拡大開始 ID:{GetInstanceID()}");
         float elapsed = 0f;
         if (m_expandDuration <= 0f)
         {
@@ -443,12 +468,24 @@ public class ConductorGhost : MonoBehaviour
             yield return null;
         }
         transform.localScale = m_originalScale;
+
+        m_isExpandingFlag = false;
     }
 
 
     // 縮小のコルーチン
     private IEnumerator ShrinkCoroutine()
     {
+        if (m_isShrinkingFlag)
+        {
+            yield break;
+        }
+
+        m_isShrinkingFlag = true;
+        Debug.Log(
+    $"縮小開始 ID:{GetInstanceID()} " +
+    $"Frame:{Time.frameCount}"
+);
         float elapsed = 0f;
 
         if (m_shrinkDuration <= 0f)
@@ -467,6 +504,8 @@ public class ConductorGhost : MonoBehaviour
         }
 
         transform.localScale = Vector3.zero;
+
+        m_isShrinkingFlag = false;
     }
 
     // 群れお化けを全て削除する
