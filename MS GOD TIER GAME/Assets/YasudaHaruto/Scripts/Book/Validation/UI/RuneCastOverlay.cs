@@ -9,7 +9,6 @@ namespace YasudaHaruto.BookValidation
     public sealed class RuneCastOverlay : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
         IBeginDragHandler, IDragHandler, IEndDragHandler
     {
-        private const float GlowHeightRatio = 0.39f;
         private const float ReleaseFadeDuration = 0.18f;
         private RuneTraceController m_controller;
         private CastSwipeDetector m_detector;
@@ -25,6 +24,7 @@ namespace YasudaHaruto.BookValidation
         private RunePageView m_spellView;
         private RuneSpellSettings m_settings;
         private readonly Image[] m_arrows = new Image[3];
+        private readonly Vector2[] m_arrowAxes = new Vector2[3];
         private Sprite[] m_frames;
         private RawImage m_glow, m_prompt;
         private Material m_glowMaterial, m_shadeMaterial;
@@ -131,13 +131,13 @@ namespace YasudaHaruto.BookValidation
             float progress = effect != null && effect.IsVisible ? effect.GatherProgress : 1f;
             float fade = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((progress - 0.12f) / 0.65f));
             UpdateShade(rect, fade * visibility);
-            float glowHeight = rect.height * GlowHeightRatio;
+            float glowHeight = rect.height * RuneSpellSettings.GlowHeightRatio;
             m_resetRadius = glowHeight * 0.40f;
             PlaceArtwork(m_glow, local, glowHeight, fade * visibility);
             UpdateGlowComposite(glowHeight);
             float promptFade = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((progress - 0.72f) / 0.28f));
-            PlaceArtwork(m_prompt, local - Vector2.up * rect.height * 0.205f, rect.height * 0.10f, promptFade * visibility);
-            RefreshArrows(rect.height);
+            PlaceArtwork(m_prompt, local - Vector2.up * rect.height * 0.275f, rect.height * 0.10f, promptFade * visibility);
+            RefreshArrows(rect.size);
             return true;
         }
 
@@ -178,8 +178,9 @@ namespace YasudaHaruto.BookValidation
             m_glowMaterial.SetVector("_BookUV", new Vector4(origin.x, origin.y, size.x, size.y));
         }
 
-        private void RefreshArrows(float bookHeight)
+        private void RefreshArrows(Vector2 bookSize)
         {
+            float bookHeight = bookSize.y;
             bool ready = m_controller != null && m_spellView != null && m_spellView.IsCastReady &&
                 (m_controller.State == RUNE_TRACE_STATE.WAITING_CAST_START || m_controller.State == RUNE_TRACE_STATE.CHARGING);
             bool show = ready || m_pressed;
@@ -191,7 +192,7 @@ namespace YasudaHaruto.BookValidation
                 int index = Mathf.FloorToInt((Time.unscaledTime - m_arrowStart) * 24f) % m_frames.Length;
                 frame = m_frames[index];
             }
-            float length = bookHeight * m_settings.ArrowLength * 2.25f;
+            float length = bookHeight * m_settings.ArrowLength * 1.8f;
             float sideAngle = m_detector != null ? m_detector.GuideSideAngle : 45f;
             for (int i = 0; i < m_arrows.Length; i++)
             {
@@ -200,15 +201,21 @@ namespace YasudaHaruto.BookValidation
                 if (frame != null) arrow.sprite = frame;
                 bool visible = show && arrow.sprite != null;
                 arrow.gameObject.SetActive(visible);
-                if (!visible) continue;
                 float angle = (i - 1) * sideAngle;
                 Vector2 direction = new Vector2(Mathf.Sin(angle * Mathf.Deg2Rad), Mathf.Cos(angle * Mathf.Deg2Rad));
                 // Keep the tail clear even on the frame with the longest dotted arrow.
-                Vector2 point = m_center + direction * (bookHeight * 0.435f);
+                bool centerArrow = i == (int)MAGIC_CAST_DIRECTION.CENTER;
+                float distance = bookHeight * (centerArrow ? 0.385f : 0.455f);
+                Vector2 point = m_center + direction * distance;
+                if (!centerArrow)
+                    point += new Vector2((i - 1) * bookSize.x * 0.042f, -bookHeight * 0.045f);
+                Vector2 axis = (point - m_center).normalized;
+                m_arrowAxes[i] = axis;
+                if (!visible) continue;
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(m_graphic.rectTransform, point, null, out Vector2 local);
                 arrow.rectTransform.anchoredPosition = local;
                 arrow.rectTransform.sizeDelta = Vector2.one * length;
-                arrow.rectTransform.localRotation = Quaternion.Euler(0f, 0f, -angle);
+                arrow.rectTransform.localRotation = Quaternion.Euler(0f, 0f, -Mathf.Atan2(axis.x, axis.y) * Mathf.Rad2Deg);
                 Color tint = m_graphic.SelectedDirection == i
                     ? new Color(1f, 0.9f, 0.28f)
                     : new Color(1f, 1f, 1f, Mathf.Lerp(0.45f, 1f, m_settings.ArrowIdleAlpha));
@@ -282,8 +289,7 @@ namespace YasudaHaruto.BookValidation
                 m_graphic.SelectedDirection = (int)direction;
             if (m_graphic.SelectedDirection < 0) return Vector2.zero;
 
-            float angle = (m_graphic.SelectedDirection - 1) * m_detector.GuideSideAngle * Mathf.Deg2Rad;
-            Vector2 axis = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
+            Vector2 axis = m_arrowAxes[m_graphic.SelectedDirection];
             return axis * Mathf.Max(0f, Vector2.Dot(delta, axis));
         }
 

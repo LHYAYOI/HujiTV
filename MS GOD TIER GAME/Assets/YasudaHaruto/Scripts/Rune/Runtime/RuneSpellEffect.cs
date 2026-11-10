@@ -15,6 +15,7 @@ public sealed class RuneSpellEffect : MonoBehaviour
     private RuneBulletPreview m_preview;
     private Rect m_source;
     private Vector2 m_pivot;
+    private float m_traceExtent;
     private float m_elapsed, m_sideAngle, m_transformProgress;
     private bool m_dragging;
     private Color m_traceColor;
@@ -52,6 +53,8 @@ public sealed class RuneSpellEffect : MonoBehaviour
             }
         }
         m_pivot = (min + max) * 0.5f;
+        Vector2 traceSize = Vector2.Scale(max - min, m_source.size);
+        m_traceExtent = Mathf.Max(1f, Mathf.Max(traceSize.x, traceSize.y) + width);
         m_trace.rectTransform.pivot = m_pivot;
         m_trace.rectTransform.sizeDelta = m_source.size;
         m_traceColor = color;
@@ -94,7 +97,7 @@ public sealed class RuneSpellEffect : MonoBehaviour
     {
         if (!IsReady || direction == MAGIC_CAST_DIRECTION.NONE) return;
         float angle = ((int)direction - 1) * m_sideAngle * Mathf.Deg2Rad;
-        m_launchDirection = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
+        m_launchDirection = m_drag.sqrMagnitude > 0f ? m_drag.normalized : new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
         Advance(0f);
         if (!IsReady) return;
         m_launchStart = m_center + m_drag * (1f - Mathf.SmoothStep(0f, 1f, m_transformProgress));
@@ -111,7 +114,7 @@ public sealed class RuneSpellEffect : MonoBehaviour
         Rect? book = m_bookRect?.Invoke();
         if (!book.HasValue || book.Value.height <= 0f) { Hide(); return; }
         m_elapsed += Mathf.Max(0f, deltaTime);
-        Vector2 origin = m_origin != null ? m_origin() : new Vector2(0.5f, 0.25f);
+        Vector2 origin = m_origin != null ? m_origin() : new Vector2(0.5f, 0.39f);
         Vector2 home = book.Value.min + Vector2.Scale(origin, book.Value.size);
         float height = book.Value.height;
         float progress = GatherProgress;
@@ -121,7 +124,8 @@ public sealed class RuneSpellEffect : MonoBehaviour
             m_transformProgress = Mathf.MoveTowards(m_transformProgress, 1f, deltaTime / TransformDuration);
         float morph = IsFlying ? 1f : Mathf.SmoothStep(0f, 1f, m_transformProgress);
         m_center = home + m_drag * morph;
-        float scale = 0.34f;
+        // The opaque part of the glow spans about 91% of its image height.
+        float scale = height * RuneSpellSettings.GlowHeightRatio * 0.91f * 0.75f / m_traceExtent;
         if (m_phase == PHASE.GATHERING)
         {
             float eased = Mathf.SmoothStep(0f, 1f, progress);
@@ -147,7 +151,7 @@ public sealed class RuneSpellEffect : MonoBehaviour
         if (hasBullet) traceTint.a *= 1f - morph;
         m_trace.color = traceTint;
         if (hasBullet && m_dragging)
-            m_preview.Draw(local, height * m_settings.CoreSize * 6f * Mathf.Lerp(0.6f, 1f, morph), morph);
+            m_preview.Draw(local, height * m_settings.CoreSize * 18f * Mathf.Lerp(0.6f, 1f, morph), morph);
     }
 
     private void EnsureCanvas()

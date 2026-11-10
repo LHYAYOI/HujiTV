@@ -40,7 +40,7 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
     private int m_pointerId;
     private bool m_runeStarted;
     [Header("Cast Guide")]
-    [SerializeField] private Vector2 m_castOrigin = new Vector2(0.5f, 0.31f);
+    [SerializeField] private Vector2 m_castOrigin = new Vector2(0.5f, 0.39f);
     [SerializeField, Range(0.03f, 0.2f)] private float m_castRadius = 0.08f;
     [SerializeField, Range(0f, 0.85f)] private float m_castShade = 0.55f;
     [SerializeField, Min(0.1f)] private float m_castPulseSpeed = 1f;

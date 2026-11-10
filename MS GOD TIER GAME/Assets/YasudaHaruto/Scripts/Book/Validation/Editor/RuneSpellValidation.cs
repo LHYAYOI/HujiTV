@@ -312,16 +312,18 @@ namespace YasudaHaruto.BookValidation.Editor
             s_overlay.OnDrag(Pointer(end));
             s_effect.Advance(0.18f);
             Vector2 start = s_effect.Center;
-            var detector = (CastSwipeDetector)Get(s_overlay, "m_detector");
-            float guideAngle = detector.GuideSideAngle * Mathf.Deg2Rad;
-            Vector2 axis = new Vector2(side * Mathf.Sin(guideAngle), Mathf.Cos(guideAngle));
+            Image arrow = s_overlay.GetComponentsInChildren<Image>()[(int)direction];
+            Vector2 arrowCenter = RectTransformUtility.WorldToScreenPoint(null, arrow.transform.position);
+            Vector2 axis = (arrowCenter - s_overlay.Center).normalized;
+            Require(Vector2.Dot(axis, arrow.transform.up) > 0.999f, "Arrow art points along its actual axis");
             Vector2 expected = axis * Vector2.Dot(end - s_overlay.Center, axis);
             Require((start - s_overlay.Center - expected).sqrMagnitude < 0.01f,
                 direction + " aim projects movement onto its arrow axis");
             s_overlay.OnPointerUp(Pointer(end));
             s_effect.Advance(s_settings.FlightDuration * 0.1f);
             Require(s_lastDirection == direction && s_castCount == previous + 1 && s_effect.IsFlying &&
-                Mathf.Sign(s_effect.Center.x - start.x) == side, direction + " gesture fires exactly once in the selected direction");
+                Vector2.Dot((s_effect.Center - start).normalized, axis) > 0.999f,
+                direction + " gesture fires exactly once along the same visible axis");
         }
 
         private static void Finish()

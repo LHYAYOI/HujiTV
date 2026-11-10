@@ -4,6 +4,8 @@ using UnityEngine;
 [Serializable]
 public sealed class RuneSpellSettings
 {
+    public const float GlowHeightRatio = 0.36f;
+
     [Header("Dissolve / Gather (seconds)")]
     [Min(0.01f)] [SerializeField] private float m_floatDuration = 0.2f;
     public float FloatDuration => m_floatDuration;
