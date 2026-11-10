@@ -40,13 +40,13 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
     private int m_pointerId;
     private bool m_runeStarted;
     [Header("Cast Guide")]
-    [SerializeField] private Vector2 m_castOrigin = new Vector2(0.5f, 0.25f);
+    [SerializeField] private Vector2 m_castOrigin = new Vector2(0.5f, 0.31f);
     [SerializeField, Range(0.03f, 0.2f)] private float m_castRadius = 0.08f;
     [SerializeField, Range(0f, 0.85f)] private float m_castShade = 0.55f;
     [SerializeField, Min(0.1f)] private float m_castPulseSpeed = 1f;
     [SerializeField, Range(0f, 0.25f)] private float m_castPulseAmount = 0.08f;
     [SerializeField, Range(0.02f, 0.2f)] private float m_castArrowWidth = 0.1f;
-    [Header("Spell Particle Presentation")]
+    [Header("Spell Presentation")]
     [SerializeField] private RuneSpellSettings m_spellSettings = new RuneSpellSettings();
     private RunePageView m_spellView;
     private RuneCastOverlay m_castOverlay;
@@ -55,7 +55,8 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
     {
         m_spellView = view;
         view.ConfigureSpellCast(GetBookScreenRect, () => m_castOrigin, m_spellSettings,
-            () => m_castSwipeDetector != null ? m_castSwipeDetector.GuideSideAngle : 45f);
+            () => m_castSwipeDetector != null ? m_castSwipeDetector.GuideSideAngle : 45f,
+            () => m_inventoryOwner?.CurrentPage?.Data.Action?.MagicData);
     }
 
     private void Update()
@@ -66,14 +67,14 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
              m_runeController.State == RUNE_TRACE_STATE.CHARGING);
         if (!show)
         {
-            if (m_castOverlay != null) m_castOverlay.Hide();
+            if (m_castOverlay != null && !m_castOverlay.IsFadingOut) m_castOverlay.Hide();
             return;
         }
         if (m_castOverlay == null)
         {
             m_castOverlay = new GameObject("Rune Cast Guide", typeof(RectTransform)).AddComponent<RuneCastOverlay>();
             m_castOverlay.Configure(m_runeController, m_castSwipeDetector, GetBookScreenRect,
-                m_castOrigin, m_castRadius, m_castShade, m_castPulseSpeed, m_castPulseAmount, m_castArrowWidth, m_spellView, m_spellSettings);
+                m_castOrigin, m_castRadius, m_castShade, m_castPulseSpeed, m_castPulseAmount, m_castArrowWidth, m_spellView, m_spellSettings, m_displayRect, () => m_flipView.OutputTexture);
         }
         m_castOverlay.gameObject.SetActive(true);
     }

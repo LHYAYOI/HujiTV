@@ -41,6 +41,7 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
     private Func<Rect?> m_spellBookRect;
     private Func<Vector2> m_spellOrigin;
     private Func<float> m_spellSideAngle;
+    private Func<MagicData> m_spellMagic;
     private RuneSpellSettings m_spellSettings;
     private RuneSpellEffect m_spellEffect;
     private bool m_directionalCast = true;
@@ -48,16 +49,18 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
     public RuneSpellEffect SpellEffect => m_spellEffect;
 
     public void ConfigureSpellCast(Func<Rect?> bookRect, Func<Vector2> origin,
-        RuneSpellSettings settings, Func<float> sideAngle)
+        RuneSpellSettings settings, Func<float> sideAngle, Func<MagicData> magic = null)
     {
         m_spellBookRect = bookRect;
         m_spellOrigin = origin;
         m_spellSettings = settings;
         m_spellSideAngle = sideAngle;
+        m_spellMagic = magic;
     }
 
     public void SetDirectionalCast(bool directional) => m_directionalCast = directional;
-    public void SetSpellDrag(Vector2 delta, float radius) => m_spellEffect?.SetDrag(delta, radius);
+    public void SetSpellDrag(Vector2 offset) => m_spellEffect?.SetDrag(offset);
+    public void CancelSpellDrag() => m_spellEffect?.CancelDrag();
     public void LaunchCast(MAGIC_CAST_DIRECTION direction) => m_spellEffect?.Launch(direction);
     private void HideSpell(bool keepFlying = false)
     {
@@ -143,10 +146,11 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
         if (m_directionalCast && m_spellSettings != null && m_spellBookRect != null)
         {
             if (m_spellEffect == null)
-                m_spellEffect = new GameObject("Rune Spell Particles", typeof(RectTransform)).AddComponent<RuneSpellEffect>();
-            Color color = RuneSpellPalette.Sample(m_cooldownImage?.Invoke(), m_spellSettings.FallbackColor);
-            m_spellEffect.Play(m_completedStrokes, GetCompletionScreenRect, m_spellBookRect, m_spellOrigin,
-                m_spellSettings, color, m_spellSideAngle != null ? m_spellSideAngle() : 45f);
+                m_spellEffect = new GameObject("Rune Cast Presentation", typeof(RectTransform)).AddComponent<RuneSpellEffect>();
+            float traceWidth = m_playerGraphic.LineWidth * area.Value.width / m_playerGraphic.rectTransform.rect.width;
+            m_spellEffect.Play(m_completedStrokes, area.Value, m_spellBookRect, m_spellOrigin,
+                m_spellSettings, Color.white, traceWidth, m_spellSideAngle != null ? m_spellSideAngle() : 45f,
+                m_spellMagic?.Invoke());
             m_playerGraphic.Clear();
             return;
         }
@@ -170,6 +174,8 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
 
     public void PlayFailure(RuneTraceResult result)
     {
+        ClearPlayerStrokes();
+        if (isActiveAndEnabled) Canvas.ForceUpdateCanvases();
         HideSpell();
         HideCompletion();
         if (!isActiveAndEnabled) return;
@@ -221,10 +227,15 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
 
     private void ClearGraphics()
     {
+        ClearPlayerStrokes();
+        if (m_referenceGraphic != null) m_referenceGraphic.Clear();
+    }
+
+    private void ClearPlayerStrokes()
+    {
         m_completedStrokes.Clear();
         m_displayStrokes.Clear();
         m_lastCurrentStroke.Clear();
-        if (m_referenceGraphic != null) m_referenceGraphic.Clear();
         if (m_playerGraphic != null) m_playerGraphic.Clear();
     }
 

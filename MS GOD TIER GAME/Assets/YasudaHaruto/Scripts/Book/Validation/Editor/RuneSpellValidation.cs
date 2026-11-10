@@ -24,6 +24,7 @@ namespace YasudaHaruto.BookValidation.Editor
         private static RuneData s_rune;
         private static RuneSpellSettings s_settings;
         private static Vector2 s_home, s_pointer;
+        private static Sprite s_readyFrame;
         private static MAGIC_CAST_DIRECTION s_lastDirection;
 
         static RuneSpellValidation()
@@ -99,7 +100,7 @@ namespace YasudaHaruto.BookValidation.Editor
             if (type == MAGIC_AIM_TYPE.NONE) return;
             Require(s_controller.State == RUNE_TRACE_STATE.WAITING_CAST_RELEASE, "Completed trace waits for original finger release");
             s_effect = s_view.SpellEffect;
-            Require(s_effect != null && s_effect.IsVisible && !s_effect.IsReady, "Completed player strokes become gathering particles");
+            Require(s_effect != null && s_effect.IsVisible && !s_effect.IsReady, "Completed player strokes begin moving to the cast origin");
             s_effect.enabled = false; // Deterministic phase advancement, actual uGUI rendering remains active.
         }
 
@@ -126,7 +127,14 @@ namespace YasudaHaruto.BookValidation.Editor
                             var page = s_game.Pages[i].Data;
                             if (page.Interaction != null && page.Interaction.RuneData != null && page.Action != null &&
                                 page.Action.MagicData != null && page.Action.MagicData.AimType == MAGIC_AIM_TYPE.THREE_DIRECTIONS)
-                            { s_spread = i + 1; s_rune = page.Interaction.RuneData; break; }
+                            {
+                                if (s_spread < 0 || page.Action.MagicData.MagicType == MAGIC_TYPE.FIRE)
+                                {
+                                    s_spread = i + 1;
+                                    s_rune = page.Interaction.RuneData;
+                                }
+                                if (page.Action.MagicData.MagicType == MAGIC_TYPE.FIRE) break;
+                            }
                         }
                         Require(s_spread > 0, "Found a directional rune in the current inventory");
                         var bootstrap = UnityEngine.Object.FindFirstObjectByType<BookGameBootstrap>();
@@ -139,62 +147,83 @@ namespace YasudaHaruto.BookValidation.Editor
                         Require(s_game.BookView.OpenBook(s_spread), "Open directional spread");
                         break;
                     case 1:
-                        Require(Resources.Load<Sprite>("RuneSpell/MagicAimArrow") != null, "Generated arrow imported as a Sprite");
+                        Require(Resources.LoadAll<Sprite>("RuneSpell/DirectionFrames").Length == 27, "All 27 arrow frames import as sprites");
                         Complete();
-                        Require(s_effect.GetComponentsInChildren<ParticleSystem>().Length == 4, "Four independent ParticleSystems compose spell");
+                        Require(s_effect.GetComponentInChildren<RuneLineGraphic>().enabled, "Moving rune uses the handwritten stroke geometry");
                         var player = (RuneLineGraphic)Get(s_view, "m_playerGraphic");
                         using (var mesh = new VertexHelper())
                         {
                             typeof(RuneLineGraphic).GetMethod("OnPopulateMesh", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
                                 .Invoke(player, new object[] { mesh });
-                            Require(mesh.currentVertCount == 0, "Player line disappears when it dissolves");
+                            Require(mesh.currentVertCount == 0, "Original drawing is cleared after copying the line");
                         }
                         Require(s_game.GetCurrentRuneImage() != null, "Printed colored rune remains intact");
                         Capture("01-dissolve");
                         break;
                     case 2:
                         s_controller.EndStroke();
-                        Require(!s_controller.TryBeginCast(), "Cannot aim before particles gather");
+                        Require(!s_controller.TryBeginCast(), "Cannot aim before the rune arrives");
+                        Vector2 gatherStart = s_effect.Center;
                         s_effect.Advance(s_settings.FloatDuration * 0.8f);
-                        var trace = s_effect.transform.Find("Dissolving Rune").GetComponent<ParticleSystem>();
-                        Require(trace.particleCount == Mathf.Clamp(s_settings.TraceParticleCount, 32, 512), "Player stroke samples populate ParticleSystem");
+                        var trace = s_effect.GetComponentInChildren<RuneLineGraphic>();
+                        Require(trace.enabled && trace.rectTransform.localScale.x < 1f &&
+                            s_effect.Center != gatherStart, "Handwritten line moves and shrinks as a single shape");
                         Capture("02-float");
                         break;
                     case 3:
                         s_effect.Advance(s_settings.FloatDuration + s_settings.GatherDuration);
                         Require(s_effect.IsReady && s_view.IsCastReady, "Gather finishes and unlocks aiming");
-                        Require(s_effect.transform.Find("Spell Core").GetComponent<ParticleSystem>().particleCount == 12 &&
-                            s_effect.transform.Find("Orbiting Motes").GetComponent<ParticleSystem>().particleCount > 0,
-                            "Core and surrounding motes remain active while waiting");
+                        Require(s_effect.GetComponentInChildren<RuneLineGraphic>().enabled &&
+                            s_effect.GetComponentInChildren<RawImage>() == null,
+                            "Ready state keeps the handwritten rune until the direction gesture moves");
                         s_overlay = UnityEngine.Object.FindFirstObjectByType<RuneCastOverlay>();
                         Require(s_overlay != null, "Spotlight and input overlay active");
-                        foreach (var image in s_overlay.GetComponentsInChildren<Image>(true))
-                            Require(!image.gameObject.activeSelf && !image.raycastTarget, "Arrows hidden before dragging and never intercept input");
+
+                        s_overlay.SendMessage("LateUpdate");
+                        s_readyFrame = s_overlay.GetComponentsInChildren<Image>()[1].sprite;
                         s_home = s_effect.Center;
                         Capture("03-ready");
                         break;
                     case 4:
-                        var core = s_effect.transform.Find("Spell Core").GetComponent<ParticleSystem>();
-                        Require(core.particleCount == 12, "Core particles survive the next player-loop frame");
-                        var graphic = core.GetComponent<RuneParticleGraphic>();
-                        using (var mesh = new VertexHelper())
-                        {
-                            typeof(RuneParticleGraphic).GetMethod("OnPopulateMesh", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
-                                .Invoke(graphic, new object[] { mesh });
-                            Require(mesh.currentVertCount == 48, "Core produces visible UI particle quads");
-                            File.AppendAllText(Report, "Core graphic: " + graphic.rectTransform.rect + ", rotation=" + graphic.transform.localEulerAngles +
-                                ", scale=" + graphic.transform.lossyScale + ", culled=" + graphic.canvasRenderer.cull + "\n");
-                            var buffer = new ParticleSystem.Particle[12]; core.GetParticles(buffer);
-                            File.AppendAllText(Report, "Core particle: position=" + buffer[0].position + ", size=" + buffer[0].startSize +
-                                ", color=" + buffer[0].startColor + ", active=" + graphic.isActiveAndEnabled + ", canvas=" + graphic.canvas + "\n");
-                        }
-                        s_pointer = s_overlay.Center + Vector2.up * Screen.height * 0.35f;
+                        var arrows = s_overlay.GetComponentsInChildren<Image>();
+                        Require(arrows.Length == 3 && !arrows[0].raycastTarget && !arrows[1].raycastTarget &&
+                            !arrows[2].raycastTarget, "Three direction arrows are visible before dragging and ignore input");
+                        s_pointer = s_overlay.Center + new Vector2(0.07f, 0.35f) * Screen.height;
                         s_overlay.OnPointerDown(Pointer(s_overlay.Center));
+                        Require(s_effect.GetComponentInChildren<RuneLineGraphic>().enabled,
+                            "Touch without movement preserves the rune");
                         s_overlay.OnDrag(Pointer(s_pointer));
-                        s_effect.Advance(0f);
+                        s_effect.Advance(0.09f);
+                        var bullet = s_effect.GetComponentInChildren<RawImage>();
+                        var movingRune = s_effect.GetComponentInChildren<RuneLineGraphic>();
+                        Require(bullet != null && bullet.texture is RenderTexture && bullet.color.a > 0f &&
+                            bullet.color.a < 1f && movingRune.enabled && movingRune.color.a < 1f,
+                            "Moving the pointer shrinks and fades the rune as the registered bullet fades in");
+                        s_effect.Advance(0.10f);
+                        Require(!movingRune.enabled && Mathf.Abs(s_effect.Center.x - s_home.x) < 0.01f &&
+                            Mathf.Abs(s_effect.Center.y - s_pointer.y) < 0.01f,
+                            "Center aim follows upward progress and ignores sideways pointer drift");
                         Require(s_controller.State == RUNE_TRACE_STATE.CHARGING && s_effect.Center.y > s_home.y,
                             "Touch spell and drag moves the core toward the pointer");
-                        Require(s_overlay.GetComponentsInChildren<Image>().Length == 3, "Only image sprites render the three direction arrows");
+                        Vector2 leftDrag = s_home + new Vector2(-0.35f, 0.35f) * Screen.height;
+                        s_overlay.OnDrag(Pointer(leftDrag));
+                        s_effect.Advance(0f);
+                        Require(Mathf.Abs(s_effect.Center.x - s_home.x) < 0.01f,
+                            "Moving left midway does not switch the locked center arrow");
+                        Vector2 insideGlow = s_home + Vector2.up * s_overlay.Radius * 1.5f;
+                        s_overlay.OnDrag(Pointer(insideGlow));
+                        s_effect.Advance(0f);
+                        Require((s_effect.Center - s_home).sqrMagnitude < 0.01f,
+                            "Returning inside the yellow glow resets the aim before reaching its center");
+                        s_overlay.OnDrag(Pointer(leftDrag));
+                        s_effect.Advance(0f);
+                        Require(s_effect.Center.x < s_home.x, "Left arrow can be chosen after returning to the origin");
+                        s_overlay.OnDrag(Pointer(s_home));
+                        s_overlay.OnDrag(Pointer(s_pointer));
+                        s_effect.Advance(0f);
+                        s_overlay.SendMessage("LateUpdate");
+                        Require(arrows[1].sprite != s_readyFrame && arrows[1].color.b < arrows[0].color.b &&
+                            arrows[0].color == arrows[2].color, "Arrow frames advance and only the selected direction changes color");
                         var hits = new List<RaycastResult>();
                         EventSystem.current.RaycastAll(Pointer(s_overlay.Center), hits);
                         Require(hits.Count > 0 && hits[0].gameObject.GetComponentInParent<RuneCastOverlay>() == s_overlay,
@@ -202,18 +231,24 @@ namespace YasudaHaruto.BookValidation.Editor
                         Capture("04-aim");
                         break;
                     case 5:
-                        s_overlay.OnPointerUp(Pointer(s_pointer));
+                        s_overlay.OnPointerUp(Pointer(s_home + new Vector2(-0.35f, 0.35f) * Screen.height));
                         Require(s_effect.IsFlying && s_controller.State == RUNE_TRACE_STATE.COOLDOWN && s_castCount == 1 &&
-                            s_lastDirection == MAGIC_CAST_DIRECTION.CENTER, "Release launches once and starts cooldown immediately");
+                            s_lastDirection == MAGIC_CAST_DIRECTION.CENTER, "Release keeps the locked direction and launches once");
+                        Require(s_overlay.IsFadingOut && s_overlay.gameObject.activeSelf &&
+                            !s_overlay.GetComponentInChildren<RuneCastGuideGraphic>().raycastTarget,
+                            "Release keeps the dimmer visible briefly without blocking input");
                         float remaining = s_controller.CooldownRemaining;
+                        Vector2 launch = s_effect.Center;
                         s_effect.Advance(s_settings.FlightDuration * 0.18f);
-                        Require(s_effect.transform.Find("Spell Trail").GetComponent<ParticleSystem>().particleCount > 0 &&
-                            Mathf.Approximately(s_controller.CooldownRemaining, remaining), "Visual flight has its own tail and never ticks cooldown");
+                        Require(s_effect.Center.y > launch.y &&
+                            Mathf.Approximately(s_controller.CooldownRemaining, remaining), "Preview flies without ticking cooldown");
                         Capture("05-flight");
                         break;
                     case 6:
+                        Require(!s_overlay.IsFadingOut && !s_overlay.gameObject.activeSelf,
+                            "Release fade completes and removes the dimmer");
                         s_effect.Advance(s_settings.FlightDuration);
-                        Require(!s_effect.IsVisible, "Flight clears its particles at the end");
+                        Require(!s_effect.IsVisible, "Flight clears the visual at the end");
                         CheckSide(MAGIC_CAST_DIRECTION.LEFT);
                         CheckSide(MAGIC_CAST_DIRECTION.RIGHT);
                         Complete();
@@ -230,6 +265,23 @@ namespace YasudaHaruto.BookValidation.Editor
                         Require(!s_effect.IsVisible && s_controller.State == RUNE_TRACE_STATE.WAITING_STROKE,
                             "Connection or fourth-slot input block clears pending spell");
                         s_controller.SetInputAvailable(true);
+                        s_controller.BeginTrace(s_rune);
+                        var firstPoint = s_rune.TraceData.Strokes[0].Points[0];
+                        s_controller.BeginStroke(firstPoint);
+                        s_controller.AddPoint(firstPoint + new Vector2(2f, 2f));
+                        Require(s_controller.State == RUNE_TRACE_STATE.FAILED_WAITING_RELEASE,
+                            "Invalid stroke fails before the original finger is lifted");
+                        using (var failedMesh = new VertexHelper())
+                        {
+                            var drawing = (RuneLineGraphic)Get(s_view, "m_playerGraphic");
+                            typeof(RuneLineGraphic).GetMethod("OnPopulateMesh", BindingFlags.NonPublic |
+                                BindingFlags.Instance | BindingFlags.DeclaredOnly).Invoke(drawing, new object[] { failedMesh });
+                            Require(failedMesh.currentVertCount == 0, "Failed handwriting is cleared while the pointer is still held");
+                        }
+                        Capture("06-failed-while-held");
+                        break;
+                    case 7:
+                        s_controller.EndStroke();
                         Complete(MAGIC_AIM_TYPE.NONE);
                         Require(s_controller.State == RUNE_TRACE_STATE.COOLDOWN && !s_effect.IsVisible && s_lastDirection == MAGIC_CAST_DIRECTION.NONE,
                             "Spells without aiming keep immediate cast behavior");
@@ -258,8 +310,14 @@ namespace YasudaHaruto.BookValidation.Editor
             int previous = s_castCount;
             s_overlay.OnPointerDown(Pointer(s_overlay.Center));
             s_overlay.OnDrag(Pointer(end));
-            s_effect.Advance(0f);
+            s_effect.Advance(0.18f);
             Vector2 start = s_effect.Center;
+            var detector = (CastSwipeDetector)Get(s_overlay, "m_detector");
+            float guideAngle = detector.GuideSideAngle * Mathf.Deg2Rad;
+            Vector2 axis = new Vector2(side * Mathf.Sin(guideAngle), Mathf.Cos(guideAngle));
+            Vector2 expected = axis * Vector2.Dot(end - s_overlay.Center, axis);
+            Require((start - s_overlay.Center - expected).sqrMagnitude < 0.01f,
+                direction + " aim projects movement onto its arrow axis");
             s_overlay.OnPointerUp(Pointer(end));
             s_effect.Advance(s_settings.FlightDuration * 0.1f);
             Require(s_lastDirection == direction && s_castCount == previous + 1 && s_effect.IsFlying &&

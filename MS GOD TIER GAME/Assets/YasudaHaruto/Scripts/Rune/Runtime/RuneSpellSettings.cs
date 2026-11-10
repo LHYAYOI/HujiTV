@@ -5,9 +5,9 @@ using UnityEngine;
 public sealed class RuneSpellSettings
 {
     [Header("Dissolve / Gather (seconds)")]
-    [Min(0.01f)] [SerializeField] private float m_floatDuration = 0.35f;
+    [Min(0.01f)] [SerializeField] private float m_floatDuration = 0.2f;
     public float FloatDuration => m_floatDuration;
-    [Min(0.01f)] [SerializeField] private float m_gatherDuration = 0.55f;
+    [Min(0.01f)] [SerializeField] private float m_gatherDuration = 0.3f;
     public float GatherDuration => m_gatherDuration;
     [Tooltip("Fraction of book height")]
     [Range(0f, 0.4f)] [SerializeField] private float m_floatHeight = 0.12f;
