@@ -1,10 +1,15 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Rendering;
+
 
 public class ConductorGhost : MonoBehaviour
 {
+    [Header("上の引き出しのTargetable")]
+    [SerializeField] private TargetableObject m_upperDrawerTargetable;
+
+    [Header("下の引き出しのTargetable")]
+    [SerializeField] private TargetableObject m_lowerDrawerTargetable;
+
     [Header("群れお化けのマネージャー")]
     [SerializeField] private SwarmGhostManager m_swarmGhostManager;
 
@@ -167,6 +172,9 @@ public class ConductorGhost : MonoBehaviour
 
     public IEnumerator StartBattleCoroutine()
     {
+        m_upperDrawerTargetable.SetTargetable(false);
+        m_lowerDrawerTargetable.SetTargetable(false);
+
         m_isUpperVisibleFlag = true;
 
         StartCoroutine(ExpandCoroutine());
@@ -195,11 +203,16 @@ public class ConductorGhost : MonoBehaviour
         m_isUpperVisibleFlag = false;
 
         m_isBattleStartedFlag = true;
+
+        m_upperDrawerTargetable.SetTargetable(true);
+        m_lowerDrawerTargetable.SetTargetable(true);
     }
 
     // 上の引き出しを開けて、閉める
     public IEnumerator OpenAndCloseUpperChest()
     {
+        m_upperDrawerTargetable.SetTargetable(false);
+
         m_isUpperVisibleFlag = true;
 
         // 上の引き出しに移動して開ける
@@ -221,11 +234,15 @@ public class ConductorGhost : MonoBehaviour
 
         // 上の引き出しを閉める
         yield return StartCoroutine(CloseUpperChest());
+
+        m_upperDrawerTargetable.SetTargetable(true);
     }
 
     // 下の引き出しを開けて、閉める
     public IEnumerator OpenAndCloseLowerChest()
     {
+        m_lowerDrawerTargetable.SetTargetable(false);
+
         m_isLowerVisibleFlag = true;
 
         // 下の引き出しに移動して開ける
@@ -248,6 +265,8 @@ public class ConductorGhost : MonoBehaviour
 
         // 下の引き出しを閉める
         yield return StartCoroutine(CloseLowerChest());
+
+        m_lowerDrawerTargetable.SetTargetable(true);
     }
 
     // 上の引き出しに移動して開ける
@@ -447,12 +466,11 @@ public class ConductorGhost : MonoBehaviour
     {
         if(m_isExpandingFlag)
         {
-            Debug.Log("拡大要求を無視");
             yield break;
         }
 
         m_isExpandingFlag = true;
-        Debug.Log($"拡大開始 ID:{GetInstanceID()}");
+
         float elapsed = 0f;
         if (m_expandDuration <= 0f)
         {
@@ -482,10 +500,7 @@ public class ConductorGhost : MonoBehaviour
         }
 
         m_isShrinkingFlag = true;
-        Debug.Log(
-    $"縮小開始 ID:{GetInstanceID()} " +
-    $"Frame:{Time.frameCount}"
-);
+   
         float elapsed = 0f;
 
         if (m_shrinkDuration <= 0f)

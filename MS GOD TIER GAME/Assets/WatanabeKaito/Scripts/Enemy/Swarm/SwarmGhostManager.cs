@@ -40,6 +40,8 @@ public class SwarmGhostManager : TargetableObject
     private void Start()
     {
         m_currentHealth = m_swarmGhostData.m_maxHealth;
+
+        m_IsTargetableFlag = false;
     }
 
     private void Update()
@@ -104,6 +106,8 @@ public class SwarmGhostManager : TargetableObject
     // ŒQ‚ê‚¨‰»‚¯‚ğŠÔ·‚ÅoŒ»‚³‚¹‚é
     public IEnumerator SpawnAllSwarmGhostCoroutine()
     {
+        m_IsTargetableFlag = true;
+
         // ‘Ì—Í‚ğÅ‘å’l‚Éİ’è
         SetCurrentHealth(m_swarmGhostData.m_maxHealth);
 
@@ -278,6 +282,8 @@ public class SwarmGhostManager : TargetableObject
         m_availableSpawnPositions.Clear();
 
         m_isActiveFlag = false;
+
+        m_IsTargetableFlag = false;
     }
 
     public void SetCurrentHealth(int health)

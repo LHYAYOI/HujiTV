@@ -68,6 +68,11 @@ public class BattleManager : MonoBehaviour
             return; 
         }
 
+        if(Instance.m_isBattleFlag)
+        {
+            return;
+        }
+
         Instance.m_isBattleFlag = true;
         Instance.m_onFinishEvent = onFinishEvent;
 

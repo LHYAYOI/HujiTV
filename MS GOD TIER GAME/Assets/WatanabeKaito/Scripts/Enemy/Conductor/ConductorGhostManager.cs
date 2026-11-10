@@ -3,6 +3,12 @@ using UnityEngine.InputSystem;
 
 public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
 {
+    [Header("上の引き出しのTargetable")]
+    [SerializeField] private TargetableObject m_upperDrawerTargetable;
+
+    [Header("下の引き出しのTargetable")]
+    [SerializeField] private TargetableObject m_lowerDrawerTargetable;
+
     [Header("指揮者お化け")]
     [SerializeField] private ConductorGhost m_conductorGhost;
 
@@ -13,7 +19,9 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        m_upperDrawerTargetable.SetTargetable(false);
+        m_lowerDrawerTargetable.SetTargetable(false);
+       
     }
 
     public override void Initialize()
@@ -52,6 +60,9 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
         m_conductorGhost.SetUpperDrawerLockedFlag(true);
         m_conductorGhost.SetLowerDrawerLockedFlag(true);
 
+        m_upperDrawerTargetable.SetTargetable(false);
+        m_lowerDrawerTargetable.SetTargetable(false);
+
         m_conductorGhost.RemoveAllSwarmGhosts();
     }
 
@@ -76,7 +87,7 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
             {
                 TryReceiveEventMagic(magicData.EventMagicType);
 
-                //if (magicData.EventMagicType == EVENT_MAGIC_TYPE.CLOSE)
+                if (magicData.EventMagicType == EVENT_MAGIC_TYPE.CLOSE)
                 {
 
                     if (m_isUpperFlag)
@@ -111,6 +122,8 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
     {
         if(!m_conductorGhost.GetIsUpperVisibleFlag())
         {
+            m_upperDrawerTargetable.SetTargetable(false);
+
             m_isUpperFlag = true;
             // 上の引き出しが開いている場合のみ処理を行う
             HandleMagicBulletHit(hitData);
@@ -122,6 +135,8 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
     {
         if(!m_conductorGhost.GetIsLowerVisibleFlag())
         {
+            m_lowerDrawerTargetable.SetTargetable(false);
+
             m_isUpperFlag = false;
             // 下の引き出しが開いている場合のみ処理を行う
             HandleMagicBulletHit(hitData);

@@ -23,6 +23,8 @@ public class MiniGhostDyingState : MiniGhostState
 
     public override void EnterState()
     {
+        m_owner.GetTargetableObject().SetTargetable(false);
+
         if (m_animator != null)
         {
             m_animator.SetBool("bDead", true);
