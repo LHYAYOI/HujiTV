@@ -15,6 +15,8 @@ public class LockOnTargetController : MonoBehaviour
 
     float m_rotateSpeed;
 
+    bool m_isCanceling = false;
+
     private void Update()
     {
         //ターゲットを追従
@@ -65,7 +67,9 @@ public class LockOnTargetController : MonoBehaviour
 
     public void AppearTargetUI() 
     {
-        if(m_currentCoroutine != null)
+        m_isCanceling = false;
+
+        if (m_currentCoroutine != null)
         {
             StopCoroutine(m_currentCoroutine);
         }
@@ -75,6 +79,13 @@ public class LockOnTargetController : MonoBehaviour
 
     public void CancelTargetUI() 
     {
+        if (m_isCanceling)
+        {
+            return;
+        }
+
+        m_isCanceling = true;
+
         if (m_currentCoroutine != null)
         {
             StopCoroutine(m_currentCoroutine);
@@ -85,6 +96,13 @@ public class LockOnTargetController : MonoBehaviour
 
     public void SelectedTargetUI() 
     {
+        if (m_isCanceling) 
+        {
+            return;
+        }
+
+        m_isCanceling = true;
+
         if (m_currentCoroutine != null)
         {
             StopCoroutine(m_currentCoroutine);
@@ -137,6 +155,8 @@ public class LockOnTargetController : MonoBehaviour
 
             yield return null;
         }
+
+        gameObject.SetActive(false);
     }
 
     private IEnumerator SelectedRoutine(float duration)
@@ -160,6 +180,8 @@ public class LockOnTargetController : MonoBehaviour
 
             yield return null;
         }
+
+        gameObject.SetActive(false);
     }
 
 }

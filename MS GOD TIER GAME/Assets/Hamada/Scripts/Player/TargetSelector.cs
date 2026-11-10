@@ -25,10 +25,10 @@ public class TargetSelector : MonoBehaviour
 
     private struct TargetInfo 
     {
-        public GameObject m_target;
+        public TargetableObject m_target;
         public Vector3 m_screenPos;
 
-        public TargetInfo(GameObject target, Vector3 screenPos) 
+        public TargetInfo(TargetableObject target, Vector3 screenPos) 
         {
             m_target = target;
             m_screenPos = screenPos;
@@ -36,6 +36,8 @@ public class TargetSelector : MonoBehaviour
     }
 
     [Header("参照")]
+
+    [SerializeField] private int m_maxTargetNumber = 3;
 
     [SerializeField] private float m_targetRange = 10.0f;
 
@@ -97,7 +99,7 @@ public class TargetSelector : MonoBehaviour
         CheckIfAddToTargetList();
 
         //ターゲットを配列に割り当てる
-        bool assignAllFlag = m_targetList.Count == 3;
+        bool assignAllFlag = m_targetList.Count == m_maxTargetNumber;
 
         if (assignAllFlag)
         {
@@ -174,7 +176,7 @@ public class TargetSelector : MonoBehaviour
         });
 
         //既に割り当ててるターゲットを保持するリスト
-        var selectedTargets = new HashSet<GameObject>();
+        HashSet<TargetableObject> selectedTargets = new HashSet<TargetableObject>();
 
         foreach (var candidate in candidates)
         {
@@ -233,7 +235,7 @@ public class TargetSelector : MonoBehaviour
             if (IsInsideScreen(viewPos) && IsTargetInRange(target.gameObject))
             {
                 Debug.Log("範囲内よー");
-                m_targetList.Add(new TargetInfo(target.gameObject, viewPos));
+                m_targetList.Add(new TargetInfo(target, viewPos));
             }
         }
     }
@@ -267,7 +269,14 @@ public class TargetSelector : MonoBehaviour
             return null;
         }
 
-        GameObject target = m_targetArray[intIndex].m_target;
+        TargetableObject targetable = m_targetArray[intIndex].m_target;
+
+        if (targetable == null) 
+        {
+            return null;
+        }
+
+        GameObject target = targetable.gameObject;
 
         if (target == null) 
         {

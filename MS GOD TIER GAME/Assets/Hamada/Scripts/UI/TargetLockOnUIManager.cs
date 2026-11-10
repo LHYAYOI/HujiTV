@@ -4,109 +4,158 @@ using UnityEngine;
 public class TargetLockOnUIManager : MonoBehaviour
 {
 
-    [System.Serializable]
-    public struct DirectionUIMapping
-    {
-        public MAGIC_CAST_DIRECTION direction;
-        public LockOnTargetController uiController; // あらかじめ配置したUIコントローラー
-    }
-
     [Header("参照")]
     [SerializeField] private TargetSelector m_targetSelector;
 
     [Header("方向別UIマッピング")]
-    [SerializeField] private List<DirectionUIMapping> m_directionUIMappings = new List<DirectionUIMapping>();
-
-    // 前フレームで各方向にアサインされていたターゲット（GameObject）を保持
-    private Dictionary<MAGIC_CAST_DIRECTION, GameObject> m_previousTargets = new Dictionary<MAGIC_CAST_DIRECTION, GameObject>();
+    [SerializeField] private List<LockOnTargetController> m_lockOnUIList = new List<LockOnTargetController>();
 
     private void Start()
     {
-        if (m_targetSelector == null)
-        {
-            m_targetSelector = TargetSelector.Instance;
-        }
-
         //初期化
-        foreach (var mapping in m_directionUIMappings)
+        foreach (LockOnTargetController ui in m_lockOnUIList)
         {
-            if (mapping.uiController != null)
+            if (ui != null)
             {
-                mapping.uiController.Init();
+                ui.Init();
+                ui.gameObject.SetActive(false);
             }
-            m_previousTargets[mapping.direction] = null;
         }
     }
 
     private void Update()
     {
-        if (m_targetSelector == null) return;
-
-        foreach (var mapping in m_directionUIMappings)
+        if (m_targetSelector == null)
         {
-            MAGIC_CAST_DIRECTION dir = mapping.direction;
-            LockOnTargetController uiController = mapping.uiController;
+            return;
+        }
 
-            if (uiController == null) 
+       //選定されてるターゲット取得
+        List<TargetableObject> activeTargets = GetActiveTargetsFromSelector();
+
+        // すでに割り当てられているUIのチェック（範囲外、またはフラグfalseになったものの解除）
+        foreach (LockOnTargetController ui in m_lockOnUIList)
+        {
+            if (!ui.gameObject.activeSelf) 
             {
                 continue;
             }
 
-            //TargetSelectorから現在のターゲットを取得
-            GameObject currentTargetObj = m_targetSelector.GetSelectedTarget(dir);
-            TargetableObject currentTargetable = null;
+            TargetableObject assignedTarget = ui.GetTarget();
 
-            if (currentTargetObj != null)
+            // ターゲット自体が消滅、または TargetSelector の有効リストから外れた（範囲外）
+            // TargetableObject の狙えるフラグが false になった
+            bool shouldRelease = assignedTarget == null || !assignedTarget.IsTargetable() || !activeTargets.Contains(assignedTarget);
+
+            if (shouldRelease)
             {
-                currentTargetable = currentTargetObj.GetComponent<TargetableObject>();
+                ui.CancelTargetUI();
+            }
+        }
 
-                //m_isTargetableFlag（IsTargetable）が false になっていたらターゲットなしとみなす
-                if (currentTargetable != null && !currentTargetable.IsTargetable())
+        // 新たに範囲内に入ってきたターゲットの割り当て
+        foreach (TargetableObject target in activeTargets)
+        {
+            if (target == null) continue;
+
+            // すでにこのターゲットを担当しているUIがすでにあるか確認
+            bool isAlreadyAssigned = false;
+
+            foreach (LockOnTargetController ui in m_lockOnUIList)
+            {
+                if (ui.gameObject.activeSelf && ui.GetTarget() == target)
                 {
-                    currentTargetObj = null;
-                    currentTargetable = null;
+                    isAlreadyAssigned = true;
+                    break;
                 }
             }
 
-            GameObject previousTargetObj = m_previousTargets[dir];
-
-            if (uiController.GetTarget() == currentTargetable) 
+            if (isAlreadyAssigned)
             {
                 continue;
             }
 
-            //状態の変化を検知して制御
-            if (previousTargetObj == null && currentTargetObj != null)
-            {
-                //範囲内に入ってきたまたは新たにターゲットされた
-                uiController.SetTarget(currentTargetable);
-                uiController.AppearTargetUI(); // 出現アニメーション再生
-            }
-            else if (previousTargetObj != null && currentTargetObj == null)
-            {
-                //範囲外に出た、またはターゲットフラグが false になった
-                uiController.SetTarget(null);
-                uiController.CancelTargetUI(); // 解除・フェードアウトアニメーション再生
-            }
-            else if (previousTargetObj != null && currentTargetObj != null && previousTargetObj != currentTargetObj)
-            {
-                //別のターゲットに切り替わった場合
-                uiController.SetTarget(currentTargetable);
-                uiController.AppearTargetUI();
-            }
+            // 割り当ててないUIを割り当てる
+            LockOnTargetController freeUI = GetFreeUI();
 
-            //前フレームの情報を更新
-            m_previousTargets[dir] = currentTargetObj;
+            if (freeUI != null)
+            {
+                freeUI.gameObject.SetActive(true);
+                freeUI.SetTarget(target);
+                freeUI.AppearTargetUI();
+            }
         }
+    }
+
+    // 空いている（使われていない）UIをプールから1つ見つける
+    private LockOnTargetController GetFreeUI()
+    {
+        foreach (LockOnTargetController ui in m_lockOnUIList)
+        {
+            if (!ui.gameObject.activeSelf)
+            {
+                return ui;
+            }
+        }
+
+        return null;
+    }
+
+    // TargetSelector から現在狙うべき有効なターゲットのリストを取得するヘルパー
+    private List<TargetableObject> GetActiveTargetsFromSelector()
+    {
+        List<TargetableObject> targets = new List<TargetableObject>();
+
+        // TargetSelector が持つ方向別配列（m_targetArrayなど）から有効なものを集める
+        foreach (MAGIC_CAST_DIRECTION dir in System.Enum.GetValues(typeof(MAGIC_CAST_DIRECTION)))
+        {
+            GameObject obj = m_targetSelector.GetSelectedTarget(dir);
+
+            if (obj != null)
+            {
+                TargetableObject targetable = obj.GetComponent<TargetableObject>();
+
+                if (targetable != null && !targets.Contains(targetable))
+                {
+                    targets.Add(targetable);
+                }
+            }
+        }
+
+        return targets;
     }
 
     public void PlaySelectedEffect(MAGIC_CAST_DIRECTION direction)
     {
-        foreach (var mapping in m_directionUIMappings)
+        GameObject target = m_targetSelector.GetSelectedTarget(direction);
+
+        if (target == null) 
         {
-            if (mapping.direction == direction && mapping.uiController != null)
+            return;
+        }
+
+        TargetableObject targetable = target.GetComponent<TargetableObject>();
+
+        if (targetable == null) 
+        {
+            return;
+        }
+
+        foreach (LockOnTargetController ui in m_lockOnUIList) 
+        {
+            if (ui == null) 
             {
-                mapping.uiController.SelectedTargetUI(); // 決定アニメーション再生
+                continue;
+            }
+
+            if (!ui.gameObject.activeSelf) 
+            {
+                continue;
+            }
+
+            if (ui.GetTarget() == targetable) 
+            {
+                ui.SelectedTargetUI();
                 break;
             }
         }
