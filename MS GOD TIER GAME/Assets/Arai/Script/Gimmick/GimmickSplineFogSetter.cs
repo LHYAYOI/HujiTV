@@ -8,6 +8,7 @@ public class GimmickSplineFogSetter : GimmickSpline
 
     [SerializeField] private GimmickSplineRange m_range;   
     [SerializeField] private Vector2 m_density;
+    [SerializeField] private AnimationCurve m_curve;
 
     private void Awake()
     {
@@ -31,9 +32,10 @@ public class GimmickSplineFogSetter : GimmickSpline
 
     public void SetDensity(CartController cart, float rate)
     {
+        Debug.Log(rate);
         foreach(var fog in m_targetFog)
         {
-            fog.m_density = Mathf.Lerp(m_density.x,m_density.y, rate);
+            fog.m_density = Mathf.Lerp(m_density.x,m_density.y, m_curve.Evaluate(rate));
         }
     }
 
@@ -41,7 +43,8 @@ public class GimmickSplineFogSetter : GimmickSpline
     {
         foreach(var fog in m_targetFog)
         {
-            fog.gameObject.SetActive(false);
+            fog.m_density = 0;
+//            fog.gameObject.SetActive(false);
         }
     }
 }

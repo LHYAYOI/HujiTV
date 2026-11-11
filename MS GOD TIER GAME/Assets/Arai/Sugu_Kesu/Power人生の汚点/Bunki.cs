@@ -54,7 +54,7 @@ public class Bunki : GimmickSpline
 
         foreach(GameObject go in data.Door)
         {
-            go.SetActive(false);
+//            go.SetActive(false);
         }
     }
 
