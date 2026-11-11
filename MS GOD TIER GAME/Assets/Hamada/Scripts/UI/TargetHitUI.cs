@@ -33,12 +33,13 @@ public class TargetHitUI : MonoBehaviour
         transform.LookAt(Camera.main.transform);
     }
 
-    public void ShowHitUI(GameObject target) 
+    public void ShowHitUI(GameObject target, Sprite sprite) 
     {
         m_target = target;
 
         m_image.color = m_defaultColor;
         m_image.transform.localScale = m_defaultSize;
+        m_image.sprite = sprite;
 
         StartCoroutine(ShowHitImageRoutine(m_animationDuration));
     }

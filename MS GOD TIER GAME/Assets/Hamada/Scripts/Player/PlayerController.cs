@@ -38,6 +38,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void TakeDamage() 
+    {
+    //ダメージ処理
+    }
+
     //弾の発射イベント
     private void OnReceiveCastMagic(PLAYER_SLOT slot, byte id, MAGIC_CAST_DIRECTION direction)
     {
@@ -54,8 +59,6 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
-
-
 
         CameraManager.Instance.ShakeCameraInVHF(.5f, 1.0f, 0.0f, 0.0f);
 
