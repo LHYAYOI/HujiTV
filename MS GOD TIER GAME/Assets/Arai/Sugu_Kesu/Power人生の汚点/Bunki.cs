@@ -1,10 +1,11 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class Bunki : GimmickSpline
 {
     [SerializeField] private List<Transform> m_roomObject;
+    [SerializeField] private GimmickSplineStop m_stop;
     [SerializeField] private GimmickSplineSwitchPoint m_switchPoint;
     [SerializeField] private Vector3 m_basePosition = Vector3.zero;
 
@@ -12,6 +13,7 @@ public class Bunki : GimmickSpline
     [System.Serializable]
     public class BunkiData
     {
+
         [SerializeField] private Vector3 m_position;
         [SerializeField] private List<GameObject> m_door;
         [SerializeField] private SplineController2 m_toSpline;
@@ -28,6 +30,11 @@ public class Bunki : GimmickSpline
 
     public void SetRoute(int index)
     {
+        m_stop?.Move();
+
+
+
+
         if (index < 0 || m_routeData.Count < index)
         {
             return;

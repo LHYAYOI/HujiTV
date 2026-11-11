@@ -76,6 +76,6 @@ public class GimmickSplineSwitchPoint : GimmickSpline
         Gizmos.DrawLine(gimmickPosition, switchOffsetPosition);
 
         Gizmos.color = Color.red;
-        Gizmos.DrawSphere(switchOffsetPosition, 0.3f);
+        Gizmos.DrawSphere(switchOffsetPosition, 0.06f);
     }
 }
