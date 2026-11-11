@@ -65,6 +65,21 @@ namespace YasudaHaruto.BookValidation
         private bool m_inventoryInitialized;
         public int PageCount => m_runtimePages.Count;
         public event Action<int> SpreadShown;
+        private Action<int, BookPageView, BookPageView, Camera> m_pageDecoration;
+        private int m_captureSpread;
+
+        internal void SetPageDecoration(Action<int, BookPageView, BookPageView, Camera> decoration)
+        {
+            m_pageDecoration = decoration;
+            if (decoration != null)
+                PreparePageDecoration(m_captureSpread, m_leftPageView, m_rightPageView, m_captureCamera);
+        }
+
+        private void PreparePageDecoration(int spread, BookPageView left, BookPageView right, Camera camera)
+        {
+            if (camera == m_captureCamera) m_captureSpread = spread;
+            m_pageDecoration?.Invoke(spread, left, right, camera);
+        }
         private readonly List<BookPageData> m_runtimePages = new List<BookPageData>();
         private Action<bool> m_inventoryCompletion;
 
@@ -109,6 +124,7 @@ namespace YasudaHaruto.BookValidation
             int left = targetSpread * 2;
             m_leftPageView.ShowPage(candidate[left]);
             m_rightPageView.ShowPage(left + 1 < candidate.Count ? candidate[left + 1] : null);
+            PreparePageDecoration(targetSpread, m_leftPageView, m_rightPageView, m_captureCamera);
             m_captureCamera.targetTexture = target;
             m_captureCamera.enabled = true;
             Canvas.ForceUpdateCanvases();
@@ -439,6 +455,7 @@ namespace YasudaHaruto.BookValidation
             m_captureCamera.targetTexture = targetTexture;
             m_leftPageView.ShowPage(GetPage(spreadIndex * 2));
             m_rightPageView.ShowPage(GetPage(spreadIndex * 2 + 1));
+            PreparePageDecoration(spreadIndex, m_leftPageView, m_rightPageView, m_captureCamera);
             Canvas.ForceUpdateCanvases();
             m_captureCamera.enabled = true;
             yield return WaitForCameraFrame(m_captureCamera);
@@ -516,6 +533,7 @@ namespace YasudaHaruto.BookValidation
             if (m_liveCamera == null || m_liveLeftView == null || m_liveRightView == null || m_currentTexture == null) return;
             m_liveLeftView.ShowPage(GetPage(m_spreadIndex * 2));
             m_liveRightView.ShowPage(GetPage(m_spreadIndex * 2 + 1));
+            PreparePageDecoration(m_spreadIndex, m_liveLeftView, m_liveRightView, m_liveCamera);
             Canvas.ForceUpdateCanvases();
             m_liveCamera.targetTexture = m_currentTexture;
             m_liveCamera.enabled = true;
@@ -547,6 +565,7 @@ namespace YasudaHaruto.BookValidation
             m_captureCamera.targetTexture = targetTexture;
             m_leftPageView.ShowPage(leftPage);
             m_rightPageView.ShowPage(rightPage);
+            PreparePageDecoration(spreadIndex, m_leftPageView, m_rightPageView, m_captureCamera);
 
             Canvas.ForceUpdateCanvases();
 
@@ -571,6 +590,7 @@ namespace YasudaHaruto.BookValidation
                         m_captureCamera.targetTexture = m_currentTexture;
                         m_leftPageView.ShowPage(GetPage(m_spreadIndex * 2));
                         m_rightPageView.ShowPage(GetPage(m_spreadIndex * 2 + 1));
+                        PreparePageDecoration(m_spreadIndex, m_leftPageView, m_rightPageView, m_captureCamera);
                         Canvas.ForceUpdateCanvases();
                         m_captureFlag = false;
                         ResumePendingSpread();

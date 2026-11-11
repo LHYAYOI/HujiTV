@@ -61,7 +61,6 @@ namespace YasudaHaruto.BookValidation.Editor
             EditorApplication.EnterPlaymode();
         }
 
-        [MenuItem("Tools/YasudaHaruto/Verify Network Recovery")]
         public static void Run()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)

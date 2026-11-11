@@ -2062,15 +2062,15 @@ MonoBehaviour:
   m_grabCorner: 0
   m_closeAtEnds: 1
   m_grabZone: 1
-  m_castOrigin: {x: 0.5, y: 0.25}
+  m_castOrigin: {x: 0.5, y: 0.39}
   m_castRadius: 0.08
   m_castShade: 0.55
   m_castPulseSpeed: 1
   m_castPulseAmount: 0.08
   m_castArrowWidth: 0.2
   m_spellSettings:
-    m_floatDuration: 0.35
-    m_gatherDuration: 0.55
+    m_floatDuration: 0.2
+    m_gatherDuration: 0.3
     m_floatHeight: 0.12
     m_traceParticleCount: 220
     m_traceParticleSize: 0.009

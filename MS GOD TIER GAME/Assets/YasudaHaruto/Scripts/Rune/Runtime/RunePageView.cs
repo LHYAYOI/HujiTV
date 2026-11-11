@@ -41,27 +41,28 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
     private Func<Rect?> m_spellBookRect;
     private Func<Vector2> m_spellOrigin;
     private Func<float> m_spellSideAngle;
+    private Func<MagicData> m_spellMagic;
     private RuneSpellSettings m_spellSettings;
     private RuneSpellEffect m_spellEffect;
-    private bool m_directionalCast = true;
     public bool IsCastReady => m_spellEffect == null || !m_spellEffect.IsVisible || m_spellEffect.IsReady;
     public RuneSpellEffect SpellEffect => m_spellEffect;
 
     public void ConfigureSpellCast(Func<Rect?> bookRect, Func<Vector2> origin,
-        RuneSpellSettings settings, Func<float> sideAngle)
+        RuneSpellSettings settings, Func<float> sideAngle, Func<MagicData> magic = null)
     {
         m_spellBookRect = bookRect;
         m_spellOrigin = origin;
         m_spellSettings = settings;
         m_spellSideAngle = sideAngle;
+        m_spellMagic = magic;
     }
 
-    public void SetDirectionalCast(bool directional) => m_directionalCast = directional;
-    public void SetSpellDrag(Vector2 delta, float radius) => m_spellEffect?.SetDrag(delta, radius);
+    public void SetSpellDrag(Vector2 offset) => m_spellEffect?.SetDrag(offset);
+    public void CancelSpellDrag() => m_spellEffect?.CancelDrag();
     public void LaunchCast(MAGIC_CAST_DIRECTION direction) => m_spellEffect?.Launch(direction);
-    private void HideSpell(bool keepFlying = false)
+    private void HideSpell(bool keepReleasing = false)
     {
-        if (m_spellEffect != null && !(keepFlying && m_spellEffect.IsFlying)) m_spellEffect.Hide();
+        if (m_spellEffect != null && !(keepReleasing && m_spellEffect.IsReleasing)) m_spellEffect.Hide();
     }
 
     public void ConfigureCooldownImage(Func<UnityEngine.UI.Image> image) => m_cooldownImage = image;
@@ -79,6 +80,57 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
     private Func<Rect?> m_screenRect;
     private Func<RectTransform, Rect?> m_graphicScreenRect;
     private RuneFailureOverlay m_failureOverlay;
+    private RuneLineGraphic m_traceGraphic;
+    private Canvas m_traceCanvas;
+    private Func<bool> m_traceVisible;
+    private Color m_traceColor;
+    private bool m_hasTrace;
+    private RuneLineGraphic PlayerGraphic => m_traceGraphic != null ? m_traceGraphic : m_playerGraphic;
+
+    // The captured graphic remains the coordinate/width reference.
+    public void ConfigureTraceOverlay(Func<bool> visible)
+    {
+        m_traceVisible = visible;
+        if (m_traceGraphic != null || m_playerGraphic == null) return;
+        var root = new GameObject("Rune Trace Overlay", typeof(RectTransform), typeof(Canvas));
+        m_traceCanvas = root.GetComponent<Canvas>();
+        m_traceCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        m_traceCanvas.sortingOrder = 30400;
+        m_traceGraphic = new GameObject("Player Trace", typeof(RectTransform), typeof(CanvasRenderer),
+            typeof(RuneLineGraphic)).GetComponent<RuneLineGraphic>();
+        m_traceGraphic.transform.SetParent(root.transform, false);
+        m_traceGraphic.raycastTarget = false;
+        m_playerGraphic.Clear();
+        m_traceCanvas.enabled = false;
+    }
+
+    private void LateUpdate()
+    {
+        if (m_traceCanvas == null) return;
+        bool available = m_hasTrace && isActiveAndEnabled && Application.isFocused &&
+            (m_traceVisible == null || m_traceVisible());
+        Rect? area = available && m_playerGraphic != null ? GetCompletionScreenRect() : null;
+        bool visible = available && area.HasValue;
+        m_traceCanvas.enabled = visible;
+        if (!visible) return;
+        Rect rect = area.Value;
+        RectTransform target = m_traceGraphic.rectTransform;
+        target.anchorMin = target.anchorMax = target.pivot = Vector2.zero;
+        target.sizeDelta = rect.size;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)m_traceCanvas.transform,
+            rect.min, null, out Vector2 local);
+        target.position = m_traceCanvas.transform.TransformPoint(local);
+        float width = m_playerGraphic.LineWidth * rect.width /
+            Mathf.Max(0.001f, m_playerGraphic.rectTransform.rect.width);
+        if (!Mathf.Approximately(m_traceGraphic.LineWidth, width)) m_traceGraphic.LineWidth = width;
+    }
+
+    private void HideTrace()
+    {
+        m_hasTrace = false;
+        if (m_traceCanvas != null) m_traceCanvas.enabled = false;
+        if (PlayerGraphic != null) PlayerGraphic.Clear();
+    }
 
     public void ConfigureScreenProjection(Func<Rect?> screenRect, Func<RectTransform, Rect?> graphicScreenRect = null)
     {
@@ -104,8 +156,8 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
     public void SetTraceDeviation(float normalizedDeviation)
     {
         float amount = Mathf.Pow(Mathf.Clamp01(normalizedDeviation), Mathf.Max(0.1f, m_deviationColorPower));
-        if (m_playerGraphic != null)
-            m_playerGraphic.color = Color.Lerp(m_accurateColor, m_deviatedColor, amount);
+        m_traceColor = Color.Lerp(m_accurateColor, m_deviatedColor, amount);
+        if (PlayerGraphic != null) PlayerGraphic.color = m_traceColor;
     }
 
     public void UpdateCurrentStroke(IReadOnlyList<Vector2> points)
@@ -118,7 +170,8 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
         {
             m_displayStrokes.Add(new RuneStrokeData(points));
         }
-        if (m_playerGraphic != null) m_playerGraphic.SetStrokes(m_displayStrokes);
+        m_hasTrace = m_displayStrokes.Count > 0;
+        if (PlayerGraphic != null) PlayerGraphic.SetStrokes(m_displayStrokes);
     }
 
     public void EndStroke()
@@ -128,7 +181,8 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
             m_completedStrokes.Add(new RuneStrokeData(m_lastCurrentStroke));
         }
         m_lastCurrentStroke.Clear();
-        if (m_playerGraphic != null) m_playerGraphic.SetStrokes(m_completedStrokes);
+        m_hasTrace = m_completedStrokes.Count > 0;
+        if (PlayerGraphic != null) PlayerGraphic.SetStrokes(m_completedStrokes);
     }
 
     public void BringToFront() => transform.SetAsLastSibling();
@@ -137,24 +191,25 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
 
     public void PlayCompletion()
     {
+        HideTrace();
         if (!isActiveAndEnabled || m_playerGraphic == null || m_completedStrokes.Count == 0) return;
         Rect? area = GetCompletionScreenRect();
         if (!area.HasValue || m_playerGraphic.rectTransform.rect.width <= 0f) return;
-        if (m_directionalCast && m_spellSettings != null && m_spellBookRect != null)
+        if (m_spellSettings != null && m_spellBookRect != null)
         {
             if (m_spellEffect == null)
-                m_spellEffect = new GameObject("Rune Spell Particles", typeof(RectTransform)).AddComponent<RuneSpellEffect>();
-            Color color = RuneSpellPalette.Sample(m_cooldownImage?.Invoke(), m_spellSettings.FallbackColor);
-            m_spellEffect.Play(m_completedStrokes, GetCompletionScreenRect, m_spellBookRect, m_spellOrigin,
-                m_spellSettings, color, m_spellSideAngle != null ? m_spellSideAngle() : 45f);
-            m_playerGraphic.Clear();
+                m_spellEffect = new GameObject("Rune Cast Presentation", typeof(RectTransform)).AddComponent<RuneSpellEffect>();
+            float traceWidth = m_playerGraphic.LineWidth * area.Value.width / m_playerGraphic.rectTransform.rect.width;
+            m_spellEffect.Play(m_completedStrokes, area.Value, m_spellBookRect, m_spellOrigin,
+                m_spellSettings, Color.white, traceWidth, m_spellSideAngle != null ? m_spellSideAngle() : 45f,
+                m_spellMagic?.Invoke());
             return;
         }
         if (m_completionOverlay == null)
             m_completionOverlay = new GameObject("Rune Completion Overlay", typeof(RectTransform))
                 .AddComponent<RuneCompletionOverlay>();
         float width = m_playerGraphic.LineWidth * area.Value.width / m_playerGraphic.rectTransform.rect.width;
-        m_completionOverlay.Play(m_completedStrokes, GetCompletionScreenRect, m_playerGraphic.color, width,
+        m_completionOverlay.Play(m_completedStrokes, GetCompletionScreenRect, m_traceColor, width,
             m_completionDuration, m_completionEndScale);
     }
 
@@ -170,6 +225,8 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
 
     public void PlayFailure(RuneTraceResult result)
     {
+        ClearPlayerStrokes();
+        if (isActiveAndEnabled) Canvas.ForceUpdateCanvases();
         HideSpell();
         HideCompletion();
         if (!isActiveAndEnabled) return;
@@ -221,11 +278,16 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
 
     private void ClearGraphics()
     {
+        ClearPlayerStrokes();
+        if (m_referenceGraphic != null) m_referenceGraphic.Clear();
+    }
+
+    private void ClearPlayerStrokes()
+    {
         m_completedStrokes.Clear();
         m_displayStrokes.Clear();
         m_lastCurrentStroke.Clear();
-        if (m_referenceGraphic != null) m_referenceGraphic.Clear();
-        if (m_playerGraphic != null) m_playerGraphic.Clear();
+        HideTrace();
     }
 
     public void Clear()
@@ -245,6 +307,7 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
 
     private void OnDisable()
     {
+        ClearPlayerStrokes();
         HideSpell();
         HideCooldown();
         HideFailure();
@@ -253,6 +316,7 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
 
     private void OnDestroy()
     {
+        if (m_traceCanvas != null) Destroy(m_traceCanvas.gameObject);
         if (m_spellEffect != null) Destroy(m_spellEffect.gameObject);
         if (m_failureOverlay != null) Destroy(m_failureOverlay.gameObject);
         if (m_completionOverlay != null) Destroy(m_completionOverlay.gameObject);
