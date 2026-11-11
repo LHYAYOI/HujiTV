@@ -55,6 +55,8 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+
+
         CameraManager.Instance.ShakeCameraInVHF(.5f, 1.0f, 0.0f, 0.0f);
 
         m_bulletManager.FireBullet(magicData, direction, target);
