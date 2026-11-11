@@ -21,13 +21,15 @@ public class BookGameBootstrap : MonoBehaviour
     [SerializeField] private BookGameDragInput m_gameDragInput;
 
     [Header("Obstacles")]
-    [SerializeField] private ObstacleData[] m_obstacles = new ObstacleData[0];
+    [SerializeField] private ObstacleData m_obstacleSettings;
     [SerializeField] private Rect m_rightObstacleArea = new Rect(0.1f, 0.15f, 0.8f, 0.7f);
     private BookObstacleController m_obstacleController;
     private RuneTraceController m_runeTraceController;
     [SerializeField] private PageDatabase m_pageDatabase;
     private BookNetworkClient m_networkClient;
     private BookPageRequestQueue m_pageRequests;
+    public BookGameController GameController => m_gameController;
+    public BookObstacleController ObstacleController => m_obstacleController;
 
     private void Start()
     {
@@ -66,7 +68,7 @@ public class BookGameBootstrap : MonoBehaviour
         m_pageRequests = new BookPageRequestQueue(m_pageDatabase, m_gameController);
         Debug.Log("BookGameBootstrap : 初期化完了");
         m_obstacleController = gameObject.AddComponent<BookObstacleController>();
-        m_obstacleController.Initialize(m_gameController, m_gameDragInput, m_obstacles, m_rightObstacleArea);
+        m_obstacleController.Initialize(m_gameController, m_gameDragInput, m_obstacleSettings, m_rightObstacleArea);
         m_networkClient = networkClient;
         if (m_networkClient != null)
         {

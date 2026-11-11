@@ -44,7 +44,6 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
     private Func<MagicData> m_spellMagic;
     private RuneSpellSettings m_spellSettings;
     private RuneSpellEffect m_spellEffect;
-    private bool m_directionalCast = true;
     public bool IsCastReady => m_spellEffect == null || !m_spellEffect.IsVisible || m_spellEffect.IsReady;
     public RuneSpellEffect SpellEffect => m_spellEffect;
 
@@ -58,13 +57,12 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
         m_spellMagic = magic;
     }
 
-    public void SetDirectionalCast(bool directional) => m_directionalCast = directional;
     public void SetSpellDrag(Vector2 offset) => m_spellEffect?.SetDrag(offset);
     public void CancelSpellDrag() => m_spellEffect?.CancelDrag();
     public void LaunchCast(MAGIC_CAST_DIRECTION direction) => m_spellEffect?.Launch(direction);
-    private void HideSpell(bool keepFlying = false)
+    private void HideSpell(bool keepReleasing = false)
     {
-        if (m_spellEffect != null && !(keepFlying && m_spellEffect.IsFlying)) m_spellEffect.Hide();
+        if (m_spellEffect != null && !(keepReleasing && m_spellEffect.IsReleasing)) m_spellEffect.Hide();
     }
 
     public void ConfigureCooldownImage(Func<UnityEngine.UI.Image> image) => m_cooldownImage = image;
@@ -143,7 +141,7 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
         if (!isActiveAndEnabled || m_playerGraphic == null || m_completedStrokes.Count == 0) return;
         Rect? area = GetCompletionScreenRect();
         if (!area.HasValue || m_playerGraphic.rectTransform.rect.width <= 0f) return;
-        if (m_directionalCast && m_spellSettings != null && m_spellBookRect != null)
+        if (m_spellSettings != null && m_spellBookRect != null)
         {
             if (m_spellEffect == null)
                 m_spellEffect = new GameObject("Rune Cast Presentation", typeof(RectTransform)).AddComponent<RuneSpellEffect>();

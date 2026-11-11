@@ -199,7 +199,8 @@ namespace YasudaHaruto.BookValidation
                 var arrow = m_arrows[i];
                 if (arrow == null) continue;
                 if (frame != null) arrow.sprite = frame;
-                bool visible = show && arrow.sprite != null;
+                bool visible = show && arrow.sprite != null &&
+                    (m_controller.UsesThreeDirections || i == (int)MAGIC_CAST_DIRECTION.CENTER);
                 arrow.gameObject.SetActive(visible);
                 float angle = (i - 1) * sideAngle;
                 Vector2 direction = new Vector2(Mathf.Sin(angle * Mathf.Deg2Rad), Mathf.Cos(angle * Mathf.Deg2Rad));
@@ -285,7 +286,8 @@ namespace YasudaHaruto.BookValidation
             }
 
             if (m_graphic.SelectedDirection < 0 &&
-                m_detector.TryPreviewDirection(m_start, pointer, out MAGIC_CAST_DIRECTION direction))
+                m_detector.TryPreviewDirection(m_start, pointer, out MAGIC_CAST_DIRECTION direction) &&
+                (m_controller.UsesThreeDirections || direction == MAGIC_CAST_DIRECTION.CENTER))
                 m_graphic.SelectedDirection = (int)direction;
             if (m_graphic.SelectedDirection < 0) return Vector2.zero;
 

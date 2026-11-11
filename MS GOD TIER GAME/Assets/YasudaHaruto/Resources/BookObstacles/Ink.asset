@@ -12,12 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe1490c2c0064a4f98e7a30730a8a4e9, type: 3}
   m_Name: Ink
   m_EditorClassIdentifier:
-  m_obstacleId: 2
-  m_slotCount: 2
-  m_removalType: 1
-  m_texture: {fileID: 0}
-  m_color: {r: 0.02, g: 0.02, b: 0.02, a: 1}
-  m_rubPasses: 8
-  m_rubDistance: 0.2
-  m_brushRadius: 0.1
-  m_clearRatio: 0.85
+  m_texture: {fileID: 2800000, guid: de4e5b96bf5d4e03aa4f212a8031b966, type: 3}
+  m_color: {r: 1, g: 1, b: 1, a: 1}
+  m_requiredDistance: 4
+  m_minimumMovement: 0.003

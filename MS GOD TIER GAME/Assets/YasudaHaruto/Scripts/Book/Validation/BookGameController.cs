@@ -24,6 +24,13 @@ public class BookGameController : MonoBehaviour
 
     [SerializeField] private BookInventorySettings m_inventorySettings;
     private BookInventory m_inventory;
+    private IReadOnlyList<PageInstance> m_captureCandidate;
+
+    internal PageInstance GetPageForCapture(int spread, bool live)
+    {
+        var pages = !live && m_captureCandidate != null ? m_captureCandidate : Pages;
+        return pages != null && spread > 0 && spread <= pages.Count ? pages[spread - 1] : null;
+    }
     private bool m_editing;
     private Func<bool> m_canEdit;
     private int m_maxPageCount;
@@ -148,6 +155,7 @@ public class BookGameController : MonoBehaviour
 
         EndCurrentInteraction();
         m_editing = false;
+        m_captureCandidate = null;
         m_initialized = false;
     }
 
@@ -174,6 +182,7 @@ public class BookGameController : MonoBehaviour
             currentSpread == 0 ? 0 : currentSpread + 1;
         m_editing = true;
         EndCurrentInteraction();
+        m_captureCandidate = candidate;
         bool accepted = m_bookController.TryApplyInventory(visuals, spread, present, success =>
         {
             if (success)
@@ -181,6 +190,7 @@ public class BookGameController : MonoBehaviour
                 m_inventory.Commit(candidate);
                 if (present) m_bookController.PlayAcquisitionEffect();
             }
+            m_captureCandidate = null;
             m_editing = false;
             if (isActiveAndEnabled && m_initialized && m_bookController.IsReady && !m_bookController.IsClosed)
                 ActivateSpread(m_bookController.CurrentSpread);
@@ -188,6 +198,7 @@ public class BookGameController : MonoBehaviour
         });
         if (!accepted)
         {
+            m_captureCandidate = null;
             m_editing = false;
             ActivateSpread(m_bookController.CurrentSpread);
         }

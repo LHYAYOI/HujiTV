@@ -14,6 +14,9 @@ public class MagicData : ScriptableObject
 
     [SerializeField] private MAGIC_AIM_TYPE m_aimType = MAGIC_AIM_TYPE.THREE_DIRECTIONS;
 
+    [Tooltip("Projectile flies from the book; Instant activates the rune in place.")]
+    [SerializeField] private MAGIC_CAST_TYPE m_castType = MAGIC_CAST_TYPE.PROJECTILE;
+
     [Tooltip("着弾時に表示する固定ルーン画像。未設定の場合はルーン画像の演出を省略します。")]
     [SerializeField] private Sprite m_impactRuneTexture;
 
@@ -22,5 +25,6 @@ public class MagicData : ScriptableObject
     public MAGIC_TYPE MagicType => m_magicType;
     public EVENT_MAGIC_TYPE EventMagicType => m_eventMagicType;
     public MAGIC_AIM_TYPE AimType => m_aimType;
+    public MAGIC_CAST_TYPE CastType => m_castType;
     public Sprite ImpactRuneTexture => m_impactRuneTexture;
 }

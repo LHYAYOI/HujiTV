@@ -1,4 +1,20 @@
 # Project Status
+## 魔法の発動方式を方向指定から分離（2026-11-11）
+
+- MagicDataにMAGIC_CAST_TYPE（PROJECTILE=0 / INSTANT=1）とCastTypeを追加。InspectorのCast Typeから選択する。MAGIC_AIM_TYPEとは独立し、既存アセットは未設定時PROJECTILEとして従来の挙動を維持する。既存魔法の分類は推測で変更していない。
+- 本側のRuneSpellEffectでCastTypeを参照。PROJECTILEは既存の弾プレビュー・飛翔を維持。INSTANTは弾プレビューを生成せず、ドラッグ中もルーンを発射位置に留め、確定時に0.25秒で拡大・フェードする。クールダウン終了による描画リセットでも発動中の演出を維持する。
+- スワイプ操作と魔法ID・方向の送信は共通。明かり等のゲーム内効果自体は追加していない。PC側の受信・HamadaのMagicBulletManagerによる弾生成分岐は今回未変更。PC側で分類を利用する場合はMagicData.CastTypeを参照して連携する必要がある。
+- Verify Rune Spell In Current Sceneに、INSTANTの設定取得、弾なし・移動なし・飛翔なし、リセット時の演出維持、演出終了の検証を追加。
+- Unity同梱Roslyn・Bee参照による別出力Runtime/Editorコンパイル成功（既存Runtime警告3件）。Play Mode検証メニュー実行・目視・実機は未実施。Git終了確認は親パス解決エラーにより未完了。Scene・Prefab・他担当コードは未変更。
+
+## 方向指定なしの魔法も上スワイプで発動（2026-11-11）
+
+- AGENTS.mdと本記録を確認。NONEの魔法はルーン完成時の即発動を廃止し、完成演出→指を離す→上矢印へのスワイプで発動する。3方向魔法の操作は維持。
+- NONEでは中央（上）の矢印のみ表示し、左右の選択・確定を拒否する。演出は上方向へ発射し、CastConfirmedと通信へ渡す方向は従来のNONEを維持。クールダウンはスワイプ確定時から開始。
+- RuneSpellValidationとRuneFeedbackValidationの即発動前提を更新。上矢印のみの表示、左右拒否、単発通知、NONE維持の確認を追加。
+- Unity同梱RoslynとBee参照で現行Runtime・Editorソースの別出力コンパイル成功（Runtimeは既存警告3件）。Unityが無視する末尾~のバックアップは検証ソースから除外。Play Modeでの検証メニュー実行、目視、Android実機・通信は未確認。
+- 開始時のGit status/fetch/追跡先比較は成功し、追跡先との差分なし。既存変更はAssets/hatake/common/texture/number.png.metaのみ。終了時のGit差分確認は親リポジトリのパス解決／アクセス拒否で失敗。既存変更・Scene・Prefab・共有設定は変更していない。
+
 
 ## 左右の矢印と弾の軌道を一致（2026-11-10）
 
@@ -824,3 +840,57 @@ $12026-10-29：お邪魔4枠の初期実装。左右擦り・スクラッチ、�
 - 外部検証成果物：C:/Users/ths30546/.codex/visualizations/2026/11/02/01a19b7c-e5ee-7a51-9572-bcb6ef59b35a/trace-before-results.json、trace-after-results.json、trace-after-output-mobile.png、trace-before.log / trace-after.log。最初の補助検証のGetMesh呼び出しと対象View取得を修正後、上記の比較を実施した。
 - 開始時からのMobile_Renderer.asset、UniversalRenderPipelineGlobalSettings.asset、number.png.meta、.utmp配下の変更は保持。今回の変更は担当側Bootstrap、新規更新通知スクリプトと.meta、本記録のみ。次はユーザーによるBookSceneでの実操作確認。その後に位置調整・フチの仕様／実装へ進む。
 - ユーザー実操作で線の表示を確認。その後のOnPostRender引数エラーを修正。Unityの引数なしメッセージOnPostRenderと、Camera.onPostRenderイベント用のCamera引数付きハンドラーが同名だったため、後者をHandleCameraRenderedへ改名し、購読・解除・URP側からの呼び出しも更新。Camera引数と再描画通知の動作は維持。参照の静的確認を実施し、この改名後のUnity再生確認は未実施。位置・フチは未変更。
+
+## お邪魔を汚れ1種類へ絞る現状調査・設計案（2026-11-11）
+- ユーザー依頼により現行コードを確認。4枠管理、Rub／Scratch派生、方式enum、種類辞書、Rub／Inkアセットが残る。Rubは初期8段階で全体が薄くなる。BookSceneはResourcesの2種をロードする設定。ServerにSpace→PLAYER1／ID1の確認用送信が存在する。
+- BOOK_INTERACTION_DESIGN.md末尾に単一汚れへの簡素化案を追記。方式基底・派生・種類検索・除去マスクをなくし、各枠が清掃進捗を直接保持する案。4枠、操作制限、入力所有権、通信の重複防止と予約は維持する前提。
+- 通信byteの種類IDを枠数へ黙って読み替えず、既存固定ID1による互換維持を先行する案。擦り方向・滑らかな薄化・複数枠付与の継続は未確定。
+- 今回は資料のみ更新。既存の魔法発動方式・方向入力等の未コミット変更を保持し、ゲームコード・Scene・Prefab・アセットを変更していない。Unity実行・コンパイル・実機確認は未実施。
+- Git status/fetch/追跡先コミット比較を実施。MS-133/Fix/BookShotAnimationは追跡先との差分なし。禁止Git操作なし。
+
+## インク汚れ1種類・連続距離解除の実装（2026-11-11）
+- ユーザー確定の4枠・複数枠付与を維持。左右往復回数／スクラッチの汎用方式を廃止し、各枠のObstacleInstanceで方向を問わない距離と進捗を直接保持する方式へ変更。
+- 縦横で同じ画面移動距離が同じ進捗になるよう、表示の短辺で両軸を正規化。手ぶれ・押し直しの座標差・キャンセル後の移動は加算しない。全体alphaを連続的に減らし、表示は4頂点へ簡素化。
+- 単一のObstacleData設定へ統一。種類ID／方式enum／辞書／基底派生／64×64除去マスクを撤去。旧RubアセットGUIDを維持して使用し、Inkアセットは旧GUID保護のため残すが種類として読み込まない。
+- 新SendDirt(playerSlot,slotCount)とAPPLY_DIRT=10を追加。旧メッセージ6を無断で読み替えず、ID1／2のみ1枠／2枠の同じ汚れへ互換変換する。旧SendObstacleは互換窓口。ServerのSpace確認送信も新APIを使用。敵側の接続追加は未実施。
+- imagegenスキル・built-in image_genで黒いインク飛沫を生成しResources/BookObstacles/InkSplat.pngへ保存・設定済み。alphaを保持し、Read/Write不要。プロンプト・設定・手順はBOOK_OBSTACLE_IMPLEMENTATION.mdへ記録。
+- 別出力Runtime／Editorコンパイル成功（既存警告3件）。同じプロジェクトのUnityが起動していないことを確認後、Unity6000.3.23f1バッチ検証でBookObstacle COMPLETE／BookObstacleRuntime COMPLETE。透過画像の透明角と不透明中心、方向不変の距離、連続alpha、枠の個別解除、上書き、4番枠の制限／復帰、予約受信を検証。
+- Play Modeでは合成ポインターの縦ドラッグで進捗増加し、4番枠だけを擦り切って他枠を残したまま通常入力が復帰することを確認。初回のメッシュ検証は反射の同名メソッドが曖昧で失敗し、DeclaredOnly指定で修正後に全検証を通過。
+- バッチScreenCaptureでは画面PNGを取得できず、本全体での最終目視は未確認。元PNGの見た目・透過とUnityへの接続は確認済み。Android物理タッチ・実PC間通信は未実施。
+- 元Scene／Prefab／hatake原本／共有設定を編集していない。保存済みBookSceneのSHA256は作業前後795B63625E14E7A34891FEC0E93419AAB31AFDDDEBE58CD563472894560A190Cで同一。開始時の魔法発動方式・ルーン演出等のユーザー変更を保持。バッチは終了済み。
+- 開始時のGit status／fetch／追跡先比較は成功。終了時は通常権限の親Gitアクセスが失敗したため承認付きでstatus／diffを確認。禁止Git操作なし。
+
+## お邪魔デバッグ画面（2026-11-11）
+- Tools > YasudaHaruto > Obstacle Debug Windowを追加。Play Modeで1〜4枠を選んで現在の本へ汚れを直接追加できる。表紙・固定ページなら最初の通常見開きを開いて適用する既存Preview処理を共用。
+- 各枠の清掃進捗と4番枠による操作制限を表示。初期化中・めくり中・編集中・一時停止中は追加ボタンを無効化。通信接続は不要。
+- 既存Preview ObstacleにはThree Stainsを追加。単一汚れの既存付与処理を利用し、通信イベントIDには触れない。
+- Unity同梱Roslyn・既存Bee参照でEditorソースの別出力コンパイル成功。初回は前回のTemp応答ファイルが消えていたため、現行Bee応答ファイルから再構成して確認した。今回のウィンドウ目視・Play Modeボタン操作は未実施。Scene・Prefab・ゲーム側処理は未変更。
+
+## 通常見開きでデバッグ追加できない問題の修正（2026-11-11）
+- 原因：デバッグ画面とPreviewがbootstrap.GetComponent<BookGameController>()を使い、同じGameObjectにあると誤って仮定していた。現行BookSceneのBootstrapは別GameObjectの管理コンポーネントをm_gameControllerで参照しているためnullになり、ボタン無効／無言returnになっていた。
+- BootstrapのGameController／ObstacleController参照を公開し、画面とPreviewが実際の初期化先を使うよう修正。追加不可時の説明も参照未設定・初期化・一時停止等へ分けた。
+- 現行BookSceneの既存UnityでVerify Book Obstacles In Current Sceneを実行。別GameObject間の参照一致、実際のPreview(2)による通常見開きへの2枠追加を新規確認し、BookObstacleRuntime COMPLETE。既存の通信解析・4番枠制限・個別擦り解除も通過。
+- Runtime／Editor別出力コンパイル成功（既存警告3件）。Sceneの保存・差し替えなし。検証後のPlay Mode終了を画面で確認。既存変更を保持。
+
+## 汚れの配置拡大とTools整理（2026-11-11）
+- ユーザーがお邪魔デバッグの実操作成功を確認。その後の指定により、1枠目を右ページ領域の右上、2枠目を中央左、3枠目を右下へ固定配置。横帯／付与順による位置ずらしを廃止し、各矩形を拡大。2列間に隙間を置き、拡大しても解除の当たり判定が重ならない構成。4番枠も左ページ内で少し拡大。画像の縦横比を維持。
+- 担当側ToolsのVerify系10件をメニューから削除。Obstacle Debug Windowと重複するPreview Obstacleの4件も削除。残る担当メニューはObstacle Debug Window、Preview Page Drop and Acquisition、Tools/Rune Editor。
+- 内部検証メソッドは再検証用に保持し、MenuItem登録のみ撤去。ゲームの操作画面・Scene・Prefab・他メンバーのメニューには変更なし。
+- Runtime／Editor別出力コンパイル成功（既存警告3件）。残存MenuItemを静的確認。今回の配置のPlay Mode目視とメニューのUI確認は未実施。
+- 開始時のGit status／fetch／追跡先比較を実施。追跡先とのコミット差分なし。既存ユーザー変更を保持し、禁止Git操作なし。
+
+## 汚れの外へ出た後の擦り再開（2026-11-11）
+- ユーザー報告：左クリック保持中に汚れの外へ出ると、戻っても消せない。原因はMovePointerの範囲外判定でCancelPointerを呼び、操作対象まで破棄していたこと。
+- 範囲外では入力所有権と元の汚れを保持し、距離計測のみ停止する。再入場ではその位置へ起点を置き直してから擦りを再開。外側の経路や再入場時の座標差は清掃に加算しない。指離し・上書き・フォーカス喪失等の取消は従来どおり。
+- Runtime／Editor別出力コンパイル成功（既存警告3件）。既存Unityで非表示の回帰検証を実行し、外側移動で進捗不変・再入場時のジャンプ加算なし・押し直さず清掃再開・4番枠解除後の復帰を合成ポインターで確認。BookObstacleRuntime COMPLETE。Verifyメニューは再追加していない。
+- Scene・Prefab・他担当コードは未変更。既存変更を保持。実マウス／Androidタッチでの体感確認は未実施。利用ガイドの範囲外操作説明も更新。
+
+## 汚れをページRenderTextureへ移行（2026-11-11）
+- ユーザー報告：1〜3枠の汚れがめくり開始で消える。Screen Space OverlayをReady=falseで隠す旧方式が原因。
+- 汚れGraphicを本の撮影用BookPageViewの子へ移し、紙面と同じRenderTextureへ描画する方式に変更。Live Turn撮影の複製にも元のPageInstanceを割り当て、元ページ・移動先・めくり取消・閉じた撮影で状態を取り違えないよう専用Viewへ撮影直前フックを追加。
+- ページ追加中は候補一覧に基づく状態を撮影し、論理一覧の確定後は候補参照を解除。元のLive Turnは既存一覧から解決する。
+- 汚れの配置・縦横比・薄化・4番枠制限を維持。左右Cropに対応したGraphic→画面投影で入力矩形を取得する。状態はPageInstanceに保持し、表示用ページの使い回しで他の見開きへ混入しない。
+- Graphic.Bindが実際の変更を返し、変更のあったCameraの撮影完了後だけFlipView.MarkDirtyを通知する。常時の無条件再描画は追加していない。紙面Graphicは1枠4頂点を維持。
+- Runtime／Editor別出力コンパイル成功（既存警告3件）。既存Unityで非表示の回帰検証を実行しBookObstacleRuntime COMPLETE。通常撮影とめくり用撮影の両方でRTのインク中心の黒い画素を読み戻し、元の3汚れ維持／移動先の汚れなし、帰還後の4枠操作、擦りによる薄化、再入場・解除を確認。Verifyメニューは復活させていない。
+- Scene・Prefab・hatake原本・共有設定は未変更。保存済みBookScene SHA256は795B63625E14E7A34891FEC0E93419AAB31AFDDDEBE58CD563472894560A190Cで同一。既存変更を保持。Android実機・物理ドラッグの体感は未確認。
+- Git status／fetch／追跡先比較と差分整形確認を実施。禁止Git操作なし。開始時に保持されていたメニュー削除・魔法演出等の変更を維持。

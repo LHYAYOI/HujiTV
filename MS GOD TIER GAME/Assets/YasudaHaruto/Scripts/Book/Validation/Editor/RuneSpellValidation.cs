@@ -49,7 +49,6 @@ namespace YasudaHaruto.BookValidation.Editor
             };
         }
 
-        [MenuItem("Tools/YasudaHaruto/Verify Rune Spell In Current Scene")]
         public static void Run()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Exit Play Mode first.");
@@ -97,7 +96,6 @@ namespace YasudaHaruto.BookValidation.Editor
                 for (int i = 1; i < stroke.Points.Count; i++) s_controller.AddPoint(stroke.Points[i]);
                 if (s_controller.State == RUNE_TRACE_STATE.WAITING_RELEASE) s_controller.EndStroke();
             }
-            if (type == MAGIC_AIM_TYPE.NONE) return;
             Require(s_controller.State == RUNE_TRACE_STATE.WAITING_CAST_RELEASE, "Completed trace waits for original finger release");
             s_effect = s_view.SpellEffect;
             Require(s_effect != null && s_effect.IsVisible && !s_effect.IsReady, "Completed player strokes begin moving to the cast origin");
@@ -283,8 +281,29 @@ namespace YasudaHaruto.BookValidation.Editor
                     case 7:
                         s_controller.EndStroke();
                         Complete(MAGIC_AIM_TYPE.NONE);
-                        Require(s_controller.State == RUNE_TRACE_STATE.COOLDOWN && !s_effect.IsVisible && s_lastDirection == MAGIC_CAST_DIRECTION.NONE,
-                            "Spells without aiming keep immediate cast behavior");
+                        Require(s_controller.State == RUNE_TRACE_STATE.WAITING_CAST_RELEASE,
+                            "Spells without aiming wait instead of casting immediately");
+                        s_controller.EndStroke();
+                        s_effect.Advance(s_settings.FloatDuration + s_settings.GatherDuration + 0.01f);
+                        s_overlay.gameObject.SetActive(true);
+                        s_overlay.OnPointerDown(Pointer(s_overlay.Center));
+                        var upOnlyArrows = (Image[])Get(s_overlay, "m_upOnlyArrows");
+                        Require(!upOnlyArrows[0].gameObject.activeSelf && upOnlyArrows[1].gameObject.activeSelf && !upOnlyArrows[2].gameObject.activeSelf,
+                            "Spells without aiming display only the up arrow");
+                        int beforeUpCast = s_castCount;
+                        s_controller.ConfirmCast(MAGIC_CAST_DIRECTION.LEFT);
+                        Require(s_castCount == beforeUpCast, "Spells without aiming reject side confirmation");
+                        s_overlay.OnDrag(Pointer(s_overlay.Center + new Vector2(-1f, 1f) * Screen.height * 0.4f));
+                        Require(((RuneCastGuideGraphic)Get(s_overlay, "m_graphic")).SelectedDirection == -1,
+                            "Spells without aiming reject hidden side upOnlyArrows");
+                        Vector2 upEnd = s_overlay.Center + Vector2.up * Screen.height * 0.4f;
+                        s_overlay.OnDrag(Pointer(upEnd));
+                        s_overlay.OnPointerUp(Pointer(upEnd));
+                        s_overlay.OnPointerUp(Pointer(upEnd));
+                        Require(s_controller.State == RUNE_TRACE_STATE.COOLDOWN && s_effect.IsFlying &&
+                            s_castCount == beforeUpCast + 1 && s_lastDirection == MAGIC_CAST_DIRECTION.NONE,
+                            "Up swipe launches once and preserves NONE for the spell command");
+                        CheckInstantCast();
                         File.AppendAllText(Report, "RuneSpell COMPLETE\n");
                         Finish();
                         break;
@@ -298,6 +317,34 @@ namespace YasudaHaruto.BookValidation.Editor
             }
         }
 
+        private static void CheckInstantCast()
+        {
+            var magic = ScriptableObject.CreateInstance<MagicData>();
+            try
+            {
+                var serialized = new SerializedObject(magic);
+                serialized.FindProperty("m_castType").intValue = (int)MAGIC_CAST_TYPE.INSTANT;
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+                Require(magic.CastType == MAGIC_CAST_TYPE.INSTANT, "MagicData exposes the configured cast type");
+                s_effect.Play(s_rune.TraceData.Strokes, new Rect(0f, 0f, 100f, 100f),
+                    () => new Rect(0f, 0f, Screen.width, Screen.height), () => new Vector2(0.5f, 0.39f),
+                    s_settings, Color.white, 2f, 45f, magic);
+                s_effect.Advance(s_settings.FloatDuration + s_settings.GatherDuration + 0.01f);
+                Vector2 home = s_effect.Center;
+                s_effect.SetDrag(Vector2.up * 200f);
+                s_effect.Advance(0.2f);
+                Require(Get(s_effect, "m_preview") == null && (s_effect.Center - home).sqrMagnitude < 0.01f,
+                    "Instant cast keeps the rune in place without a bullet preview");
+                s_effect.Launch(MAGIC_CAST_DIRECTION.CENTER);
+                s_view.BeginTrace(s_rune);
+                Require(s_effect.IsActivating && !s_effect.IsFlying, "Instant activation survives cooldown reset without flying");
+                s_effect.Advance(0.1f);
+                Require((s_effect.Center - home).sqrMagnitude < 0.01f, "Instant activation stays at its origin");
+                s_effect.Advance(0.2f);
+                Require(!s_effect.IsVisible, "Instant activation finishes and hides");
+            }
+            finally { UnityEngine.Object.Destroy(magic); }
+        }
         private static void CheckSide(MAGIC_CAST_DIRECTION direction)
         {
             Complete();

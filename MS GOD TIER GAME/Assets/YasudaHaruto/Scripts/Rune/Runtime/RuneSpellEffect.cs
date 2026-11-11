@@ -4,9 +4,11 @@ using UnityEngine;
 
 public sealed class RuneSpellEffect : MonoBehaviour
 {
-    private enum PHASE { HIDDEN, GATHERING, READY, FLYING }
+    private enum PHASE { HIDDEN, GATHERING, READY, FLYING, ACTIVATING }
 
     private const float TransformDuration = 0.18f;
+    private const float ActivationDuration = 0.25f;
+    private MAGIC_CAST_TYPE m_castType;
     private PHASE m_phase;
     private RuneSpellSettings m_settings;
     private Func<Rect?> m_bookRect;
@@ -23,6 +25,8 @@ public sealed class RuneSpellEffect : MonoBehaviour
 
     public bool IsReady => m_phase == PHASE.READY;
     public bool IsFlying => m_phase == PHASE.FLYING;
+    public bool IsActivating => m_phase == PHASE.ACTIVATING;
+    public bool IsReleasing => IsFlying || IsActivating;
     public bool IsVisible => m_phase != PHASE.HIDDEN && gameObject.activeSelf;
     public Vector2 Center => m_center;
     public float GatherProgress => m_phase == PHASE.GATHERING ? Mathf.Clamp01(m_elapsed / GatherDuration) : 1f;
@@ -34,6 +38,7 @@ public sealed class RuneSpellEffect : MonoBehaviour
         Hide();
         EnsureCanvas();
         m_settings = settings;
+        m_castType = magic != null ? magic.CastType : MAGIC_CAST_TYPE.PROJECTILE;
         m_source = source;
         m_bookRect = bookRect;
         m_origin = origin;
@@ -63,7 +68,7 @@ public sealed class RuneSpellEffect : MonoBehaviour
         m_trace.enabled = true;
 
         var catalog = Resources.Load<RuneBulletPreviewCatalog>("RuneSpell/BulletPreviews");
-        MagicBulletController bullet = catalog != null ? catalog.Find(magic) : null;
+        MagicBulletController bullet = m_castType == MAGIC_CAST_TYPE.PROJECTILE && catalog != null ? catalog.Find(magic) : null;
         if (bullet != null)
         {
             m_preview = new GameObject("Rune Bullet Preview").AddComponent<RuneBulletPreview>();
@@ -80,7 +85,7 @@ public sealed class RuneSpellEffect : MonoBehaviour
     {
         if (!IsReady) return;
         m_dragging = true;
-        m_drag = offset;
+        m_drag = m_castType == MAGIC_CAST_TYPE.INSTANT ? Vector2.zero : offset;
     }
 
     public void CancelDrag()
@@ -96,6 +101,14 @@ public sealed class RuneSpellEffect : MonoBehaviour
     public void Launch(MAGIC_CAST_DIRECTION direction)
     {
         if (!IsReady || direction == MAGIC_CAST_DIRECTION.NONE) return;
+        if (m_castType == MAGIC_CAST_TYPE.INSTANT)
+        {
+            m_drag = Vector2.zero;
+            m_elapsed = 0f;
+            m_phase = PHASE.ACTIVATING;
+            Advance(0f);
+            return;
+        }
         float angle = ((int)direction - 1) * m_sideAngle * Mathf.Deg2Rad;
         m_launchDirection = m_drag.sqrMagnitude > 0f ? m_drag.normalized : new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
         Advance(0f);
@@ -134,6 +147,12 @@ public sealed class RuneSpellEffect : MonoBehaviour
             m_center.y += Mathf.Sin(progress * Mathf.PI) * height * m_settings.FloatHeight;
             scale = Mathf.Lerp(1f, scale, eased);
         }
+        else if (IsActivating)
+        {
+            float t = Mathf.Clamp01(m_elapsed / ActivationDuration);
+            if (t >= 1f) { Hide(); return; }
+            scale *= Mathf.Lerp(1f, 1.5f, Mathf.SmoothStep(0f, 1f, t));
+        }
         else if (IsFlying)
         {
             float t = m_elapsed / m_settings.FlightDuration;
@@ -148,6 +167,7 @@ public sealed class RuneSpellEffect : MonoBehaviour
         m_trace.rectTransform.anchoredPosition = local;
         m_trace.rectTransform.localScale = Vector3.one * (hasBullet ? scale * Mathf.Lerp(1f, 0.32f, morph) : scale);
         Color traceTint = m_traceColor;
+        if (IsActivating) traceTint.a *= 1f - Mathf.SmoothStep(0f, 1f, m_elapsed / ActivationDuration);
         if (hasBullet) traceTint.a *= 1f - morph;
         m_trace.color = traceTint;
         if (hasBullet && m_dragging)

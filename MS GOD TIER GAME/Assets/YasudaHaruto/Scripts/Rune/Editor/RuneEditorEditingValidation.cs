@@ -6,7 +6,6 @@ using UnityEngine;
 
 public static class RuneEditorEditingValidation
 {
-    [MenuItem("Tools/YasudaHaruto/Verify Rune Editing")]
     public static void Verify()
     {
         RuneData rune = ScriptableObject.CreateInstance<RuneData>();

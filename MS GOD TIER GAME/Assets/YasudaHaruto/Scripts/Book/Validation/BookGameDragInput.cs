@@ -316,6 +316,12 @@ public class BookGameDragInput : MonoBehaviour, IPointerDownHandler, IPointerUpH
             ? rect : (Rect?)null;
     }
 
+    public bool TryGetObstacleScreenRect(RectTransform graphic, bool rightPage, out Rect rect)
+    {
+        rect = default;
+        return m_areaDetector != null && m_areaDetector.TryGetPageGraphicScreenRect(graphic,
+            rightPage ? BOOK_PAGE_SIDE.RIGHT : BOOK_PAGE_SIDE.LEFT, out rect);
+    }
     private bool TryGetBookPoint(Vector2 screenPosition, Camera eventCamera, out Vector2 point)
     {
         return m_flipView.ScreenToBook(m_displayRect, screenPosition, eventCamera, out point);
