@@ -16,17 +16,9 @@ MonoBehaviour:
   m_backgroundMaterial: {fileID: 0}
   m_manuscriptHeading: 0
   m_pageName: 09
-  m_backgroundColor: {r: 1, g: 0.97319454, b: 0.80566037, a: 1}
+  m_backgroundColor: {r: 1, g: 1, b: 1, a: 1}
   m_images:
-  - m_sprite: {fileID: 21300000, guid: 0d2fad89554e5ea47b954c0abac85009, type: 3}
+  - m_sprite: {fileID: 21300000, guid: dea6d7d2631bcd742b62decd55b75723, type: 3}
     m_material: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
-    m_position: {x: 12.5, y: 0}
-    m_size: {x: 280, y: 75}
-  - m_sprite: {fileID: 21300000, guid: 3b55a519897a8b24da8c0d23075cfcb8, type: 3}
-    m_material: {fileID: 2100000, guid: 384d09db911c20b469f67f69c177a51e, type: 2}
-    m_position: {x: 25, y: 75}
-    m_size: {x: 260, y: 260}
-  - m_sprite: {fileID: 21300000, guid: b98bab75e6001794595d060cf196824a, type: 3}
-    m_material: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
-    m_position: {x: 25, y: 75}
-    m_size: {x: 250, y: 250}
+    m_position: {x: 0, y: 0}
+    m_size: {x: 310, y: 360}

@@ -173,9 +173,9 @@ AnimatorController:
     m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
-    m_Name: UpperDrawer
-    m_StateMachine: {fileID: 7355827834301311397}
-    m_Mask: {fileID: 31900000, guid: 2e74f39807893bb4eb6bc69abf24adab, type: 2}
+    m_Name: LowerDrawer
+    m_StateMachine: {fileID: 9032962844161938249}
+    m_Mask: {fileID: 31900000, guid: ec6dc1ffb374b874fb1e2cbb4e5b48e9, type: 2}
     m_Motions: []
     m_Behaviours: []
     m_BlendingMode: 0
@@ -185,9 +185,9 @@ AnimatorController:
     m_SyncedLayerAffectsTiming: 0
     m_Controller: {fileID: 9100000}
   - serializedVersion: 5
-    m_Name: LowerDrawer
-    m_StateMachine: {fileID: 9032962844161938249}
-    m_Mask: {fileID: 31900000, guid: ec6dc1ffb374b874fb1e2cbb4e5b48e9, type: 2}
+    m_Name: UpperDrawer
+    m_StateMachine: {fileID: 7355827834301311397}
+    m_Mask: {fileID: 31900000, guid: 2e74f39807893bb4eb6bc69abf24adab, type: 2}
     m_Motions: []
     m_Behaviours: []
     m_BlendingMode: 0
