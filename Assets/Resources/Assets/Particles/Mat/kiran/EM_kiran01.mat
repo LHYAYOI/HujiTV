@@ -44,7 +44,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 90f405f95044c1645b7477b498cffa2c, type: 3}
+        m_Texture: {fileID: 2800000, guid: dc129d03f0c5e1d4ca49191fd227673e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MaskTex:
@@ -101,7 +101,7 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EdgeColor: {r: 0.2706314, g: 1.7824345, b: 1.5218832, a: 1}
-    - _EmissionColor: {r: 1, g: 0.9879249, b: 0.8283019, a: 0.039215688}
+    - _EmissionColor: {r: 2, g: 0.86243844, b: 0.645283, a: 1}
     - _MainScroll: {r: 0, g: 0, b: 0, a: 0}
     - _NoiseScroll: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
