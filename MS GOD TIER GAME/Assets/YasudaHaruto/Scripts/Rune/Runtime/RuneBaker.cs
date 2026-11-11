@@ -26,7 +26,9 @@ public static class RuneBaker
                 continue;
             }
 
-            List<Vector2> resampledPoints = RunePathUtility.Resample(stroke.Points, sampleInterval);
+            List<Vector2> resampledPoints = stroke.PreserveCorners
+                ? ResampleWithCorners(stroke.Points, sampleInterval)
+                : RunePathUtility.Resample(stroke.Points, sampleInterval);
 
             if (resampledPoints.Count >= 2)
             {
@@ -37,5 +39,24 @@ public static class RuneBaker
         return bakedStrokes;
     }
 
+
+    // Retain authored corners; subdivide each straight segment to at most the sample interval.
+    private static List<Vector2> ResampleWithCorners(IReadOnlyList<Vector2> points, float interval)
+    {
+        var result = new List<Vector2>();
+        if (points == null || points.Count == 0) return result;
+        result.Add(points[0]);
+        if (interval <= 0f) return result;
+        for (int i = 1; i < points.Count; i++)
+        {
+            Vector2 start = points[i - 1], end = points[i];
+            float distance = Vector2.Distance(start, end);
+            if (distance <= Mathf.Epsilon) continue;
+            int steps = Mathf.Max(1, Mathf.CeilToInt(distance / interval));
+            for (int step = 1; step <= steps; step++)
+                result.Add(Vector2.Lerp(start, end, (float)step / steps));
+        }
+        return result;
+    }
 
 }

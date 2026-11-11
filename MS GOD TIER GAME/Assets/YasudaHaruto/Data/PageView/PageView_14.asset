@@ -16,9 +16,9 @@ MonoBehaviour:
   m_backgroundMaterial: {fileID: 0}
   m_manuscriptHeading: 0
   m_pageName: 14
-  m_backgroundColor: {r: 1, g: 0.97319454, b: 0.80566037, a: 1}
+  m_backgroundColor: {r: 1, g: 1, b: 1, a: 1}
   m_images:
-  - m_sprite: {fileID: -776523695, guid: 3edcb3facf25544428b5cc0a118f89e5, type: 3}
+  - m_sprite: {fileID: 21300000, guid: 546ed016bea9d8c4481df5b90fe823f0, type: 3}
     m_material: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
     m_position: {x: 0, y: 0}
-    m_size: {x: 310, y: 350}
+    m_size: {x: 310, y: 360}
