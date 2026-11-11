@@ -14,7 +14,7 @@ namespace YasudaHaruto.BookValidation.Editor
     {
         private const string Running = "Yasuda.RuneSpellValidation";
         private const string Report = "Temp/RuneSpellValidation/runtime-result.txt";
-        private static int s_step, s_spread, s_castCount;
+        private static int s_step, s_spread, s_castCount, s_traceRenderCount;
         private static double s_next, s_deadline;
         private static BookGameController s_game;
         private static RuneTraceController s_controller;
@@ -29,6 +29,12 @@ namespace YasudaHaruto.BookValidation.Editor
 
         static RuneSpellValidation()
         {
+            const string request = "Temp/RuneSpellValidation/runtime-request";
+            if (File.Exists(request)) EditorApplication.delayCall += () =>
+            {
+                File.Delete(request);
+                Run();
+            };
             EditorApplication.playModeStateChanged += state =>
             {
                 if (!SessionState.GetBool(Running, false)) return;
@@ -145,8 +151,57 @@ namespace YasudaHaruto.BookValidation.Editor
                         Require(s_game.BookView.OpenBook(s_spread), "Open directional spread");
                         break;
                     case 1:
+                        s_controller.BeginTrace(s_rune);
+                        s_next = EditorApplication.timeSinceStartup + 2;
+                        break;
+                    case 2:
+                        s_traceRenderCount = s_game.BookView.FlipView.RenderCount;
+                        var captured = (RuneLineGraphic)Get(s_view, "m_playerGraphic");
+                        int dirties = 0;
+                        UnityEngine.Events.UnityAction dirty = () => dirties++;
+                        captured.RegisterDirtyVerticesCallback(dirty);
+                        for (int sample = 0; sample < 20; sample++)
+                        {
+                            s_view.SetTraceDeviation(sample / 20f);
+                            s_view.UpdateCurrentStroke(new[] { new Vector2(0.2f, 0.2f),
+                                new Vector2(0.3f + sample * 0.01f, 0.7f) });
+                        }
+                        captured.UnregisterDirtyVerticesCallback(dirty);
+                        Require(dirties == 0, "Tracing and deviation color never dirty the captured player graphic");
+                        var separate = (RuneLineGraphic)Get(s_view, "m_traceGraphic");
+                        Require(separate != null && !separate.raycastTarget &&
+                            separate.GetComponentInParent<Canvas>().renderMode == RenderMode.ScreenSpaceOverlay,
+                            "Handwriting uses an independent non-interactive screen Canvas");
+                        using (var mesh = new VertexHelper())
+                        {
+                            var populate = typeof(RuneLineGraphic).GetMethod("OnPopulateMesh",
+                                BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                            populate.Invoke(captured, new object[] { mesh });
+                            Require(mesh.currentVertCount == 0, "Captured page contains no handwritten geometry");
+                            populate.Invoke(separate, new object[] { mesh });
+                            Require(mesh.currentVertCount > 0, "Separate Canvas contains visible handwritten geometry");
+                        }
+                        Capture("00-trace-overlay");
+                        s_next = EditorApplication.timeSinceStartup + 1;
+                        break;
+                    case 3:
+                        Require(s_game.BookView.FlipView.RenderCount == s_traceRenderCount,
+                            "Tracing does not increase book RenderCount across rendered frames");
+                        s_view.ConfigureTraceOverlay(() => false);
+                        s_view.SendMessage("LateUpdate");
+                        Require(!((Canvas)Get(s_view, "m_traceCanvas")).enabled,
+                            "Unavailable or turning book hides the screen line");
+                        s_view.ConfigureTraceOverlay(() => s_game.BookView.IsReady && !s_game.BookView.IsClosed);
+                        s_view.PlayFailure(default);
+                        Require(!(bool)Get(s_view, "m_hasTrace"), "Failure clears the separate trace");
+                        s_view.UpdateCurrentStroke(new[] { Vector2.zero, Vector2.one });
+                        s_controller.Cancel();
+                        Require(!(bool)Get(s_view, "m_hasTrace"), "Cancel/page exit clears the separate trace");
+                        break;
+                    case 4:
                         Require(Resources.LoadAll<Sprite>("RuneSpell/DirectionFrames").Length == 27, "All 27 arrow frames import as sprites");
                         Complete();
+                        Require(!(bool)Get(s_view, "m_hasTrace"), "Completion clears separate trace before cast presentation");
                         Require(s_effect.GetComponentInChildren<RuneLineGraphic>().enabled, "Moving rune uses the handwritten stroke geometry");
                         var player = (RuneLineGraphic)Get(s_view, "m_playerGraphic");
                         using (var mesh = new VertexHelper())
@@ -158,7 +213,7 @@ namespace YasudaHaruto.BookValidation.Editor
                         Require(s_game.GetCurrentRuneImage() != null, "Printed colored rune remains intact");
                         Capture("01-dissolve");
                         break;
-                    case 2:
+                    case 5:
                         s_controller.EndStroke();
                         Require(!s_controller.TryBeginCast(), "Cannot aim before the rune arrives");
                         Vector2 gatherStart = s_effect.Center;
@@ -168,7 +223,7 @@ namespace YasudaHaruto.BookValidation.Editor
                             s_effect.Center != gatherStart, "Handwritten line moves and shrinks as a single shape");
                         Capture("02-float");
                         break;
-                    case 3:
+                    case 6:
                         s_effect.Advance(s_settings.FloatDuration + s_settings.GatherDuration);
                         Require(s_effect.IsReady && s_view.IsCastReady, "Gather finishes and unlocks aiming");
                         Require(s_effect.GetComponentInChildren<RuneLineGraphic>().enabled &&
@@ -182,7 +237,7 @@ namespace YasudaHaruto.BookValidation.Editor
                         s_home = s_effect.Center;
                         Capture("03-ready");
                         break;
-                    case 4:
+                    case 7:
                         var arrows = s_overlay.GetComponentsInChildren<Image>();
                         Require(arrows.Length == 3 && !arrows[0].raycastTarget && !arrows[1].raycastTarget &&
                             !arrows[2].raycastTarget, "Three direction arrows are visible before dragging and ignore input");
@@ -228,7 +283,7 @@ namespace YasudaHaruto.BookValidation.Editor
                             "Spotlight input surface receives real UI raycasts");
                         Capture("04-aim");
                         break;
-                    case 5:
+                    case 8:
                         s_overlay.OnPointerUp(Pointer(s_home + new Vector2(-0.35f, 0.35f) * Screen.height));
                         Require(s_effect.IsFlying && s_controller.State == RUNE_TRACE_STATE.COOLDOWN && s_castCount == 1 &&
                             s_lastDirection == MAGIC_CAST_DIRECTION.CENTER, "Release keeps the locked direction and launches once");
@@ -242,7 +297,7 @@ namespace YasudaHaruto.BookValidation.Editor
                             Mathf.Approximately(s_controller.CooldownRemaining, remaining), "Preview flies without ticking cooldown");
                         Capture("05-flight");
                         break;
-                    case 6:
+                    case 9:
                         Require(!s_overlay.IsFadingOut && !s_overlay.gameObject.activeSelf,
                             "Release fade completes and removes the dimmer");
                         s_effect.Advance(s_settings.FlightDuration);
@@ -278,7 +333,7 @@ namespace YasudaHaruto.BookValidation.Editor
                         }
                         Capture("06-failed-while-held");
                         break;
-                    case 7:
+                    case 10:
                         s_controller.EndStroke();
                         Complete(MAGIC_AIM_TYPE.NONE);
                         Require(s_controller.State == RUNE_TRACE_STATE.WAITING_CAST_RELEASE,
@@ -287,7 +342,7 @@ namespace YasudaHaruto.BookValidation.Editor
                         s_effect.Advance(s_settings.FloatDuration + s_settings.GatherDuration + 0.01f);
                         s_overlay.gameObject.SetActive(true);
                         s_overlay.OnPointerDown(Pointer(s_overlay.Center));
-                        var upOnlyArrows = (Image[])Get(s_overlay, "m_upOnlyArrows");
+                        var upOnlyArrows = (Image[])Get(s_overlay, "m_arrows");
                         Require(!upOnlyArrows[0].gameObject.activeSelf && upOnlyArrows[1].gameObject.activeSelf && !upOnlyArrows[2].gameObject.activeSelf,
                             "Spells without aiming display only the up arrow");
                         int beforeUpCast = s_castCount;

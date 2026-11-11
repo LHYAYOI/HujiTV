@@ -894,3 +894,20 @@ $12026-10-29：お邪魔4枠の初期実装。左右擦り・スクラッチ、�
 - Runtime／Editor別出力コンパイル成功（既存警告3件）。既存Unityで非表示の回帰検証を実行しBookObstacleRuntime COMPLETE。通常撮影とめくり用撮影の両方でRTのインク中心の黒い画素を読み戻し、元の3汚れ維持／移動先の汚れなし、帰還後の4枠操作、擦りによる薄化、再入場・解除を確認。Verifyメニューは復活させていない。
 - Scene・Prefab・hatake原本・共有設定は未変更。保存済みBookScene SHA256は795B63625E14E7A34891FEC0E93419AAB31AFDDDEBE58CD563472894560A190Cで同一。既存変更を保持。Android実機・物理ドラッグの体感は未確認。
 - Git status／fetch／追跡先比較と差分整形確認を実施。禁止Git操作なし。開始時に保持されていたメニュー削除・魔法演出等の変更を維持。
+
+## なぞり中の描画更新の調査・分離案（2026-11-11）
+- ユーザー依頼はまず現状と実装案の検討。コード・Scene・Prefab・設定を変更せず静的調査。Android実測・新規計測コードの追加はしていない。
+- AddPoint→RunePageView.UpdateCurrentStroke→RuneLineGraphic.SetStrokes→Dirty購読→撮影Camera完了→BookRuneCaptureRefresh.MarkDirty→BookFlipView.NeedsRedraw／本合成という経路を確認。0.005未満の点は無視し、撮影ごとに通知を集約。通知だけ止めると11/5の線が表示されない問題へ戻る。
+- 保存済み撮影RTは1600×900。Cameraは撮影後も有効。本合成は変更時更新、Idle Refresh=0だが連続する線の変更で更新要求が継続する。GPU・Camera・CPU／GCの寄与は未測定。点列コピー／一時RuneStrokeDataの生成も候補。
+- 推奨案は動的な手描き線だけ画面側の独立Canvasへ分離。元の座標基準・判定を残し、お手本と汚れは本RTに維持。線には紙質・にじみ等が自動適用されなくなる。完成／発射演出は既に別Canvasであり接続可能。
+- 線専用RTと最後の透明合成、更新頻度制限の代案も比較。まず線由来の本合成を外し、残るCamera負荷と実機CPU/GPUを比較してから必要時撮影へ進む案。クールダウンのMaterial変化は頂点Dirtyと別なのでCamera停止だけを先行させない。
+- 詳細、トレードオフ、めくり開始時の線の扱い、検証基準はRUNE_TRACE_RENDER_REVIEW.md。今回は資料のみ追加／追記。Git status/fetch/追跡先比較が成功し、作業開始時の未コミット変更なし。禁止Git操作なし。
+
+
+## 手描き線を独立Canvasへ分離（2026-11-11）
+- ユーザー承認により、BookGameBootstrapがRunePageViewへ画面側の手描きCanvasを設定。元のPlayerGraphicは空のまま座標・線幅の基準として保持し、入力座標・判定・お手本・汚れの本RT表示を維持する。Scene・Prefab・hatake原本は変更していない。
+- なぞりの点列・逸脱色を独立Graphicだけへ送る。本が利用不可／めくり中／フォーカス喪失中は非表示。失敗・完成・取消・ページ退出の既存Clearとコンポーネント無効化で手描き線を消去し、完成時は既存の魔法演出へ引き継ぐ。線には本の紙質・陰影・Bloomを適用しない。
+- Runtime／Editor別出力コンパイル成功（既存警告3件）。既存Unityの現在のBookSceneで非表示のRuneSpellValidationを実行し、元GraphicへのDirty通知なし、元メッシュが空／独立メッシュあり、描画フレームをまたいでもBookFlipView.RenderCount増加なし、非表示・失敗・取消・完成時の消去を確認。画面キャプチャで左紙面上の独立線を確認。
+- 既存の完成／移動／3方向発射／入力制限／失敗／上方向のみ／即時発動も通過しRuneSpell COMPLETE。検証末尾に残っていた古いm_upOnlyArrows参照を現行m_arrowsへ修正。Toolsメニューは追加していない。
+- Android実機の速度・GPU負荷比較は未実施。撮影Camera自体の継続描画や既存の点列コピーは今回の対象外であり残る。線由来の本再合成を分離した結果として評価する。
+- BookScene保存済みSHA256は795B63625E14E7A34891FEC0E93419AAB31AFDDDEBE58CD563472894560A190Cで不変。Play Mode終了を確認。Git status/fetch/追跡先比較を実施しコミット差分なし。調査資料と既存追記を保持し、禁止Git操作なし。
