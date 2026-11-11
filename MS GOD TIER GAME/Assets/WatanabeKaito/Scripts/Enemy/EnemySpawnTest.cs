@@ -16,7 +16,7 @@ public class EnemySpawnTest : MonoBehaviour
 
         //m_enemySpawnManager.SpawnSplineMoveEnemy("MiniGhost_C", "test_spline3", "testPosition3");
 
-
+        OnSpawnEnemy();
     }
 
     // Update is called once per frame
@@ -24,8 +24,7 @@ public class EnemySpawnTest : MonoBehaviour
     {
        if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
-            //m_activeEnemyManager.RemoveAllActiveEnemies();
-            //m_activeEnemyManager.SetAllMiniGhostsToBattleStart();
+            OnSpawnEnemy();
         }
 
 
@@ -33,6 +32,6 @@ public class EnemySpawnTest : MonoBehaviour
 
     public void OnSpawnEnemy()
     {
-        m_enemySpawnManager.SpawnSplineMoveEnemy("MiniGhost_A", "test_spline", "testPosition");
+        m_enemySpawnManager.SpawnSplineMoveEnemy("CrushingWallEnemy", "test_spline", "");
     }
 }

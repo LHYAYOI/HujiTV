@@ -102,17 +102,28 @@ public class EnemySpawnManager : MonoBehaviour
             return;
         }
 
-        // 辞書から出現位置を取得
-        if (!m_spawnPositionDictionary.TryGetValue(spawnId, out Transform spawnTransform))
+        // スポーン位置を取得
+        Vector3 spawnPosition;
+
+        if (!string.IsNullOrEmpty(spawnId) &&
+            m_spawnPositionDictionary.TryGetValue(spawnId, out Transform spawnTransform) &&
+            spawnTransform != null)
         {
-            return;
+            // 指定されたスポーン位置を使用
+            spawnPosition = spawnTransform.position;
+        }
+        else
+        {
+            // スポーンIDがない場合はスプラインの開始位置を使用
+            spawnPosition = spline.EvaluatePosition(0f);
         }
 
         // 生成と初期化
-        Vector3 spawnPosition = spawnTransform.position;
         EnemyBase enemyObj = Instantiate(prefab, spawnPosition, Quaternion.identity);
         enemyObj.SetPlayerPosition(m_playerTransform);
         enemyObj.SetActiveEnemyManager(m_activeEnemyManager);
+
+     
 
         // アクティブなエネミーリストに追加
         m_activeEnemyManager.AddActiveEnemy(enemyObj);
