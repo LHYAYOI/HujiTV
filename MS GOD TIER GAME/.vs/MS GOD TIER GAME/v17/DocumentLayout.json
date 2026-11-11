@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\camera\\cameramanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\camera\\cameramanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\player\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\player\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -147,10 +151,6 @@
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\arai\\script\\trokko\\cartcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\camera\\cameramanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\camera\\cameramanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\assets\\hamada\\scripts\\camera\\cameralooktargetchanger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{76992496-88E4-406A-320B-68AF841A7558}|Assembly-CSharp.csproj|solutionrelative:assets\\hamada\\scripts\\camera\\cameralooktargetchanger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -230,11 +230,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 168,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "MagicBulletHitSender.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletHitSender.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletHitSender.cs",
@@ -247,7 +247,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "TargetHitUI.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\UI\\TargetHitUI.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\UI\\TargetHitUI.cs",
@@ -260,7 +260,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "MagicBulletController.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletController.cs",
@@ -273,7 +273,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "PlayerController.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Player\\PlayerController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Player\\PlayerController.cs",
@@ -286,7 +286,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 0,
+              "Title": "CameraManager.cs",
+              "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
+              "ToolTip": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
+              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
+              "ViewState": "AgIAAFwAAAAAAAAAAAAowGgAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-01T15:01:11.751Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "MagicBulletManager.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletManager.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\MagicBullet\\MagicBulletManager.cs",
@@ -299,7 +312,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "Spider_Attack.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Boss\\Spider\\States\\Spider_Attack.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Boss\\Spider\\States\\Spider_Attack.cs",
@@ -312,7 +325,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "Spider_Encount.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Boss\\Spider\\States\\Spider_Encount.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Boss\\Spider\\States\\Spider_Encount.cs",
@@ -325,7 +338,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "Spider_Idle.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Boss\\Spider\\States\\Spider_Idle.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Boss\\Spider\\States\\Spider_Idle.cs",
@@ -338,7 +351,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "SpiderController.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Boss\\SpiderController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Boss\\SpiderController.cs",
@@ -351,7 +364,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "TargetHitUIManager.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\UI\\TargetHitUIManager.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\UI\\TargetHitUIManager.cs",
@@ -364,7 +377,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "Spider_Damageable.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Boss\\Spider\\States\\Spider_Damageable.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Boss\\Spider\\States\\Spider_Damageable.cs",
@@ -377,7 +390,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "SpiderHitColliderController.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Boss\\SpiderHitColliderController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Boss\\SpiderHitColliderController.cs",
@@ -389,7 +402,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "Spider_Dead.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Boss\\Spider\\States\\Spider_Dead.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Boss\\Spider\\States\\Spider_Dead.cs",
@@ -402,7 +415,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "StateBase.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\StateBase.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Common\\StateBase.cs",
@@ -414,7 +427,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "BoneHitReaction.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Hit\\BoneHitReaction.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Hit\\BoneHitReaction.cs",
@@ -426,7 +439,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 18,
               "Title": "HitSenderBase.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Hit\\HitSenderBase.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Hit\\HitSenderBase.cs",
@@ -438,7 +451,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 19,
               "Title": "testHitSender.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\test\\testHitSender.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\test\\testHitSender.cs",
@@ -450,7 +463,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 21,
               "Title": "TargetSelector.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Player\\TargetSelector.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Player\\TargetSelector.cs",
@@ -462,7 +475,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 17,
               "Title": "TargetLockOnUIManager.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\UI\\TargetLockOnUIManager.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\UI\\TargetLockOnUIManager.cs",
@@ -474,7 +487,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "LockOnTargetController.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\UI\\LockOnTargetController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\UI\\LockOnTargetController.cs",
@@ -486,7 +499,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 20,
               "Title": "TargetableObject.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Common\\TargetableObject.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Common\\TargetableObject.cs",
@@ -498,7 +511,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 22,
               "Title": "testMover.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\test\\testMover.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\test\\testMover.cs",
@@ -510,7 +523,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 23,
               "Title": "BookTargetMotion.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\YasudaHaruto\\Scripts\\Book\\BookTargetMotion.cs",
               "RelativeDocumentMoniker": "Assets\\YasudaHaruto\\Scripts\\Book\\BookTargetMotion.cs",
@@ -522,7 +535,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 24,
               "Title": "ChandelierController.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\ChandelierController.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\ChandelierController.cs",
@@ -534,7 +547,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 25,
               "Title": "ShakeObject.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\test\\ShakeObject.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\test\\ShakeObject.cs",
@@ -546,7 +559,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 27,
               "Title": "ChandelierBreakable.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\hatake\\chandelier\\scripts\\ChandelierBreakable.cs",
               "RelativeDocumentMoniker": "Assets\\hatake\\chandelier\\scripts\\ChandelierBreakable.cs",
@@ -558,7 +571,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 26,
               "Title": "ChandelierFallSample.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\hatake\\chandelier\\scripts\\ChandelierFallSample.cs",
               "RelativeDocumentMoniker": "Assets\\hatake\\chandelier\\scripts\\ChandelierFallSample.cs",
@@ -570,7 +583,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 28,
               "Title": "ChandelierImpactEffect.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\hatake\\chandelier\\scripts\\ChandelierImpactEffect.cs",
               "RelativeDocumentMoniker": "Assets\\hatake\\chandelier\\scripts\\ChandelierImpactEffect.cs",
@@ -582,7 +595,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 30,
               "Title": "ActiveEnemyManager.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\ActiveEnemyManager.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\ActiveEnemyManager.cs",
@@ -594,7 +607,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
+              "DocumentIndex": 29,
               "Title": "GimmickSplineSetLookTarget.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Gimmick\\GimmickSplineSetLookTarget.cs",
               "RelativeDocumentMoniker": "Assets\\Arai\\Script\\Gimmick\\GimmickSplineSetLookTarget.cs",
@@ -606,7 +619,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 31,
               "Title": "MiniGhostEnemy.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\MiniGhostEnemy.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\MiniGhostEnemy.cs",
@@ -618,7 +631,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 31,
+              "DocumentIndex": 32,
               "Title": "MiniGhostIdleState.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostIdleState.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostIdleState.cs",
@@ -630,7 +643,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 32,
+              "DocumentIndex": 33,
               "Title": "MiniGhostSpawnState.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostSpawnState.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostSpawnState.cs",
@@ -642,7 +655,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 33,
+              "DocumentIndex": 34,
               "Title": "MiniGhostDyingState.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostDyingState.cs",
               "RelativeDocumentMoniker": "Assets\\WatanabeKaito\\Scripts\\Enemy\\MiniGhost\\State\\MiniGhostDyingState.cs",
@@ -654,7 +667,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 34,
+              "DocumentIndex": 35,
               "Title": "MiniGhostHitSender.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\MiniGhostHitSender.cs",
               "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\MiniGhostHitSender.cs",
@@ -667,18 +680,6 @@
             {
               "$type": "Document",
               "DocumentIndex": 36,
-              "Title": "CameraManager.cs",
-              "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
-              "RelativeDocumentMoniker": "Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
-              "ToolTip": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
-              "RelativeToolTip": "Assets\\Hamada\\Scripts\\Camera\\CameraManager.cs",
-              "ViewState": "AgIAAD4AAAAAAAAAAAAowEAAAAAQAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-11-01T15:01:11.751Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 35,
               "Title": "CartController.cs",
               "DocumentMoniker": "C:\\GitHub\\HujiTV\\MS GOD TIER GAME\\Assets\\Arai\\Script\\Trokko\\CartController.cs",
               "RelativeDocumentMoniker": "Assets\\Arai\\Script\\Trokko\\CartController.cs",

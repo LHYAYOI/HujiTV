@@ -343,6 +343,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d7e8a9f68dc24048897a698d17db99f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MagicManager
+--- !u!1 &117088948 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1980104333955073435, guid: 526a675716d7e2a42a8e69a46d0585e4, type: 3}
+  m_PrefabInstance: {fileID: 1088811096}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &371206898 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4050885996209634149, guid: bb73fe1e7c44b8444bd4e3eac0b93414, type: 3}
@@ -927,6 +932,40 @@ Transform:
   - {fileID: 1428018234}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &902081746 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3898269378758847607, guid: 05af61a048cab92428b26362eafbfb76, type: 3}
+  m_PrefabInstance: {fileID: 7713662760566421027}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &902081749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 902081746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07817d30b803b7c46b901fc5fef95ca5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AnimationEventRelay
+  onAnimationEvent:
+  - m_eventName: ShakeCamera
+    onAnimationEvent:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 117088948}
+          m_TargetAssemblyTypeName: 
+          m_MethodName: 
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!114 &933808866 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1715315696896216547, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
@@ -2403,6 +2442,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SpiderBoss
       objectReference: {fileID: 0}
+    - target: {fileID: 2891612462245475655, guid: 05af61a048cab92428b26362eafbfb76, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4631033087239045963, guid: 05af61a048cab92428b26362eafbfb76, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2446,7 +2489,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3898269378758847607, guid: 05af61a048cab92428b26362eafbfb76, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 902081749}
   m_SourcePrefab: {fileID: 100100000, guid: 05af61a048cab92428b26362eafbfb76, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
