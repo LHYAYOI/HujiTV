@@ -29,23 +29,6 @@ public class ActiveEnemyManager : MonoBehaviour
         }
     }
 
-    // エネミーのデータのIDを指定してアクティブリストから削除
-    public void RemoveActiveEnemyByData(string enemyId)
-    {
-        EnemyBase enemyToRemove = m_activeEnemies.Find(enemy => enemy.GetEnemyData().m_id == enemyId);
-        if (enemyToRemove != null)
-        {
-            // MiniGhostEnemyの場合は状態をDYINGに変更
-            MiniGhostEnemy miniGhostEnemy = enemyToRemove as MiniGhostEnemy;
-            if (miniGhostEnemy != null)
-            {
-                miniGhostEnemy.ChangeState(MINI_GHOST_STATE_TYPE.DYING);
-            }
-          
-            m_activeEnemies.Remove(enemyToRemove);
-        }
-    }
-
     // エネミーをすべて削除
     public void RemoveAllActiveEnemies()
     {
@@ -53,77 +36,33 @@ public class ActiveEnemyManager : MonoBehaviour
         {
             if (enemy != null)
             {
-                // MiniGhostEnemyの場合は状態をDYINGに変更
-                MiniGhostEnemy miniGhostEnemy = enemy as MiniGhostEnemy;
-                if (miniGhostEnemy != null)
-                {
-                    miniGhostEnemy.ChangeState(MINI_GHOST_STATE_TYPE.DYING);
-                }
-
-                // ConductorGhostManagerの場合はバトル終了処理を呼び出す
-                ConductorGhostManager conductorGhostManager = enemy as ConductorGhostManager;
-                if (conductorGhostManager != null)
-                {
-                    conductorGhostManager.EndBattle();
-                }
-
+               Destroy(enemy.gameObject);
             }
         }
         m_activeEnemies.Clear();
     }
 
-    // ミニオバケのデータのIDを指定してバトル開始状態にする
-    public void SetActiveEnemyToBattleStart(string enemyId)
-    {
-        EnemyBase enemy = m_activeEnemies.Find(e => e.GetEnemyData().m_id == enemyId);
-        if (enemy != null)
-        {
-            MiniGhostEnemy miniGhostEnemy = enemy as MiniGhostEnemy;
-            if (miniGhostEnemy != null)
-            {
-                miniGhostEnemy.StartTimeLimit();
-                miniGhostEnemy.ChangeState(MINI_GHOST_STATE_TYPE.MOVE);
-            }
-        }
-    }
 
     // アクティブな全てのエネミーをバトル開始状態にする
     public void SetAllActiveEnemiesToBattleStart()
     {
-        SetAllMiniGhostsToBattleStart();
-
-        SetAllSwarmGhostsToBattleStart();
-    }
-
-    // アクティブなミニオバケをすべてバトル開始状態にする
-    public void SetAllMiniGhostsToBattleStart()
-    {
         foreach (var enemy in m_activeEnemies)
         {
             if (enemy != null)
             {
-                MiniGhostEnemy miniGhostEnemy = enemy as MiniGhostEnemy;
-                if (miniGhostEnemy != null)
-                {
-                    miniGhostEnemy.StartTimeLimit();
-                    miniGhostEnemy.ChangeState(MINI_GHOST_STATE_TYPE.MOVE);
-                }
+                enemy.BattleStart();
             }
         }
     }
 
-    // アクティブな指揮者お化けをすべてバトル開始状態にする
-    public void SetAllSwarmGhostsToBattleStart()
+    // アクティブな全てのエネミーをバトル終了状態にする
+    public void SetAllActiveEnemiesToBattleEnd()
     {
         foreach (var enemy in m_activeEnemies)
         {
             if (enemy != null)
             {
-                ConductorGhostManager conductorGhostManager = enemy as ConductorGhostManager;
-                if (conductorGhostManager != null)
-                {
-                    conductorGhostManager.StartBattle();
-                }
+                enemy.BattleEnd();
             }
         }
     }

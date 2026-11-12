@@ -12,8 +12,9 @@ public class SplineMoveEnemy : EnemyBase
     [Header("進行方向(1 = 始点→終点, -1 = 終点→始点)")]
     [SerializeField] private float m_moveDirection = -1f;
 
+    [Header("移動スピード")]
+    [SerializeField]protected float m_moveSpeed = 1f; // 移動スピード
 
-    protected float m_moveSpeed = 1f; // 移動スピード
     protected bool m_rotateWithSplineFlag = true;// スプラインに合わせて回転するかどうか
     protected SplineContainer m_targetSpline; // 移動対象のスプライン
     protected float m_distanceTraveled = 0f;  // スプライン上の移動距離
@@ -21,10 +22,22 @@ public class SplineMoveEnemy : EnemyBase
     protected bool m_isClosedSplineFlag = false; // スプラインがループClosedしているかどうか
     protected Vector3 m_spawnPosition;
 
-
+    // 初期化処理
     public override void Initialize()
     {
-        // 初期化処理
+        
+    }
+
+    // 戦闘開始時の処理
+    public override void BattleStart()
+    {
+        
+    }
+
+    // 戦闘終了時の処理
+    public override void BattleEnd()
+    {
+        m_moveSpeed = 0f;
     }
 
     public virtual void SetupSpline(SplineContainer spline)

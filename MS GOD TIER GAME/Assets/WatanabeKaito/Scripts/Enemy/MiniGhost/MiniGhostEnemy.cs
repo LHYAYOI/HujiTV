@@ -68,6 +68,19 @@ public class MiniGhostEnemy : SplineMoveEnemy
         ChangeState(MINI_GHOST_STATE_TYPE.SPAWN);
     }
 
+    public override void BattleStart()
+    {
+        base.BattleStart();
+        StartTimeLimit();
+    }
+
+    public override void BattleEnd()
+    {
+        base.BattleEnd();
+        m_targetableObject.SetTargetable(false);
+        ChangeState(MINI_GHOST_STATE_TYPE.IDLE);
+    }
+
     protected override void Update()
     {
         //if (m_timeLimitStarted && !m_isDying)

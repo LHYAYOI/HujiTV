@@ -5,15 +5,12 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Splines;
 
-public class SwarmGhostEvent : MonoBehaviour
+public class SwarmGhostEvent : SplineMoveEnemy
 {
+
     [SerializeField] private GroupLeader m_groupLeader;
 
-    [Header("移動させるスプライン")]
-    [SerializeField] private SplineContainer m_splineContainer;
-
     [Header("移動設定")]
-    [SerializeField] private float m_moveSpeed = 2.0f;
     [SerializeField] private bool m_loopFlag = true;
 
     [Header("回転補正")]
@@ -35,32 +32,42 @@ public class SwarmGhostEvent : MonoBehaviour
     // 移動中かどうか
     private bool m_isMovingFlag = false;
 
-    private bool m_stopFlag = false;
-
-
     void Start()
     {
        
     }
 
-    private void Update()
-    {
-      
-        // スプライン移動
-        if (m_isMovingFlag)
-        {
-            MoveAlongSpline();
-        }
-    }
-
     
 
-   
+    
+    public override void Initialize()
+    {
+        // スプラインの始点に移動
+        transform.position = m_targetSpline.EvaluatePosition(0f);
+        m_groupLeader.SpawnAllSwarmGhost();
+        StartSplineMovement();
+    }
+
+    public override void BattleStart()
+    {
+       Debug.Log("SwarmGhostEvent: BattleStart called.");
+    }
+
+    public override void BattleEnd()
+    {
+        Debug.Log("SwarmGhostEvent: BattleEnd called.");
+        m_isMovingFlag = false;
+
+        m_groupLeader.RemoveAllOyoguSwarmGhosts();
+
+        Debug.Log("SwarmGhostEvent: BattleEnd called, all swarm ghosts removed.");
+    }
+
 
     // スプライン移動を初期化
     public void StartSplineMovement()
     {
-        if (m_splineContainer == null)
+        if (m_targetSpline == null)
         {
             return;
         }
@@ -113,7 +120,7 @@ public class SwarmGhostEvent : MonoBehaviour
             float t = i / (float)SAMPLE_COUNT;
 
             m_samplePositions[i] =
-                m_splineContainer.EvaluatePosition(t);
+                m_targetSpline.EvaluatePosition(t);
 
             if (i > 0)
             {
@@ -130,39 +137,7 @@ public class SwarmGhostEvent : MonoBehaviour
     }
 
 
-    // スプラインに沿って移動
-    private void MoveAlongSpline()
-    {
-        // 移動距離を更新
-        m_currentDistance += m_moveSpeed * Time.deltaTime;
-
-        if (m_loopFlag)
-        {
-            // 終点に到達したら先頭に戻る
-            m_currentDistance = Mathf.Repeat(
-                m_currentDistance,
-                m_totalLength
-            );
-        }
-        else
-        {
-            // ループしない場合は終点で停止
-            if (m_currentDistance >= m_totalLength)
-            {
-                m_currentDistance = m_totalLength;
-                m_isMovingFlag = false;
-
-                if (!m_stopFlag)
-                {
-                    m_groupLeader.SetStoppedDistance(true);
-                    m_stopFlag = true;
-                }
-            }
-        }
-
-        UpdateSplineTransform();
-    }
-
+    
 
     // 移動距離からスプラインの補間値を取得
     private float GetInterpolationFromDistance(float distance)
@@ -215,14 +190,14 @@ public class SwarmGhostEvent : MonoBehaviour
 
         // スプライン上の位置に移動
         transform.position =
-            m_splineContainer.EvaluatePosition(t);
+            m_targetSpline.EvaluatePosition(t);
 
         // スプラインの進行方向を取得
         Vector3 tangent =
-            m_splineContainer.EvaluateTangent(t);
+            m_targetSpline.EvaluateTangent(t);
 
         Vector3 up =
-            m_splineContainer.EvaluateUpVector(t);
+            m_targetSpline.EvaluateUpVector(t);
 
         if (tangent.sqrMagnitude <= 0.0001f)
         {

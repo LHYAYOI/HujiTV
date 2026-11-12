@@ -286,6 +286,13 @@ public class SwarmGhostManager : TargetableObject
         m_IsTargetableFlag = false;
     }
 
+    // 全ての群れお化けを非アクティブにする
+    public void DeactivateAllSwarmGhosts()
+    {
+        m_IsTargetableFlag = false;
+        m_isActiveFlag = false;
+    }
+
     public void SetCurrentHealth(int health)
     {
         m_currentHealth = health;

@@ -27,7 +27,7 @@ public class ChandelierController : TargetableObject
 
         if (data.GetHitObject.CompareTag("Floor")) 
         {
-            m_groupLeader.RemoveAllOyoguSwarmGhosts();
+            m_groupLeader.DeadAnimationAllOyoguSwarmGhosts();
         }
     }
 

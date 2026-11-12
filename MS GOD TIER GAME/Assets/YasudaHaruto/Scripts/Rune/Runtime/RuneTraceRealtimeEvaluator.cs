@@ -23,6 +23,10 @@ public class RuneTraceRealtimeEvaluator
     private readonly float m_endTolerance;
     private readonly float m_sampleInterval;
 
+    private readonly float[] m_pathDistances;
+    private int m_coverageSegment;
+    private float m_coverageFraction;
+    private float m_coveredDistance;
     private float m_currentDistance;
     private float m_maxDistance;
     private bool m_hasStarted;
@@ -39,7 +43,10 @@ public class RuneTraceRealtimeEvaluator
     public RuneTraceRealtimeEvaluator(IReadOnlyList<Vector2> referencePoints, float distanceTolerance, float startTolerance, float endTolerance, float sampleInterval)
     {
         m_referencePoints = referencePoints;
-        m_pathLength = RunePathUtility.CalculatePathLength(referencePoints);
+        m_pathDistances = new float[referencePoints != null ? referencePoints.Count : 0];
+        for (int i = 1; i < m_pathDistances.Length; i++)
+            m_pathDistances[i] = m_pathDistances[i - 1] + Vector2.Distance(referencePoints[i - 1], referencePoints[i]);
+        m_pathLength = m_pathDistances.Length > 0 ? m_pathDistances[m_pathDistances.Length - 1] : 0f;
         m_distanceTolerance = Mathf.Max(0f, distanceTolerance);
         m_startTolerance = Mathf.Max(0f, startTolerance);
         m_endTolerance = Mathf.Max(0f, endTolerance);
@@ -61,7 +68,12 @@ public class RuneTraceRealtimeEvaluator
             return false;
         }
 
-        NormalizedDeviation = Mathf.Clamp01(RunePathUtility.DistancePointToSegment(position, m_referencePoints[0], m_referencePoints[1]) / Mathf.Max(0.0001f, m_distanceTolerance));
+        // Starting within StartTolerance also covers the contiguous prefix near the pointer.
+        AdvanceCoverage(position, position, m_startTolerance);
+        RunePathUtility.TryProjectOnPath(m_referencePoints, position, 0f, 0f, m_coveredDistance,
+            out m_currentDistance, out float distance);
+        m_maxDistance = m_currentDistance;
+        NormalizedDeviation = Mathf.Clamp01(distance / Mathf.Max(0.0001f, m_distanceTolerance));
         m_hasStarted = true;
         return true;
     }
@@ -96,12 +108,15 @@ public class RuneTraceRealtimeEvaluator
             // サンプリング位置を計算
             Vector2 position = Vector2.Lerp(previous, current, (float)i / sampleCount);
 
-            // パス上に投影する際の許容距離を設定
-            float backwardAllowance = Mathf.Max(m_distanceTolerance, m_sampleInterval * 4f);
-            float forwardAllowance = m_sampleInterval * 2f;
+            Vector2 samplePrevious = Vector2.Lerp(previous, current, (float)(i - 1) / sampleCount);
+            AdvanceCoverage(samplePrevious, position, m_distanceTolerance);
 
-            // パス上に投影し、距離を取得
-            bool projected = RunePathUtility.TryProjectOnPath(m_referencePoints, position, m_currentDistance, backwardAllowance, forwardAllowance, out float pathDistance, out float distanceFromPath);
+            // Distance is measured against the continuously visited part of the route.
+            // Coverage cannot jump over an unvisited loop at a crossing or nearby branch.
+            float backwardAllowance = Mathf.Max(m_distanceTolerance, m_sampleInterval * 4f);
+            float forwardAllowance = Mathf.Max(0f, m_coveredDistance - m_currentDistance);
+            bool projected = RunePathUtility.TryProjectOnPath(m_referencePoints, position, m_currentDistance,
+                backwardAllowance, forwardAllowance, out float pathDistance, out float distanceFromPath);
 
             NormalizedDeviation = Mathf.Max(NormalizedDeviation, projected
                 ? Mathf.Clamp01(distanceFromPath / Mathf.Max(0.0001f, m_distanceTolerance)) : 1f);
@@ -117,12 +132,13 @@ public class RuneTraceRealtimeEvaluator
         }
 
         // ルーンのトレースが完了したかどうかを判定
-        float remaining = m_pathLength - m_maxDistance;
-        float progressTolerance = Mathf.Min(m_sampleInterval * 2f, m_endTolerance);
+        float remaining = m_pathLength - m_coveredDistance;
+        float progressTolerance = m_endTolerance;
 
         if (remaining <= progressTolerance && Vector2.Distance(current, m_referencePoints[m_referencePoints.Count - 1]) <= m_endTolerance)
         {// トレースが完了した場合は完了扱い
             m_isCompleted = true;
+            m_maxDistance = m_pathLength;
             return RUNE_REALTIME_RESULT.COMPLETED;
         }
 
@@ -134,11 +150,57 @@ public class RuneTraceRealtimeEvaluator
     public void Reset()
     {
         NormalizedDeviation = 0f;
+        m_coverageSegment = 0;
+        m_coverageFraction = 0f;
+        m_coveredDistance = 0f;
         m_currentDistance = 0f;
         m_maxDistance = 0f;
         m_hasStarted = false;
         m_isCompleted = false;
         m_hasFailed = false;
+    }
+
+    // Advance only a contiguous route prefix inside the swept input capsule.
+    // A capsule is convex, so a straight reference segment with both ends inside is covered.
+    private void AdvanceCoverage(Vector2 previous, Vector2 current, float tolerance)
+    {
+        float radiusSquared = tolerance * tolerance + 0.0000000001f;
+        while (m_coverageSegment + 1 < m_referencePoints.Count)
+        {
+            Vector2 start = m_referencePoints[m_coverageSegment];
+            Vector2 end = m_referencePoints[m_coverageSegment + 1];
+            Vector2 frontier = Vector2.Lerp(start, end, m_coverageFraction);
+            if (SquaredDistanceToSegment(frontier, previous, current) > radiusSquared) return;
+            if (SquaredDistanceToSegment(end, previous, current) <= radiusSquared)
+            {
+                m_coverageSegment++;
+                m_coverageFraction = 0f;
+                m_coveredDistance = m_pathDistances[m_coverageSegment];
+                continue;
+            }
+
+            // Locate the capsule exit without allocating or resampling the reference path.
+            float low = m_coverageFraction, high = 1f;
+            for (int step = 0; step < 16; step++)
+            {
+                float middle = (low + high) * 0.5f;
+                Vector2 point = Vector2.Lerp(start, end, middle);
+                if (SquaredDistanceToSegment(point, previous, current) <= radiusSquared) low = middle;
+                else high = middle;
+            }
+            m_coverageFraction = low;
+            m_coveredDistance = Mathf.Lerp(m_pathDistances[m_coverageSegment],
+                m_pathDistances[m_coverageSegment + 1], low);
+            return;
+        }
+    }
+
+    private static float SquaredDistanceToSegment(Vector2 point, Vector2 start, Vector2 end)
+    {
+        Vector2 direction = end - start;
+        float lengthSquared = direction.sqrMagnitude;
+        float t = lengthSquared > 0f ? Mathf.Clamp01(Vector2.Dot(point - start, direction) / lengthSquared) : 0f;
+        return (point - (start + t * direction)).sqrMagnitude;
     }
 
     // 評価が失敗した場合の処理

@@ -8,14 +8,14 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class RuneEditorWindow : EditorWindow
+public partial class RuneEditorWindow : EditorWindow
 {
     private RuneData m_runeData;
 
     private readonly List<Vector2> m_currentStroke = new();
 
     private bool m_isDrawing;
-    private enum CANVAS_TOOL { DRAW, SELECT }
+    private enum CANVAS_TOOL { DRAW, SELECT, POINTS }
     private CANVAS_TOOL m_canvasTool;
     private bool m_showSourceImage = true;
     private float m_sourceImageOpacity = 0.3f;
@@ -41,6 +41,8 @@ public class RuneEditorWindow : EditorWindow
     {
         if (m_canvasControlId != 0 && GUIUtility.hotControl == m_canvasControlId)
             GUIUtility.hotControl = 0;
+        EndPointDrag();
+        m_selectedPointIndex = -1;
         m_isDrawing = false;
         m_currentStroke.Clear();
         Repaint();
@@ -278,6 +280,7 @@ public class RuneEditorWindow : EditorWindow
 
         if (m_showImportedPreview) DrawImportedStrokes();
 
+        DrawPointGrid();
         DrawSavedStrokes();
 
         DrawBakedPoints();
@@ -285,6 +288,7 @@ public class RuneEditorWindow : EditorWindow
         DrawCurrentStroke();
 
         DrawStrokeGuides(m_runeData.AuthoringData.Strokes);
+        DrawPointHandles();
     }
 
 
@@ -373,12 +377,13 @@ public class RuneEditorWindow : EditorWindow
     private void DrawCanvasTools()
     {
         EditorGUILayout.LabelField("Canvas Editing", EditorStyles.boldLabel);
-        var tool = (CANVAS_TOOL)GUILayout.Toolbar((int)m_canvasTool, new[] { "Draw", "Select / Delete" });
-        if (tool != m_canvasTool) { CancelCanvasInput(); m_canvasTool = tool; }
+        var tool = (CANVAS_TOOL)GUILayout.Toolbar((int)m_canvasTool, new[] { "Draw", "Select / Delete", "Points" });
+        if (tool != m_canvasTool) { CancelCanvasInput(); m_canvasTool = tool; m_placingPoints = false; }
+        if (m_canvasTool == CANVAS_TOOL.POINTS) DrawPointToolbar();
         m_showSourceImage = EditorGUILayout.Toggle("Show Source Image", m_showSourceImage);
         m_sourceImageOpacity = EditorGUILayout.Slider("Source Opacity", m_sourceImageOpacity, 0f, 1f);
         m_showImportedPreview = EditorGUILayout.Toggle("Show Import Preview", m_showImportedPreview);
-        EditorGUILayout.HelpBox(m_canvasTool == CANVAS_TOOL.DRAW
+        if (m_canvasTool != CANVAS_TOOL.POINTS) EditorGUILayout.HelpBox(m_canvasTool == CANVAS_TOOL.DRAW
             ? "Draw over the source image. Each drag adds one stroke. Bake after editing."
             : "Click a saved stroke to select it (cyan). Delete removes it; Ctrl+Z restores it. Apply an import before editing its strokes.", MessageType.Info);
         using (new EditorGUI.DisabledScope(m_selectedStrokeIndex < 0 || m_selectedStrokeIndex >= m_runeData.AuthoringData.Strokes.Count))
@@ -426,6 +431,7 @@ public class RuneEditorWindow : EditorWindow
     private void HandleDrawingInput()
     {
         Event e = Event.current;
+        if (m_canvasTool == CANVAS_TOOL.POINTS) { HandlePointInput(e); return; }
         if (e.type == EventType.KeyDown && GUIUtility.keyboardControl == m_canvasControlId)
         {
             if (e.keyCode == KeyCode.Escape) { CancelCanvasInput(); e.Use(); return; }
@@ -529,7 +535,7 @@ public class RuneEditorWindow : EditorWindow
         Undo.RecordObject(m_runeData, "Add Rune Stroke");
 
         // 現在のストロークをRuneStrokeDataに変換する
-        RuneStrokeData stroke = new RuneStrokeData(m_currentStroke);
+        RuneStrokeData stroke = new RuneStrokeData(m_currentStroke, m_placingPoints);
 
         // RuneDataのAuthoringDataにストロークを追加する
         m_runeData.AuthoringData.AddStroke(stroke);
@@ -627,6 +633,7 @@ public class RuneEditorWindow : EditorWindow
 
     private void BakeRune()
     {
+        if (m_canvasTool == CANVAS_TOOL.POINTS && m_currentStroke.Count >= 2) FinishPointStroke();
         if (m_runeData == null)
         {// RuneDataがnullの場合は処理を終了する
             return;
