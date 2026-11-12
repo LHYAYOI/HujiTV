@@ -36,11 +36,32 @@ public class PlayerController : MonoBehaviour
         {
             FireBullet(magicData, MAGIC_CAST_DIRECTION.RIGHT);
         }
+
+        if (Input.GetKeyDown(KeyCode.K)) 
+        {
+            TakeDamage(1);
+        }
     }
 
-    public void TakeDamage() 
-    {
     //ダメージ処理
+    public void TakeDamage(byte dirtAmount) 
+    {
+        //汚れの付着
+
+        BookNetworkServer server = BookNetworkServer.Instance;
+
+        if (server != null) 
+        {
+            server.SendObstacle(PLAYER_SLOT.PLAYER1, dirtAmount);
+            server.SendObstacle(PLAYER_SLOT.PLAYER2, dirtAmount);
+        }
+
+        //ダメージエフェクト
+
+        //シェイク
+        CameraManager.Instance.ShakeCamera(.5f, 10);
+
+        //音再生
     }
 
     //弾の発射イベント

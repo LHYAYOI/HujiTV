@@ -22,24 +22,6 @@ public class SpiderController : MonoBehaviour
         ChangeState("Encount_State");
     }
 
-    private void Start()
-    {
-        
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.K)) 
-        {
-            EnableDamageableState();
-        }
-
-        if (Input.GetKeyDown(KeyCode.J))
-        {
-            ChangeState("Attack_State");
-        }
-    }
-
     public void ChangeState(string stateName) 
     {
         m_stateMachine.ChangeState(stateName);
