@@ -11,8 +11,10 @@ public class MiniGhostIdleState : MiniGhostState
 
     public override void EnterState()
     {
-      
+        
     }
+
+  
 
     public override void ExitState()
     {
