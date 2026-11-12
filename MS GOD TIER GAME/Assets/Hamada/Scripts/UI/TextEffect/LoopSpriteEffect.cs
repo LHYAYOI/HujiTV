@@ -1,4 +1,4 @@
-using TMPro;
+ï»¿using TMPro;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "LoopSpriteEffect", menuName = "Scriptable Objects/LoopSpriteEffect")]
@@ -9,31 +9,24 @@ public class LoopSpriteEffect : TextEffect
 
     [SerializeField] float m_frameRate = 12f;
 
-    public override void Apply(
-        TMP_TextInfo textInfo,
-        int characterIndex,
-        int localIndex,
-        float elapsedTime)
+    public override void Apply(TMP_TextInfo textInfo, int characterIndex, int localIndex, float elapsedTime)
     {
 
-        TMP_CharacterInfo charInfo =
-            textInfo.characterInfo[characterIndex];
+        TMP_CharacterInfo charInfo = textInfo.characterInfo[characterIndex];
 
-        // ƒXƒvƒ‰ƒCƒgˆÈŠO‚Íˆ—‚µ‚È‚¢
+        // ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆä»¥å¤–ã¯å‡¦ç†ã—ãªã„
         if (charInfo.elementType != TMP_TextElementType.Sprite)
             return;
 
         if (m_frameIndices == null || m_frameIndices.Length == 0)
             return;
 
-        TMP_SpriteCharacter baseSprite =
-    charInfo.textElement as TMP_SpriteCharacter;
+        TMP_SpriteCharacter baseSprite = charInfo.textElement as TMP_SpriteCharacter;
 
         if (baseSprite == null)
             return;
 
-        TMP_SpriteAsset spriteAsset =
-            baseSprite.textAsset as TMP_SpriteAsset;
+        TMP_SpriteAsset spriteAsset = baseSprite.textAsset as TMP_SpriteAsset;
 
         if (spriteAsset == null || spriteAsset.spriteSheet == null)
             return;
@@ -41,49 +34,43 @@ public class LoopSpriteEffect : TextEffect
         int materialIndex = charInfo.materialReferenceIndex;
         int vertexIndex = charInfo.vertexIndex;
 
-        TMP_MeshInfo meshInfo =
-            textInfo.meshInfo[materialIndex];
+        TMP_MeshInfo meshInfo = textInfo.meshInfo[materialIndex];
 
-        // Œ»İ‚ÌƒtƒŒ[ƒ€‚ğŒvZ
-        int frameStep = Mathf.FloorToInt(
-            elapsedTime * Mathf.Max(0.01f, m_frameRate)
-        );
+        // ç¾åœ¨ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’è¨ˆç®—
+        int frameStep = Mathf.FloorToInt(elapsedTime * Mathf.Max(0.01f, m_frameRate));
 
         int frameListIndex = frameStep % m_frameIndices.Length;
 
-        // Sprite Asset“à‚ÌƒtƒŒ[ƒ€”Ô†
+        // Sprite Assetå†…ã®ãƒ•ãƒ¬ãƒ¼ãƒ ç•ªå·
         int spriteIndex = m_frameIndices[frameListIndex];
 
-        if (spriteIndex < 0 ||
-            spriteIndex >= spriteAsset.spriteCharacterTable.Count)
+        if (spriteIndex < 0 || spriteIndex >= spriteAsset.spriteCharacterTable.Count)
             return;
 
-        TMP_SpriteCharacter spriteCharacter =
-            spriteAsset.spriteCharacterTable[spriteIndex];
+        TMP_SpriteCharacter spriteCharacter = spriteAsset.spriteCharacterTable[spriteIndex];
 
-        // Œ³‚ÌƒXƒvƒ‰ƒCƒg‚ÌƒXƒP[ƒ‹
-        float baseSpriteScale =
-            baseSprite.scale * baseSprite.glyph.scale;
+        // å…ƒã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ã‚¹ã‚±ãƒ¼ãƒ«
+        float baseSpriteScale = baseSprite.scale * baseSprite.glyph.scale;
 
         if (baseSpriteScale <= 0.0001f)
             return;
 
-        // Œ»İ‚ÌƒtƒŒ[ƒ€‚ÌƒXƒP[ƒ‹
+        // ç¾åœ¨ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã®ã‚¹ã‚±ãƒ¼ãƒ«
         float spriteScale =
             charInfo.scale / baseSpriteScale *
             spriteCharacter.scale *
             spriteCharacter.glyph.scale;
 
-        // •¶š‚ÌŠî€ˆÊ’u
+        // æ–‡å­—ã®åŸºæº–ä½ç½®
         Vector2 origin = new Vector2(
             charInfo.origin,
             charInfo.baseLine
         );
 
-        // Œ»İ‚ÌƒtƒŒ[ƒ€‚ÌMetrics
+        // ç¾åœ¨ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã®Metrics
         var metrics = spriteCharacter.glyph.metrics;
 
-        // ’¸“_‚ğÄŒvZ
+        // é ‚ç‚¹ã‚’å†è¨ˆç®—
         Vector3 bl = new Vector3(
             origin.x + metrics.horizontalBearingX * spriteScale,
             origin.y + (metrics.horizontalBearingY - metrics.height) * spriteScale
@@ -110,11 +97,42 @@ public class LoopSpriteEffect : TextEffect
         vertices[vertexIndex + 1] = tl;
         vertices[vertexIndex + 2] = tr;
         vertices[vertexIndex + 3] = br;
+
+        // UVæ›´æ–°
+        var rect = spriteCharacter.glyph.glyphRect;
+        var atlas = spriteAsset.spriteSheet;
+
+        Vector2 uv0 = new Vector2(
+            (float)rect.x / atlas.width,
+            (float)rect.y / atlas.height
+        );
+
+        Vector2 uv1 = new Vector2(
+            uv0.x,
+            (float)(rect.y + rect.height) / atlas.height
+        );
+
+        Vector2 uv2 = new Vector2(
+            (float)(rect.x + rect.width) / atlas.width,
+            uv1.y
+        );
+
+        Vector2 uv3 = new Vector2(
+            uv2.x,
+            uv0.y
+        );
+
+        Vector4[] uvs = meshInfo.uvs0;
+
+        uvs[vertexIndex + 0] = uv0;
+        uvs[vertexIndex + 1] = uv1;
+        uvs[vertexIndex + 2] = uv2;
+        uvs[vertexIndex + 3] = uv3;
     }
 
     public override float GetDuration(int characterCount)
     {
-        // ƒ‹[ƒv‚·‚é‚½‚ßI—¹ŠÔ‚Í‚È‚¢
+        // ãƒ«ãƒ¼ãƒ—ã™ã‚‹ãŸã‚çµ‚äº†æ™‚é–“ã¯ãªã„
         return float.PositiveInfinity;
     }
 

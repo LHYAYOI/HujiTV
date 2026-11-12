@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum TEXT_EFFECT_STATE
@@ -40,6 +41,8 @@ public class TextEffectController : MonoBehaviour
     private void Start()
     {
         m_state = TEXT_EFFECT_STATE.Standby;
+
+        Play();
     }
 
     public void Play() 
