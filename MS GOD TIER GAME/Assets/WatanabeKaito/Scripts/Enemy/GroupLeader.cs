@@ -275,7 +275,7 @@ public class GroupLeader : MonoBehaviour
     }
 
     // すべての群れお化けを削除する
-    public void RemoveAllOyoguSwarmGhosts()
+    public void DeadAnimationAllOyoguSwarmGhosts()
     {
         m_isDead = true;
 
@@ -293,6 +293,20 @@ public class GroupLeader : MonoBehaviour
         m_activeSwarmGhostList.Clear();
     }
 
+    public void RemoveAllOyoguSwarmGhosts()
+    {
+        for (int i = 0; i < m_activeSwarmGhostList.Count; i++)
+        {
+            OyoguSwarmGhost swarmGhost = m_activeSwarmGhostList[i].GetComponent<OyoguSwarmGhost>();
+            if (swarmGhost != null)
+            {
+                Destroy(swarmGhost.gameObject);
+            }
+        }
+        // お化けと出現位置の管理リストをクリア
+        m_activeSwarmGhostList.Clear();
+    }
+
     // 群れお化けのリーダーへの追従を解除する
     public void ReleaseSwarmGhosts()
     {
@@ -303,7 +317,7 @@ public class GroupLeader : MonoBehaviour
     {
         if (other.CompareTag("Chandelier"))
         {
-            RemoveAllOyoguSwarmGhosts();
+            DeadAnimationAllOyoguSwarmGhosts();
         }
     }
 }
