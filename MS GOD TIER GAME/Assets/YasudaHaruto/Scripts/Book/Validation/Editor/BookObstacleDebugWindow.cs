@@ -26,6 +26,16 @@ public sealed class BookObstacleDebugWindow : EditorWindow
         var bootstrap = Application.isPlaying ? Object.FindFirstObjectByType<BookGameBootstrap>() : null;
         var controller = bootstrap != null ? bootstrap.ObstacleController : null;
         var game = bootstrap != null ? bootstrap.GameController : null;
+        var settings = controller != null ? controller.Settings : Resources.Load<ObstacleData>("BookObstacles/Rub");
+        if (settings != null)
+        {
+            var serialized = new SerializedObject(settings);
+            serialized.Update();
+            EditorGUILayout.PropertyField(serialized.FindProperty("m_requiredDistance"));
+            serialized.ApplyModifiedProperties();
+            EditorGUILayout.HelpBox("小さいほど早く消えます。2なら4の半分の距離で解除します。設定アセットへ保存されます。", MessageType.None);
+            if (GUILayout.Button("画像・配置の設定を選択")) Selection.activeObject = settings;
+        }
         bool available = controller != null && game != null && game.IsInitialized && game.isActiveAndEnabled &&
             game.BookView != null && game.BookView.isActiveAndEnabled && !game.IsEditing &&
             !game.BookView.IsBusy && !game.BookView.FlipView.IsTurning && !EditorApplication.isPaused;

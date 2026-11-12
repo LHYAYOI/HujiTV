@@ -961,3 +961,34 @@ $12026-10-29：お邪魔4枠の初期実装。左右擦り・スクラッチ、�
 ## 担当範囲外の変更を撤回（2026-11-11）
 - 前項の「承認された発動経路の接続」という記載は誤り。基底・Prefab参照方式の実装承認を、他担当コードの変更承認と解釈してしまった。AGENTS.mdの事前相談を行っていない。
 - ユーザー指示により、PlayerController.csに今回追加したnull確認とINSTANT分岐の18行を除去し、変更前へ復旧。InstantMagicBaseとMagicDataのPrefab参照は担当範囲内の実装として維持。PC側の生成・Execute呼出し接続は未実装の状態へ戻った。
+
+## PC側ジェットコースターの調査・設計（2026-11-12）
+- ユーザー指定により実装せず、AGENTS.md・本記録・TROLLEY_STAGE_SETUP.mdと現行Arai/Hamada/WatanabeKaitoのスプライン/カメラ関連を静的調査。ROLLER_COASTER_DESIGN.mdへ設計を記録。
+- 走行・区間加減速・停止・分岐は流用候補。スプライン側シェイク呼出しはコメントアウト。カメラ側APIは存在。対向車は生成後の走行設定/終了/対象判別が追加候補。
+- Unity Splines 2.9.1のローカル実装を確認。反復配置と断面押出しは利用候補だが、既存素材の曲げと継ぎ目調整には追加設計が必要。素材パス未特定。
+- 同じSplineContainerを走行・生成で共有し、連続素材は変形、支柱等は形を保った反復配置を提案。既存の距離/全長によるパラメータ評価と実距離配置の差、高速衝突イベント、急カーブの姿勢追従を課題として記載。
+- Git status/fetch/追跡先比較成功、確定コミット・ファイル差分なし。開始時からBunkiScene.unityと.metaの削除あり、保持。今回の変更は設計資料と本記録のみ。ゲームコード・Scene・Prefab・共有設定未変更、Unity/Play Mode未実施。
+
+## ジェットコースター使用素材の特定（2026-11-12）
+- ユーザー指定のAssets/map/bunki/duct_lane.fbxを確認。FBX内部のModel/Geometry接続を読み取り、対象がrail_straightとduct_straightであることを確認。直線線路と直線囲いを使用予定。
+- 元データは囲い8頂点/4面、線路40頂点/30面（Unityインポート前）。囲いは長手方向に中間頂点がなく、滑らかな変形には面の分割が必要。素材展示位置の除去、子メッシュのスケール反映、レールと囲いの別レイヤー生成を設計へ追加。
+- isReadable=0、addColliders=0を確認。Editorで生成用Meshを保存する方式を検討。素材原本・Importer・コード・Scene・Prefabは未変更。Unityでの表示/最終寸法/端面接続は未確認。変更は設計資料と本記録のみ。
+
+## 汚れ4画像の差し替え・配置参考への対応（2026-11-12）
+- 作業開始時にAGENTS.mdと本記録を確認。MS-153/Feature/RollerCoasterでfetch／追跡先比較を実施。既存のBunkiScene削除・map素材変更／新規ファイル・ジェットコースター資料／追記を保持。禁止Git操作なし。
+- ユーザー追加のData/Texture/Dirt/Ink1〜Ink4.pngとDownloads/配置参考2.pngを確認。Ink1は右上、Ink2は右下、Ink3は左上、Ink4は全見開きに飛沫を含む画像。4枚ともRGBA透過あり。原本PNG・Importer設定は変更していない。
+- Rub.assetへ枠別Textureと見開き正規化Rectを設定。ObstacleInstanceが枠番号を保持し画像を選択。4枠の付与・上書き・個別解除・4番の制限・通信プロトコル・距離による連続薄化を維持する。
+- 画像が跨ぐ紙面ごとにRectを切り分け、元画像UVの対応部分を4頂点で描画。左上画像の右端と4番画像の左右飛沫を撮影RTへ含め、Live Turnにも同じ状態を反映。左右Graphicは同じObstacleInstanceを参照し、一つの清掃進捗を共有する。入力矩形は両紙面の投影結果から取得する。
+- 既存RequiredDistanceを日本語ラベル・説明付きにし、Obstacle Debug Windowから編集可能にした。値4を維持。2なら同じ移動で倍消える。「画像・配置の設定を選択」で使用中設定をInspectorへ表示できる。Verifyメニューは追加なし。
+- Runtime／Editor別出力コンパイル成功（既存警告3件）。Unity内コア検証BookObstacle COMPLETE、現在のBookSceneのPlay Mode検証BookObstacleRuntime COMPLETE。段階ごとの画像、透過、数値による倍速、左右UV、撮影RT画素差分、めくり中／戻った後の保持、枠別解除、範囲外からの再開、4番の操作制限／解除を確認。四画像の配置キャプチャを目視確認。Android実機・物理マウスによる最終体感は未確認。
+- 初回Runtime検証で汚れGraphicが白代替となった原因はRectのYAML保存でserializedVersion:2が欠けていたこと。正規形式へ修正し、配置寸法の読込チェック追加後に全検証通過。見た目確認はTemp/ObstacleValidation/four-stage-layout.png。
+- Scene／Prefab／他担当コードは変更していない。保存済みBookScene SHA256は確認した2回とも509ADABD49B02D51E1A0B90F179F5BEF1689A2CD3693E72AAA82F8CB00A22710。既存の未保存Sceneは保存・破棄せず、検証後は編集モードへ戻った。変更は担当側汚れコード・設定・既存検証と資料のみ。
+
+## 透明部分で汚れが消える問題と分割画像への対応（2026-11-12）
+- ユーザー報告：画像の透明な箇所を擦っても清掃が進む。新しく分割された画像を使って修正する依頼。AGENTS.md・本記録・配置参考を確認し、新しいInk4〜Ink8を目視／寸法確認。4段階目の本体Ink6と4/5/7/8の飛沫へ再配置した。原本PNG・Importer・Sceneは変更しない。
+- ObstacleDataへ4番枠の追加画像群と、小さなalpha占有マスクを追加。ObstaclePatchGraphicは表示用Textureを個別指定でき、全パーツが同一ObstacleInstanceの進捗で薄くなる。各画像を左右紙面へUV分割して撮影する既存方式は維持。
+- BookObstacleControllerは各表示パーツの画面RectとUVをキャッシュし、元画像の汚れがある場所だけを入力対象とする。透明部分からは開始不可、保持中の透明部分は消去停止、戻れば押し直さず再開。入力間の経路も約1px間隔で検査し、両端が汚れ上でも透明な間隙を距離へ加算しない。矩形を埋める透明領域で下の枠への押下を奪わない。
+- EditorのObstacleMaskBakerがRub設定の使用画像を読み、長辺256セル・1bit/cell・alpha26/255以上の判定データを保存。起動／関連画像のimport／設定Inspector変更で更新する。実機では小さなbit参照のみで、画像Read/WriteやGPU読戻しは不要。旧未使用Ink.assetへ一度及んだ自動生成分は除去し、自動更新をRub.assetへ限定した。
+- Runtime／Editor別出力コンパイル成功（既存警告3件）。起動済みUnityでBookObstacle COMPLETE、BookObstacleRuntime COMPLETE。分割パーツ・透過マスク、透明押下不可、透明領域での進捗不変、離れた不透明端点の間隙非加算、再入場後の擦り、4番枠の解除／ルーン復帰、めくり用RTと状態保持の既存回帰も通過。表示キャプチャで参考配置の維持を確認。
+- 判定マスクの分解能は原寸ピクセルと完全一致ではない（長辺256）。Android実機・物理マウス操作の最終体感は未確認。Verifyメニューは追加しない。新規スクリプトはObstacleAlphaMask／Editor ObstacleMaskBakerと.meta。
+- 現在のMS-153/Feature/RollerCoasterでstatus／fetch／追跡先比較を実施。map素材・BunkiScene削除・資料を含む既存ユーザー変更を保持。旧Ink設定に差分が残っていないことを確認。保存済みBookScene SHA256は509ADABD49B02D51E1A0B90F179F5BEF1689A2CD3693E72AAA82F8CB00A22710で前作業と一致。Scene保存・破棄・他担当コード変更・禁止Git操作なし。

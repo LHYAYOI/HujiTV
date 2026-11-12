@@ -10,6 +10,9 @@ public sealed class BookObstacleController : MonoBehaviour
     private ObstacleData m_settings;
     private readonly ObstaclePatchGraphic[] m_graphics = new ObstaclePatchGraphic[4];
     private readonly Rect[] m_areas = new Rect[4];
+    private struct HitArea { public Rect Screen, UV; public Texture2D Texture; }
+    private readonly List<HitArea>[] m_hitAreas = { new List<HitArea>(), new List<HitArea>(), new List<HitArea>(), new List<HitArea>() };
+    private Vector2 m_pointerScreen;
     private BookGameController m_game;
     private BookGameDragInput m_input;
     private YasudaBookViewController m_book;
@@ -25,7 +28,7 @@ public sealed class BookObstacleController : MonoBehaviour
         public bool Right;
         public bool Live;
         public PageInstance Page;
-        public readonly ObstaclePatchGraphic[] Graphics = new ObstaclePatchGraphic[4];
+        public ObstaclePatchGraphic[] Graphics;
     }
     private PageInstance m_page;
     private ObstacleInstance m_pressed;
@@ -36,6 +39,7 @@ public sealed class BookObstacleController : MonoBehaviour
     private bool m_connected = true;
     private Rect m_rightArea;
     public bool BlocksActions => m_game != null && m_game.CurrentPage != null && m_game.CurrentPage.Obstacles.BlocksActions;
+    public ObstacleData Settings => m_settings;
     private bool Ready => m_game != null && m_game.CanRemoveObstacles;
 
     public void Initialize(BookGameController game, BookGameDragInput input, ObstacleData settings, Rect rightArea)
@@ -75,17 +79,19 @@ public sealed class BookObstacleController : MonoBehaviour
             surface.Root.anchorMin = Vector2.zero;
             surface.Root.anchorMax = Vector2.one;
             surface.Root.offsetMin = surface.Root.offsetMax = Vector2.zero;
-            for (int slot = 0; slot < 4; slot++)
+            surface.Graphics = new ObstaclePatchGraphic[4 + (m_settings != null ? m_settings.ExtraPartCount : 0)];
+            for (int index = 0; index < surface.Graphics.Length; index++)
             {
-                if ((slot < 3) != right) continue;
+                int slot = index < 4 ? index : 3;
                 var go = new GameObject("Page Stain " + (slot + 1), typeof(RectTransform),
                     typeof(CanvasRenderer), typeof(ObstaclePatchGraphic));
                 go.transform.SetParent(surface.Root, false);
                 go.layer = view.gameObject.layer;
                 var graphic = go.GetComponent<ObstaclePatchGraphic>();
                 graphic.raycastTarget = false;
-                surface.Graphics[slot] = graphic;
-                if (!live) m_graphics[slot] = graphic;
+                surface.Graphics[index] = graphic;
+                if (index < 4 && !live && right == (m_settings != null && m_settings.HasStageImages ? slot < 2 : slot < 3))
+                    m_graphics[slot] = graphic;
             }
         }
         surface.Page = page;
@@ -93,15 +99,31 @@ public sealed class BookObstacleController : MonoBehaviour
         m_pendingCaptures.Add(camera);
     }
 
-    private Rect GetPlacement(int slot)
+    private Rect GetPlacement(int slot, int part = 0)
     {
-        if (slot == 3) return new Rect(0.03f, 0.04f, 0.94f, 0.92f);
+        if (m_settings != null && m_settings.HasStageImages) return m_settings.GetPartPlacement(slot, part);
+        if (slot == 3) return new Rect(0.015f, 0.04f, 0.47f, 0.92f);
         Rect placement = slot == 0 ? new Rect(0.52f, 0.58f, 0.48f, 0.42f)
             : slot == 1 ? new Rect(0f, 0.29f, 0.48f, 0.42f)
             : new Rect(0.52f, 0f, 0.48f, 0.42f);
-        return new Rect(m_rightArea.x + m_rightArea.width * placement.x,
+        return new Rect(0.5f + (m_rightArea.x + m_rightArea.width * placement.x) * 0.5f,
             m_rightArea.y + m_rightArea.height * placement.y,
-            m_rightArea.width * placement.width, m_rightArea.height * placement.height);
+            m_rightArea.width * placement.width * 0.5f, m_rightArea.height * placement.height);
+    }
+
+    // Split an image at the gutter, retaining its original UVs on each captured page.
+    private bool GetPageFragment(int slot, int part, bool right, out Rect placement, out Rect uv)
+    {
+        Rect full = GetPlacement(slot, part);
+        float pageMin = right ? 0.5f : 0f;
+        float left = Mathf.Max(full.xMin, pageMin), bottom = Mathf.Max(full.yMin, 0f);
+        float rightEdge = Mathf.Min(full.xMax, pageMin + 0.5f), top = Mathf.Min(full.yMax, 1f);
+        placement = uv = default;
+        if (rightEdge <= left || top <= bottom || full.width <= 0f || full.height <= 0f) return false;
+        placement = new Rect((left - pageMin) * 2f, bottom, (rightEdge - left) * 2f, top - bottom);
+        uv = new Rect((left - full.xMin) / full.width, (bottom - full.yMin) / full.height,
+            (rightEdge - left) / full.width, (top - bottom) / full.height);
+        return true;
     }
 
     private void RefreshSurface(PageSurface surface)
@@ -110,19 +132,23 @@ public sealed class BookObstacleController : MonoBehaviour
         if (surface.Root.GetSiblingIndex() != surface.View.transform.childCount - 1)
             surface.Root.SetAsLastSibling();
         Rect pageRect = surface.Root.rect;
-        for (int slot = 0; slot < 4; slot++)
+        for (int index = 0; index < surface.Graphics.Length; index++)
         {
-            var graphic = surface.Graphics[slot];
+            int slot = index < 4 ? index : 3;
+            int part = index < 4 ? 0 : index - 3;
+            var graphic = surface.Graphics[index];
             if (graphic == null) continue;
             var instance = surface.Page?.Obstacles[slot];
-            bool changed = graphic.gameObject.activeSelf != (instance != null);
-            graphic.gameObject.SetActive(instance != null);
-            Rect placement = GetPlacement(slot);
+            bool fragment = GetPageFragment(slot, part, surface.Right, out Rect placement, out Rect uv);
+            bool active = instance != null && fragment;
+            bool changed = graphic.gameObject.activeSelf != active;
+            graphic.gameObject.SetActive(active);
+            if (!fragment) { if (changed) m_pendingCaptures.Add(surface.Camera); continue; }
             Vector2 size = new Vector2(pageRect.width * placement.width, pageRect.height * placement.height);
             Vector2 center = pageRect.min + new Vector2(
                 pageRect.width * placement.center.x, pageRect.height * placement.center.y);
-            Texture texture = instance?.Data.Texture;
-            if (texture != null)
+            Texture2D texture = instance != null ? m_settings.GetPartTexture(slot, part) : null;
+            if (texture != null && !m_settings.HasStageImages)
             {
                 float aspect = (float)texture.width / texture.height;
                 if (size.x / size.y > aspect) size.x = size.y * aspect;
@@ -135,7 +161,7 @@ public sealed class BookObstacleController : MonoBehaviour
             rect.pivot = Vector2.zero;
             rect.anchoredPosition = position;
             rect.sizeDelta = size;
-            changed |= graphic.Bind(instance);
+            changed |= graphic.Bind(instance, uv, texture);
             if (changed) m_pendingCaptures.Add(surface.Camera);
         }
     }
@@ -209,13 +235,35 @@ public sealed class BookObstacleController : MonoBehaviour
             while (m_pending.Count > 0) Apply(m_pending.Dequeue());
         RefreshSurfaces();
         if (!Ready) { CancelPointer(); return; }
-        for (int slot = 0; slot < 4; slot++)
+        for (int slot = 0; slot < 4; slot++) { m_areas[slot] = default; m_hitAreas[slot].Clear(); }
+        foreach (var surface in m_surfaces)
         {
-            var graphic = m_graphics[slot];
-            m_areas[slot] = graphic != null && graphic.gameObject.activeInHierarchy &&
-                m_input.TryGetObstacleScreenRect(graphic.rectTransform, slot < 3, out Rect rect)
-                    ? rect : default;
+            if (surface.Live) continue;
+            for (int index = 0; index < surface.Graphics.Length; index++)
+            {
+                int slot = index < 4 ? index : 3;
+                var graphic = surface.Graphics[index];
+                if (graphic == null || !graphic.gameObject.activeInHierarchy ||
+                    !m_input.TryGetObstacleScreenRect(graphic.rectTransform, surface.Right, out Rect rect)) continue;
+                var areas = m_hitAreas[slot];
+                Rect combined = m_areas[slot];
+                m_areas[slot] = areas.Count == 0 ? rect : Rect.MinMaxRect(Mathf.Min(combined.xMin, rect.xMin),
+                    Mathf.Min(combined.yMin, rect.yMin), Mathf.Max(combined.xMax, rect.xMax), Mathf.Max(combined.yMax, rect.yMax));
+                areas.Add(new HitArea { Screen = rect, UV = graphic.UVRect, Texture = graphic.mainTexture as Texture2D });
+            }
         }
+    }
+
+    private bool IsInkAt(int slot, Vector2 screen)
+    {
+        foreach (var area in m_hitAreas[slot])
+        {
+            if (!area.Screen.Contains(screen) || area.Screen.width <= 0 || area.Screen.height <= 0) continue;
+            Vector2 local = (screen - area.Screen.min) / area.Screen.size;
+            Vector2 uv = area.UV.min + Vector2.Scale(local, area.UV.size);
+            if (m_settings.ContainsInk(area.Texture, uv)) return true;
+        }
+        return false;
     }
     public bool BeginPointer(Vector2 screen)
     {
@@ -224,10 +272,11 @@ public sealed class BookObstacleController : MonoBehaviour
         for (int i = 3; i >= 0; i--)
         {
             var entry = m_game.CurrentPage.Obstacles[i];
-            if (entry == null || !m_graphics[i].gameObject.activeInHierarchy || !m_areas[i].Contains(screen)) continue;
+            if (entry == null || !IsInkAt(i, screen)) continue;
             m_slot = i;
             m_pressed = entry;
             m_pointerInside = true;
+            m_pointerScreen = screen;
             entry.Begin(Normalize(screen));
             FinishIfComplete();
             return true;
@@ -241,9 +290,10 @@ public sealed class BookObstacleController : MonoBehaviour
     {
         if (m_pressed == null || !Ready || m_game.CurrentPage == null ||
             !ReferenceEquals(m_game.CurrentPage.Obstacles[m_slot], m_pressed)) { CancelPointer(); return; }
-        Vector2 p = Normalize(screen);
-        // Keep ownership until release, but suspend cleaning outside the original patch.
-        if (!m_areas[m_slot].Contains(screen))
+        Vector2 previousScreen = m_pointerScreen;
+        m_pointerScreen = screen;
+        // Transparent areas act like leaving the patch: retain ownership, suspend cleaning.
+        if (!IsInkAt(m_slot, screen))
         {
             m_pressed.Cancel();
             m_pointerInside = false;
@@ -251,12 +301,29 @@ public sealed class BookObstacleController : MonoBehaviour
         }
         if (!m_pointerInside)
         {
-            m_pressed.Begin(p);
+            m_pressed.Begin(Normalize(screen));
             m_pointerInside = true;
-            return; // The outside path and the jump back inside do not count as cleaning.
+            return;
         }
-        m_pressed.Move(p);
-        FinishIfComplete();
+        // Sample the swept path as well: opaque endpoints cannot count a transparent gap.
+        int steps = Mathf.Clamp(Mathf.CeilToInt(Vector2.Distance(previousScreen, screen)), 1, 8192);
+        for (int i = 1; i <= steps; i++)
+        {
+            Vector2 sample = Vector2.Lerp(previousScreen, screen, (float)i / steps);
+            if (!IsInkAt(m_slot, sample))
+            {
+                m_pressed.Cancel();
+                m_pointerInside = false;
+            }
+            else if (!m_pointerInside)
+            {
+                m_pressed.Begin(Normalize(sample));
+                m_pointerInside = true;
+            }
+            else m_pressed.Move(Normalize(sample));
+            FinishIfComplete();
+            if (m_pressed == null) return;
+        }
     }
     private void FinishIfComplete()
     {

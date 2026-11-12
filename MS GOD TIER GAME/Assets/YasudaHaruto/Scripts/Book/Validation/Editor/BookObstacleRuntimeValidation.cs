@@ -42,9 +42,16 @@ public static class BookObstacleRuntimeValidation
                 Mathf.Clamp((int)(viewport.y * texture.height), 0, texture.height - 1), 1, 1), 0, 0);
             pixel.Apply();
             Color ink = pixel.GetPixel(0, 0);
-            Require(ink.r < 0.2f && ink.g < 0.2f && ink.b < 0.2f, "Opaque ink center exists in captured RenderTexture");
+            graphic.enabled = false;
+            Canvas.ForceUpdateCanvases(); camera.Render();
+            pixel.ReadPixels(new Rect(Mathf.Clamp((int)(viewport.x * texture.width), 0, texture.width - 1),
+                Mathf.Clamp((int)(viewport.y * texture.height), 0, texture.height - 1), 1, 1), 0, 0);
+            pixel.Apply();
+            Color clean = pixel.GetPixel(0, 0);
+            Require(Mathf.Abs(ink.r - clean.r) + Mathf.Abs(ink.g - clean.g) + Mathf.Abs(ink.b - clean.b) > 0.03f,
+                "Colored stain changes the captured RenderTexture pixels");
         }
-        finally { RenderTexture.active = previous; UnityEngine.Object.DestroyImmediate(pixel); }
+        finally { graphic.enabled = true; Canvas.ForceUpdateCanvases(); camera.Render(); RenderTexture.active = previous; UnityEngine.Object.DestroyImmediate(pixel); }
     }
     static BookObstacleRuntimeValidation()
     {
@@ -74,6 +81,7 @@ public static class BookObstacleRuntimeValidation
     public static void Run()
     {
         if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Exit Play Mode first.");
+        ObstacleMaskBaker.Bake(Resources.Load<ObstacleData>("BookObstacles/Rub"));
         Directory.CreateDirectory("Temp/ObstacleValidation");
         File.WriteAllText(Report, "Current scene test; no scene save or replacement.\n");
         SessionState.SetBool(Running, true);
@@ -90,6 +98,22 @@ public static class BookObstacleRuntimeValidation
         Run();
     }
     private static object Get(object target, string name) => target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+    private static bool IsInk(int slot, Vector2 point) => (bool)typeof(BookObstacleController)
+        .GetMethod("IsInkAt", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(s_obstacles, new object[] { slot, point });
+    private static Vector2 FindPoint(int slot, bool ink, float span = 0f)
+    {
+        Rect area = ((Rect[])Get(s_obstacles, "m_areas"))[slot];
+        for (int y = 2; y < 30; y++)
+            for (int x = 2; x < 30; x++)
+            {
+                Vector2 point = area.min + Vector2.Scale(area.size, new Vector2(x / 32f, y / 32f));
+                bool valid = true;
+                for (int step = -10; step <= 10; step++)
+                    valid &= IsInk(slot, point + Vector2.up * span * step / 10f) == ink;
+                if (valid) return point;
+            }
+        throw new InvalidOperationException("No suitable opaque/transparent test point found.");
+    }
     private static void Set(object target, string name, object value) => target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).SetValue(target, value);
     private static void Require(bool value, string message)
     {
@@ -155,7 +179,12 @@ public static class BookObstacleRuntimeValidation
                     s_obstacles.Receive(s_event, 1);
                     Require(s_page.Obstacles[3] == null, "Duplicate event ignored");
                     var pageGraphics = (ObstaclePatchGraphic[])Get(s_obstacles, "m_graphics");
+                    for (int slot = 0; slot < 3; slot++)
+                        Require(pageGraphics[slot].mainTexture == s_obstacles.Settings.GetTexture(slot),
+                            "Stage " + (slot + 1) + " uses its corresponding image (actual=" + pageGraphics[slot].mainTexture.name +
+                            ", placement=" + s_obstacles.Settings.GetSpreadPlacement(slot) + ")");
                     Require(ActiveStains((BookPageView)Get(s_game.BookView, "m_rightPageView")) == 3 &&
+                        ActiveStains((BookPageView)Get(s_game.BookView, "m_leftPageView")) == 1 &&
                         pageGraphics[0].GetComponentInParent<Canvas>().rootCanvas.renderMode != RenderMode.ScreenSpaceOverlay,
                         "Stains are attached to the captured page rather than a screen overlay");
                     CheckCapturedInk((Camera)Get(s_game.BookView, "m_captureCamera"), pageGraphics[0], s_game.BookView.CurrentTexture);
@@ -195,30 +224,71 @@ public static class BookObstacleRuntimeValidation
                     Require(graphics.Length == 4, "Four visible patches built");
                     foreach (var graphic in graphics) Require(!graphic.raycastTarget && graphic.rectTransform.rect.width > 0, "Patch has geometry and leaves routing to shared input");
                     var areas = (Rect[])Get(s_obstacles, "m_areas");
+                    Require(areas[0].center.y > areas[1].center.y && areas[2].center.x < areas[0].center.x,
+                        "First image is upper-right, second lower-right, third upper-left");
+                    var leftPage = (BookPageView)Get(s_game.BookView, "m_leftPageView");
+                    var rightPage = (BookPageView)Get(s_game.BookView, "m_rightPageView");
+                    ObstaclePatchGraphic leftFourth = null, rightFourth = null;
+                    foreach (var patch in leftPage.GetComponentsInChildren<ObstaclePatchGraphic>())
+                        if (patch.mainTexture == s_obstacles.Settings.GetTexture(3)) leftFourth = patch;
+                    foreach (var patch in rightPage.GetComponentsInChildren<ObstaclePatchGraphic>())
+                        if (patch.mainTexture == s_obstacles.Settings.GetTexture(3)) rightFourth = patch;
+                    Require(leftFourth != null && rightFourth != null &&
+                        ReferenceEquals(Get(leftFourth, "m_instance"), Get(rightFourth, "m_instance")),
+                        "Fourth image spans both pages with one shared cleaning progress");
+                    ScreenCapture.CaptureScreenshot("Temp/ObstacleValidation/four-stage-layout.png");
                     Rect fourth = areas[3];
                     var fourthStain = s_page.Obstacles[3];
+                    Vector2 empty = FindPoint(3, false);
+                    Require(!s_obstacles.BeginPointer(empty), "Transparent image area cannot begin cleaning");
+                    float span = Mathf.Min(fourth.width, fourth.height) * 0.1f;
+                    Vector2 paint = FindPoint(3, true, span);
+                    Vector2 splash = default;
+                    bool foundSplash = false;
+                    foreach (var patch in rightPage.GetComponentsInChildren<ObstaclePatchGraphic>())
+                    {
+                        if (patch.mainTexture.name != "Ink7" || !s_input.TryGetObstacleScreenRect(patch.rectTransform, true, out Rect splashRect)) continue;
+                        for (int y = 1; y < 10 && !foundSplash; y++) for (int x = 1; x < 10 && !foundSplash; x++)
+                        {
+                            Vector2 local = new Vector2(x / 10f, y / 10f);
+                            if (!s_obstacles.Settings.ContainsInk(patch.mainTexture as Texture2D,
+                                patch.UVRect.min + Vector2.Scale(local, patch.UVRect.size))) continue;
+                            splash = splashRect.min + Vector2.Scale(local, splashRect.size);
+                            foundSplash = true;
+                        }
+                    }
+                    Require(foundSplash && s_obstacles.BeginPointer(paint), "Can rub the split fourth-stage paint and its separate splash");
+                    float beforeGap = fourthStain.Progress;
+                    s_obstacles.MovePointer(splash);
+                    float fullGapProgress = Vector2.Distance(paint, splash) / Mathf.Min(fourth.width, fourth.height) /
+                        s_obstacles.Settings.RequiredDistance;
+                    Require(fourthStain.Progress - beforeGap < fullGapProgress * 0.8f,
+                        "Opaque endpoints do not count the transparent gap between split images");
+                    s_obstacles.CancelPointer();
                     var pointer = new PointerEventData(EventSystem.current)
-                    { button = PointerEventData.InputButton.Left, pointerId = -1, position = fourth.center };
+                    { button = PointerEventData.InputButton.Left, pointerId = -1, position = paint };
                     s_input.OnPointerDown(pointer);
-                    float span = Mathf.Min(fourth.width, fourth.height) * 0.2f;
-                    pointer.position = fourth.center + Vector2.up * span;
+                    pointer.position = paint + Vector2.up * span;
                     s_input.OnDrag(pointer);
                     Require(fourthStain.Progress > 0 && fourthStain.Progress < 1, "Vertical pointer drag fades fourth stain continuously");
                     float beforeExit = fourthStain.Progress;
+                    pointer.position = empty;
+                    s_input.OnDrag(pointer);
+                    Require(fourthStain.Progress == beforeExit, "Transparent area inside the image rectangle does not clean");
                     pointer.position = fourth.center + Vector2.right * fourth.width;
                     s_input.OnDrag(pointer);
                     pointer.position += Vector2.up * fourth.height;
                     s_input.OnDrag(pointer);
                     Require(fourthStain.Progress == beforeExit, "Moving outside stain does not clean it");
-                    pointer.position = fourth.center - Vector2.up * span;
+                    pointer.position = paint - Vector2.up * span;
                     s_input.OnDrag(pointer);
                     Require(fourthStain.Progress == beforeExit, "Reentry while held does not count the outside path");
-                    pointer.position = fourth.center + Vector2.up * span;
+                    pointer.position = paint + Vector2.up * span;
                     s_input.OnDrag(pointer);
                     Require(fourthStain.Progress > beforeExit, "Rubbing resumes after reentry without another press");
-                    for (int i = 0; i < 16; i++)
+                    for (int i = 0; i < 40; i++)
                     {
-                        pointer.position = fourth.center + Vector2.up * (i % 2 == 0 ? -span : span);
+                        pointer.position = paint + Vector2.up * (i % 2 == 0 ? -span : span);
                         s_input.OnDrag(pointer);
                     }
                     s_input.OnPointerUp(pointer);

@@ -26,7 +26,7 @@ public sealed class PageObstacleState
             selected[at] = true;
         }
         for (int i = 0; i < SLOT_COUNT; i++)
-            if (selected[i]) m_slots[i] = new ObstacleInstance(data, ++m_sequence);
+            if (selected[i]) m_slots[i] = new ObstacleInstance(data, ++m_sequence, i);
     }
 
     public bool Clear(int slot, ObstacleInstance expected)
@@ -42,16 +42,19 @@ public sealed class ObstacleInstance
 {
     public ObstacleData Data { get; }
     public long Sequence { get; }
+    public int Slot { get; }
+    public Texture2D Texture => Data.GetTexture(Slot);
     private float m_distance;
     private Vector2 m_previous;
     private bool m_tracking;
     public float Progress => Mathf.Clamp01(m_distance / Data.RequiredDistance);
     public bool Complete => Progress >= 1f;
 
-    public ObstacleInstance(ObstacleData data, long sequence)
+    public ObstacleInstance(ObstacleData data, long sequence, int slot = 0)
     {
         Data = data ?? throw new ArgumentNullException(nameof(data));
         Sequence = sequence;
+        Slot = slot;
     }
 
     public void Begin(Vector2 point) { m_previous = point; m_tracking = true; }
