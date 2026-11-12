@@ -27,7 +27,7 @@ public class CartController : MonoBehaviour
     [SerializeField] private float m_distance; // 全体の進んだ距離
 
 
-    private SplineContainer m_spline;
+    [SerializeField]private SplineContainer m_spline;
     
     private float m_splineAnchor = 0.0f; // 進んだ距離 - アンカーポイント
     
@@ -138,10 +138,9 @@ public class CartController : MonoBehaviour
         m_spline.Evaluate(0, value, out position, out tangent, out up);
 
         transform.rotation = 
-            Quaternion.Lerp(
-                transform.rotation,
-                Quaternion.LookRotation(tangent,up),
-                Time.deltaTime);
+            Quaternion.Lerp(transform.rotation,
+            Quaternion.LookRotation(tangent, up),
+            Time.deltaTime);
         transform.position = position;
 
     }

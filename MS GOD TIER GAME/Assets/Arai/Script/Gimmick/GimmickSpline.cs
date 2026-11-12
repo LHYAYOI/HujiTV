@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Splines;
 
-public abstract class GimmickSpline : Gimmick
+public class GimmickSpline : Gimmick
 {
     // ―――――――――――――――――――――――――――――――――――――
     // Propaty

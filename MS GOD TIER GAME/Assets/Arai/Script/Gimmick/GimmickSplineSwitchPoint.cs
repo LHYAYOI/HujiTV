@@ -16,7 +16,7 @@ public class GimmickSplineSwitchPoint : GimmickSpline
     // ―――――――――――――――――――――――――――――――――――――
     // Public Propaty
     // ―――――――――――――――――――――――――――――――――――――
-    public SplineController2 TargetSplineController { get { return m_targetSplineController; } }    
+    public SplineController2 TargetSplineController { get { return m_targetSplineController; } set { m_targetSplineController = value; } }    
     public SplineContainer TargetSpline { get { return m_targetSplineController?.Spline; } }
     public float SwitchOffset { get { return m_switchOffset; } }
 
@@ -76,6 +76,6 @@ public class GimmickSplineSwitchPoint : GimmickSpline
         Gizmos.DrawLine(gimmickPosition, switchOffsetPosition);
 
         Gizmos.color = Color.red;
-        Gizmos.DrawSphere(switchOffsetPosition, 0.3f);
+        Gizmos.DrawSphere(switchOffsetPosition, 0.06f);
     }
 }
