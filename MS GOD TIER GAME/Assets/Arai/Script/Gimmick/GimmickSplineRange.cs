@@ -13,12 +13,13 @@ public class GimmickSplineRange : GimmickSpline
     private CartController m_cart;
     private float m_startDistance;
 
-    
+    private bool m_entered = false;
 
     // ―――――――――――――――――――――――――――――――――――――
     // Public Propaty
     // ―――――――――――――――――――――――――――――――――――――
 
+    public event Action OnEnterRange;
     public event Action<CartController,float> OnInRange;
     public event Action OnOutRange;
 
@@ -50,7 +51,14 @@ public class GimmickSplineRange : GimmickSpline
         float dist = m_cart.SplineOffset - m_startDistance;
 
         
+        // ENTER
+        if(!m_entered)
+        {
+            m_entered = true;
+            OnEnterRange?.Invoke();
+        }
 
+        // IN RANGE
         OnInRange?.Invoke(m_cart , Mathf.Clamp01(dist / max) );
 
 
@@ -58,13 +66,11 @@ public class GimmickSplineRange : GimmickSpline
         if (Mathf.Abs(max) < Mathf.Abs(rate) ||
             Mathf.Abs(dist) > Mathf.Abs(max))
         {
-
-            // 正しい方向で抜けないと発動しません
-            if(Mathf.Abs(max) < Mathf.Abs(rate))
-            {
-            }
+            // ON OUT RANGE
             OnOutRange?.Invoke();
             m_cart = null;
+
+            m_entered = false;
         }
 
     }
