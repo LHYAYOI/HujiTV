@@ -1643,6 +1643,7 @@ GameObject:
   - component: {fileID: 1173983705}
   - component: {fileID: 1173983707}
   - component: {fileID: 1173983706}
+  - component: {fileID: 1173983708}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -1769,6 +1770,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1173983704}
   m_CullTransparentMesh: 1
+--- !u!114 &1173983708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1173983704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fa03a79347e33b4693898fcddfaed71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TextEffectController
+  m_text: {fileID: 1173983706}
+  m_effectSettings:
+  - m_applyToAllTextFlag: 0
+    m_targetSpriteFlag: 0
+    m_targetText: 
+    m_targetSpriteName: 
+    m_effect: {fileID: 11400000, guid: 09dd99ab482c8a245b30f0beeaeca819, type: 2}
 --- !u!1001 &1358071902
 PrefabInstance:
   m_ObjectHideFlags: 0
