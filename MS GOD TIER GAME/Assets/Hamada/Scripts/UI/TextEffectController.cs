@@ -83,7 +83,7 @@ public class TextEffectController : MonoBehaviour
         ModifyMesh(textInfo);
 
         // 頂点と色の変更を反映
-        m_text.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices | TMP_VertexDataUpdateFlags.Colors32);
+        m_text.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices | TMP_VertexDataUpdateFlags.Colors32 | TMP_VertexDataUpdateFlags.Uv0);
 
         //終了処理とか
         CheckEffectCompletion(textInfo);
