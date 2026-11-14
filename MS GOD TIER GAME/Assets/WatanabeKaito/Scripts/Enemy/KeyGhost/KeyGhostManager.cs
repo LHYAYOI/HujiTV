@@ -14,36 +14,43 @@ public class KeyGhostManager : EnemyBase
     [Header("ターゲットまでの移動時間")]
     [SerializeField] private float m_moveDuration = 2.0f;
 
-    private Camera m_targetCamera;  // 視界判定用のカメラ
+    [Header("視界判定の余白（画面端からの割合）")]
+    [SerializeField, Range(0f, 0.49f)]
+    private float m_viewMargin = 0.2f;
 
-    private Renderer m_visibilityRenderer;  // 視界判定用のRenderer
+    [Header("奥行の判定範囲")]
+    [SerializeField] private float m_minViewDepth = 1.0f;
+    [SerializeField] private float m_maxViewDepth = 10.0f;
 
-    private Vector3 m_originalPosition;     // 元の位置を保存する変数
+
+    private Camera m_targetCamera;          // 視界判定用のカメラ
+    private Renderer m_visibilityRenderer; // 視界判定用のRenderer
+
+    private Vector3 m_originalPosition;     // 元の位置
     private Vector3 m_moveStartPosition;    // 移動開始位置
     private Vector3 m_moveEndPosition;      // 移動終了位置
-    private Vector3 m_returnStartPosition;  // 元の位置に戻る際の開始位置
+    private Vector3 m_returnStartPosition;  // 戻る際の開始位置
 
-    private float m_moveTimer;  // 移動時間の計測用タイマー
-
-    private Plane[] m_frustumPlanes = new Plane[6]; // カメラの視界判定用
+    private float m_moveTimer;  // 移動タイマー
 
 
     // 現在の状態
     private enum KEY_GHOST_STATE
     {
-        HIDE,  // 隠れている
-        MOVE,  // 移動中
-        STAY,  // ターゲット位置で待機中
-        RETURN // 元の位置に戻る
+        HIDE,   // 隠れている
+        MOVE,   // 移動中
+        STAY,   // ターゲット位置で待機中
+        RETURN  // 元の位置に戻る
     }
 
-    private KEY_GHOST_STATE m_currentState; // 現在の状態を保持する変数
+    private KEY_GHOST_STATE m_currentState;
 
 
     private void Start()
     {
         Initialize();
     }
+
 
     public override void Initialize()
     {
@@ -60,7 +67,7 @@ public class KeyGhostManager : EnemyBase
             m_targetCamera = Camera.main;
         }
 
-        // Rendererが未設定なら動かすオブジェクトから取得
+        // Rendererを取得
         if (m_visibilityRenderer == null)
         {
             m_visibilityRenderer = m_movableObject.GetComponentInChildren<Renderer>();
@@ -81,6 +88,18 @@ public class KeyGhostManager : EnemyBase
 
         // ターゲット不可にする
         m_targetableObject.SetTargetable(false);
+    }
+
+
+    public override void BattleStart()
+    {
+        // バトル開始時の処理
+    }
+
+
+    public override void BattleEnd()
+    {
+        // バトル終了時の処理
     }
 
 
@@ -155,15 +174,34 @@ public class KeyGhostManager : EnemyBase
     // カメラの視界内に入っているか判定
     private bool IsInCameraView()
     {
-        GeometryUtility.CalculateFrustumPlanes(
-            m_targetCamera,
-            m_frustumPlanes
+        // ワールド座標をビューポート座標に変換
+        Vector3 viewportPosition = m_targetCamera.WorldToViewportPoint(
+            m_visibilityRenderer.bounds.center
         );
 
-        return GeometryUtility.TestPlanesAABB(
-            m_frustumPlanes,
-            m_visibilityRenderer.bounds
-        );
+        // 奥行の判定
+        if (viewportPosition.z < m_minViewDepth ||
+            viewportPosition.z > m_maxViewDepth)
+        {
+            return false;
+        }
+
+        // カメラの描画距離外なら判定しない
+        if (viewportPosition.z < m_targetCamera.nearClipPlane ||
+            viewportPosition.z > m_targetCamera.farClipPlane)
+        {
+            return false;
+        }
+
+        // 画面の判定範囲
+        float min = m_viewMargin;
+        float max = 1.0f - m_viewMargin;
+
+        // 画面中央の範囲内にあるか判定
+        return viewportPosition.x >= min &&
+               viewportPosition.x <= max &&
+               viewportPosition.y >= min &&
+               viewportPosition.y <= max;
     }
 
 
