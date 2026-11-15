@@ -22,6 +22,9 @@ public class KeyGhostManager : EnemyBase
     [SerializeField] private float m_minViewDepth = 1.0f;
     [SerializeField] private float m_maxViewDepth = 10.0f;
 
+    [Header("トイレのふた")]
+    [SerializeField] private ToiletLidController m_lidController;
+
 
     private Camera m_targetCamera;          // 視界判定用のカメラ
     private Renderer m_visibilityRenderer; // 視界判定用のRenderer
@@ -216,6 +219,12 @@ public class KeyGhostManager : EnemyBase
 
         m_moveTimer = 0f;
 
+        // ふたを開く
+        if (m_lidController != null)
+        {
+            m_lidController.StartOpening();
+        }
+
         // ターゲット不可にする
         m_targetableObject.SetTargetable(false);
 
@@ -241,6 +250,13 @@ public class KeyGhostManager : EnemyBase
 
         float easeT = Easing.EaseOutSine(t);
 
+        // ふたを開く
+        if (m_lidController != null)
+        {
+            m_lidController.UpdateRotation(easeT);
+        }
+
+        // 移動
         m_movableObject.transform.localPosition = Vector3.Lerp(
             m_moveStartPosition,
             m_moveEndPosition,
@@ -267,6 +283,12 @@ public class KeyGhostManager : EnemyBase
 
         m_moveTimer = 0f;
 
+        // ふたを閉じる
+        if (m_lidController != null)
+        {
+            m_lidController.StartClosing();
+        }
+
         // ターゲット不可にする
         m_targetableObject.SetTargetable(false);
 
@@ -292,6 +314,13 @@ public class KeyGhostManager : EnemyBase
 
         float easeT = Easing.EaseOutSine(t);
 
+        // ふたを閉じる
+        if (m_lidController != null)
+        {
+            m_lidController.UpdateRotation(easeT);
+        }
+
+        // 移動
         m_movableObject.transform.localPosition = Vector3.Lerp(
             m_returnStartPosition,
             m_originalPosition,
