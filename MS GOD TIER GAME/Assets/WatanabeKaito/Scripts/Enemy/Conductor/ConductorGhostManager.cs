@@ -52,7 +52,7 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
         BattleEndCheck();
     }
 
-    public void BattleEndCheck()
+    private void BattleEndCheck()
     {
         if (m_conductorGhost.GetUpperDrawerLockedFlag() && m_conductorGhost.GetLowerDrawerLockedFlag()
             && m_conductorGhost.GetSwarmGhostCurrentHealth() == 0)
@@ -66,14 +66,14 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
         }
     }
 
-    public void StartBattle()
+    private void StartBattle()
     {
         m_conductorGhost.StartBattle();
 
         m_battleStartFlag = true;
     }
 
-    public void EndBattle()
+    private void EndBattle()
     {
         m_conductorGhost.SetUpperDrawerLockedFlag(true);
         m_conductorGhost.SetLowerDrawerLockedFlag(true);

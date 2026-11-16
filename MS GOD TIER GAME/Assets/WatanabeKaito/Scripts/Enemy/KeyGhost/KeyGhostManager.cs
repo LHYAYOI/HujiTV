@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class KeyGhostManager : EnemyBase
+public class KeyGhostManager : EnemyBase, IEventMagicReceiver
 {
     [Header("TargetableObject")]
     [SerializeField] private TargetableObject m_targetableObject;
@@ -337,5 +337,28 @@ public class KeyGhostManager : EnemyBase
             // çƒÇ—âBÇÍÇƒÇ¢ÇÈèÛë‘Ç…Ç∑ÇÈ
             m_currentState = KEY_GHOST_STATE.HIDE;
         }
+    }
+
+    public void OnKeyGhostHit(HitData hitData)
+    {
+        if (hitData != null)
+        {
+            MagicData magicData = hitData.GetMagicData;
+
+            if (magicData != null)
+            {
+                TryReceiveEventMagic(EVENT_MAGIC_TYPE.NONE);
+            }
+        }
+    }
+
+    public bool TryReceiveEventMagic(EVENT_MAGIC_TYPE eventMagicType)
+    {
+        //if (eventMagicType == EVENT_MAGIC_TYPE.CLOSE)
+        {
+            Destroy(m_movableObject);
+        }
+
+        return false;
     }
 }
