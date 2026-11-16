@@ -30,7 +30,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
-  m_ConstrainProportionsScale: 1
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -67,7 +67,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: "<sprite name=\"WaterDamage_00\">\u306F\u5ACC\u3060"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5ba232a4af18bb44f96df1609d9af5d3, type: 2}
   m_sharedMaterial: {fileID: 1001439375356677718, guid: 5ba232a4af18bb44f96df1609d9af5d3, type: 2}
@@ -76,8 +76,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 1, g: 1, b: 1, a: 0}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -182,4 +182,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DeathTextController
   m_text: {fileID: 2475799013642570605}
   m_textEffectController: {fileID: 5257863476222568355}
-  m_disappearTime: 1
+  m_showTime: 3
+  m_disappearTime: 0.5

@@ -69,7 +69,7 @@ public class LockOnTargetController : MonoBehaviour
             return;
         }
 
-        m_targetImage.transform.Rotate(0, 0, m_rotateSpeed * Time.deltaTime);
+        m_targetImage.transform.Rotate(0, 0, m_rotateSpeed * Time.unscaledDeltaTime);
     }
 
     public void AppearTargetUI() 

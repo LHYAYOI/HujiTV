@@ -10,8 +10,6 @@ public class EnemyDeathTextManager : MonoBehaviour
 
     List<DeathTextController> m_uiList = new List<DeathTextController>();
 
-    [SerializeField] DeathTextData m_testDeathTextData;
-
     private void Start()
     {
         CreateUIs();
@@ -19,10 +17,6 @@ public class EnemyDeathTextManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.M)) 
-        {
-            PlayText(new Vector3(0, 0, 1), new Vector2(1, 1), m_testDeathTextData);
-        }
     }
 
     private void CreateUIs() 
