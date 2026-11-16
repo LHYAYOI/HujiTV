@@ -15,15 +15,13 @@ public class EnemyDeathTextManager : MonoBehaviour
     private void Start()
     {
         CreateUIs();
-
-        m_testDeathTextData.SetSpawnPosition(new Vector3(0, 0, 1));
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.M))
+        if (Input.GetKeyDown(KeyCode.M)) 
         {
-            PlayText(m_testDeathTextData);
+            PlayText(new Vector3(0, 0, 1), new Vector2(1, 1), m_testDeathTextData);
         }
     }
 
@@ -37,7 +35,7 @@ public class EnemyDeathTextManager : MonoBehaviour
         }
     }
 
-    public void PlayText(DeathTextData data) 
+    public void PlayText(Vector3 position, Vector2 scale, DeathTextData data)
     {
         if (data == null)
         {
@@ -56,8 +54,8 @@ public class EnemyDeathTextManager : MonoBehaviour
                 continue;
             }
 
-            ui.gameObject.SetActive(true);
-            ui.Appear(data);
+            ui.SetUsingFlag(true);
+            ui.Appear(position, scale, data);
 
             break;
         }

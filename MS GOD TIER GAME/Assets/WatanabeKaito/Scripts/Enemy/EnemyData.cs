@@ -15,6 +15,9 @@ public class EnemyData : ScriptableObject
     [Header("エネミーの名前")]
     public string m_name;
 
+    [Header("死んだときのテキストデータ")]
+    public DeathTextData m_deathText;
+
     [Header("エネミーの最大体力")]
     public int m_maxHealth;
 

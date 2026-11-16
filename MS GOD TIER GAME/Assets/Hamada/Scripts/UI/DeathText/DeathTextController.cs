@@ -11,6 +11,17 @@ public class DeathTextController : MonoBehaviour
 
     bool m_isUsing = false;
 
+    private void Update()
+    {
+        if (!m_isUsing) 
+        {
+            return;
+        }
+
+        //カメラの方を向く
+        gameObject.transform.LookAt(Camera.main.transform);
+    }
+
     public void SetUsingFlag(bool flag) 
     {
         m_isUsing = flag;
@@ -21,11 +32,12 @@ public class DeathTextController : MonoBehaviour
         return m_isUsing;
     }
 
-    public void Appear(DeathTextData data)
+    public void Appear(Vector3 position, Vector2 scale, DeathTextData data)
     {
         m_text.text = data.GetDeathText();
 
-        gameObject.transform.position = data.GetSpawnPosition();
+        gameObject.transform.localScale = scale;
+        gameObject.transform.position = position;
 
         Color color = m_text.color;
         m_text.color = new Color(color.r, color.g, color.b, 1);

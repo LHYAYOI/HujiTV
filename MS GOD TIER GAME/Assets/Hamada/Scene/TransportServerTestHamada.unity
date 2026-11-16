@@ -364,6 +364,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1211059285858714691, guid: 5fb943052830f694292568c95bdbfc94, type: 3}
   m_PrefabInstance: {fileID: 669518710}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &460017166
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 460017167}
+  m_Layer: 0
+  m_Name: textPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &460017167
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 460017166}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 568092642}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &568092638
 GameObject:
   m_ObjectHideFlags: 0
@@ -377,6 +408,7 @@ GameObject:
   - component: {fileID: 568092640}
   - component: {fileID: 568092639}
   - component: {fileID: 568092643}
+  - component: {fileID: 568092647}
   - component: {fileID: 568092644}
   - component: {fileID: 568092645}
   - component: {fileID: 568092646}
@@ -386,7 +418,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &568092639
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -477,7 +509,8 @@ Transform:
   m_LocalPosition: {x: 5.1, y: -1.92, z: 8.82}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 460017167}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &568092643
@@ -528,12 +561,46 @@ MonoBehaviour:
   m_GameObject: {fileID: 568092638}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: beaf5a5b118fc6c4c947a4e4af65c109, type: 3}
+  m_Script: {fileID: 11500000, guid: 286cfc7152b995c48a6d0eb04578f254, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DeathTextController
-  m_text: {fileID: 0}
-  m_textEffectController: {fileID: 0}
-  m_disappearTime: 0
+  m_EditorClassIdentifier: '::'
+  m_enemyData: {fileID: 11400000, guid: 750ed9f667d41b64399f066e8659dec7, type: 2}
+  manager: {fileID: 1687848672}
+  m_deathTextPosition: {fileID: 460017167}
+  m_deathTextScale: {x: -1, y: 1}
+--- !u!114 &568092647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 568092638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ced5332850543c24ca276d1983454a1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitReceiverController
+  m_onHit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 568092646}
+        m_TargetAssemblyTypeName: TestObjectController, Assembly-CSharp
+        m_MethodName: HitProcess
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_onStay:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onExit:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &569436597
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -787,7 +854,8 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3799338149709635310, guid: 5ea5a88b38dbe4f4ba9390359703d067, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -1182,7 +1250,6 @@ GameObject:
   - component: {fileID: 1035992087}
   - component: {fileID: 1035992091}
   - component: {fileID: 1035992092}
-  - component: {fileID: 1035992093}
   m_Layer: 0
   m_Name: Target_L
   m_TagString: Target
@@ -1308,21 +1375,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TargetableObject
   m_IsTargetableFlag: 1
---- !u!114 &1035992093
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1035992086}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: beaf5a5b118fc6c4c947a4e4af65c109, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DeathTextController
-  m_text: {fileID: 0}
-  m_textEffectController: {fileID: 0}
-  m_disappearTime: 0
 --- !u!20 &1041369788 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 2981722016134048084, guid: 4487dfc90121ce04c8da989321422093, type: 3}
@@ -1421,7 +1473,6 @@ GameObject:
   - component: {fileID: 1078199874}
   - component: {fileID: 1078199878}
   - component: {fileID: 1078199879}
-  - component: {fileID: 1078199880}
   m_Layer: 0
   m_Name: Target_M
   m_TagString: Target
@@ -1547,21 +1598,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TargetableObject
   m_IsTargetableFlag: 1
---- !u!114 &1078199880
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1078199873}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: beaf5a5b118fc6c4c947a4e4af65c109, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DeathTextController
-  m_text: {fileID: 0}
-  m_textEffectController: {fileID: 0}
-  m_disappearTime: 0
 --- !u!1001 &1088811096
 PrefabInstance:
   m_ObjectHideFlags: 0
