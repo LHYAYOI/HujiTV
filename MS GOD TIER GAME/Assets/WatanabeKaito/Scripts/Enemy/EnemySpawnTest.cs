@@ -26,6 +26,7 @@ public class EnemySpawnTest : MonoBehaviour
         {
             //m_activeEnemyManager.RemoveAllActiveEnemies();
             //m_activeEnemyManager.SetAllMiniGhostsToBattleStart();
+            OnSpawnEnemy();
         }
 
 
@@ -33,6 +34,6 @@ public class EnemySpawnTest : MonoBehaviour
 
     public void OnSpawnEnemy()
     {
-        //m_enemySpawnManager.SpawnSplineMoveEnemy("MiniGhost_A", "test_spline", "testPosition");
+        m_enemySpawnManager.SpawnEnemy(0);
     }
 }

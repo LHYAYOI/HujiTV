@@ -21,23 +21,19 @@ public class CrushingWallEnemy : SplineMoveEnemy
     [SerializeField] private float m_damageSpeedRate = 0.7f;
     [SerializeField] private float m_minSpeedRate = 0.3f;
 
-    [Header("プレイヤーへの攻撃")]
-    [SerializeField] private float m_attackDistance = 1.5f;
-    [SerializeField] private float m_attackDuration = 1f;
+    [Header("攻撃終了からプレイヤー移動開始までの時間")]
+    [SerializeField] private float m_attackToPlayerMoveDelay = 2f;
 
-    // 移動速度グラフの経過時間
-    private float m_speedElapsedTime = 0f;
+    [Header("プレイヤー移動開始から自身の移動開始までの時間")]
+    [SerializeField] private float m_playerMoveToSelfMoveDelay = 1f;
 
-    // 被弾による速度倍率
-    private float m_damageSpeedMultiplier = 1f;
+    private float m_speedElapsedTime = 0f; // 移動速度グラフの経過時間
 
-    // 攻撃中フラグ
-    private bool m_isAttackingFlag = false;
+    
+    private float m_damageSpeedMultiplier = 1f; // 被弾による速度倍率
 
-    // 攻撃済みフラグ
-    private bool m_hasAttackedFlag = false;
-
-    private Coroutine m_attackCoroutine;
+    
+    private bool m_isAttackingFlag = false; // 攻撃中フラグ
 
 
     public override void Initialize()
@@ -46,9 +42,23 @@ public class CrushingWallEnemy : SplineMoveEnemy
         m_speedElapsedTime = 0f;
         m_damageSpeedMultiplier = 1f;
         m_isAttackingFlag = false;
-        m_hasAttackedFlag = false;
+
         ResetMoveSpeed();
 
+    }
+
+    public override void BattleStart()
+    {
+        base.BattleStart();
+        m_speedElapsedTime = 0f;
+        m_damageSpeedMultiplier = 1f;
+        m_isAttackingFlag = false;
+        ResetMoveSpeed();
+    }
+
+    public override void BattleEnd()
+    {
+        base.BattleEnd();
     }
 
     // 移動処理
@@ -58,20 +68,6 @@ public class CrushingWallEnemy : SplineMoveEnemy
         if (m_isAttackingFlag)
         {
             return;
-        }
-
-        // プレイヤーに追いついたか確認
-        if (!m_hasAttackedFlag && m_playerPosition != null)
-        {
-            float distance = Vector3.Distance(transform.position, m_playerPosition.position);
-
-            if (distance <= m_attackDistance)
-            {
-                m_hasAttackedFlag = true;
-                m_attackCoroutine = StartCoroutine(AttackPlayer());
-
-                return;
-            }
         }
 
         // 移動速度を更新
@@ -123,33 +119,11 @@ public class CrushingWallEnemy : SplineMoveEnemy
 
         if (m_speedRampDuration > 0f)
         {
-            normalizedTime =
-                Mathf.Clamp01(m_speedElapsedTime / m_speedRampDuration);
+            normalizedTime = Mathf.Clamp01(m_speedElapsedTime / m_speedRampDuration);
         }
 
         m_moveSpeed =  EvaluateSpeed(normalizedTime) * m_damageSpeedMultiplier;
     }
-
-
-    // プレイヤーへの攻撃
-    private IEnumerator AttackPlayer()
-    {
-        m_isAttackingFlag = true;
-
-        // 攻撃
-
-        // 攻撃時間
-        yield return new WaitForSeconds(m_attackDuration);
-
-        // 初速に戻す
-        ResetMoveSpeed();
-
-        // 移動再開
-        m_isAttackingFlag = false;
-
-        m_attackCoroutine = null;
-    }
-
 
     // 移動速度を初期状態に戻す
     private void ResetMoveSpeed()
@@ -159,5 +133,40 @@ public class CrushingWallEnemy : SplineMoveEnemy
 
         // グラフの最初の速度に戻す
         m_moveSpeed = EvaluateSpeed(0f);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        CartController cartController = other.GetComponent<CartController>();
+
+        if (cartController != null)
+        {
+            StartCoroutine(AttackCoroutine(cartController));
+        }
+
+    }
+
+
+    // 攻撃のコルーチン
+    public IEnumerator AttackCoroutine(CartController cartController)
+    {
+        // お互いに移動を止める
+        cartController.SetSpeed(0f);
+        m_isAttackingFlag = true;
+
+        // 攻撃アニメーション
+
+
+        // 攻撃終了後、プレイヤーの移動を再開するまでの待機
+        yield return new WaitForSeconds(m_attackToPlayerMoveDelay);
+
+        // プレイヤーの移動を再開
+        cartController.ResetSpeed();
+
+        // プレイヤーの移動再開後、自身の移動を再開するまでの待機
+        yield return new WaitForSeconds(m_playerMoveToSelfMoveDelay);
+
+        // 自身の移動を再開
+        m_isAttackingFlag = false;
     }
 }
