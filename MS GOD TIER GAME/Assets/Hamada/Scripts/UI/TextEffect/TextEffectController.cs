@@ -41,8 +41,6 @@ public class TextEffectController : MonoBehaviour
     private void Start()
     {
         m_state = TEXT_EFFECT_STATE.Standby;
-
-        Play();
     }
 
     public void Play() 
@@ -61,6 +59,11 @@ public class TextEffectController : MonoBehaviour
 
             m_completedEffects.Add(setting, false);
         }
+    }
+
+    public void SetText(string text) 
+    {
+        m_text.text = text;
     }
 
     public TEXT_EFFECT_STATE GetEffectState()

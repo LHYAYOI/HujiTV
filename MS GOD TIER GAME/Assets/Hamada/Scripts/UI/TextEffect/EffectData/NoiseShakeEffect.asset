@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b315039d5b93bb4b86da21fc726b964, type: 3}
   m_Name: NoiseShakeEffect
   m_EditorClassIdentifier: Assembly-CSharp::NoiseShakeEffect
-  m_amplitude: {x: 0.1, y: 0.2}
+  m_amplitude: {x: 0.1, y: 0.3}
   m_frequency: 1
   m_seed: 0
