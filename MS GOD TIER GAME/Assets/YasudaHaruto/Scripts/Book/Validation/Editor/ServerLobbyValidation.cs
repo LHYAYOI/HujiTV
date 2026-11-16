@@ -53,7 +53,6 @@ namespace YasudaHaruto.BookValidation.Editor
             EditorApplication.EnterPlaymode();
         }
 
-        [MenuItem("Tools/YasudaHaruto/Verify Server Lobby In Play Mode")]
         public static void Run()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode || SceneManager.GetActiveScene().path !=

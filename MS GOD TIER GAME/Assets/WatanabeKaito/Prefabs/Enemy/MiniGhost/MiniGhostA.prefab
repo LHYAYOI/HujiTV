@@ -319,6 +319,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8a470f822ec9f540a9148b8f6aa0292, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostIdleState
+  m_renderer: {fileID: 8355977398376699291}
 --- !u!114 &2702416843714358507
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -32,7 +32,6 @@ namespace YasudaHaruto.BookValidation.Editor
             EditorApplication.playModeStateChanged += OnPlayMode;
         }
 
-        [MenuItem("Tools/YasudaHaruto/Verify Existing Book Validation")]
         public static void VerifyExisting()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
@@ -51,7 +50,6 @@ namespace YasudaHaruto.BookValidation.Editor
             EditorApplication.EnterPlaymode();
         }
 
-        [MenuItem("Tools/YasudaHaruto/Verify Integrated Book Scene")]
         public static void VerifyIntegratedBookScene()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Exit Play Mode first.");

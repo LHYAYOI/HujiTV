@@ -395,7 +395,14 @@ public class BookNetworkClient : MonoBehaviour
                 if (reader.Length - reader.GetBytesRead() < 5) { Debug.LogWarning("Truncated obstacle packet."); break; }
                 uint eventId = reader.ReadUInt();
                 byte obstacleId = reader.ReadByte();
-                if (obstacleId != 0) ObstacleReceived?.Invoke(eventId, obstacleId);
+                // Legacy types 1 and 2 used one and two slots respectively.
+                if (obstacleId == 1 || obstacleId == 2) ObstacleReceived?.Invoke(eventId, obstacleId);
+                break;
+            case BOOK_MESSAGE_TYPE.APPLY_DIRT:
+                if (reader.Length - reader.GetBytesRead() != 5) { Debug.LogWarning("Invalid dirt packet."); break; }
+                uint dirtEventId = reader.ReadUInt();
+                byte slotCount = reader.ReadByte();
+                if (slotCount >= 1 && slotCount <= 4) ObstacleReceived?.Invoke(dirtEventId, slotCount);
                 break;
             case BOOK_MESSAGE_TYPE.ADD_PAGE:
                 ReceiveAddPage(reader);

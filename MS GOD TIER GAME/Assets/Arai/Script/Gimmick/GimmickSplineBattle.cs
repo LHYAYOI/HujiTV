@@ -9,6 +9,8 @@ public class GimmickSplineBattle : GimmickSpline
     // ―――――――――――――――――――――――――――――――――――――
     [SerializeField] private BattleData m_battleData;
 
+    [SerializeField] private EnemySpawnManager m_enemyManager;
+
     [SerializeField] private UnityEvent m_onFinishBattle;
 
     // ―――――――――――――――――――――――――――――――――――――
@@ -17,7 +19,12 @@ public class GimmickSplineBattle : GimmickSpline
 
     public void SpawnStart()
     {
-        BattleManager.StartSpawn(m_battleData);
+        foreach (int id in m_battleData.SpawnIds)
+        {
+            m_enemyManager.SpawnEnemy(id);
+        }
+
+        BattleManager.SetCurrentBattleData(m_battleData);
     }
 
     public void BattleStart()

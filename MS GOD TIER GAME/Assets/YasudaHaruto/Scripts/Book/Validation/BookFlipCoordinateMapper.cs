@@ -19,12 +19,15 @@ public class BookFlipCoordinateMapper : MonoBehaviour
     [SerializeField] private Camera m_captureCamera;
 
     // Inverse of the input mapping: capture area -> left-page crop -> book output -> screen.
-    public bool TryGetScreenRect(RectTransform area, out Rect screenRect)
+    public bool TryGetScreenRect(RectTransform area, out Rect screenRect) =>
+        TryGetScreenRect(area, BOOK_PAGE_SIDE.LEFT, out screenRect);
+
+    public bool TryGetScreenRect(RectTransform area, BOOK_PAGE_SIDE side, out Rect screenRect)
     {
         screenRect = default;
         if (area == null || m_flipView == null || m_displayImage == null || m_captureCamera == null)
             return false;
-        Vector4 crop = m_flipView.LeftCrop;
+        Vector4 crop = side == BOOK_PAGE_SIDE.RIGHT ? m_flipView.RightCrop : m_flipView.LeftCrop;
         if (crop.z <= 0f || crop.w <= 0f) return false;
         Vector2 bookMin = m_flipView.UvToBook(Vector2.zero);
         Vector2 bookMax = m_flipView.UvToBook(Vector2.one);
@@ -41,7 +44,7 @@ public class BookFlipCoordinateMapper : MonoBehaviour
             Vector3 capture = m_captureCamera.WorldToViewportPoint(corner);
             if (capture.z <= 0f) return false;
             Vector2 page = new Vector2((capture.x - crop.x) / crop.z, (capture.y - crop.y) / crop.w);
-            Vector2 book = new Vector2(page.x - 1f, page.y * m_flipView.PageAspect);
+            Vector2 book = new Vector2(page.x - (side == BOOK_PAGE_SIDE.RIGHT ? 0f : 1f), page.y * m_flipView.PageAspect);
             Vector2 uv = new Vector2((book.x - bookMin.x) / extent.x, (book.y - bookMin.y) / extent.y);
             Rect rect = m_displayImage.rect;
             Vector3 world = m_displayImage.TransformPoint(new Vector3(

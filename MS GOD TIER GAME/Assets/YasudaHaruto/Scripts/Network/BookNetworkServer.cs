@@ -128,7 +128,7 @@ public class BookNetworkServer : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            SendObstacle(PLAYER_SLOT.PLAYER1, 1);
+            SendDirt(PLAYER_SLOT.PLAYER1, 1);
         }
 
         m_driver.ScheduleUpdate().Complete();
@@ -203,17 +203,21 @@ public class BookNetworkServer : MonoBehaviour
     }
 
     private uint m_obstacleEvent;
-    public bool SendObstacle(PLAYER_SLOT playerSlot, byte obstacleId)
+    // Compatibility for previous callers: old Rub=1, old Ink=2.
+    public bool SendObstacle(PLAYER_SLOT playerSlot, byte obstacleId) =>
+        obstacleId == 1 || obstacleId == 2 ? SendDirt(playerSlot, obstacleId) : false;
+
+    public bool SendDirt(PLAYER_SLOT playerSlot, byte slotCount = 1)
     {
-        if (Owner != this) return Owner.SendObstacle(playerSlot, obstacleId);
-        if (obstacleId == 0 || !m_driver.IsCreated) return false;
+        if (Owner != this) return Owner.SendDirt(playerSlot, slotCount);
+        if (slotCount < 1 || slotCount > 4 || !m_driver.IsCreated) return false;
         foreach (var pair in m_playerSlots)
         {
             if (pair.Value != playerSlot || !pair.Key.IsCreated) continue;
             if (m_driver.BeginSend(m_reliablePipeline, pair.Key, out DataStreamWriter writer) != 0) return false;
-            writer.WriteByte((byte)BOOK_MESSAGE_TYPE.APPLY_OBSTACLE);
+            writer.WriteByte((byte)BOOK_MESSAGE_TYPE.APPLY_DIRT);
             writer.WriteUInt(++m_obstacleEvent);
-            writer.WriteByte(obstacleId);
+            writer.WriteByte(slotCount);
             return m_driver.EndSend(writer) >= 0;
         }
         return false;

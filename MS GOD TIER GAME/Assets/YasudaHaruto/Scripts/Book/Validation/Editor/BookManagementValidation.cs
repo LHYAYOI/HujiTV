@@ -44,7 +44,6 @@ namespace YasudaHaruto.BookValidation.Editor
             };
         }
 
-        [MenuItem("Tools/YasudaHaruto/Verify Book Management In Current Scene")]
         public static void Run()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Exit Play Mode first.");

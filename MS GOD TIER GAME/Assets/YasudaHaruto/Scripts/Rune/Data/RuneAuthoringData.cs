@@ -91,8 +91,9 @@ public class RuneAuthoringData
         for (int i = 0; i <= pointIndex; i++) first.Add(points[i]);
         for (int i = pointIndex; i < points.Count; i++) second.Add(points[i]);
 
-        m_strokes[strokeIndex] = new RuneStrokeData(first);
-        m_strokes.Insert(strokeIndex + 1, new RuneStrokeData(second));
+        bool preserveCorners = m_strokes[strokeIndex].PreserveCorners;
+        m_strokes[strokeIndex] = new RuneStrokeData(first, preserveCorners);
+        m_strokes.Insert(strokeIndex + 1, new RuneStrokeData(second, preserveCorners));
         return true;
     }
 
@@ -140,7 +141,8 @@ public class RuneAuthoringData
 
         for (int i = 1; i < next.Count; i++) merged.Add(next[i]);
 
-        m_strokes[firstIndex] = new RuneStrokeData(merged);
+        bool preserveCorners = m_strokes[firstIndex].PreserveCorners || m_strokes[secondIndex].PreserveCorners;
+        m_strokes[firstIndex] = new RuneStrokeData(merged, preserveCorners);
         m_strokes.RemoveAt(secondIndex);
         return true;
     }

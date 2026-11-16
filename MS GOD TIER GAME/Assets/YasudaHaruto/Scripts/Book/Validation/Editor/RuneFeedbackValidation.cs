@@ -32,7 +32,6 @@ namespace YasudaHaruto.BookValidation.Editor
             Debug.Log("RuneFeedback PASS: " + message);
         }
 
-        [MenuItem("Tools/YasudaHaruto/Verify Rune Feedback")]
         public static void Run()
         {
             Vector2 start = new Vector2(0.1f, 0.5f);
@@ -75,14 +74,16 @@ namespace YasudaHaruto.BookValidation.Editor
                 controller.BeginTrace(rune, MAGIC_AIM_TYPE.NONE);
                 controller.BeginStroke(start);
                 controller.AddPoint(end);
-                Require(controller.State == RUNE_TRACE_STATE.COOLDOWN && fake.Failures == 3,
-                    "Accurate completed rune still reaches cast cooldown");
+                Require(controller.State == RUNE_TRACE_STATE.WAITING_CAST_RELEASE && fake.Failures == 3,
+                    "Accurate completed rune waits for a cast gesture");
                 Require(fake.Completions == 1, "Completion effect fires on full rune completion only");
-                Require(Mathf.Approximately(fake.Cooldown, 1f), "Cooldown starts at full remaining time");
                 controller.Tick(0.25f);
-                Require(Mathf.Approximately(fake.Cooldown, 1f), "Automatic cast waits for finger release before advancing");
+                Require(controller.State == RUNE_TRACE_STATE.WAITING_CAST_RELEASE, "Completion does not start cooldown");
                 controller.EndStroke();
                 controller.SetCooldown(1f);
+                Require(controller.TryBeginCast(), "Up-only spell accepts a new cast gesture");
+                controller.ConfirmCast(MAGIC_CAST_DIRECTION.CENTER);
+                Require(Mathf.Approximately(fake.Cooldown, 1f), "Cooldown starts after the up gesture");
                 controller.Tick(0.25f);
                 Require(Mathf.Approximately(fake.Cooldown, 0.75f), "Cooldown feedback uses the controller remaining time");
                 controller.Tick(1f);

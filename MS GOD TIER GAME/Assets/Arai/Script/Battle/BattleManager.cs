@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Rendering;
 
 public class BattleManager : MonoBehaviour
 {
@@ -25,40 +26,13 @@ public class BattleManager : MonoBehaviour
         Instance = this; 
     }
 
-    public static void StartSpawn(BattleData battleData)
+    public static void SetCurrentBattleData(BattleData battleData)
     {
-        if (Instance.m_spawnManager == null)
+        if (Instance == null)
         {
             return;
         }
-
         Instance.m_currentBattleData = battleData;
-
-        Instance.StartCoroutine(Instance.SpawnEnemyCoroutine());
-    }
-
-
-    private IEnumerator SpawnEnemyCoroutine()
-    {
-        if (m_currentBattleData == null)
-        {
-            yield break;
-        }
-
-        List<BattleEnemyData> enemyData = m_currentBattleData.EnemyData;
-
-        foreach (BattleEnemyData data in enemyData)
-        {
-            if(data.SplineId != "")
-            {
-                m_spawnManager.SpawnSplineMoveEnemy(data.EnemyId, data.SplineId, data.SpawnId);
-            }
-            else
-            {
-                m_spawnManager.SpawnPopUpEnemy(data.EnemyId, data.SpawnId);
-            }
-            
-        }
     }
 
     public static void StartBattle(UnityEvent onFinishEvent)
@@ -116,11 +90,10 @@ public class BattleManager : MonoBehaviour
             // バトル時間が経過するまで待機する
             if ( Time.time - time > m_currentBattleData.BattleTime)
             {
-                // アクティブな敵が残っている場合は全て削除する
+                // アクティブな敵が残っている場合はバトルを終了する
                 if (m_activeEnemyManager.GetActiveEnemies().Count() != 0)
                 {
-                    // バトル終了時に全ての敵を削除する
-                    m_activeEnemyManager.RemoveAllActiveEnemies();
+                    m_activeEnemyManager.SetAllActiveEnemiesToBattleEnd();
                 }
                 break;
             }

@@ -53,6 +53,8 @@ public class RuneTraceController
     public int CurrentStrokeIndex => m_strokeIndex;
     public float Progress => m_evaluator?.Progress ?? 0f;
 
+    public bool UsesThreeDirections => m_aimType != MAGIC_AIM_TYPE.NONE;
+
     public bool IsAwaitingCast => m_state == RUNE_TRACE_STATE.WAITING_CAST_RELEASE ||
         m_state == RUNE_TRACE_STATE.WAITING_CAST_START || m_state == RUNE_TRACE_STATE.CHARGING;
 
@@ -105,7 +107,6 @@ public class RuneTraceController
 
         m_runeData = runeData;
         m_aimType = aimType;
-        if (m_view is IRuneCastPresentation presentation) presentation.SetDirectionalCast(aimType != MAGIC_AIM_TYPE.NONE);
         m_session = new RuneTraceSession();
         ResetAttempt();
     }
@@ -212,16 +213,8 @@ public class RuneTraceController
         {
             if (m_view is IRuneTraceFeedbackView feedback) feedback.PlayCompletion();
             // すべてのストロークが完了した場合、詠唱を確定する
-            if (m_aimType == MAGIC_AIM_TYPE.NONE)
-            {// 方向指定がない場合は詠唱を確定する
-                StartCooldown(false);
-                CastConfirmed?.Invoke(MAGIC_CAST_DIRECTION.NONE);
-            }
-            else
-            {// 方向指定がある場合は詠唱を開始する
-                m_state = RUNE_TRACE_STATE.WAITING_CAST_RELEASE;
-                Debug.Log("Rune : Release before aiming");
-            }
+            m_state = RUNE_TRACE_STATE.WAITING_CAST_RELEASE;
+            Debug.Log("Rune : Release before aiming");
         }
         else
         {// 次のストロークを待機する
@@ -251,10 +244,12 @@ public class RuneTraceController
             return;
         }
 
+        if (!UsesThreeDirections && direction != MAGIC_CAST_DIRECTION.CENTER) return;
+
         Debug.Log($"Rune : Cast Confirmed / Direction={direction}");
         if (m_view is IRuneCastPresentation presentation) presentation.LaunchCast(direction);
         StartCooldown(true);
-        CastConfirmed?.Invoke(direction);
+        CastConfirmed?.Invoke(UsesThreeDirections ? direction : MAGIC_CAST_DIRECTION.NONE);
     }
 
 

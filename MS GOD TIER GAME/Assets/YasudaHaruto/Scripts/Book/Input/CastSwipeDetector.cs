@@ -28,6 +28,13 @@ public class CastSwipeDetector : MonoBehaviour
     public float GuideSideAngle => (m_centerAngle + m_maxAngle) * 0.5f;
 
     public bool TryEvaluate(Vector2 startScreenPosition, Vector2 endScreenPosition, out MAGIC_CAST_DIRECTION direction)
+        => TryEvaluate(startScreenPosition, endScreenPosition, true, out direction);
+
+    public bool TryPreviewDirection(Vector2 startScreenPosition, Vector2 endScreenPosition, out MAGIC_CAST_DIRECTION direction)
+        => TryEvaluate(startScreenPosition, endScreenPosition, false, out direction);
+
+    private bool TryEvaluate(Vector2 startScreenPosition, Vector2 endScreenPosition, bool requireMinimumDistance,
+        out MAGIC_CAST_DIRECTION direction)
     {
         // 初期化
         direction = default;
@@ -62,7 +69,7 @@ public class CastSwipeDetector : MonoBehaviour
 
         // スワイプの距離と方向を計算
         Vector2 delta = end - start;
-        if (delta.magnitude / displayHeight < m_minSwipeDistance)
+        if (requireMinimumDistance && delta.magnitude / displayHeight < m_minSwipeDistance)
         {// スワイプの距離が最小距離未満の場合は評価できない
             return false;
         }

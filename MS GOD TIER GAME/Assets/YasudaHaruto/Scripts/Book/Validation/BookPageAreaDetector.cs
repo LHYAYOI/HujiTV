@@ -126,6 +126,11 @@ public class BookPageAreaDetector : MonoBehaviour
         return m_mapper != null && m_mapper.TryGetScreenRect(graphic, out rect);
     }
 
+    public bool TryGetPageGraphicScreenRect(RectTransform graphic, BOOK_PAGE_SIDE side, out Rect rect)
+    {
+        rect = default;
+        return m_mapper != null && m_mapper.TryGetScreenRect(graphic, side, out rect);
+    }
     public bool TryGetRunePosition(Vector2 screenPosition, out Vector2 normalizedPosition)
     {
         // 初期化

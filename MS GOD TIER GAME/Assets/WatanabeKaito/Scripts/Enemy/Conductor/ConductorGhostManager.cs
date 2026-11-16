@@ -26,7 +26,17 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
 
     public override void Initialize()
     {
-        
+       
+    }
+
+    public override void BattleStart()
+    {
+        StartBattle();
+    }
+
+    public override void BattleEnd()
+    {
+        EndBattle();
     }
 
     // Update is called once per frame
@@ -63,7 +73,7 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
         m_upperDrawerTargetable.SetTargetable(false);
         m_lowerDrawerTargetable.SetTargetable(false);
 
-        m_conductorGhost.RemoveAllSwarmGhosts();
+        m_conductorGhost.DeactivateAllSwarmGhosts();
     }
 
     public void OnChestHit()
