@@ -125,7 +125,7 @@ public class TargetLockOnUIManager : MonoBehaviour
         return targets;
     }
 
-    public void PlaySelectedEffect(MAGIC_CAST_DIRECTION direction)
+    public void PlaySelectedEffect(MAGIC_CAST_DIRECTION direction, MagicBulletController bullet)
     {
         GameObject target = m_targetSelector.GetSelectedTarget(direction);
 
@@ -155,6 +155,7 @@ public class TargetLockOnUIManager : MonoBehaviour
 
             if (ui.GetTarget() == targetable) 
             {
+                ui.SetMagicBulletController(bullet);
                 ui.SelectedTargetUI();
                 break;
             }

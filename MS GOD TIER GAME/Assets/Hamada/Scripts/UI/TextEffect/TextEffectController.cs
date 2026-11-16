@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum TEXT_EFFECT_STATE
@@ -15,8 +16,12 @@ public class TextEffectSetting
 {
     public bool m_applyToAllTextFlag = false;
 
+    public bool m_targetSpriteFlag;
+
     [Tooltip("エフェクトを適用したい文字列")]
     public string m_targetText;
+
+    public string m_targetSpriteName;
 
     [Tooltip("適用するエフェクト")]
     public TextEffect m_effect;
@@ -56,6 +61,11 @@ public class TextEffectController : MonoBehaviour
         }
     }
 
+    public void SetText(string text) 
+    {
+        m_text.text = text;
+    }
+
     public TEXT_EFFECT_STATE GetEffectState()
     {
         return m_state;
@@ -83,7 +93,7 @@ public class TextEffectController : MonoBehaviour
         ModifyMesh(textInfo);
 
         // 頂点と色の変更を反映
-        m_text.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices | TMP_VertexDataUpdateFlags.Colors32);
+        m_text.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices | TMP_VertexDataUpdateFlags.Colors32 | TMP_VertexDataUpdateFlags.Uv0);
 
         //終了処理とか
         CheckEffectCompletion(textInfo);
@@ -106,6 +116,10 @@ public class TextEffectController : MonoBehaviour
                     setting.m_effect.Apply(textInfo, i, i, m_elapsedTime);
                 }
             }
+            else if (setting.m_targetSpriteFlag)
+            {
+                ApplyToMatchingSprite(textInfo, setting);
+            }
             else 
             {
                 //文字の指定があるか
@@ -117,6 +131,40 @@ public class TextEffectController : MonoBehaviour
                 //指定した文字にエフェクトを実行
                 ApplyToMatchingText(textInfo, setting);
             }
+        }
+    }
+
+    private void ApplyToMatchingSprite(
+    TMP_TextInfo textInfo,
+    TextEffectSetting setting)
+    {
+        int localIndex = 0;
+
+        for (int i = 0; i < textInfo.characterCount; i++)
+        {
+            TMP_CharacterInfo charInfo =
+                textInfo.characterInfo[i];
+
+            if (charInfo.elementType != TMP_TextElementType.Sprite)
+                continue;
+
+            TMP_SpriteCharacter spriteCharacter =
+                charInfo.textElement as TMP_SpriteCharacter;
+
+            if (spriteCharacter == null)
+                continue;
+
+            if (spriteCharacter.name != setting.m_targetSpriteName)
+                continue;
+
+            setting.m_effect.Apply(
+                textInfo,
+                i,
+                localIndex,
+                m_elapsedTime
+            );
+
+            localIndex++;
         }
     }
 
