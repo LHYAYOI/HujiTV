@@ -139,15 +139,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   m_magicData: {fileID: 11400000, guid: fd84468c9ad10ad489611b6288bb8c24, type: 2}
   m_trail: {fileID: 7039418750288848135}
-  m_hitEffect: {fileID: 888282901553999714, guid: dfb6b4b86c6de9f4299373af8344de92, type: 3}
-  m_moveSpeed: 5
+  m_hitEffect: {fileID: 888282901553999714, guid: f02c97a1218647c48b89a736e3d97bad, type: 3}
+  m_moveSpeed: 3
   m_bezierControlPoints:
-  - m_curveHeight: {x: 1, y: 3}
-    m_curveWidth: {x: 1, y: 3}
-  - m_curveHeight: {x: 0.5, y: 2}
-    m_curveWidth: {x: -2, y: 2}
-  - m_curveHeight: {x: 1, y: 3}
-    m_curveWidth: {x: -1, y: -3}
+  - m_curveHeight: {x: 1, y: 2}
+    m_curveWidth: {x: 1, y: 2}
+  - m_curveHeight: {x: 0.5, y: 1}
+    m_curveWidth: {x: -1, y: 1}
+  - m_curveHeight: {x: 1, y: 2}
+    m_curveWidth: {x: -1, y: -2}
 --- !u!1 &1249662005817768199
 GameObject:
   m_ObjectHideFlags: 0
@@ -178,7 +178,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 8962476768535423735}
@@ -202,7 +202,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 0.1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &5260777087622495879
 Rigidbody:

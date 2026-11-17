@@ -40,11 +40,6 @@ public class CameraManager : MonoBehaviour
         {
             SwitchCamera("BattleCamera");
         }
-
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            SwitchCamera("FPSCamera");
-        }
     }
 
     public void SwitchCamera(string cameraName)
@@ -99,6 +94,25 @@ public class CameraManager : MonoBehaviour
         {
             yield return null;
         }
+    }
+
+    public void KickCameraRotation(Vector3 angle,float duration)
+    {
+        CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
+
+        if (currentVirtualCamera == null)
+        {
+            return;
+        }
+
+        CameraShake shake = currentVirtualCamera.GetComponent<CameraShake>();
+
+        if (shake == null)
+        {
+            return;
+        }
+
+        shake.KickRotation(angle, duration);
     }
 
     //縦と横の強さを指定できるカメラシェイク
@@ -162,7 +176,7 @@ public class CameraManager : MonoBehaviour
     }
 
     //Z軸を傾ける
-    public void TiltCamera(float duration, float tiltDegree)
+    public void TiltCamera(float duration, Vector3 tiltDegree)
     {
         CinemachineCamera currentVirtualCamera = m_currentCamera.GetCamera();
 

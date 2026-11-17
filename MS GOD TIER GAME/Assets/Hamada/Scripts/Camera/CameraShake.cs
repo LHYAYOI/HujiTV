@@ -15,12 +15,51 @@ public class CameraShake : MonoBehaviour
     [SerializeField] float m_amplitudeGain;
     [SerializeField] float m_frequencyGain;
 
+    [Header("キック揺れ周り")]
+    [SerializeField]
+    private AnimationCurve m_kickCurve =
+    new AnimationCurve(
+        new Keyframe(0f, 0f, 0f, 5f),
+        new Keyframe(0.2f, 1f, 0f, 0f),
+        new Keyframe(1f, 0f, 0f, 0f)
+    );
+
     private Vector3 m_totalShakeOffset;
+    private Vector3 m_kickRotationOffset;
+
+    Coroutine m_kickRoutine;
 
     private void Start()
     {
         m_multiChannelPerlin.AmplitudeGain = m_amplitudeGain;
         m_multiChannelPerlin.FrequencyGain = m_frequencyGain;
+    }
+
+    public void KickRotation(Vector3 targetAngle,float rotateDuration)
+    {
+        if (m_kickRoutine != null) 
+        {
+            StopCoroutine(m_kickRoutine);
+        }
+
+        m_kickRoutine = StartCoroutine(KickRotationRoutine(targetAngle, rotateDuration));
+    }
+
+    public void VHShake(float duration, float horizontalIntensity = 0, float verticalIntensity = 0, float forwardIntensity = 0)
+    {
+        StartCoroutine(ShakeRoutine(duration, horizontalIntensity, verticalIntensity, forwardIntensity, new Vector2(25f, 80f)));
+    }
+
+    public void ShakeCamera(float intensity, float duration)
+    {
+        StartCoroutine(ShakeRoutine(duration, intensity, intensity, intensity, new Vector2(25f, 40f)));
+    }
+
+    public void SetRateOnTrolleyShake(float rate)
+    {
+        rate = Mathf.Clamp01(rate);
+        m_multiChannelPerlin.AmplitudeGain = m_amplitudeGain * rate;
+        m_multiChannelPerlin.FrequencyGain = m_frequencyGain * rate;
     }
 
     IEnumerator ShakeRoutine(float duration, float horizontalIntensity, float verticalIntensity, float forwardIntensity, Vector2 frequencyRange)
@@ -70,20 +109,41 @@ public class CameraShake : MonoBehaviour
         m_cinemachineRotationExtension.SetShakeRotationOffset(m_totalShakeOffset);
     }
 
-    public void VHShake(float duration, float horizontalIntensity = 0, float verticalIntensity = 0, float forwardIntensity = 0) 
+    IEnumerator KickRotationRoutine(Vector3 targetAngle, float duration) 
     {
-        StartCoroutine(ShakeRoutine(duration, horizontalIntensity, verticalIntensity, forwardIntensity, new Vector2(25f, 80f)));
-    }
+        if (duration <= 0f)
+        {
+            yield break;
+        }
 
-    public void ShakeCamera(float intensity, float duration)
-    {
-        StartCoroutine(ShakeRoutine(duration, intensity, intensity, intensity, new Vector2(25f, 40f)));
-    }
+        float elapsedTime = 0f;
 
-    public void SetRateOnTrolleyShake(float rate) 
-    {
-        rate = Mathf.Clamp01(rate);
-        m_multiChannelPerlin.AmplitudeGain = m_amplitudeGain * rate;
-        m_multiChannelPerlin.FrequencyGain = m_frequencyGain * rate;
+        // 前回の揺れが残っていた場合の開始オフセット
+        Vector3 startOffset = m_kickRotationOffset;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+
+            float rate = Mathf.Clamp01(elapsedTime / duration);
+
+            float curve = m_kickCurve.Evaluate(rate);
+
+            // 前回のオフセットも徐々に解消
+            float returnWeight = 0.5f + 0.5f * Mathf.Cos(Mathf.PI * rate);
+
+            m_kickRotationOffset = startOffset * returnWeight + targetAngle * curve;
+
+            m_cinemachineRotationExtension.SetKickRotationOffset(m_kickRotationOffset);
+
+            yield return null;
+        }
+
+        // 最終的に完全にリセット
+        m_kickRotationOffset = Vector3.zero;
+
+        m_cinemachineRotationExtension.SetKickRotationOffset(Vector3.zero);
+
+        m_kickRoutine = null;
     }
 }

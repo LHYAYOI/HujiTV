@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class TestObjectController : EnemyBase
 {
@@ -15,6 +15,15 @@ public class TestObjectController : EnemyBase
     }
 
     public override void Initialize()
+    {
+    }
+
+    public override void BattleStart() 
+    {
+    }
+
+    // バトル終了時の処理を行う関数
+    public override void BattleEnd() 
     {
     }
 }

@@ -36,11 +36,6 @@ public class PlayerController : MonoBehaviour
         {
             FireBullet(magicData, MAGIC_CAST_DIRECTION.RIGHT);
         }
-
-        if (Input.GetKeyDown(KeyCode.K)) 
-        {
-            TakeDamage(1);
-        }
     }
 
     //ダメージ処理
@@ -80,8 +75,6 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
-
-        CameraManager.Instance.ShakeCameraInVHF(.5f, 1.0f, 0.0f, 0.0f);
 
         m_bulletManager.FireBullet(magicData, direction, target);
     }
