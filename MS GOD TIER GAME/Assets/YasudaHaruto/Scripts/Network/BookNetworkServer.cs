@@ -37,6 +37,32 @@ public class BookNetworkServer : MonoBehaviour
     private readonly List<NetworkConnection> m_replyBuffer = new();
     private System.Action<PLAYER_SLOT, byte, MAGIC_CAST_DIRECTION> m_castMagicReceived;
 
+    private readonly HashSet<PLAYER_SLOT> m_castSelectingPlayers = new();
+    private System.Action<PLAYER_SLOT, bool> m_castSelectionChanged;
+
+    public event System.Action<PLAYER_SLOT, bool> CastSelectionChanged
+    {
+        add { Owner.m_castSelectionChanged += value; }
+        remove { Owner.m_castSelectionChanged -= value; }
+    }
+
+    public bool IsPlayerSelectingCast(PLAYER_SLOT slot) => Owner.m_castSelectingPlayers.Contains(slot);
+
+    private void SetCastSelection(PLAYER_SLOT slot, bool active)
+    {
+        bool changed = active ? m_castSelectingPlayers.Add(slot) : m_castSelectingPlayers.Remove(slot);
+        if (changed) m_castSelectionChanged?.Invoke(slot, active);
+    }
+
+    private void ReceiveCastSelection(NetworkConnection connection, DataStreamReader reader)
+    {
+        if (!m_isGameStarted || reader.Length - reader.GetBytesRead() != 1 ||
+            !m_playerSlots.TryGetValue(connection, out PLAYER_SLOT slot)) return;
+        byte active = reader.ReadByte();
+        if (active > 1) return;
+        SetCastSelection(slot, active == 1);
+    }
+
     // Scene-local servers remain as reference adapters for existing Inspector links.
     private void Awake()
     {
@@ -185,6 +211,7 @@ public class BookNetworkServer : MonoBehaviour
                         {
                             Debug.Log($"{playerSlot}Ç™êÿífÇµÇ‹ÇµÇΩ");
 
+                            SetCastSelection(playerSlot, false);
                             m_playerSlots.Remove(connection);
                         }
                         else
@@ -286,6 +313,10 @@ public class BookNetworkServer : MonoBehaviour
                 ReceiveCastMagic(connection, reader);
                 break;
 
+            case BOOK_MESSAGE_TYPE.CAST_SELECTION:
+                ReceiveCastSelection(connection, reader);
+                break;
+
             case BOOK_MESSAGE_TYPE.CURSOR_POSITION:
                 ReceiveVector2(connection, reader);
                 break;
@@ -359,6 +390,7 @@ public class BookNetworkServer : MonoBehaviour
 
         // CastMagicÇÃéÛêMÇí ímÇ∑ÇÈ
         Debug.Log($"CastMagicéÛêM : {playerSlot} / SkillId={skillId} / Direction={direction}");
+        SetCastSelection(playerSlot, false);
         m_castMagicReceived?.Invoke(playerSlot, skillId, direction);
     }
 

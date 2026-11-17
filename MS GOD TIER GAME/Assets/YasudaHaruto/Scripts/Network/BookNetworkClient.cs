@@ -282,6 +282,16 @@ public class BookNetworkClient : MonoBehaviour
     }
 
     // CastSkillメッセージを送信する
+    public bool SendCastSelection(bool active)
+    {
+        if (!CanSend()) return false;
+        int result = m_driver.BeginSend(m_reliablePipeline, m_connection, out DataStreamWriter writer);
+        if (result != 0) return false;
+        writer.WriteByte((byte)BOOK_MESSAGE_TYPE.CAST_SELECTION);
+        writer.WriteByte(active ? (byte)1 : (byte)0);
+        return m_driver.EndSend(writer) >= 0;
+    }
+
     public bool SendCastSkill(byte skillId, MAGIC_CAST_DIRECTION direction)
     {
         if (!CanSend())

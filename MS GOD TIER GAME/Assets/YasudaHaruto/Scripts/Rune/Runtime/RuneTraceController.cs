@@ -63,6 +63,9 @@ public class RuneTraceController
     public float CooldownProgress => m_cooldownSeconds > 0f
         ? 1f - Mathf.Clamp01(m_cooldownRemaining / m_cooldownSeconds) : 1f;
 
+    private bool m_castSelectionActive;
+    public event Action<bool> CastSelectionChanged;
+
     public event Action<RuneTraceResult> TraceSucceeded;
     public event Action<RuneTraceResult> TraceFailed;
     public event Action<MAGIC_CAST_DIRECTION> CastConfirmed;
@@ -214,6 +217,7 @@ public class RuneTraceController
             if (m_view is IRuneTraceFeedbackView feedback) feedback.PlayCompletion();
             // すべてのストロークが完了した場合、詠唱を確定する
             m_state = RUNE_TRACE_STATE.WAITING_CAST_RELEASE;
+            SetCastSelectionActive(true);
             Debug.Log("Rune : Release before aiming");
         }
         else
@@ -248,6 +252,7 @@ public class RuneTraceController
 
         Debug.Log($"Rune : Cast Confirmed / Direction={direction}");
         if (m_view is IRuneCastPresentation presentation) presentation.LaunchCast(direction);
+        m_castSelectionActive = false; // CAST_MAGIC closes the selection on the PC.
         StartCooldown(true);
         CastConfirmed?.Invoke(UsesThreeDirections ? direction : MAGIC_CAST_DIRECTION.NONE);
     }
@@ -286,6 +291,7 @@ public class RuneTraceController
 
     public void Cancel()
     {
+        SetCastSelectionActive(false);
         m_state = RUNE_TRACE_STATE.INACTIVE;
         m_strokeIndex = 0;
         m_evaluator = null;
@@ -304,6 +310,13 @@ public class RuneTraceController
             feedback.SetTraceDeviation(m_evaluator?.NormalizedDeviation ?? 0f);
     }
 
+    private void SetCastSelectionActive(bool active)
+    {
+        if (m_castSelectionActive == active) return;
+        m_castSelectionActive = active;
+        CastSelectionChanged?.Invoke(active);
+    }
+
     private void NotifyFailure()
     {
         if (m_failureNotified) return;
@@ -315,6 +328,7 @@ public class RuneTraceController
 
     private void ResetAttempt()
     {
+        SetCastSelectionActive(false);
         m_failureNotified = false;
         m_session ??= new RuneTraceSession();
         m_session.Clear();

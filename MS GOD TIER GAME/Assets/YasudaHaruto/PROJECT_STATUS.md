@@ -1,4 +1,160 @@
 # Project Status
+
+## 最終作業：右の奥の遮蔽を強め、対向車のすれ違いを接近（2026-11-17）
+- 最新ユーザー指定を実装しRollerCoaster Scene保存。1回目の右進行ルートだけ囲いの開始を分岐の実距離6m先へ寄せ、局所幅4.8→3.6mへ絞る（分岐+2〜5mで補間、+18〜24mで復元）。左の枝のSpline・囲いの接続位置12m／幅4.8mを維持。主線Splineと自車の速度設定は変更しない。
+- 分岐手前5mの視点から右レールの12m先が壁に隠れることをrayで確認。左右線路は常時表示し、滑らかな接線接続と曲がった先の通路を保持。右へ進んでから自然に奥が開ける。生成囲い23,944頂点。UVは実距離基準のため幅を絞っても引き延ばさない。
+- 2か所とも対向車の開始12→9m／停止6→2.5mへ変更。速度3.2m/sと35m／20mの起動先行距離は維持。開始8mの試作ではタイミングによって視点接触が出たため、9mで余裕を確保。車体後部の重なり許容というユーザー指定に合わせ、旧中心間2.3m制限を廃止し、実Playのカメラ位置が対向車の保守的箱領域（幅2／高さ2.4／長さ2.4m）へ入らず距離0.2m超を保つ検証へ変更。静的な全組合せ距離は時間を無視した参考値として記録。
+- 別出力C#／Unity内コンパイル成功。両枝常時表示・先頭接線一致、主線198点で床隠れなし、両枝奥4方向と右12m先の遮蔽、囲い3,904rayと落下通路の幅／下層天井遮蔽を確認。
+- 最終実Play Modeで全コース完走、2か所の回避、最短中心間1.973m／2.445m、保守的対向車箱とカメラの最短距離0.908m、対向車速度最大3.246m/s。頂点減速停止、着地停止と0.600からの加速、Pause/Resume、縦揺れ、着地衝撃一回、落下方位維持（最大角度差0.1813度）、出口停止、Restart、実行時Errorなしを確認。更新されたencounter-1-0.png／encounter-1-1.pngで右奥の遮蔽と目の前まで来る対向車を目視。編集モードへ復帰。
+- 記録：Temp/RollerCoasterCourseValidation/close-pass-build.txt、Temp/RollerCoasterTrialValidation/close-pass-play.txt。SETUP／DESIGNの冒頭に最新値を追記。別PC・別FPSでの体感、本番ステージ統合、最終モデルは未確認／未実施。
+- 既存の本・Rune・通信と.vs変更を保持。他担当コード／共有設定は変更せず、禁止Git操作なし。
+
+## 最終作業：手描き図の滑らかなY分岐と左右の奥を隠す囲い（2026-11-17）
+- 最新の手描き俯瞰図を反映。左右のレールは同じ点・同じ接線から滑らかに分岐し、曲がった先は図の赤／青の範囲に相当する囲いの奥へ続く。左右の線路は常時表示。2か所（らせん開始前の左脅威→右回避、落下前の右脅威→左回避）を維持。
+- 対向車側Spline先頭のBezierKnot.Rotationをidentityにして明示的な接線を設定。従来はAutoSmoothで作られた回転を残したまま異なる座標系のTangentOutを代入しており、分岐始点が折れたり交差気味に見える原因になっていた。先頭の接線一致dot>0.999を両方で確認。枝の制御点を緩い90度カーブへ変更。
+- 囲いの接続は開口ごとの外周順を保持する方式へ変更。凸包だと曲がった進入路で開口の端が内側へ落ちて塞がるため、左右の分岐内側のくぼみと3開口を保持。枝側通路の接続位置12m。現在の下り／らせんと自車Splineを変更せず収まったため、追加直線は不要。対向車の開始12m／停止6m、速度3.2m/s。各EncounterのInspectorで調整可能。
+- C#別出力／Unity内コンパイル成功。両接線一致、両枝常時表示・接続、停止域全体での最短中心距離2.783m／3.821m、分岐主線198点の床隠れなしを確認。分岐手前5mから左右それぞれの奥へrayを飛ばして全4方向の遮蔽確認。3,904囲いray、落下通路の幅／下層天井の上面遮蔽を確認。囲い23,672頂点。
+- 最終Play Modeで2回の接近／回避と出口まで完走。実最短距離4.072m、対向車速度最大3.216m/s。Pause/Resume、頂点減速停止、着地停止と0.600からの再加速、縦揺れと着地衝撃一回、落下視線維持（最大更新間角度差0.2238度）、出口停止、Restart、実行時Errorなし。更新後のencounter-1-0.png／encounter-2-0.pngを乗車視点で目視確認。編集モードへ復帰。
+- 記録：Temp/RollerCoasterCourseValidation/smooth-forks-build.txt、Temp/RollerCoasterTrialValidation/smooth-forks-play.txt。SETUP／DESIGN冒頭へ最新調整を追記。対向車のモデルは仮、本番統合や最終的な体感調整は引き続き未実施。
+- 今回の変更は担当領域のRollerCoaster用コード／Scene／生成資産／メモのみ。既存の本・通信・Runeと.vsの未コミット変更を保持。Commit等の禁止Git操作なし。
+
+## 最終作業：対向トロッコを前半2か所へ再構成（2026-11-17）
+- 最新ユーザー指定を実装・RollerCoaster Scene保存。1回目は最初のらせん開始直前（ノット4）で左の対向車を右へ回避。2回目はらせん終端〜落下直前（36〜37）で右の対向車を左へ回避。従来の着地後の演出と、ぎりぎりで右線路を表示する方式は廃止。左右両レールは常時接続・表示、対向車の枝は再合流しない。
+- RollerCoasterEncounterを2インスタンス対応にし、RollerCoasterEncounterSequenceとTwoEncounterSetupを追加。Course Baselineを保存し、旧下層回避のノット41〜44を復元。落下開始以降を水平左4mへ移動して2回目の実回避を作り、落下の高さと帰路の図形を保持。対向車は実距離3.2m/s、10m先から4m先まで接近、先行起動距離35m／20m。Pause中は停止。モデルは仮。
+- 原本HamadaのRotationExtensionへ最大15度の短い視線誘導を接続（1回目左／2回目右、回避中に正面へ戻す）。車体は走行Splineへ追従。Camera MotionのEncounter Look Degreesで調整／0で無効化可能。既存縦揺れ・着地揺れ・速度プロファイルを保持。
+- 囲いを3開口の分岐空間へ変更し、両枝と主線を常時開口接続。床がレールにかぶる問題を画像確認して修正。コンパクトな落下通路と下層への接続、配色・UVスクロールを保持。廃止したRollerCoasterRightTrackSetupと.metaを除去。
+- 別出力C#コンパイルとUnity内コンパイル成功。両分岐の接続・常時表示、対向車停止域全体との最短中心距離2.890m／3.265m、分岐の主線198点で床によるレール隠れなし、囲い3,904rayと落下通路の適正幅／下層天井の上面遮蔽を確認。コースVerify成功：73ノット／404.520m、線路なし落下212.715〜249.729m、全経路3,001点frame、元図の帰路の5区間・高低差を保持。
+- 最終実Play Modeで2演出の接近・回避・通過、常時線路表示、全経路完走を確認。実最短距離4.378m、対向車速度ピーク3.215m/s。頂点減速停止、着地停止と0.600からの再加速、Pause/Resume、縦揺れ、着地衝撃一回、落下視線維持（最大更新間角度差0.2683度）、出口停止、Restart、実行時Errorなし。各演出の乗車画像を目視して左右の配置と床修正を確認。編集モードへ復帰。
+- 検証記録：Temp/RollerCoasterCourseValidation/two-encounters-build.txt、Temp/RollerCoasterTrialValidation/two-encounters-play.txt、同encounter-1-0/1/2.pngとencounter-2-0/1/2.png。SETUP／DESIGNの冒頭に最新仕様と再生成の注意を追記。過去記録の単発・下層・線路の隠蔽表示は現行仕様ではない。
+- 他担当コード・共有設定・BookSceneは今回未変更。BookScene SHA256=509ADABD49B02D51E1A0B90F179F5BEF1689A2CD3693E72AAA82F8CB00A22710。既存の未コミット変更を保持。最終status、diff --check、追跡先比較0/0確認。禁止Git操作なし。本番統合、最終モデル・演出の体感仕上げ、入口出口とワープの確定は未実施。
+## 閉じた落下通路・左だけに見せる右回避・減速と下り縦揺れ（2026-11-17）
+- 最新のユーザー画像と追加指示を反映。「広い部屋を落ちる」のではなく囲われた縦通路を落ち、下の天井上面は見せない。接近時は左にだけ行けそうに見せ、対向車直前に隠れた右へ回避する。左に目立つ青い箱を置く表現を廃止。前回確定の左非合流・自車は直進気味・右から既存アップダウンへ接続は維持。
+- 囲い内に幅6.8mの縦通路・天井・正面の出口壁を追加。出口壁の向こうに下の通路の天井をつなぎ、落下中に屋根上面を見下ろさない形へ変更。中間地点の横方向距離2.5〜4.5m／前方2〜8mと、下の天井上面への遮蔽を検証。旧大部屋は外壁として残すが乗車視点は内側通路で囲う。
+- 左のSplineを入口近くで強く左へ曲げ、奥を隠す通路壁を分岐から約6mまで手前へ延長。左内壁を周囲と同じ緑Materialへ揃え、室内で重なる青い通路天井は生成しない。右は出口壁から続く内壁と鼻先で隠し、通過後に開ける形へ変更。
+- 壁だけでは右奥の線路が一部見えたため、右回避区間のMeshをConcealed Right Trackへ分離。通常AfterFall Meshは区間前後を結合し、右区間はBegin+0.002（約0.8m先）で表示。走行Splineは変えず演出上の見え方を制御する。Restartで再度伏せ、編集モードでは全レール表示に戻る。回避経路と囲いの更新ボタンで分離表示も再設定。
+- 対向車はApproach Start=0.42／End=0.12／Lead=0.04／Arrival Ratio=0。短い移動区間を長めの補間で進め、急加速するSmoothStepをやめた。進行同期とPause/Restart対応は維持。仮モデルは継続。
+- 専用Noiseの上下Yを共通元2.4倍、縦回転Xを1.5倍へ増加。Airborne Strength=0.3。さらに独自CinemachineExtensionで上下PositionCorrectionだけを増幅し、下りは傾斜に応じて最大1.5倍、落下は1.25倍。横揺れ・車体姿勢は増幅しない。着地縦衝撃3.5度は維持。共通NoiseやHamada原本は未変更。
+- C#別出力／Unityコンパイル成功。囲い23,068頂点。3,904本の囲いray、左の初期遮蔽と曲がり角の奥の遮蔽、接近中の右線路遮蔽と壁通過後の開放、対向車の前方視認、左非合流、落下通路の幅と下の天井上面の遮蔽を確認。Course Verifyも成功し73ノット／409.209m、落下211.651〜248.664m、線路前126,582頂点・後の通常Mesh80,118頂点＋右回避の別Mesh。図の高低差と3,001点frameを維持。
+- 最終実Play Modeで全経路完走し、右線路が接近中に隠れて曲がる時に表示されること、対向車接近（視認区間の速度最大3.825m/s、最短距離3.413m）、下り／落下の上下だけの増幅、着地衝撃一回、頂点停止、着地停止と低速発進、Pause/Resume、落下視線維持（最大更新間角度差0.2238度）、出口停止、Restart、実行時Errorなしを確認。画像で左の道だけが続く見え方・青い箱の解消・下の屋根が見えない落下を目視。Scene保存、編集モードへ復帰。
+- 記録: Temp/RollerCoasterCourseValidation/compact-shaft-build.txt、同compact-shaft-route-verify.txt、Temp/RollerCoasterTrialValidation/compact-shaft-play.txt、compact-shaft-fall.png、blind-right-approach.png。SETUPと設計メモ更新済み。
+- Book/Network/Runeと.vsの別作業変更を保持し未変更。他担当コード・原本素材・共有設定も未変更。BookScene SHA256は509ADABD49B02D51E1A0B90F179F5BEF1689A2CD3693E72AAA82F8CB00A22710で不変。開始時status/fetch/追跡先比較、終了時status/diff --check/追跡先比較成功、0/0。禁止Git操作なし。
+## 縦揺れ・背景の黒帯とUV・広い落下室・独立した左ルートへ修正（2026-11-17）
+- ユーザーへ先に確認し、「左ルートは再合流させず別方向へ、自車は右回避後に既存アップダウン／出口」「車体は直進気味で左の線路と見せ方で誘導」を確定。旧合流する実装から修正してRollerCoasterシーン保存。
+- 既存6D Wobbleを担当側RideVerticalNoise.assetへ複製。Position NoiseのY Amplitudeを1.8倍（0.35→0.63等）、Orientation NoiseのXを1.25倍に変更し、SceneのPerlinへ接続。Hamada VHShakeのverticalIntensityへ渡すLanding Pitchを2.5→3.5度。原本CameraShake／共通Noiseは未変更。
+- 囲いの断面ごとの法線分断、壁の実寸を無視したUV、旧Materialの視差／法線マップと裏面の陰影を見直した。各壁の同位置の法線を平均化し、実際の壁の曲線長に沿う実寸UVへ変更。専用URP Shaderを追加し、簡易陰影（明度0.8以上）で黒い帯と近接歪みを抑える。通常の4.8m断面は維持。
+- Shader内で色ごとのAtlas範囲を反復・反転してUVスクロール。Scroll Velocity=(0.012,0.004) cycles/sec、Tile Meters=3。元画像の緑領域に混ざっていた余白を避ける範囲へ変更。原本Textureは未変更、毎フレームのMaterial書き換えなし。DuctColor1〜5から速度・模様寸法を調整可能。
+- 落下室を分岐まで延ばし、横と前を拡張。中間地点の前方12m超・左右各5m超を検査。床は着地位置の約0.7m下、着地後の部分には低い天井を追加。落下時の前傾／方位・線路なし区間は維持。最終囲い22,224頂点。
+- 自車の41番ノットまでを直進気味にし、42番で右3m、その後は既存44番へつなぐ。左の見かけの線路は別のSplineで左へ30m伸ばし、右ルートと再合流しない。左壁に開口を作って曲がった専用通路・終端壁を接続し、対向車の登場元を隠す。Approach End=0.17、Arrival Ratio=0.1へ調整し、右へ大きく向く前に正面左から対向車が迫る見せ方へ変更。Inspectorの再生成ボタンもこの形を生成する。
+- 起動済みUnityはユーザーのPlay一時停止状態だったため編集モードへ戻して反映。別出力C#コンパイル、Unityコンパイル、Shaderエラーなし。3,904本の囲いray、最初の対向車の遮蔽／回避前の視認、正面45度以内・10m以内の接近、左の非合流、静的最短距離4.357mを検証。既存Course Verifyも成功（73ノット／409.209m、落下211.651〜248.664m、線路前126,582／後96,000頂点、3,001点frameと図の高低差を維持）。
+- 最終Play Modeで全経路完走、実行時Errorなし。対向車接近／右通過（最短4.357m）、強化した揺れ（最大観測回転補正3.413度）、着地衝撃一回、頂点停止、着地停止と速度0.600からの発進、Pause/Resume、落下方位維持（最大更新間角度差0.1813度）、出口停止、Restart確認。降下・落下・隠れた左通路・出現時の画像を保存して、黒帯と画像余白の改善、広がった落下室、切り返し前の正面左に見える対向車を目視確認。編集モードへ復帰。
+- 記録: Temp/RollerCoasterCourseValidation/presentation-rework-build.txt、同presentation-rework-route-verify.txt、Temp/RollerCoasterTrialValidation/presentation-rework-play.txt、presentation-descent.png／presentation-fall.png／presentation-hidden-left.png／presentation-left-reveal.png。SETUP／設計メモへ設定方法を追記。対向車は引き続き仮モデル、本番接続や最終演出の仕上げは未実施。
+- 今回開始時にBook/Network/Rune関連コードと.vsの別作業変更が存在したため保持し、一切変更していない。他担当コード・原本素材・共有設定も未変更。BookScene SHA256は509ADABD49B02D51E1A0B90F179F5BEF1689A2CD3693E72AAA82F8CB00A22710で不変。Git開始時status/fetch/追跡先比較、終了時status/diff --check/追跡先比較成功、現在ブランチ0/0。禁止Git操作なし。
+## 方向選択開始・終了のPC通知（2026-11-17）
+
+- ユーザー確定に基づき、ルーン成功時にCastSelectionChanged(true)、方向選択の失敗／ページ終了／入力禁止時にfalseを通知。BookGameBootstrapから新規CAST_SELECTION（11、状態1byte）を既存ReliableSequenced経路で送信。送信開始失敗時はBootstrap.Updateで最新状態を再試行する。
+- PCはBookNetworkServer.CastSelectionChanged(PLAYER_SLOT, bool)で受信し、IsPlayerSelectingCast(slot)で現在値を参照できる。Scene内の参照アダプターも既存Owner方式へ転送。発射時は既存CAST_MAGIC受信からfalseへ解除するため追加の終了パケットなし。切断時も該当プレイヤーを解除。重複した同状態はイベントを再発行しない。
+- PC側の演出への接続は行っていない。利用側はCastSelectionChangedを購読し、必要なら購読直後にIsPlayerSelectingCastで現在値を取得する。クライアントとPCの両方の更新が必要。
+- Unity 6000.3.23f1のRoslyn・既存参照設定で現行Runtime全体の別出力コンパイル成功（既存警告3件）。diff --check成功。Play Mode・端末間通信は今回未確認。既存RollerCoaster変更、他担当コード、Scene・共有設定を保持。
+
+## 方向選択状態のPC通知に向けた現状調査（2026-11-17）
+
+- 現行RuneTraceControllerはなぞり成功でWAITING_CAST_RELEASEへ進み、集合演出・元の指の解放後に方向操作が可能になる。方向選択の開始を通知する通信はない。TraceFailedはなぞり失敗と方向選択失敗を共用しているため、段階を区別する必要がある。
+- 発射はCastConfirmed→RuneTraceInteraction→CastMagicCommand→SendCastSkill→CAST_MAGIC→BookNetworkServer.CastMagicReceived。PLAYER_SLOT・魔法ID・方向を受け取り、ReliableSequencedを使用済み。発射成功による方向選択終了はこの既存受信を利用できる。
+- 開始の通知タイミング、PC側での用途、ページ変更・入力禁止・切断時の解除方針を確認してから実装する。今回は調査と記録のみ。現在MS-153/Feature/RollerCoasterはfetch後追跡先0/0。既存RollerCoaster関連の未コミット変更を保持。Play Mode・実通信確認なし。
+
+## 滑らかな囲い・落下空間・対向車の右回避演出を実装（2026-11-17）
+- ユーザーの「それで実装して」を受け、担当側で実装してRollerCoasterシーン保存。RollerCoasterSmoothEnclosureBuilderで0.25m間隔の連続断面から壁／天井／床を生成し、23,072頂点へ自動細分化。原本FBX・Texture・Materialの手動編集は不要。固定Seedと既存5枠Paletteの緑／青／桃色模様を維持。通常部分の隙間をなくした。
+- 落下部分は、幅を持つ一定断面を急角度へ無理に曲げると内側が潰れるため、入口／出口で同一断面へ接続する閉じた縦長空間にした。落下中も囲いがあり、線路なしの落下は維持。コースの入口と出口は開口。囲いは通常4.8m角で、遭遇区間だけ広くする。Smooth切替・Mesh Stepと再生成ボタンをInspectorへ追加。Colliderは本番へ追加しない。
+- RollerCoasterEncounterとEditorセットアップを追加。演出位置は着地後の最初の平坦区間。左へ続く見かけの線路と対向トロッコを配置し、自車は右へ3m膨らんで帰路へ戻る固定経路。実分岐切替・プレイヤー入力は使わない。41〜44番ノットを更新対象とし、区間外の手編集を保持。対向車は自車の進行に同期して接近し、Pause/Restartに対応。仮の車体／車輪／発光ヘッドライト／乗員を作成し、参照先差し替えに対応。
+- 対向車接近のBegin/Peak/End、Approach End、Right OffsetをInspectorで調整できる。Right Offset変更後の「回避経路と囲いを更新」を追加。Original Left Routeは基準として保持し、囲い生成時は現走行経路の演出区間だけを基準形状に戻した一時Guideを使う。全コース再生成後には演出経路を再適用する必要がある。
+- 別出力コンパイル・Unity内コンパイル成功。3,904本の壁／天井／床rayで落下を含む囲いの抜けと視点直近の壁干渉を検証。2,001点の接近シミュレーションで最短距離3.036mを確認。既存コースVerifyも成功し、73ノット／404.429m、落下211.651〜248.664m、線路前126,582／後93,108頂点。経路3,001点frame、図の高低差と境界、前半の線路なし落下を保持。
+- 最終実Play Modeで全経路完走。対向車の接近／右回避／通過、実最短距離3.036m、頂点減速停止、着地停止と速度0.600からの再加速、Pause/Resume、Hamada揺れと着地衝撃一回、落下方位維持（最大更新間角度差0.5189度）、出口停止、Restart、実行時Errorなしを確認。接近・回避の乗車画像を記録して目視し、対向車が正面から接近して左をすれ違い、自車が右へ進む見え方を確認。編集モードへ復帰。
+- 記録はTemp/RollerCoasterCourseValidation/smooth-encounter-build.txt、Temp/RollerCoasterTrialValidation/smooth-encounter-play.txt、同encounter-0/1/2.png。Setupと設計メモ更新済み。最終キャラクターモデル／音／演出位置と見せ方の仕上げ・本番ステージ接続は未実施。動画の再生確認はできておらず、ユーザーの画像と説明に基づく実装。
+- 他担当コード・原本モデル・共有設定は未変更。BookScene SHA256は509ADABD49B02D51E1A0B90F179F5BEF1689A2CD3693E72AAA82F8CB00A22710で不変。既存未コミット変更を保持。開始時status/fetch/追跡先比較、終了時status/diff --check/追跡先比較成功、現在ブランチ0/0。禁止Git操作なし。
+## 囲いの連続Mesh化と対向トロッコ演出の相談（2026-11-17）
+- ユーザーから、外が見えない大きめの囲い／落下区間にも囲い／配色を維持できるなら滑らかなSpline Mesh化を希望。今回は現行コードと既存切替機能を調査した設計相談で、Scene・生成物・実装は変更していない。
+- 現行囲いは変形しない筒を重ねる方式で、継ぎ目が残る。担当側RailMeshBuilder.Subdivideは長手方向の自動分割に対応しており、囲いにも応用可能。原本モデルの手動高密度化は必須ではない。連続断面での接続、内側表示、落下でのframeの反転・潰れ、色境界の一致は実装後に検証が必要。
+- 対向トロッコが同じ線路を接近し、衝突直前に自車の経路を別ルートへ切り替えて回避する演出として理解。既存Arai/GimmickSplineSwitchPointがCartController.SetSplineを呼ぶ仕組みを確認。現在TrialRideはCourseの経路へ毎フレーム姿勢を戻すため、切替機能を置くだけでは接続できず、試走側の経路管理も調整が必要。囲いの分岐は通常の筒を重ねるだけだと壁が進路を塞ぐので専用接続空間が必要。
+- 指定YouTubeは短縮URL／通常URLとも取得失敗。該当映像の細部は未確認。回避の位置・左右／上下・自動か入力かは未確定。説明に基づく実装案として回答。
+- 開始時status/fetch/追跡先比較成功、現在ブランチ0/0。既存未コミット変更を保持。禁止Git操作なし。
+## 囲いの固定配色配置と頂点減速・着地後加速（2026-11-17）
+- ユーザー依頼を実装。RollerCoasterEnclosuresとEditor配置補助を追加し、RollerCoaster Course/Track Enclosuresへ168個配置してScene保存。既存duct_lane.fbxのduct_straightを担当側へ抽出し、全個体で同じMeshを共有。頂点は曲げず、幅／高さ4.8m、中心高さ1.8m、間隔2.2m、重なり1.4mで配置。落下区間は空け、入口／出口端は境界接線に合わせる。
+- 元Atlasの緑・青・桃色の模様を専用MaterialのTexture Scale/Offsetで使い分ける5枠Palette。固定Seed=173、1〜3個のまとまりとシャッフル袋で偏りを抑える。毎回の再生で配色は変化しない。元FBX／Texture／Material／Importerは未変更。Generate対象の専用rootだけを置換し、Undo対応。Splineや設定変更後はInspectorの「囲いを再配置」を押す。
+- SpeedProfileへCrest Approach Speed=0.65とCrest Launch Seconds=1.3を追加。入口速度6から頂点へ向けてSmoothStep減速し、頂点で既存0.7秒停止後、0から1.3秒で入口速度へ発進して下りの加速につなぐ。着地は停止1.2秒を維持し、発進速度2.5→0.6、加速時間3→4.5秒へ変更。Pause中は停止／加速時計を止める。コース形状・下り等の速度は維持。
+- 別出力コンパイル成功。Unityで固定配色の再現性、全Palette使用、共有Mesh、経路3,001点のレール左右端／視点の囲い内収容を確認。継ぎ目と配色を走行画面で確認し、最終構成で全経路Play Mode試走に成功。頂点直前1未満への単調減速、頂点停止、着地停止、速度0.600から段階加速、Pause/Resume、落下の視線維持（最大更新間角度差0.4298度）、着地衝撃一回、出口停止、Restartを確認。実行時Errorなし。ログはTemp/RollerCoasterCourseValidation/enclosures-easing-build.txtとTemp/RollerCoasterTrialValidation/enclosures-easing-play.txt。
+- 元Sceneの既存ブロック変更はCourseの子追加用TransformとSpeedProfile設定だけ。Main Camera／Cube／既存Cartインスタンスのブロックを保持。BookScene SHA256は509ADABD49B02D51E1A0B90F179F5BEF1689A2CD3693E72AAA82F8CB00A22710で不変。他担当コード・共有設定は未変更。既存未コミット変更を保持。開始時status/fetch/追跡先比較成功（0/0）。Git禁止操作なし。
+- 囲いは直線モデルを重ねる方式で、曲がり角の段差は残る。密閉した壁の継ぎ目、最終照明、Collider、本番統合は未実施。設定・使い方をROLLER_COASTER_SETUP.mdと設計メモに追記。
+## 既存Hamada機能による走行・着地カメラ揺れ（2026-11-17）
+- RollerCoasterCameraMotionを担当側へ追加。Hamada/CameraShakeのSetRateOnTrolleyShakeとVHShake、CinemachineRotationExtension、既存6D Wobble Noiseを直接利用。他担当の原本コード・Prefabは変更していない。
+- 速度に応じた小さな走行振動、上り／下りと傾斜変化による補正、停止時の滑らかな減衰、空中のレール振動抑制を接続。着地境界で一回だけ0.5秒、縦2.5度／横・ロール0.45度の減衰揺れ。Trial RideのCamera Motionから調整可能。
+- 試走CameraにCinemachineBrain、車体配下に独立VirtualCameraを追加。車体姿勢補正の後にManualUpdateし、試走中の他Camera/Brainは一時無効化・終了時復元。Sceneを保存済み。コース形状・速度設定は維持。
+- 別出力コンパイル成功。Unityで純粋な速度／坂／空中／停止の揺れ計算と参照接続を検証。実Play Modeで全経路を完走し、Cinemachineへ揺れ出力（rate最大1.000、回転補正最大2.229度）、着地衝撃一回、停止後速度2.500で発進、Pause/Resume、速度2.500〜28.000、落下方位維持（最大更新間角度差0.3753度）、出口停止、Restart、実行時Errorなしを確認。編集モードへ復帰。ログはTempのcamera-motion-build.txt / camera-motion-play.txt。
+- 本番へ経路・速度・停止設定は再利用できるが、TrialRide全体は試走用。既存入口出口への接続、Stop/Battle/Rangeと速度所有権の調整、既存CameraManagerへの接続が必要。未統合・本番未検証。手順と制約をROLLER_COASTER_SETUP.mdへ追記。
+- BookSceneのSHA256は509ADABD49B02D51E1A0B90F179F5BEF1689A2CD3693E72AAA82F8CB00A22710で不変。既存未コミット変更を保持。Git追跡先とのコミット差0/0、禁止Git操作なし。
+
+## 着地停止と発進・急降下延長・らせん縮小・高低差調整（2026-11-17）
+- ユーザーの4点の依頼を実装。着地後1.2秒停止、速度2.5から3秒で平坦速度10へ発進。急降下は水平長36→48m／落差24→36m／目標速度20→28。らせんは2周のまま半径18→12mから11.5→8.5mへ縮小し、新外側を旧内側12m以下とした。帰路の図形は維持し、First Hill Height 3.5→7.5m／Second 2.5→5.5m／Exit Drop 4→7.5m。
+- Speed ProfileへLanding Stop Seconds／Landing Start Speed／Landing Acceleration Secondsと着地停止・発進の状態を追加。既存CartController.SetSplineで着地位置へ固定し、SetSpeedで停止・低速発進。落下速度24を平坦へ引き継がず、3秒の補間終了後に平坦速度へ滑らかにつなぐ。Pause中は停止・発進時計を止め、再開時に現在の発進速度を保持。Restartでリセット、着地より先からの開始では着地停止をスキップ。
+- 起動済みUnityで現在の他設定を維持しつつ指定項目を反映してコース／線路を再生成・保存。図の俯瞰6境界と5区間の高低差方向、全経路3,001点frame、落下カメラ2,001点を再検証。急降下実距離43.563→60.434m、らせん190.665→128.785mで延長／短縮を確認。全体73ノット／403.456m、線路なし落下区間211.651〜248.665m、前126,582／後92,520頂点。
+- 別出力コンパイル成功。実Play Modeの全経路試走で、頂点停止、着地停止、着地停止中のPause／Resumeと位置保持、速度2.500での低速発進、区間速度2.500〜28.000、落下カメラ方位維持（最大観測更新間角度差0.4073度）、出口到達・停止、Restartを確認してTrial Ride COMPLETE。実行時Error／例外なし。検証後は編集モードへ戻した。記録はTemp/RollerCoasterCourseValidation/ride-tuning-build.txtとTemp/RollerCoasterTrialValidation/landing-tuning-play.txt。
+- 元のMain Camera／CartのPrefabインスタンス／Cubeの保存ブロックは変更なし。BookSceneのSHA256は509ADABD49B02D51E1A0B90F179F5BEF1689A2CD3693E72AAA82F8CB00A22710で不変。元モデル・他担当コード・共有設定は未変更。既存未コミット変更を保持。開始時status／fetch／追跡先比較、終了時status／diff --check／追跡先比較成功、コミット差0／0。禁止Git操作なし。
+
+## 拡大図に沿った帰路・高低差と区間速度（2026-11-17）
+- ユーザー指摘により、前回の「平坦な折り返しの後に山2つ」という解釈を修正。最新拡大図は右下の黒（平坦）→大きな赤（上りカーブ）→青（大カーブの下り）→左側の小さな赤（上り）→最後の青（下り）。この順で中心線と高さを同時に生成する5区間へ変更した。
+- 図の6つの境界座標とBezier制御点を基準に作成し、Return Width 85m／Return Depth 58mで大きさを調整。First Hill Height 3.5m／Second Hill Height 2.5m、最後のExit Drop 4m。旧Flat Length／Hill Half Length／Return Radius／Angle／Sway／Exit Lengthは保存値を保持するが現行生成に使わずInspectorから非表示。ReturnSectionKnotsに5区間の6境界を保存し、Scene選択時に黒／赤／青／赤／青の線と名称を表示。
+- 入口〜落下終端の0〜40番ノットは完全保持。落下設定4m前進／36m下降、空中区間256.525〜293.529mは維持。現在73ノット／443.815m、線路の前153,324／後89,904頂点。RollerCoasterシーンと試走構成を保存。
+- 新規RollerCoasterSpeedProfileを担当側へ追加し、既存CartController.SetSpeedで区間速度を制御。目標値は入口6／直線下降20／らせん16／落下24／黒10／赤7／青16／赤8／青18。各値間をSmoothStep補間し、最初の頂点で0.7秒停止して発進する。停止時間0で無効。Pause中は停止時計も停止し、Restartで初期化、頂点より先から開始すれば停止をスキップ。区間速度を無効にすると従来Speed=12による一定速度へ戻る。元のRange／Stop衝突イベントへの接続や物理加速ではなく、他担当コード／Prefab原本は未変更。
+- 別出力コンパイル成功。起動済みUnity内で俯瞰の6境界座標一致、5区間各200点の上り／下り／平坦の向き、接線の接続、前半ノット保持、全経路3,001点frame、落下部分にMeshなしを確認してCourse COMPLETE。帰路を拡大したSceneビューで図との対応を目視確認。
+- 区間速度有効の実Play Modeで全経路を試走し、頂点停止、Pause／Resume、加減速、落下カメラ、出口停止、Restartを確認してTrial Ride COMPLETE。実行時Error／例外なし。実テレメトリで正の速度6〜23.994を確認。検証コードの正速度最小値がdomain reload後に0初期化される問題はInfinity初期値へ修正し、最終コンパイル成功。これは測定コードのみの修正であり、加減速は実ログと区間目標の両方で確認。ログはTemp/RollerCoasterCourseValidation/diagram-build.txtとTemp/RollerCoasterTrialValidation/diagram-speed-play.txt。
+- 既存Main Camera／CartのPrefabインスタンス／Cubeの保存ブロックは開始時から不変。BookSceneのSHA256は509ADABD49B02D51E1A0B90F179F5BEF1689A2CD3693E72AAA82F8CB00A22710。元モデル・他担当コード・共有設定は未変更。既存の未コミット線路試作・資料を保持。開始時status／fetch／追跡先比較、終了時status／diff --check／追跡先比較は成功、コミット差0／0。編集モード・通常レイアウトへ戻しTrial Rideの速度設定を表示して引き継いだ。禁止Git操作なし。
+
+## 緩やかな帰路と落下カメラの修正（2026-11-17）
+- ユーザー指定の俯瞰図に合わせ帰路の半径12→26m、左右の振れ3→1mに変更。起動済みUnityの未保存編集を維持し、入口〜落下終端の0〜40番ノット完全一致を確認。落下の前進4m／落差36mは維持。現在55ノット／454.838m、線路の前半153,324／後半96,462頂点。RollerCoasterシーンを保存。
+- 落下視線の原因は試走側の姿勢計算。鉛直に近いSpline接線の水平成分が落下途中で逆転する区間を確認（2,001点検査中694点で逆方向）。従来の水平接線へのLookRotationと、急角度の接線へ戻す補間が急回転を発生させていた。
+- RollerCoasterTrialRideへ離陸／着地姿勢と離陸方位のキャッシュを追加。落下中の水平接線を使わず、離陸姿勢→前傾15度→着地姿勢をSmoothStepで補間。区間外では引き続き接線とupに合わせる。経路の空間形状や他担当コードは変更していない。
+- 追加／変更コードの別出力コンパイル成功。起動済みUnity内で帰路生成、前半ノット保持、3,001点の経路frame、落下前後2,001点の視線の方位維持と連続性を検証。Quaternion.Angleの微小角丸めを避けるため、検査の微小角測定を相対Quaternionのatan2へ変更し、Unity内でも再検査に成功（最大隣接角0.0473度）。最終の俯瞰表示で緩い帰路を目視確認し、Courseを選択した編集モードで引き継いだ。
+- 修正後の全経路を実Play Modeで再試走。落下中に実Cameraの水平方位が反転しないことと観測更新間の角度差を確認し、最大0.2094度。Pause／Resume、出口到達・停止、Restart、実行時例外／Errorなしを確認してTrial Ride COMPLETE。走行画面を目視し、検証後は編集モードへ復帰。ログはTemp/RollerCoasterTrialValidation/stable-camera-play.txtとTemp/RollerCoasterCourseValidation/gentle-build.txt。
+- ユーザー質問へ、走行は既存CartController使用済み、速度は仮の一定値、カメラは追加した試走用と説明。既存のGimmickSpeedChanger／Range／Stop、HamadaのCinemachine／CameraManager／視線・揺れは本番へ利用可能だが未接続。試走車のKinematic／カメラ有効化／姿勢補正と既存構成の接続を整理する必要がある。今回既存カメラへ切り替えたとは扱わない。
+- 既存の未コミット線路試作・資料とユーザー編集を保持。元Prefab／素材／他担当コード／共有設定は未変更。BookSceneのSHA256は509ADABD49B02D51E1A0B90F179F5BEF1689A2CD3693E72AAA82F8CB00A22710で不変。既存Main CameraとCubeの保存ブロックも不変。開始時status／fetch／追跡先比較成功、終了時status／diff --check／追跡先比較も成功しコミット差0／0。禁止Git操作なし。
+
+## 落下後の帰路修正とPlay Mode試走（2026-11-17）
+- ユーザー指定で落下後を「少し曲がりつつ入口側へ戻る」配置に変更し、その後トロッコ試走を接続。起動済みUnityのRollerCoasterシーンには未保存マークがあり、落下が前進4m／落差36mへ変更済みであることを目視・実データで確認。保存済みSceneへ戻さず、現在の設定と実ノットを引き継いだ。
+- 帰路は平坦12mから半径12m／180度で左へ回り込み、左右の振れ3m設定と2つの山を通って入口側へ向く。Return Radius／Angle／SwayとHillStartKnotを追加。帰路適用時は入口〜落下終端の0〜40番ノットを完全一致で保持し、帰路のみを変更。現在55ノット／411.638m、落下区間は実距離256.525〜293.529m。線路は前153,324／後70,632頂点。将来の入口／出口接続とワープは未確定。
+- 担当側RollerCoasterTrialRideとEditorセットアップ／検証を追加。Arai/TrokkoController.prefabをSceneへインスタンス配置し既存CartControllerをSetSpline／SetSpeedで起動。インスタンスだけRigidbodyをKinematic化し、既存FPSCameraを非アクティブ、箱表示の底面を経路高さへ合わせた。元Prefab・他担当コードは未変更。新アダプターはこの試走車両の回転Lerp遅延をLateUpdateで補正し、落下中は若干の前傾（15度）へブレンドする。
+- Trial Rideの乗車カメラ・確認用Directional Light・Pause／Resume／Restart・出口停止を接続。Play中だけ同じSceneの既存カメラとAudioListenerを一時無効にして終了時に復元する。元のMain CameraとCubeの保存ブロックは今回開始時から不変。速度12、開始進捗0が仮設定。Spaceまたは画面ボタンで停止／再開、Rで開始位置へ戻る。頂点での演出停止／急発進、坂での加減速、実車輪合わせは未実施。
+- 追加コードの別出力コンパイル成功、起動済みUnity内の実行も成功。帰路の入口側への向き、前半ノット保持、両区間の同経路共有、線路なし落下、全経路3,001点の位置／接線／upを確認してCourse COMPLETE。RollerCoasterシーンを保存。
+- Play Modeで実際に入口→らせん→落下→帰路の山→出口まで走行し、Pauseによる進捗固定とResume、出口の位置誤差0.01m以内と停止、Restartで入口復帰を確認してTrial Ride COMPLETE。実行中の例外／Errorなし。乗車画面を目視し、検証後は編集モード・通常レイアウトへ戻してTrial Rideを選択。最終のテスト用状態初期化追記はコンパイルで確認。ログはTemp/RollerCoasterTrialValidation、今回の作成記録／前の実データはTemp/RollerCoasterCourseValidation。
+- 既存の生成MeshはUndo／ユーザー編集のため保持し、自動整理しない。BookSceneのSHA256は509ADABD49B02D51E1A0B90F179F5BEF1689A2CD3693E72AAA82F8CB00A22710で不変。他担当コード／原本Prefab／素材／共有設定の編集なし。開始時status／fetch／追跡先比較成功、コミット差0／0。禁止Git操作なし。
+
+## RollerCoasterシーンの仮コース作成（2026-11-16）
+- ユーザー確定：入口で若干上って下の線路を隠し、下る直前に少し停止して急発進する狙い。落下中の車体は若干前傾。入口／出口のモデル位置は未確定、ワープは保留。最新方針は「まずスプライン形、その後カメラ・ギミック・スピード調整」のため、今回は形を先行した。
+- 担当側RollerCoasterCourseとEditor生成／検証を追加。ユーザー作成済みScenes/RollerCoaster.unityへRollerCoaster Courseを追加して保存。既存Main Camera／Cube／環境設定のYAMLブロックはSceneRootsへの追加以外すべて作業前と一致。Scene GUIDも維持。
+- 仮寸法：入口14mで2m上り、直線下降36mで24m下降、時計回り2周のらせんは半径18→12m／落差28m、落下前進8m／落差12m、平坦12m、半山長14mの山2つ（高さ3.5m／2.5m）、出口10m。経路長351.336m、47ノットの開いたSpline1本。入口／出口は仮位置で後から調整する。
+- Ride Splineの先頭Splineを共有し、既存SplineController2にも参照を設定。落下前は0〜256.525m、落下後は271.784m〜終点の2つのRailSplineMeshを生成。約15.259mの空中経路には線路なし。生成Meshは153,324／47,616頂点、担当側Generated配下へ追加。停止・速度・カメラ・ワープ・車体前傾・実Cart試走は未接続。Araiの現行TrokkoControllerの表示はCubeの仮モデルで、実車輪の位置合わせは未実施。
+- Inspectorから設計値による形と線路の再生成、または手編集したSplineを維持する線路のみの再生成に対応。後者は既存ノットの移動／ハンドル編集向けで追加・削除・並べ替えは対象外。落下境界はノット番号。接線は各接続で非ゼロかつ同方向とし、らせん半径変化の始終端を滑らかにした。全体再生成は2つの線路を先に計算してから反映する。
+- 起動済みUnity 6000.3.23f1内で作成・検証。1本の経路共有、上り／直線下降、縮小する時計回り2周と連続下降、接線連続、落下区間の線路欠落、全経路3,001点の位置／接線／up、平坦と山2つ、資産参照を確認してCourse COMPLETE。別のPreviewSceneに複製して、線路のみ再生成で手編集保持、一括Undo／Redo、不正値で既存出力保持、元Mesh非変更も通過。検証専用Meshを削除し、Sceneビューで形を目視確認。追加Editorコードの別出力コンパイルも成功。ログと経路JSONはTemp/RollerCoasterCourseValidation。
+- 検証要求をコード再読込前に送ってUnknown course requestとなった一度の実行は無変更。再読込後に再実行し通過。既存Unityをそのまま利用し、別Unityプロセスは起動していない。Unity UIは通常レイアウトに戻してCourseを選択。Play Mode／乗車視点は未実施。
+- 他担当コード・原本Prefab／モデル・共有設定を編集していない。BookSceneのSHA256は509ADABD49B02D51E1A0B90F179F5BEF1689A2CD3693E72AAA82F8CB00A22710。開始時Git status／fetch／追跡先比較成功、コミット差0／0。終了時status／diff --check／追跡先比較も成功し、差分は担当側のみ。既存の線路試作・資料変更とユーザー作成RollerCoasterシーンを保持。禁止Git操作なし。
+
+## 線路スプラインメッシュの初期実装（2026-11-16）
+- ユーザー承認によりScripts/RollerCoasterへRailSplineMeshとEditor生成／サンプル作成／検証を追加。既存SplineContainerの先頭Splineを共有し、素材を長手方向に細分化・変形・反復配置。末尾切り詰め、生成区間、横／高さ調整、法線・接線・UV・頂点カラー・サブメッシュ維持に対応。実距離は生成内部だけで扱い、既存の走行／ギミック距離は変更しない。
+- 実FBXのrail_straightだけをEditorの読取専用MeshData APIで抽出。担当側Data/RollerCoaster/RailStraight.assetと生成Mesh、Prefabs/RollerCoaster/RailSplineSample.prefabを作成。素材実寸は約2.527×0.220×3.034m。両端断面は一致。サンプルのYオフセット約-0.110222mは素材上端を経路へ合わせる仮設定。
+- 再生成・保存ボタンとUndo／Redoを実装。生成前の計算が成功してから管理中の子階層だけを置換。Meshは毎回新規資産とし、過去出力はUndoとPrefab複製のため保持する。囲い、Collider、ゲーム中の再生成は追加しない。手順と制限をROLLER_COASTER_SETUP.mdへ記載。
+- 追加コードの別出力コンパイル成功。Unity 6000.3.23f1内で実素材、カーブ／坂、頂点／法線／UV／マテリアル、断面一致、実距離指定と末尾、Transform、失敗時保持、手置き物保持、Undo／Redo、元Importer不変を検証しRail Spline COMPLETE。最初のUndo検証で参照復元の問題を発見し、破棄前の完全スナップショットへ修正後に通過。別起動でPrefab／生成Meshの読込も確認。
+- 元マテリアルで全景／カーブ拡大を描画し目視確認。ログ・PNGはTemp/RailSplineValidation。描画バッチが画像出力後に終了待ちとなり、コマンドラインで今回の専用プロセスと確認して終了した。最終の資産保存処理は他のdirty資産を保存しないSaveAssetIfDirtyへ限定し、追加コードを再コンパイル済み。
+- 実CartのPlay Mode走行と車輪の高さ／姿勢合わせ、既存ステージへの配置は未実施。次は複製した確認用構成で同じSplineを走る車体を合わせる。既存Scene・Prefab・素材原本・他担当コード・共有設定は編集していない。BookSceneのSHA256は509ADABD49B02D51E1A0B90F179F5BEF1689A2CD3693E72AAA82F8CB00A22710で前記録と一致。
+- Git status／fetchは制限環境内で親HujiTVへのパス解決エラーとなったが、許可された環境で再実行して成功。MS-153/Feature/RollerCoasterは追跡先とコミット差0／0。未コミット変更は担当側資料と今回の新規RollerCoaster資産のみ。同期・Commit等の禁止Git操作なし。検証用Unityプロセスの終了も確認。
+
+## 囲いの配置方針と線路生成の着手条件（2026-11-16）
+- ユーザー指定により、囲いは曲げず、線路を囲えるよう少し大きめに配置する方針へ変更。ROLLER_COASTER_DESIGN.md冒頭へ旧案より優先する最新方針を追記。
+- 線路生成は素材の軸・寸法・端面・走行基準高さを確認してから小規模試作へ進む案を整理。囲いの配置方法や演出全体の確定は初期試作を妨げない。今回は資料更新のみで生成コードは未実装。
+- Git statusは親HujiTVへのパス解決エラーで失敗。差分・同期状況は未確認。Unity操作、Scene／Prefab／素材／他担当コードの変更なし。
+
+## ジェットコースター設計の引き継ぎ確認（2026-11-15）
+- AGENTS.md、ROLLER_COASTER_DESIGN.md、既存トロッコ設定ガイドと現行SplineController2／CartControllerを再確認。既存SplineContainerを共有し、素材を細分化・変形して線路と囲いを別レイヤー生成する設計段階。生成機能の実装は今回行っていない。
+- 使用素材はAssets/map/bunki/duct_lane.fbxのrail_straight／duct_straightまで記録済み。次はUnity上の向き・寸法・断面・内面表示を確認し、軸／基準点／区間長を確定する。Unity操作・Play Mode確認なし。
+- Git status／fetch／追跡先比較を試みたが、親リポジトリHujiTVへのパス解決エラーで失敗。ローカル資料の存在は確認できるが、未コミット差分・リモート反映・他PCへの共有状況は未確認。コード・Scene・Prefab・素材は変更していない。
+
 ## 魔法の発動方式を方向指定から分離（2026-11-11）
 
 - MagicDataにMAGIC_CAST_TYPE（PROJECTILE=0 / INSTANT=1）とCastTypeを追加。InspectorのCast Typeから選択する。MAGIC_AIM_TYPEとは独立し、既存アセットは未設定時PROJECTILEとして従来の挙動を維持する。既存魔法の分類は推測で変更していない。

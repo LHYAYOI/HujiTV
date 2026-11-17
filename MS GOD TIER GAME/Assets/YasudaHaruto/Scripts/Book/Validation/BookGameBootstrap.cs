@@ -27,6 +27,7 @@ public class BookGameBootstrap : MonoBehaviour
     private RuneTraceController m_runeTraceController;
     [SerializeField] private PageDatabase m_pageDatabase;
     private BookNetworkClient m_networkClient;
+    private bool? m_pendingCastSelection;
     private BookPageRequestQueue m_pageRequests;
     public BookGameController GameController => m_gameController;
     public BookObstacleController ObstacleController => m_obstacleController;
@@ -42,6 +43,8 @@ public class BookGameBootstrap : MonoBehaviour
 
         m_runeTraceController = new RuneTraceController(m_runeTraceView);
         m_runeTraceController.SetCooldown(m_runeCooldownSeconds);
+        m_runeTraceController.CastSelectionChanged += OnCastSelectionChanged;
+        m_runeTraceController.CastConfirmed += OnCastConfirmed;
 
         m_runeTraceView.ConfigureCooldownImage(() => m_gameController != null ? m_gameController.GetCurrentRuneImage() : null);
         m_runeTraceView.ConfigureScreenProjection(m_gameDragInput.GetRuneScreenRect, m_gameDragInput.GetGraphicScreenRect);
@@ -89,6 +92,22 @@ public class BookGameBootstrap : MonoBehaviour
     {
         m_runeTraceController?.Tick(Time.deltaTime);
         m_pageRequests?.Tick();
+        if (m_pendingCastSelection.HasValue && m_networkClient != null &&
+            m_networkClient.SendCastSelection(m_pendingCastSelection.Value))
+            m_pendingCastSelection = null;
+    }
+
+    private void OnCastSelectionChanged(bool active)
+    {
+        m_pendingCastSelection = active;
+        if (m_networkClient != null && m_networkClient.SendCastSelection(active))
+            m_pendingCastSelection = null;
+    }
+
+    private void OnCastConfirmed(MAGIC_CAST_DIRECTION direction)
+    {
+        // The existing cast message terminates the selection, including an unsent start.
+        m_pendingCastSelection = null;
     }
 
     private void OnConnectionStateChanged(BOOK_CONNECTION_STATE state)
@@ -112,6 +131,11 @@ public class BookGameBootstrap : MonoBehaviour
         if (m_gameController != null)
         {
             m_gameController.Shutdown();
+        }
+        if (m_runeTraceController != null)
+        {
+            m_runeTraceController.CastSelectionChanged -= OnCastSelectionChanged;
+            m_runeTraceController.CastConfirmed -= OnCastConfirmed;
         }
     }
 }
