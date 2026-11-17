@@ -27,7 +27,7 @@ public class TargetHitUIManager : MonoBehaviour
         }
     }
 
-    public void ShowHitUI(GameObject target) 
+    public void ShowHitUI(GameObject target, Sprite sprite) 
     {
         if (target == null) 
         {
@@ -47,7 +47,7 @@ public class TargetHitUIManager : MonoBehaviour
             }
 
             ui.gameObject.SetActive(true);
-            ui.ShowHitUI(target);
+            ui.ShowHitUI(target, sprite);
 
             break;
         }

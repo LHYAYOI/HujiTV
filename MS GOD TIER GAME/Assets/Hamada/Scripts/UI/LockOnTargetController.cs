@@ -11,6 +11,8 @@ public class LockOnTargetController : MonoBehaviour
 
     TargetableObject m_target;
 
+    MagicBulletController m_bulletController;
+
     Coroutine m_currentCoroutine;
 
     float m_rotateSpeed;
@@ -39,6 +41,11 @@ public class LockOnTargetController : MonoBehaviour
         m_target = target;
     }
 
+    public void SetMagicBulletController(MagicBulletController bullet) 
+    {
+        m_bulletController = bullet;
+    }
+
     public TargetableObject GetTarget() 
     {
         return m_target;
@@ -62,7 +69,7 @@ public class LockOnTargetController : MonoBehaviour
             return;
         }
 
-        m_targetImage.transform.Rotate(0, 0, m_rotateSpeed * Time.deltaTime);
+        m_targetImage.transform.Rotate(0, 0, m_rotateSpeed * Time.unscaledDeltaTime);
     }
 
     public void AppearTargetUI() 
@@ -178,6 +185,12 @@ public class LockOnTargetController : MonoBehaviour
             m_targetImage.color = Color.Lerp(m_defaultColor, endColor, rate);
             m_targetImage.transform.localScale = Vector2.Lerp(m_defaultScale, endScale, rate);
 
+            yield return null;
+        }
+
+        //球が当たるまで待つ
+        while (m_bulletController != null) 
+        {
             yield return null;
         }
 

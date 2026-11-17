@@ -107,7 +107,7 @@ public class MagicBulletController : MonoBehaviour
         //ヒットUI
         if (m_hitUIManager) 
         {
-            m_hitUIManager.ShowHitUI(hitData.GetHitObject);
+            m_hitUIManager.ShowHitUI(hitData.GetHitObject, m_magicData.ImpactRuneTexture);
         }
 
         m_trail.transform.parent = null;

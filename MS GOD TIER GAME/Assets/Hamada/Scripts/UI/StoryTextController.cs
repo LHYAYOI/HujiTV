@@ -8,10 +8,16 @@ public class StoryTextController : MonoBehaviour
     [SerializeField] TextEffectController m_textEffectController;
     [SerializeField] float disappearTime = 0.5f;
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            Appear();
+        }
+    }
+
     public void Appear() 
     {
-        Debug.Log("ppppppppppppppppppp");
-
         Color color = m_text.color;
         m_text.color = new Color(color.r, color.g, color.b, 1);
 
