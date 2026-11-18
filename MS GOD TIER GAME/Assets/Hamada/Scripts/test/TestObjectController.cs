@@ -17,4 +17,14 @@ public class TestObjectController : EnemyBase
     public override void Initialize()
     {
     }
+
+    // バトル開始時の処理を行う関数
+    public override void BattleStart() 
+    {
+    }
+
+    // バトル終了時の処理を行う関数
+    public override void BattleEnd() 
+    {
+    }
 }
