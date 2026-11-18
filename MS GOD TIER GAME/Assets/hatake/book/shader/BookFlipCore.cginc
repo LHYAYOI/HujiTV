@@ -30,6 +30,8 @@ float _PageAspect; // ページ高さ / ページ幅
 float _TurnSide; // +1 右ページをめくる / -1 左ページをめくる
 float _Turning; // 0 / 1
 float4 _Fold; // xy 角の元位置, zw 角の現在位置（Turn space）
+float4 _TurnThickness; // まとめてめくる束：x 小口の帯の幅, y 縞の数, z 落ち影の広がり, w カールの広がり（すべて 0 = 1枚）
+float _TurnBandDrop; // 束の小口の帯の下方向へのずれ比（置いてある小口と同じ）
 
 
 // 面の種類（現在の左, 現在の右, 移動先の左, 移動先の右）：0 ページ, 1 表紙, 2 裏表紙, 3 何も無い
@@ -69,6 +71,7 @@ struct BookFlipHit
     float flapInside; // 裏面：反射点のページ端からの距離
     float flapOutside; // 裏面以外：めくれた紙の外形からの距離（落ち影用）
     float2 sheetPos; // 裏面：めくっている紙の元の位置（本座標）
+    float flapEdge; // まとめてめくる束の小口の帯：紙の外形 0 〜 帯の外側 1（0 より大きいときだけ帯）
     float rigid; // 1 = 硬い表紙の板
     float rigidMargin; // 1 = 板のページより外の縁
     float rigidShade; // 板の明るさ（立つほど暗い）
@@ -121,7 +124,9 @@ BookFlipHit BookFlipResolve(float2 p)
     float len = length(axis);
     h.foldLength = len;
 
-#if !defined(BOOK_NO_RIGID)
+    // BOOK_STILL：めくっていない見開き専用のシェーダー（めくり・板の回転のコードを書き出さない。
+    // _Turning が 0 なら通らないコードだが、書き出してあるだけでモバイルの GPU では画素ごとの負荷になる）
+#if !defined(BOOK_NO_RIGID) && !defined(BOOK_STILL)
     // BOOK_NO_RIGID：本文のめくり専用のシェーダー（表紙の板の回転のコードを書き出さない）
     if (_Turning > 0.5 && _Rigid > 0.5)
     {
@@ -155,7 +160,7 @@ BookFlipHit BookFlipResolve(float2 p)
             float y = (q.y - _PageAspect * 0.5) / lift + _PageAspect * 0.5;
             float r = min(_CoverRadius, width * 0.5);
             r = u < width * 0.5 ? r * (1 - lying) : r; // 背の側の角丸
-            // 背の側の端：閉じた側では閉じた表紙の板と同じく背の幅の半分だけ背の向こうへ出る（角金具・角丸の位置が一致する）。
+            // 背の側の端：閉じた側では閉じた表紙の板と同じく背の幅の半分だけ背の向こうへ出る（角丸の位置が一致する）。
             // 開いた側へ寝るほど背の位置へ戻す
             float uMin = -BOOK_SPINE_HALF * (1 - lying);
             float y0 = -_CoverMargin.y, y1 = _PageAspect + _CoverMargin.y;
@@ -244,6 +249,7 @@ BookFlipHit BookFlipResolve(float2 p)
     }
 #endif
 
+#if !defined(BOOK_STILL)
     if (_Turning > 0.5 && len > 1e-4)
     {
         float2 n = axis / len;
@@ -263,7 +269,24 @@ BookFlipHit BookFlipResolve(float2 p)
                 h.sheetPos = float2(r.x * s, r.y);
                 return h;
             }
-            h.flapOutside = -inside;
+            // まとめてめくる束：めくれた紙の外形の外側（小口側と下側の L 字。置いてある小口と同じ形）に束の小口を描く
+            float bandT = _TurnThickness.x;
+            [branch] if (bandT > 1e-5)
+            {
+                float edge = max(max((r.x - 1) / bandT, -r.y / max(bandT * _TurnBandDrop, 1e-5)), 0);
+                if (edge > 0 && edge <= 1 && r.x >= 0 && r.y <= _PageAspect)
+                {
+                    float2 rc = float2(clamp(r.x, 1e-4, 1), clamp(r.y, 0, _PageAspect));
+                    BookSetFlat(h, BOOK_LAYER_BACK, 1, float2(-rc.x * s, rc.y));
+                    h.flapInside = edge * bandT;
+                    h.sheetPos = float2(r.x * s, r.y);
+                    h.flapEdge = edge;
+                    return h;
+                }
+            }
+            // 落ち影は束の外形から：帯のある小口側・下側だけ帯の幅を引く（bandT = 0 なら従来と同じ）
+            float bandOut = r.x > 1 ? bandT : (r.y < 0 ? bandT * _TurnBandDrop : 0);
+            h.flapOutside = max(-inside - bandOut, 0);
         }
         if (q.x >= 0 && BookPageInside(q, 0, 1) >= 0)
         {
@@ -274,6 +297,7 @@ BookFlipHit BookFlipResolve(float2 p)
             return h;
         }
     }
+#endif
 
     if (BookPageInside(p, -1, 1) >= 0)
         BookSetFlat(h, BOOK_LAYER_FLAT, 0, p);
@@ -331,6 +355,8 @@ float4 BookSamplePage(float dest, float right, float2 uv)
         else
             c = BOOK_TEX_LOD(_CurLeftTex, float4(BookCropUV(uv, _CurLeftRect), 0, _PageLod));
     }
+#if !defined(BOOK_STILL)
+    // めくっていない見開き（演出なし）は今の見開きしか読まない
     else
     {
         if (right > 0.5)
@@ -338,6 +364,7 @@ float4 BookSamplePage(float dest, float right, float2 uv)
         else
             c = BOOK_TEX_LOD(_DstLeftTex, float4(BookCropUV(uv, _DstLeftRect), 0, _PageLod));
     }
+#endif
     return c;
 }
 

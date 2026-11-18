@@ -48,8 +48,13 @@ namespace hatake.EditorTools
                     {
                         ShaderData.Pass pass = subshader.GetPass(p);
                         // 合成は紙の仕上げの2つのバリアント、後処理はキーワード無し
+                        // BOOK_STILL（めくっていない見開き専用）は、宣言しているパスでだけ効く
                         string[][] variants = path.Contains("Composite")
-                            ? new[] { new[] { "_PAPERFINISH_MATTE" }, new[] { "_PAPERFINISH_GLOSS" } }
+                            ? new[]
+                            {
+                                new[] { "_PAPERFINISH_MATTE" }, new[] { "_PAPERFINISH_GLOSS" },
+                                new[] { "_PAPERFINISH_MATTE", "BOOK_STILL" }, new[] { "_PAPERFINISH_GLOSS", "BOOK_STILL" }
+                            }
                             : new[] { new string[0] };
                         foreach (string[] keywords in variants)
                         {
