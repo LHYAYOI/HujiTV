@@ -26,21 +26,6 @@ public sealed class BookModelView : MonoBehaviour
     public RenderTexture OutputTexture => m_modelTexture;
     public Camera ModelCamera => m_modelCamera;
     public Renderer BookRenderer => m_bookRenderer;
-    public void SetPageDissolve(int side, float progress, Color edge)
-    {
-        if (!Initialize()) return;
-        m_bookProperties.SetFloat(side == 0 ? "_DissolveLeft" : "_DissolveRight", Mathf.Clamp01(progress));
-        m_bookProperties.SetColor("_DissolveEdgeColor", edge);
-        m_bookRenderer.SetPropertyBlock(m_bookProperties);
-    }
-
-    public void ResetPageDissolve()
-    {
-        if (m_bookProperties == null || m_bookRenderer == null) return;
-        m_bookProperties.SetFloat("_DissolveLeft", 0);
-        m_bookProperties.SetFloat("_DissolveRight", 0);
-        m_bookRenderer.SetPropertyBlock(m_bookProperties);
-    }
     public void SetMagicStyle(Color primary, Color paper, float strength)
     {
         if (!Initialize()) return;

@@ -35,13 +35,13 @@ namespace hatake
         [Tooltip("ON：最初の見開きで「前へ」、最後で「次へ」をすると閉じる。OFF（既定）：閉じるのは CloseBook だけ")]
         [SerializeField] private bool m_autoCloseAtEnds;
         [Header("めくり中のページ更新")]
-        [Tooltip("めくり・燃焼・復活の間も、元の見開き（持っているページ）を撮影し続ける。撮影Cameraと撮影用Canvasを実行時に複製する")]
+        [Tooltip("めくりの間も、元の見開き（持っているページ）を撮影し続ける。撮影Cameraと撮影用Canvasを実行時に複製する")]
         [SerializeField] private bool m_liveTurningPages = true;
         [Tooltip("モバイル（Android / iOS）でも、めくり中に元の見開きを撮影し続けるか。止まった絵のページなら不要で、" +
                  "OFF でめくり中の撮影（毎フレーム約5ms、Adreno 610）が無くなる")]
         [SerializeField] private bool m_liveTurningPagesMobile;
         [Header("撮影の負荷（モバイル向け）")]
-        [Tooltip("ページを撮り直す回数（毎秒）。0：見開きを表示・めくる・燃やすときだけ撮影し、終わったら撮影カメラを止める（最も軽い）。" +
+        [Tooltip("ページを撮り直す回数（毎秒）。0：見開きを表示・めくる・入れ替えるときだけ撮影し、終わったら撮影カメラを止める（最も軽い）。" +
                  "ページに動く素材（アニメーションするマテリアルなど）があるなら 10〜30")]
         [SerializeField, Min(0)] private float m_pageRefreshRate;
         [Tooltip("ON：撮影カメラ（めくり中の複製も）のポストエフェクト・MSAA・影を切る。ページの UI の撮影には要らない。" +
@@ -70,8 +70,7 @@ namespace hatake
             (m_coverState == BookCoverState.Open && (m_spreadIndex > 0 || (CoversEnabled && m_autoCloseAtEnds))));
         public bool AutoCloseAtEnds { get => m_autoCloseAtEnds; set => m_autoCloseAtEnds = value; }
         public int CurrentSpread => m_spreadIndex;
-        public bool IsBusy => m_captureFlag || m_removingNoise;
-        public bool IsRemovingNoise => m_removingNoise;
+        public bool IsBusy => m_captureFlag;
         public int PageCount => m_runtimePages.Count;
         public event Action<int, BookPageData> PageAdded;
         public event Action<int> PageRemoved;
@@ -91,12 +90,6 @@ namespace hatake
         private int m_pendingSpread = -1;
         private int m_pendingPage = -1;
         private bool m_pendingInstant;
-        private bool m_removingNoise;
-        private bool m_clearDissolveAfterCapture;
-        private IBookNoiseRemoval m_removalPresentation;
-        // インターフェース越しでは破棄済みのコンポーネントが null にならないので、Unity の判定で確かめる
-        private bool RemovalAlive => m_removalPresentation is UnityEngine.Object component
-            ? component != null : m_removalPresentation != null;
 
         private void Awake()
         {
@@ -177,11 +170,6 @@ namespace hatake
             if (IsBusy || index < 0 || index >= PageCount || IsCoverInside(index)) return false;
             // 見開きセットの片方だけを抜くと左右がずれるので、セットは BurnSpread で扱う
             if (GetSpreadSet(index) != null) return false;
-            if (Application.isPlaying && GetPage(index) != null && GetPage(index).Category == BookPageData.PageCategory.Noise)
-            {
-                var presentation = GetComponent<IBookNoiseRemoval>();
-                if (presentation != null && presentation.CanDissolve) return RemoveNoisePage(index);
-            }
             RemovePageImmediate(index);
             return true;
         }
@@ -201,12 +189,12 @@ namespace hatake
         }
 
         // ------------------------------------------------------------------
-        // 一枚（表と裏の2ページ）を燃やす／挿入する。Flip View の演出付き
+        // 一枚（表と裏の2ページ）を取り除く／挿入する（演出は無く、撮影し直した見開きへすぐ切り替える）
         // 見開き k の右ページ 2k+1 の裏は 2k+2、左ページ 2k の裏は 2k-1。
         // 戻り値は受付のみ。完了は PageRemoved / PageInserted と SpreadShown。
         // ------------------------------------------------------------------
 
-        /// <summary>表示中の pageIndex とその裏のページを燃やして取り除く。origin は燃え始める位置（本の座標）</summary>
+        /// <summary>表示中の pageIndex とその裏のページを取り除く。origin は使わない（以前の燃焼の演出の起点。呼び出しの互換のため残す）</summary>
         public bool BurnLeaf(int pageIndex, Vector2? origin = null)
         {
             if (!CanEditLeaf(pageIndex)) return false;
@@ -219,11 +207,11 @@ namespace hatake
             if (GetSpreadSet(pageIndex) != null || GetSpreadSet(back) != null) return false;
             if (IsCoverInside(pageIndex) || IsCoverInside(back)) return false;
             int newSpread = right ? k : k - 1;
-            // 燃えた後に見える見開き（一枚分を抜いた並び）
+            // 取り除いた後に見える見開き（一枚分を抜いた並び）
             BookPageData afterLeft = right ? GetPage(2 * k) : GetPage(2 * k - 2);
             BookPageData afterRight = right ? GetPage(2 * k + 3) : GetPage(2 * k + 1);
             var removed = back < PageCount ? new[] { Mathf.Max(pageIndex, back), Mathf.Min(pageIndex, back) } : new[] { pageIndex };
-            StartCoroutine(EditLeaf(BookPageEffect.Burn, right ? 1 : -1, origin, newSpread, afterLeft, afterRight, () =>
+            StartCoroutine(EditLeaf(newSpread, afterLeft, afterRight, () =>
             {
                 foreach (int index in removed)
                 {
@@ -236,8 +224,8 @@ namespace hatake
         }
 
         /// <summary>
-        /// 表示中の右／左ページの上に一枚を挿入し、光の粒とともに組み上げる。
-        /// front が見える面、back がその裏（null は白紙）。
+        /// 表示中の右／左ページの上に一枚を挿入する。
+        /// front が見える面、back がその裏（null は白紙）。origin は使わない（呼び出しの互換のため残す）
         /// </summary>
         public bool InsertLeaf(bool rightSide, BookPageData front, BookPageData back = null, Vector2? origin = null)
         {
@@ -252,7 +240,7 @@ namespace hatake
             int newSpread = rightSide ? k : k + 1;
             BookPageData afterLeft = rightSide ? GetPage(2 * k) : front;
             BookPageData afterRight = rightSide ? front : GetPage(2 * k + 1);
-            StartCoroutine(EditLeaf(BookPageEffect.Revive, rightSide ? 1 : -1, origin, newSpread, afterLeft, afterRight, () =>
+            StartCoroutine(EditLeaf(newSpread, afterLeft, afterRight, () =>
             {
                 // 左ページしか無い（ページ数が足りない）ときは白紙で詰めて左右をそろえる
                 while (m_runtimePages.Count < at) InsertRuntime(m_runtimePages.Count, null, null);
@@ -266,24 +254,24 @@ namespace hatake
         }
 
         // ------------------------------------------------------------------
-        // 見開き両面を燃やす／挿入する。左右2ページ単位なので、以降のページの左右は変わらない。
+        // 見開き両面を取り除く／挿入する。左右2ページ単位なので、以降のページの左右は変わらない。
         // 見開きセット（BookSpreadData）はこちらで扱う。旧方式のページにも使える
         // ------------------------------------------------------------------
 
-        /// <summary>表示中の見開き（左右2ページ）を燃やして取り除く。origin から両ページへ燃え広がる</summary>
+        /// <summary>表示中の見開き（左右2ページ）を取り除く。origin は使わない（呼び出しの互換のため残す）</summary>
         public bool BurnSpread(Vector2? origin = null)
         {
             int k = m_spreadIndex;
             int left = 2 * k;
             if (!CanEditLeaf(left) || left >= PageCount) return false;
-            if (IsCoverInside(left)) return false;   // 最初の見開き（表紙の内側）は燃やせない
+            if (IsCoverInside(left)) return false;   // 最初の見開き（表紙の内側）は取り除けない
             int count = Mathf.Min(2, PageCount - left);
-            // 燃えた後：同じ番号の見開きに次の2ページ。最後の見開きなら1つ前の見開き
+            // 取り除いた後：同じ番号の見開きに次の2ページ。最後の見開きなら1つ前の見開き
             bool last = left + 2 >= PageCount;
             int newSpread = last ? Mathf.Max(0, k - 1) : k;
             BookPageData afterLeft = last ? GetPage(2 * k - 2) : GetPage(2 * k + 2);
             BookPageData afterRight = last ? GetPage(2 * k - 1) : GetPage(2 * k + 3);
-            StartCoroutine(EditLeaf(BookPageEffect.Burn, 0, origin, newSpread, afterLeft, afterRight, () =>
+            StartCoroutine(EditLeaf(newSpread, afterLeft, afterRight, () =>
             {
                 for (int index = left + count - 1; index >= left; index--)
                 {
@@ -295,7 +283,7 @@ namespace hatake
             return true;
         }
 
-        /// <summary>見開きセットを、表示中の見開きの位置に挿入して両面同時に組み上げる（今の見開きは1つ後ろへ）</summary>
+        /// <summary>見開きセットを、表示中の見開きの位置に挿入する（今の見開きは1つ後ろへ）</summary>
         public bool InsertSpread(BookSpreadData spread, Vector2? origin = null)
         {
             if (spread == null) return false;
@@ -312,7 +300,7 @@ namespace hatake
             int at = 2 * k;
             if ((left == null && right == null) || !CanEditLeaf(at, true)) return false;
             if (IsCoverInside(at)) return false;   // 表紙の内側の前には挟めない
-            StartCoroutine(EditLeaf(BookPageEffect.Revive, 0, origin, k, left, right, () =>
+            StartCoroutine(EditLeaf(k, left, right, () =>
             {
                 while (m_runtimePages.Count < at) InsertRuntime(m_runtimePages.Count, null, null);
                 InsertRuntime(at, left, set);
@@ -331,9 +319,8 @@ namespace hatake
             return allowEmpty || pageIndex < PageCount;
         }
 
-        // side：1 右ページ、-1 左ページ、0 見開き両面
-        private IEnumerator EditLeaf(BookPageEffect effect, int side, Vector2? origin, int newSpread,
-            BookPageData afterLeft, BookPageData afterRight, Action applyPages, int pageDelta)
+        // 変わった後の見開きを撮影し、すぐ切り替える
+        private IEnumerator EditLeaf(int newSpread, BookPageData afterLeft, BookPageData afterRight, Action applyPages, int pageDelta)
         {
             m_captureFlag = true;
             BeginLiveCurrent();
@@ -349,8 +336,7 @@ namespace hatake
 
             if (m_flipView != null)
             {
-                Vector2 start = origin ?? new Vector2(side * 0.5f, m_flipView.PageAspect * 0.5f);
-                yield return m_flipView.PlayPageEffect(effect, m_currentTexture, targetTexture, side, start);
+                m_flipView.ShowSpread(targetTexture);
             }
             else if (m_modelView != null)
             {
@@ -383,50 +369,15 @@ namespace hatake
 
         // Returns acceptance, not completion. PageRemoved is the completion notification.
         // Only the visible noise page can be purified; never switch the player's page implicitly.
+        // 消える演出は無く、すぐ取り除く
         public bool RemoveNoisePage(int index)
         {
             if (!Application.isPlaying || !isActiveAndEnabled || IsBusy || m_currentTexture == null || index / 2 != m_spreadIndex) return false;
             BookPageData page = GetPage(index);
             if (page == null || page.Category != BookPageData.PageCategory.Noise) return false;
             if (GetSpreadSet(index) != null) return false;   // セットは BurnSpread で扱う
-            m_removalPresentation = GetComponent<IBookNoiseRemoval>();
-            if (!RemovalAlive || !m_removalPresentation.CanDissolve) return false;
-            m_removingNoise = true;
-            StartCoroutine(DissolveNoise(index));
-            return true;
-        }
-
-        private IEnumerator DissolveNoise(int index)
-        {
-            m_removalPresentation.BeginNoiseRemoval(index, index % 2 == 0 ? m_leftPageView : m_rightPageView);
-            float duration = m_removalPresentation.NoiseRemovalDuration;
-            for (float elapsed = 0; elapsed < duration; elapsed += Time.deltaTime)
-            {
-                if (!RemovalAlive || !m_removalPresentation.CanDissolve)
-                {
-                    if (RemovalAlive) m_removalPresentation.EndNoiseRemoval(true);
-                    if (m_modelView != null) m_modelView.ResetPageDissolve();
-                    m_removingNoise = false;
-                    ResumePendingSpread();
-                    yield break;
-                }
-                m_removalPresentation.SampleNoiseRemoval(elapsed / duration, Time.deltaTime);
-                yield return null;
-            }
-            m_removalPresentation.SampleNoiseRemoval(1, 0);
-            yield return null;
-            if (!RemovalAlive || !m_removalPresentation.CanDissolve)
-            {
-                if (RemovalAlive) m_removalPresentation.EndNoiseRemoval(true);
-                if (m_modelView != null) m_modelView.ResetPageDissolve();
-                m_removingNoise = false;
-                ResumePendingSpread();
-                yield break;
-            }
-            m_removalPresentation.EndNoiseRemoval(false);
-            m_removingNoise = false;
-            m_clearDissolveAfterCapture = true;
             RemovePageImmediate(index);
+            return true;
         }
 
         private void ResumePendingSpread()
@@ -456,7 +407,20 @@ namespace hatake
         {
             if (m_displayImage != null) m_displayImage.enabled = false;
             if (m_prewarmPagesMobile && Application.isMobilePlatform && !m_prewarmed) PrewarmPages();
+            BookPageView.StateOverlayChanged -= OnPageViewChanged;
+            BookPageView.StateOverlayChanged += OnPageViewChanged;
             ShowSpread(m_spreadIndex);
+        }
+
+        // 表示中の見開きのページの状態（暗転・獲得の演出など。BookPageState）が変わった：撮影カメラを止めているなら1度撮り直す。
+        // めくりなどの最中に変わったら、終わってから撮り直す（めくり中に演出が終わると、その後は知らせが来ない）
+        private bool m_pageStateDirtyWhileBusy;
+        private void OnPageViewChanged(BookPageView view)
+        {
+            if (view != m_leftPageView && view != m_rightPageView) return;
+            if (m_captureFlag) { m_pageStateDirtyWhileBusy = true; return; }
+            if (m_captureCamera == null || m_captureCamera.enabled) return;
+            RequestRecapture();
         }
 
         [Tooltip("モバイルで、起動時に全ページを1度ずつ撮影しておく。ページの画像のマテリアルを初めて描くときの準備" +
@@ -492,6 +456,8 @@ namespace hatake
             if (!isActiveAndEnabled) return;
             if (spreadIndex < 0 || spreadIndex >= Mathf.Max(1, (PageCount + 1) / 2)) return;
             if (IsBusy) { m_pendingSpread = spreadIndex; m_pendingPage = spreadIndex * 2; m_pendingInstant = instant; return; }
+            // 暗転したページが見開きにある・獲得の演出中：めくらない（撮影もしない）
+            if (!instant && spreadIndex != m_spreadIndex && !IsClosed && m_flipView != null && m_flipView.TurnLocked) return;
             if (m_bookData == null || m_leftPageView == null ||
                 m_rightPageView == null || m_captureCamera == null ||
                 m_displayImage == null || m_textureA == null || m_textureB == null)
@@ -520,6 +486,16 @@ namespace hatake
             if (m_flipView != null) { if (!m_flipView.Initialize()) return; }
             else if (m_modelView != null && !m_modelView.Initialize()) return;
             StartCoroutine(CaptureSpread(spreadIndex, leftPage, rightPage, instant));
+        }
+
+        /// <summary>
+        /// count 見開き分をまとめてめくる（負で戻る）。端で止まる。めくりは厚みのある1枚の束で描く
+        /// </summary>
+        public void TurnSpreads(int count)
+        {
+            if (count == 0 || IsClosed) return;
+            int target = Mathf.Clamp(m_spreadIndex + count, 0, Mathf.Max(0, SpreadCount - 1));
+            if (target != m_spreadIndex) ShowSpread(target);
         }
 
         /// <summary>次へ。表紙を閉じていれば開く。最後の見開きでは Auto Close At Ends のときだけ裏表紙を閉じる</summary>
@@ -774,7 +750,9 @@ namespace hatake
                 m_flipView.SetReadingProgress(m_spreadIndex, SpreadCount);
                 if (turnFlag)
                 {
-                    yield return m_flipView.PlayTurn(m_currentTexture, targetTexture, advanceFlag);
+                    // 2見開き以上先へ飛ぶときは、厚みのある束をまとめてめくる
+                    yield return m_flipView.PlayTurn(m_currentTexture, targetTexture, advanceFlag,
+                        Mathf.Max(1, Mathf.Abs(spreadIndex - m_spreadIndex)));
                     EndLiveCurrent();
                     if (!m_flipView.LastTurnCommitted)
                     {
@@ -784,7 +762,6 @@ namespace hatake
                         m_rightPageView.ShowPage(GetPage(m_spreadIndex * 2 + 1));
                         Canvas.ForceUpdateCanvases();
                         m_captureFlag = false;
-                        m_clearDissolveAfterCapture = false;
                         ResumePendingSpread();
                         yield break;
                     }
@@ -813,7 +790,6 @@ namespace hatake
                 {
                     m_modelView.ShowSpread(targetTexture);
                 }
-                if (m_clearDissolveAfterCapture) m_modelView.ResetPageDissolve();
                 // 撮影終了はフレーム末,
                 // 次フレームで3DCameraを描画
                 yield return null;
@@ -829,7 +805,6 @@ namespace hatake
             m_spreadIndex = spreadIndex;
             m_displayImage.enabled = true;
             m_captureFlag = false;
-            m_clearDissolveAfterCapture = false;
             SpreadShown?.Invoke(spreadIndex);
             ResumePendingSpread();
         }
@@ -847,28 +822,17 @@ namespace hatake
             if (m_flipView != null) m_flipView.MarkDirty();
         }
 
-        private bool m_liveForRemoval;
-
         // 撮影カメラを必要なときだけ動かす：
-        //   ・ノイズ消去の演出中：撮影中のページが毎フレーム変わるので撮り続け、合成も毎フレーム描き直す
         //   ・Page Refresh Rate > 0：その間隔で、表示中の見開きを1フレームだけ撮り直す（動く素材のページ）
         //   ・アプリが裏から戻ったとき：撮影テクスチャの中身が消えていることがあるので1度撮り直す
         private void Update()
         {
             if (m_captureCamera == null) return;
-            if (m_removingNoise && m_captureCamera.targetTexture == m_currentTexture && m_currentTexture != null)
+            if (m_pageStateDirtyWhileBusy && !m_captureFlag && !m_pageRefreshing)
             {
-                m_captureCamera.enabled = true;
-                m_liveForRemoval = true;
-                if (m_flipView != null) m_flipView.MarkDirty();
-                return;
-            }
-            if (m_liveForRemoval)
-            {
-                // 消去の演出が終わった：最後の撮影を描かせてから止める
-                m_liveForRemoval = false;
-                if (!m_captureFlag && m_pageRefreshRate <= 0f) m_captureCamera.enabled = false;
-                if (m_flipView != null) m_flipView.MarkDirty();
+                m_pageStateDirtyWhileBusy = false;
+                if (!m_captureCamera.enabled) RequestRecapture();
+                else if (m_flipView != null) m_flipView.MarkContentDirty();
                 return;
             }
             if (m_pageRefreshing)
@@ -876,7 +840,8 @@ namespace hatake
                 // 前のフレームで撮り直した
                 m_pageRefreshing = false;
                 if (!m_captureFlag) m_captureCamera.enabled = false;
-                if (m_flipView != null) m_flipView.MarkDirty();
+                // ページの中身だけが変わる（MarkDirty だと、中身だけの更新の準備の絵まで作り直しになる）
+                if (m_flipView != null) m_flipView.MarkContentDirty();
                 return;
             }
             if (m_pageRefreshRate <= 0f || Time.unscaledTime < m_nextPageRefresh) return;
@@ -923,11 +888,9 @@ namespace hatake
 
         private void OnDisable()
         {
+            BookPageView.StateOverlayChanged -= OnPageViewChanged;
+            m_pageStateDirtyWhileBusy = false;
             StopAllCoroutines();
-            if (RemovalAlive) m_removalPresentation.EndNoiseRemoval(true);
-            m_removingNoise = false;
-            m_clearDissolveAfterCapture = false;
-            if (m_modelView != null) m_modelView.ResetPageDissolve();
             m_pendingSpread = -1;
             m_pendingPage = -1;
             m_captureFlag = false;

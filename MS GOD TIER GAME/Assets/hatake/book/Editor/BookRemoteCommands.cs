@@ -64,6 +64,57 @@ namespace hatake.EditorTools
                 File.WriteAllText("Logs/hatake_adb.txt", output);
                 return "ok " + output.Length + " chars";
             }
+            // build <シーンのパス>：そのシーンだけでビルドして端末で起動する（Build Settings のシーン一覧は変えない）
+            if (command.StartsWith("build "))
+            {
+                return Build(new[] { command.Substring(6).Trim() });
+            }
+            // play <シーンのパス>：そのシーンを開いて再生する（未保存のシーンがあれば何もしない）。stop で止めて元のシーンへ戻す
+            if (command.StartsWith("play "))
+            {
+                if (EditorApplication.isPlaying) return "already playing";
+                for (int i = 0; i < UnityEditor.SceneManagement.EditorSceneManager.sceneCount; i++)
+                    if (UnityEditor.SceneManagement.EditorSceneManager.GetSceneAt(i).isDirty) return "dirty scene (not opened)";
+                EditorPrefs.SetString("hatake_prev_scene", UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene().path);
+                UnityEditor.SceneManagement.EditorSceneManager.OpenScene(command.Substring(5).Trim());
+                EditorApplication.EnterPlaymode();
+                return "ok";
+            }
+            if (command == "stop")
+            {
+                if (!EditorApplication.isPlaying) return "not playing";
+                EditorApplication.playModeStateChanged += ReopenPrevious;
+                EditorApplication.ExitPlaymode();
+                return "ok";
+            }
+            // screen <名前>：端末の画面を Logs/<名前>.png に保存する
+            if (command.StartsWith("screen "))
+            {
+                string adb = BookAndroidDiagnostics.FindAdb();
+                BookAndroidDiagnostics.CaptureScreen(adb, "Logs/" + command.Substring(7).Trim() + ".png");
+                return "ok";
+            }
+            // fps <ミリ秒> <adb shell の引数>：コマンド（入力の操作など）を始め、その間の画面の更新の速さを測る
+            if (command.StartsWith("fps "))
+            {
+                string[] parts = command.Substring(4).Trim().Split(new[] { ' ' }, 2);
+                int wait = int.Parse(parts[0]);
+                string adb = BookAndroidDiagnostics.FindAdb();
+                string package = PlayerSettings.GetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.Android);
+                string layer = BookAndroidDiagnostics.FindLayer(adb, package);
+                if (layer.Length == 0) return "no layer (app not running?)";
+                BookAndroidDiagnostics.RunText(adb, "shell dumpsys SurfaceFlinger --latency-clear");
+                using var input = parts.Length > 1
+                    ? System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(adb, "shell " + parts[1])
+                    {
+                        UseShellExecute = false, CreateNoWindow = true
+                    })
+                    : null;
+                System.Threading.Thread.Sleep(wait);
+                string latency = BookAndroidDiagnostics.RunText(adb, "shell dumpsys SurfaceFlinger --latency '" + layer + "'");
+                if (input != null && !input.WaitForExit(10000)) input.Kill();
+                return BookAndroidDiagnostics.Summarize(latency);
+            }
             switch (command)
             {
                 case "refresh":
@@ -94,10 +145,20 @@ namespace hatake.EditorTools
             }
         }
 
-        private static string Build()
+        private static void ReopenPrevious(PlayModeStateChange change)
+        {
+            if (change != PlayModeStateChange.EnteredEditMode) return;
+            EditorApplication.playModeStateChanged -= ReopenPrevious;
+            string previous = EditorPrefs.GetString("hatake_prev_scene", "");
+            if (previous.Length > 0) UnityEditor.SceneManagement.EditorSceneManager.OpenScene(previous);
+        }
+
+        private static string Build(string[] scenes = null)
         {
             string location = EditorUserBuildSettings.GetBuildLocation(BuildTarget.Android);
-            string[] scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray();
+            // エディタを開き直すと保存先が空になることがある：Logs の下へ（git には入らない）
+            if (string.IsNullOrEmpty(location)) location = System.IO.Path.GetFullPath("Logs/hatake_book.apk");
+            scenes ??= EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray();
             var options = new BuildPlayerOptions
             {
                 scenes = scenes,

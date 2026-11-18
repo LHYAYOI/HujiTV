@@ -56,8 +56,6 @@ Shader "Book/Page Flip Composite"
         _CoverTrimInset ("Cover trim inset", Range(0, 0.1)) = 0.018
         _CoverTrimWidth ("Cover trim width", Range(0.0005, 0.02)) = 0.003
         _BookShadow ("Shadow on background", Range(0, 1)) = 0.5
-        [HDR] _CornerColor ("Corner metal (A = show)", Color) = (1.05, 0.78, 0.4, 1)
-        _CornerSize ("Corner metal size", Range(0.02, 0.4)) = 0.17
         _BoardThickness ("Cover board thickness", Range(0, 0.06)) = 0.02
 
         [Header(Magic)]
@@ -73,16 +71,6 @@ Shader "Book/Page Flip Composite"
 
         [Header(Screen Fade)]
         _FadeColor ("Fade color", Color) = (0, 0, 0, 1)
-
-        [Header(Burn and Revive)]
-        _BurnCharColor ("Burn char color", Color) = (0.07, 0.04, 0.03, 1)
-        [HDR] _BurnEmberColor ("Burn ember color", Color) = (3.2, 1.1, 0.25, 1)
-        _BurnEdgeWidth ("Burn edge width", Range(0.005, 0.15)) = 0.045
-        [HDR] _ReviveColor ("Revive light color", Color) = (0.9, 1.1, 1.6, 1)
-        _ReviveEdgeWidth ("Revive edge width", Range(0.005, 0.15)) = 0.04
-        _FxParticles ("Particle density", Range(0, 1)) = 0.55
-        _FxAsh ("Burnt flake density", Range(0, 1)) = 0.6
-        _BurnCurl ("Burning edge curl", Range(0, 1)) = 0.8
 
         [Header(Output Blend)]
         [Enum(UnityEngine.Rendering.BlendMode)] _SrcBlend ("Src blend (Blit: One / UI: SrcAlpha)", Float) = 1
@@ -105,6 +93,8 @@ Shader "Book/Page Flip Composite"
         [HideInInspector] _Fold ("Fold", Vector) = (1, 0, 1, 0)
         [HideInInspector] _TurnGlow ("Turn glow", Float) = 0
         [HideInInspector] _Stack ("Stack", Vector) = (0.02, 0.02, 14, 0.6)
+        [HideInInspector] _TurnThickness ("Turn bundle thickness", Vector) = (0, 1, 0, 0)
+        [HideInInspector] _TurnBandDrop ("Turn bundle drop", Float) = 0.6
         [HideInInspector] _Dim ("Dim", Float) = 0
         [HideInInspector] _ScreenFade ("Screen fade", Float) = 0
         [HideInInspector] _SpotCount ("Spot count", Float) = 0
@@ -112,10 +102,6 @@ Shader "Book/Page Flip Composite"
         [HideInInspector] _RigidCover ("Rigid cover", Float) = 1
         [HideInInspector] _BoardMode ("Board mode", Float) = 0
         [HideInInspector] _BoardOpen ("Board open amount", Float) = 1
-        [HideInInspector] _FxMode ("Effect mode", Float) = 0
-        [HideInInspector] _FxSide ("Effect side", Float) = 1
-        [HideInInspector] _FxProgress ("Effect progress", Float) = 0
-        [HideInInspector] _FxOrigin ("Effect origin", Vector) = (0.5, 0.5, 1, 0)
     }
     SubShader
     {
@@ -136,7 +122,6 @@ Shader "Book/Page Flip Composite"
             // 紙の仕上げのバリアント。実行時にも切り替えられるよう両方を必ず含める（shader_feature だと
             // ビルドでマテリアルが使っていない方が削られ、BookFlipView.PaperFinish で切り替えられない）
             #pragma multi_compile_local_fragment _PAPERFINISH_MATTE _PAPERFINISH_GLOSS
-            #define BOOK_FX
 
             #include "BookFlipCompositeCommon.cginc"
 
@@ -163,6 +148,8 @@ Shader "Book/Page Flip Composite"
             #pragma vertex Vert
             #pragma fragment FragOutside
             #define BOOK_SPLIT
+            // BOOK_STILL：めくっていない・暗転していない見開き専用（めくり・板の回転・暗転のコードを書き出さない）
+            #pragma multi_compile_local_fragment _ BOOK_STILL
             #include "BookFlipCompositeCommon.cginc"
 
             float4 FragOutside(VertexOutput input) : SV_Target
@@ -189,8 +176,8 @@ Shader "Book/Page Flip Composite"
             #pragma vertex Vert
             #pragma fragment FragPage
             #define BOOK_SPLIT
+            #pragma multi_compile_local_fragment _ BOOK_STILL
             #pragma multi_compile_local_fragment _PAPERFINISH_MATTE _PAPERFINISH_GLOSS
-            #pragma multi_compile_local_fragment _ BOOK_FX
             #define BOOK_PASS_PAGE
             #define BOOK_PAPER_LUT
             #include "BookFlipCompositeCommon.cginc"
@@ -207,7 +194,7 @@ Shader "Book/Page Flip Composite"
             ENDCG
         }
 
-        // 3：表紙（印刷した表紙、回る板の小口・縁、角金具）
+        // 3：表紙（印刷した表紙、回る板の小口・縁）
         Pass
         {
             Blend One Zero
@@ -216,6 +203,7 @@ Shader "Book/Page Flip Composite"
             #pragma vertex Vert
             #pragma fragment FragCover
             #define BOOK_SPLIT
+            #pragma multi_compile_local_fragment _ BOOK_STILL
             #define BOOK_PASS_COVER
             #include "BookFlipCompositeCommon.cginc"
 
@@ -241,21 +229,25 @@ Shader "Book/Page Flip Composite"
             #pragma vertex Vert
             #pragma fragment FragFinish
             #define BOOK_SPLIT
-            #pragma multi_compile_local_fragment _ BOOK_FX
+            #pragma multi_compile_local_fragment _ BOOK_STILL
             #include "BookFlipCompositeCommon.cginc"
 
             float4 FragFinish(VertexOutput input) : SV_Target
             {
                 float2 p = BookFromUV(input.uv);
-            #if !defined(BOOK_FX)
-                // 本より十分外：暗転と画面フェードだけ（燃焼の粒は本の外にも出るので、演出中は省かない）
+            #if defined(BOOK_STILL)
+                // めくっていない・暗転していない見開き：面の色に姿勢の明暗を掛けるだけ（面を決め直さない）
+                if (BookFarOutside(p)) return BookApplyScreenFade(float4(0, 0, 0, 0));
+                return BookFinish(BOOK_TEX_LOD(_BookBaseTex, float4(input.uv, 0, 0)), (BookFlipHit) 0, p);
+            #else
+                // 本より十分外：暗転と画面フェードだけ
                 if (BookFarOutside(p)) return BookApplyScreenFade(BookApplyDim(float4(0, 0, 0, 0), p));
-            #endif
                 float4 col = BOOK_TEX_LOD(_BookBaseTex, float4(input.uv, 0, 0));
                 BookFlipHit h = BookFlipResolve(p);
                 h.kind = h.layer == BOOK_LAYER_NONE ? 0 : BookSlotKind(h.dest, h.right);
                 if ((h.layer == BOOK_LAYER_FLAT || h.layer == BOOK_LAYER_UNDER) && abs(h.kind - BOOK_SLOT_EMPTY) < 0.5) h.layer = BOOK_LAYER_NONE;
                 return BookFinish(col, h, p);
+            #endif
             }
             ENDCG
         }
@@ -347,8 +339,13 @@ Shader "Book/Page Flip Composite"
                 if ((h.layer == BOOK_LAYER_FLAT || h.layer == BOOK_LAYER_UNDER) && abs(h.kind - BOOK_SLOT_EMPTY) < 0.5) h.layer = BOOK_LAYER_NONE;
                 float4 col;
                 float turnFade = saturate(h.foldLength * 4);
-                float curlWidth = max(_CurlWidth * saturate(h.foldLength * 1.5), 1e-4);
-                if (h.layer == BOOK_LAYER_UNDER || h.layer == BOOK_LAYER_BACK)
+                float curlWidth = max(_CurlWidth * saturate(h.foldLength * 1.5), 1e-4) * (1 + _TurnThickness.w);
+                if (h.flapEdge > 0)
+                {
+                    // まとめてめくる束の小口（テクスチャは読まない）
+                    col = float4(BookTurnEdgeColor(h.flapEdge) * BookPoseShade(), 1);
+                }
+                else if (h.layer == BOOK_LAYER_UNDER || h.layer == BOOK_LAYER_BACK)
                 {
                     // 移動先のページ（裏面は、めくり終えたときの位置で読む）
                     float2 uv = h.layer == BOOK_LAYER_BACK ? BookToOutputUV(h.flatPos) : input.uv;
@@ -505,131 +502,36 @@ Shader "Book/Page Flip Composite"
             ENDCG
         }
 
-        // 11：燃焼・復活（モバイル）。演出の前の静止画（_BookTurnCacheTex）と変化後のページ（_BookTurnDestTex）を、
-        // 焼き込んだ境界（_BookFxLut）で切り替える。燃えかす・粒はパス 13・14 で四角形として描く
-        Pass
-        {
-            Blend [_SrcBlend] [_DstBlend]
-            CGPROGRAM
-            #pragma target 3.5
-            #pragma vertex Vert
-            #pragma fragment FragFx
-            #define BOOK_SPLIT
-            #include "BookFlipCompositeCommon.cginc"
-            BOOK_DECLARE_TEX(_BookTurnCacheTex)
-            BOOK_DECLARE_TEX(_BookTurnDestTex)
-            BOOK_DECLARE_TEX(_BookFxLut) // r 境界の値, gb 進む向き, a ノイズ
-
-            float4 FragFx(VertexOutput input) : SV_Target
-            {
-                float2 p = BookFromUV(input.uv);
-                if (!BookFxOnPage(p)) return BOOK_TEX_LOD(_BookTurnCacheTex, float4(input.uv, 0, 0));
-                float4 lut = BOOK_TEX_LOD(_BookFxLut, float4(BookPaperLutUV(p), 0, 0));
-                float e = BookFxThreshold() - lut.r;
-                float2 shiftUV = 0;
-                float2 tilt = 0;
-                if (_FxMode < 1.5 && _BurnCurl > 0 && e <= 0)
-                {
-                    // 燃えている縁の反り返り（BookFxCurl と同じ）
-                    float width = max(_BurnEdgeWidth * 3.5, 1e-4) * (0.7 + 0.6 * lut.a);
-                    float lift = 1 - smoothstep(0, width, -e);
-                    lift *= lift * _BurnCurl;
-                    float2 dir = lut.gb / max(length(lut.gb), 1e-5);
-                    float2 shift = -dir * lift * width * 0.6 * max(_FxOrigin.z, 1e-3);
-                    shiftUV = shift * float2(0.5 * (_BookRect.z - _BookRect.x), (_BookRect.w - _BookRect.y) / max(_PageAspect, 1e-5));
-                    tilt = -dir * lift * 1.4;
-                }
-                float4 col;
-                if (e > 0)
-                {
-                    col = BOOK_TEX_LOD(_BookTurnDestTex, float4(input.uv, 0, 0));
-                    col.rgb = col.rgb / max(col.a, 1e-3) * BookPoseShade();
-                    col.a = 1;
-                    // 静止画には暗転が入っているので、変化後のページにも掛ける
-                    col = BookApplyDim(col, p);
-                }
-                else col = BOOK_TEX_LOD(_BookTurnCacheTex, float4(input.uv + shiftUV, 0, 0));
-                float3 l = BookLightDir();
-                col.rgb *= 1 + (dot(normalize(float3(tilt, 1)), l) - l.z) * 1.6;
-                // 火の縁のゆらぎ（1次元の安いゆらぎ）
-                float flicker = 0.6 + 0.4 * (0.5 + 0.5 * sin(p.x * 40 + _Time.y * 8) * sin(p.y * 37 - _Time.y * 6.3));
-                col.rgb = BookFxShadePageN(col.rgb, e, flicker, lut.a);
-                return col;
-            }
-            ENDCG
-        }
-
-        // 12：燃焼・復活の境界の焼き込み（演出の始めに1度）
+        // 11：ページの中身だけが変わったとき（線を引いている間など）。静止した見開きは、ページの中身 c に対して
+        //   出力 = K(位置) × Print(c) + S(位置)
+        // の形になっている（紙の色・むら・ノドの陰・凹凸の明暗が K、つやが S。Print は BookPaperPrint）。
+        // BookFlipView が、中身を真っ黒・真っ白に差し替えた静止画（_BookLiveZeroTex・_BookLiveOneTex）を先に描いておくので、
+        // ここでは撮影テクスチャを1回読んで、その2枚の間を Print(c) で補うだけ（紙の質感の計算をやり直さない）。
+        // 2枚が同じ画素（本の外・表紙・見返し・小口）は中身に依らないので、今の絵のまま残す
         Pass
         {
             Blend One Zero
             CGPROGRAM
             #pragma target 3.5
             #pragma vertex Vert
-            #pragma fragment FragFxLut
+            #pragma fragment FragLiveDelta
+            #define BOOK_SPLIT
+            #pragma multi_compile_local_fragment _PAPERFINISH_MATTE _PAPERFINISH_GLOSS
             #include "BookFlipCompositeCommon.cginc"
+            BOOK_DECLARE_TEX(_BookLiveZeroTex)
+            BOOK_DECLARE_TEX(_BookLiveOneTex)
 
-            float4 FragFxLut(VertexOutput input) : SV_Target
+            float4 FragLiveDelta(VertexOutput input) : SV_Target
             {
-                float2 p = float2(input.uv.x * 2 - 1, input.uv.y * _PageAspect);
-                float2 dir = BookFxDirection(p);
-                return float4(BookFxField(p), dir, BookLookNoise(p * 9 + _FxOrigin.w));
-            }
-            ENDCG
-        }
-
-        // 13・14：燃えかす・粒（モバイル）。BookFlipView が1枚ずつ四角形で描く（画面全体で毎画素ループしない）。
-        // TEXCOORD0 本の座標での中心からのずれ, TEXCOORD1 (cos, sin) 回転・裏返り・大きさ, TEXCOORD2 濃さ・光・種類, TEXCOORD3 ノイズの種
-
-        // 13：燃えかすの紙片（乗算済みの色で重ねる。BookFxAsh と同じ形）
-        Pass
-        {
-            Blend One OneMinusSrcAlpha
-            CGPROGRAM
-            #pragma target 3.5
-            #pragma vertex FxVert
-            #pragma fragment FragAsh
-            #include "BookFlipFxQuads.cginc"
-            float4 FragAsh(FxVertexOutput input) : SV_Target
-            {
-                float2 q = input.local.xy;
-                float cs = input.shape.x, sn = input.shape.y;
-                q = float2(q.x * cs - q.y * sn, q.x * sn + q.y * cs);
-                q.x /= input.shape.z;
-                float size = input.shape.w;
-                float shape = length(q) / size + (FxNoise(q / size * 1.8 + input.seed.xy) - 0.5) * 0.9;
-                float body = 1 - smoothstep(0.82, 1, shape);
-                float edge = smoothstep(0.5, 0.95, shape) * body;
-                float a = body * input.look.x;
-                float3 color = _BurnCharColor.rgb * 1.5 + _BurnEmberColor.rgb * edge * input.look.y;
-                return float4(color * a, a);
-            }
-            ENDCG
-        }
-
-        // 14：火の粉・光の粒（足して重ねる。BookFxParticles と同じ形）
-        Pass
-        {
-            Blend One One, One One
-            BlendOp Add, Max
-            CGPROGRAM
-            #pragma target 3.5
-            #pragma vertex FxVert
-            #pragma fragment FragSpark
-            #include "BookFlipFxQuads.cginc"
-            float4 FragSpark(FxVertexOutput input) : SV_Target
-            {
-                float2 d = input.local.xy;
-                float r = input.shape.w;
-                float glow = exp(-dot(d, d) / (r * r));
-                if (input.look.z > 0.5)
-                {
-                    // 十字のきらめき（復活）
-                    float2 a = abs(d);
-                    glow += (exp(-a.x / (r * 0.3)) * exp(-a.y / (r * 3.5)) + exp(-a.y / (r * 0.3)) * exp(-a.x / (r * 3.5))) * 0.6;
-                }
-                float3 c = input.seed.xyz * glow * input.look.x;
-                return float4(c, saturate(max(c.r, max(c.g, c.b))));
+                float4 zero = BOOK_TEX_LOD(_BookLiveZeroTex, float4(input.uv, 0, 0));
+                float3 gain = BOOK_TEX_LOD(_BookLiveOneTex, float4(input.uv, 0, 0)).rgb - zero.rgb;
+                if (gain.r + gain.g + gain.b < 1e-4) discard;
+                float2 p = BookFromUV(input.uv);
+                float3 c = BookSamplePage(0, p.x >= 0 ? 1 : 0, saturate(BookPageUV(p))).rgb;
+                float3 print0 = BookPaperPrint(float3(0, 0, 0));
+                float3 print1 = BookPaperPrint(float3(1, 1, 1));
+                float3 t = (BookPaperPrint(c) - print0) / (print1 - print0);
+                return float4(zero.rgb + gain * t, zero.a);
             }
             ENDCG
         }

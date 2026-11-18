@@ -25,10 +25,6 @@ float4 _EndpaperColor; // 見返し（表紙・裏表紙の内側に貼る紙）
 float _ScreenFade;
 float4 _FadeColor;
 
-// 表紙の角金具
-float4 _CornerColor; // a = 表示
-float _CornerSize;
-
 // ノドと光
 float _GutterWidth, _GutterDark;
 float4 _LightDir;
@@ -339,7 +335,8 @@ float3 BookPaperPrint(float3 c)
 {
 #if defined(_PAPERFINISH_GLOSS)
     // グロス：光をそろえて返すので、色は少し鮮やかに、暗部は深く締まる
-    c = saturate(BookDesaturate(c, -0.06));
+    // 1 を超える明るさ（光らせたい印刷。Bloom 用）はそのまま通す。ふつうの色（0〜1）は従来どおり 0〜1 に収める
+    c = clamp(BookDesaturate(c, -0.06), 0, max(1, c));
     return lerp(c, c * c, 0.12);
 #else
     // マット：光を散らす面なので、色を少し落ち着かせ、黒をわずかに浮かせる
@@ -430,7 +427,12 @@ bool BookBoardClosed()
 }
 bool BookBoardHalf()
 {
+#if defined(BOOK_STILL)
+    // めくっていない見開きでは、板は閉じているか開いているかのどちらか
+    return false;
+#else
     return abs(_BoardMode) > 1.5;
+#endif
 }
 // 表紙をめくっている間に板が置いてある（動かない）側：1 右, -1 左
 float BookBoardStill()
@@ -447,7 +449,7 @@ float BookBoardGrow(float side)
     return side == BookBoardStill() ? _BoardOpen : 0;
 }
 
-// 動かない側の金の罫の濃さ。閉じかけ（板の外側から下の板の縁が少しだけ覗く）では出さない（角金具は残す）
+// 動かない側の金の罫の濃さ。閉じかけ（板の外側から下の板の縁が少しだけ覗く）では出さない
 float BookBoardStillDeco()
 {
     return BookBoardHalf() ? smoothstep(0.03, 0.2, _BoardOpen) : 1;
@@ -497,40 +499,20 @@ float4 BookStack(float2 p)
     return BookStackScaled(p, BookBoardGrow(side));
 }
 
+#if !defined(BOOK_STILL)
+// まとめてめくる束の小口（BookStackScaled と同じ縞。edge は紙の外形 0 〜 帯の外側 1。テクスチャ・ノイズは読まない）
+float3 BookTurnEdgeColor(float edge)
+{
+    float layers = max(_TurnThickness.y, 1);
+    float edgeLine = smoothstep(0.55, 0.95, frac(edge * layers));
+    return _StackColor.rgb * lerp(1, 0.55, edge) * (1 - _StackLineDark * edgeLine);
+}
+#endif
+
 // 回っている表紙の内側に載った小口（p は着地した位置）。板と一緒に回る
 float4 BookStackCarried(float2 p)
 {
     return BookStackScaled(p, 1);
-}
-
-// 表紙の四隅の角金具（三角の板、彫りの線、鋲）
-float3 BookCornerMetal(float3 c, float2 local, float2 halfSize, float coverSd)
-{
-    if (_CornerColor.a <= 0)
-        return c;
-    float2 q = halfSize - abs(local); // 最寄りの角から内側への距離
-    float size = max(_CornerSize, 1e-3);
-    float plate = size - (q.x + q.y) * 0.7071;
-    // 板の外周に落ちる影
-    c *= 1 - 0.45 * (1 - smoothstep(0, 0.012, -plate)) * step(plate, 0) * _CornerColor.a;
-    if (plate <= 0)
-        return c;
-
-    float2 dirToCorner = sign(local);
-    float3 normal = normalize(float3(dirToCorner * 0.35 * (1 - smoothstep(0, 0.02, plate)), 1));
-    float3 l = BookLightDir();
-    float scratch = BookLookNoise(float2((q.x - q.y) * 260, (q.x + q.y) * 18)) * 0.25;
-    float diffuse = 0.55 + 0.45 * saturate(dot(normal, l)) - scratch * 0.3;
-    float sweep = pow(saturate(1 - abs(frac((q.x - q.y) * 3 + _Time.y * 0.15) - 0.5) * 2), 8);
-    float3 metal = _CornerColor.rgb * diffuse + _CornerColor.rgb * sweep * 0.6;
-    // 彫りの線と鋲
-    float engrave = 1 - smoothstep(0, 0.002, abs(plate - 0.014));
-    metal *= 1 - engrave * 0.55;
-    float rivet = length(q - size * 0.22) - 0.009;
-    if (rivet < 0)
-        metal = _CornerColor.rgb * (1.1 + 0.6 * saturate(-rivet / 0.009) * saturate(dot(normalize(float3(-(q - size * 0.22) * 60, 1)), l)));
-    float edgeFade = smoothstep(0, 0.004, plate) * smoothstep(0, 0.004, -coverSd + 0.001);
-    return lerp(c, metal, edgeFade * _CornerColor.a);
 }
 
 // 表紙の地の色：絵のある表紙の外周の色（絵の地の色）。どちらの表紙にも絵が無ければ _CoverColor。
@@ -639,7 +621,7 @@ float3 BookBoardEdgeColor(float along, float across)
     return c;
 }
 
-// 板の縁（ページより外）の仕上げ：面取り、背の陰、金の罫、角金具。center / halfSize は板の範囲。
+// 板の縁（ページより外）の仕上げ：面取り、背の陰、金の罫。center / halfSize は板の範囲。
 // 置いてある板・めくっている板の両方でこれを使い、着地の前後で見た目が変わらないようにする
 float3 BookBoardFinish(float3 c, float2 p, float2 center, float2 halfSize, bool trim, float deco)
 {
@@ -648,10 +630,10 @@ float3 BookBoardFinish(float3 c, float2 p, float2 center, float2 halfSize, bool 
     c *= lerp(1, 0.55, bevel);
     c += BookCoverBaseColor() * 0.25 * (1 - smoothstep(-0.012, -0.004, sd)) * smoothstep(-0.03, -0.012, sd);
     c *= lerp(0.6, 1, smoothstep(0, 0.06, abs(p.x)));
-    // deco は金の罫の濃さ（閉じかけで下の板の罫を消す）。四隅の角金具は常に残す
+    // deco は金の罫の濃さ（閉じかけで下の板の罫を消す）
     if (trim)
         c = lerp(c, BookCoverTrim(c, p, sd), deco);
-    return BookCornerMetal(c, p - center, halfSize, sd);
+    return c;
 }
 
 // 閉じた表紙・裏表紙の表側（絵の面）の縁。rightSide = 表紙（右に閉じている）
@@ -670,7 +652,7 @@ float3 BookClosedBoardColor(float2 p, bool rightSide)
 }
 
 // 開いた本の板の縁＝表紙の内側（左は表紙、右は裏表紙）。表紙の絵の色だけを使う（文字や模様は内側に出ない）。
-// 金の罫と角金具は見開き全体の外周に付く。めくっている表紙の内側も、着地した位置でこれを使う
+// 金の罫は見開き全体の外周に付く。めくっている表紙の内側も、着地した位置でこれを使う
 float3 BookOpenBoardColorDeco(float2 p, float deco)
 {
     float2 center = float2(0, _PageAspect * 0.5);
@@ -735,11 +717,26 @@ float4 BookCover(float2 p)
         return float4(0, 0, 0, a);
     }
 
+#if defined(BOOK_STILL)
+    // めくっていない見開き：閉じた板と開いた板のどちらか一方しか通らないので、革の面と縁の仕上げを
+    // 1回だけ書き出す（BookClosedBoardColor・BookOpenBoardColorDeco と同じ計算。板の範囲は BookBoardBox で選んである）
+    float3 picture = float3(-1, -1, -1);
+    bool rightSide = _BoardMode > 0;
+    if (closed && (rightSide ? _CoverFlags.x : _CoverFlags.y) > 0.5)
+    {
+        float2 uv = BookCoverUV(p, rightSide);
+        picture = rightSide ? BOOK_TEX_LOD(_FrontCoverTex, float4(uv, 0, _CoverLod)).rgb : BOOK_TEX_LOD(_BackCoverTex, float4(uv, 0, _CoverLod)).rgb;
+    }
+    // 開いた本の板は表紙の内側（BookBoardInside：地の色の革を 0.85 倍）
+    float3 surface = BookCoverSurface(picture, closed ? p - center : p) * (closed ? 1 : 0.85);
+    float3 c = BookBoardFinish(surface, p, center, halfSize, BookCoverTrimEnabled(), 1);
+#else
     float3 c;
     if (closed)
         c = BookClosedBoardColor(p, _BoardMode > 0);
     else
         c = BookOpenBoardColorDeco(p, BookBoardStillDeco());
+#endif
     return float4(c, 1);
 }
 
