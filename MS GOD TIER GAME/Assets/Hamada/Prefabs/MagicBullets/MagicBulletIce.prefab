@@ -49,6 +49,7 @@ MonoBehaviour:
   m_magicData: {fileID: 11400000, guid: 17ef150f604effd4e91c6dfb9950d6c0, type: 2}
   m_trail: {fileID: 1607330116481684512}
   m_hitEffect: {fileID: 888282901553999714, guid: f4eba4fb1bee99049a9f06086acbbccd, type: 3}
+  m_kiranEffect: {fileID: 5259950150523390421, guid: 3f56988eb4960d149a242284f6ff39e8, type: 3}
   m_moveSpeed: 3
   m_bezierControlPoints:
   - m_curveHeight: {x: 1, y: 2}

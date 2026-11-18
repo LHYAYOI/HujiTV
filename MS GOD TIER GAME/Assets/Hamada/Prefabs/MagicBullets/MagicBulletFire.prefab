@@ -140,6 +140,7 @@ MonoBehaviour:
   m_magicData: {fileID: 11400000, guid: fd84468c9ad10ad489611b6288bb8c24, type: 2}
   m_trail: {fileID: 7039418750288848135}
   m_hitEffect: {fileID: 888282901553999714, guid: f02c97a1218647c48b89a736e3d97bad, type: 3}
+  m_kiranEffect: {fileID: 5259950150523390421, guid: 93fcaf2779549894eba7cf7b4ee3294c, type: 3}
   m_moveSpeed: 3
   m_bezierControlPoints:
   - m_curveHeight: {x: 1, y: 2}
