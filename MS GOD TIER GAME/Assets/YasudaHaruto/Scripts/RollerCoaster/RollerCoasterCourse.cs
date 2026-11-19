@@ -22,12 +22,25 @@ namespace YasudaHaruto.RollerCoaster
         [SerializeField, Min(4f)] private float m_fallApproachLength = 8f;
         [SerializeField, Min(2f)] private float m_fallForwardLength = 8f;
         [SerializeField, Min(2f)] private float m_fallDrop = 12f;
+        [SerializeField,Min(0f),Tooltip("壁の開口から先へ伸ばす発進レールの長さ（m）")] private float m_launchRailExtension=2.5f;
+        [SerializeField,HideInInspector] private bool m_hasExtendedLaunch;
+        public bool HasExtendedLaunch=>m_hasExtendedLaunch;
+        public float LaunchRailExtension=>m_launchRailExtension;
+        public float FallLaunchParameter
+        {
+            get
+            {
+                if(m_beforeFall==null||m_beforeFall.EndDistance<=0)return SplineUtility.ConvertIndexUnit(m_spline.Spline,m_fallStartKnot,PathIndexUnit.Knot,PathIndexUnit.Normalized);
+                using(var world=new NativeSpline(m_spline.Spline,m_spline.transform.localToWorldMatrix,Unity.Collections.Allocator.Temp))
+                    return SplineUtility.GetNormalizedInterpolation(world,m_beforeFall.EndDistance,PathIndexUnit.Distance);
+            }
+        }
         // 旧コースの保存値は保持するが、画像準拠の帰路生成には使わない。
         [SerializeField, HideInInspector] private float m_flatLength = 12f;
         [SerializeField, HideInInspector] private float m_hillHalfLength = 14f;
         [Header("着地後の上り・下り（m）")]
-        [SerializeField, Min(0.2f)] private float m_firstHillHeight = 7.5f;
-        [SerializeField, Min(0.2f)] private float m_secondHillHeight = 5.5f;
+        [SerializeField, Min(0.2f)] private float m_firstHillHeight = 12f;
+        [SerializeField, Min(0.2f)] private float m_secondHillHeight = 8.8f;
         [SerializeField, Min(0.2f), Tooltip("最後の青区間が、着地点よりさらに下がる高さ。")]
         private float m_exitDrop = 7.5f;
         [SerializeField, HideInInspector] private float m_exitLength = 10f;
@@ -37,6 +50,13 @@ namespace YasudaHaruto.RollerCoaster
         [Header("画像に沿った帰路の大きさ（上から見た幅・奥行き、m）")]
         [SerializeField, Min(50f)] private float m_returnWidth = 85f;
         [SerializeField, Min(40f)] private float m_returnDepth = 58f;
+        [SerializeField, Range(0f,6f)] private float m_returnWeave=3.5f;
+        public float ReturnWeave=>m_returnWeave;
+        [Header("進行方向を軸にしたバンク（度）")]
+        [SerializeField, Range(0f,50f)] private float m_spiralBank = 40f;
+        [SerializeField, Range(0f,25f)] private float m_returnBank = 22f;
+        public float SpiralBank => m_spiralBank;
+        public float ReturnBank => m_returnBank;
         [Header("生成済みの経路と線路")]
         [SerializeField] private SplineContainer m_spline;
         [SerializeField] private RailSplineMesh m_beforeFall;
@@ -84,6 +104,7 @@ namespace YasudaHaruto.RollerCoaster
         public int[] ReturnSectionKnots => m_returnSectionKnots;
 
 #if UNITY_EDITOR
+        public void SetLaunchLayoutFlag(bool value){m_hasExtendedLaunch=value;}
         public void SetGeneratedReferences(SplineContainer spline, RailSplineMesh before, RailSplineMesh after,
             int crest, int spiralStart, int spiralEnd, int fallStart, int fallEnd, int hillStart = 0, int[] returnSections = null)
         {

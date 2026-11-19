@@ -106,5 +106,10 @@ MonoBehaviour:
     width: 0.5134606
     height: 0.96045417
   m_color: {r: 1, g: 1, b: 1, a: 1}
+  m_clearOpacityThresholds:
+  - 0.15
+  - 0.15
+  - 0.15
+  - 0.15
   m_requiredDistance: 4
   m_minimumMovement: 0.003

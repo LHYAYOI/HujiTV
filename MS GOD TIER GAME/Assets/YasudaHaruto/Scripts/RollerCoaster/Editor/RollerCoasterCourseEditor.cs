@@ -22,6 +22,7 @@ namespace YasudaHaruto.RollerCoaster.Editor
         internal sealed class Layout
         {
             public Spline Spline;
+            public bool HasLaunchExtension;
             public int Crest, SpiralStart, SpiralEnd, FallStart, FallEnd, HillStart;
             public int[] ReturnSections;
         }
@@ -68,20 +69,25 @@ namespace YasudaHaruto.RollerCoaster.Editor
             Vector3 fallStart = spiralEnd + new Vector3(0f, -finalGrade * course.FallApproachLength, course.FallApproachLength);
             points.Add(new Point(fallStart, new Vector3(0f, -finalGrade, 1f)));
             layout.FallStart = points.Count - 1;
-            points.Add(new Point(fallStart + new Vector3(0f, -course.FallDrop * 0.18f, course.FallForwardLength * 0.46f), new Vector3(0f, -1.2f, 1f)));
-            points.Add(new Point(fallStart + new Vector3(0f, -course.FallDrop * 0.76f, course.FallForwardLength * 0.78f), new Vector3(0f, -1.8f, 1f)));
+            Vector3 launchDirection=new Vector3(0f,-finalGrade,1f).normalized;
+            fallStart+=launchDirection*course.LaunchRailExtension;
+            points.Add(new Point(fallStart,launchDirection));layout.HasLaunchExtension=true;
+            points.Add(new Point(fallStart + new Vector3(0f, -course.FallDrop * 0.18f, course.FallForwardLength * 0.0875f), new Vector3(0f, -1f, .03f)));
+            points.Add(new Point(fallStart + new Vector3(0f, -course.FallDrop * 0.76f, course.FallForwardLength * 0.2f), new Vector3(0f, -1f, .03f)));
             Vector3 landing = fallStart + new Vector3(0f, -course.FallDrop, course.FallForwardLength);
             points.Add(new Point(landing, forward));
             layout.FallEnd = points.Count - 1;
             // ユーザーの拡大図の中心線。右下の黒→大きな赤→青→左の小さな赤→最後の青。
             // 俯瞰形状と高低差を同じ区間で生成し、「平坦な折り返しの後に山」を作らない。
+            // 細かな波を重ねず、制御点そのものを大きな左右のS字に配置する。
+            Vector2 P(float x,float z)=>new Vector2(508f+x*(1f+course.ReturnWeave/14f)/85f*458f,294f-z/58f*311f);
             Vector2[][] curves =
             {
-                new[] { new Vector2(508,294), new Vector2(508,248), new Vector2(450,202), new Vector2(440,166) },
-                new[] { new Vector2(440,166), new Vector2(430,130), new Vector2(352,40), new Vector2(298,40) },
-                new[] { new Vector2(298,40), new Vector2(244,40), new Vector2(128,92), new Vector2(128,140) },
-                new[] { new Vector2(128,140), new Vector2(128,178), new Vector2(50,188), new Vector2(50,226) },
-                new[] { new Vector2(50,226), new Vector2(50,264), new Vector2(52,310), new Vector2(52,351) }
+                new[] {P(0,0),P(0,5),P(0,9),P(0,14)},
+                new[] {P(0,14),P(0,28),P(30,28),P(18,44)},
+                new[] {P(18,44),P(6,60),P(-32,60),P(-18,78)},
+                new[] {P(-18,78),P(-4,96),P(32,94),P(18,112)},
+                new[] {P(18,112),P(4,130),P(0,130),P(0,148)}
             };
             float[] heights = { 0f, 0f, course.FirstHillHeight, 0f, course.SecondHillHeight, -course.ExitDrop };
             int[] subdivisions = { 4, 8, 8, 6, 6 };
@@ -108,7 +114,6 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 layout.ReturnSections[section+1] = points.Count - 1;
             }
             layout.HillStart = layout.ReturnSections[1];
-
             layout.Spline = new Spline();
             for (int i = 0; i < points.Count; i++)
             {
@@ -117,10 +122,44 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 Vector3 outgoing = i == points.Count - 1 ? incoming : points[i + 1].Position - point.Position;
                 float inLength = incoming.magnitude / 3f * Mathf.Clamp01(Vector3.Dot(point.Direction, incoming.normalized));
                 float outLength = outgoing.magnitude / 3f * Mathf.Clamp01(Vector3.Dot(point.Direction, outgoing.normalized));
+                if(i==layout.FallStart+1)outLength=.12f;
                 Quaternion rotation = Quaternion.LookRotation(point.Direction, Vector3.up);
                 layout.Spline.Add(new BezierKnot(point.Position, new Vector3(0f, 0f, -inLength), new Vector3(0f, 0f, outLength), rotation), TangentMode.Broken);
             }
             return layout;
+        }
+
+        // 接線を元の空間で保存してからフレームだけをロールする。線の形状を変えない。
+        internal static void ApplyBanking(RollerCoasterCourse course, Layout layout)
+        {
+            var spline=layout.Spline;
+            for(int i=0;i<spline.Count;i++)
+            {
+                var knot=spline[i]; Quaternion old=knot.Rotation;
+                Vector3 direction=old*Vector3.forward;
+                Quaternion upright=Quaternion.LookRotation(direction,Vector3.up);
+                float bank=0f;
+                if(i>layout.SpiralStart && i<layout.SpiralEnd)
+                {
+                    float fade=Mathf.Min(Mathf.Clamp01((i-layout.SpiralStart)/3f),Mathf.Clamp01((layout.SpiralEnd-i)/3f));
+                    bank=-course.SpiralBank*Mathf.SmoothStep(0,1,fade);
+                }
+                else if(i>layout.HillStart && i<spline.Count-1)
+                {
+                    Vector3 before=(Vector3)(spline[i].Position-spline[i-1].Position);
+                    Vector3 after=(Vector3)(spline[i+1].Position-spline[i].Position);
+                    float turn=Vector3.SignedAngle(Vector3.ProjectOnPlane(before,Vector3.up),Vector3.ProjectOnPlane(after,Vector3.up),Vector3.up);
+                    float fade=Mathf.Min(Mathf.Clamp01((i-layout.HillStart)/2f),Mathf.Clamp01((spline.Count-1-i)/2f));
+                    bank=-course.ReturnBank*Mathf.Clamp(turn/12f,-1f,1f)*Mathf.SmoothStep(0,1,fade);
+                }
+                // ポイント部分は両線路を同じ平面に置き、分岐後にバンクを戻す。
+                int split=layout.ReturnSections[2]+1;
+                bank*=Mathf.SmoothStep(0f,1f,Mathf.InverseLerp(1f,3f,Mathf.Abs(i-split)));
+                Quaternion rotation=upright*Quaternion.Euler(0,0,bank);
+                knot.TangentIn=Quaternion.Inverse(rotation)*(old*(Vector3)knot.TangentIn);
+                knot.TangentOut=Quaternion.Inverse(rotation)*(old*(Vector3)knot.TangentOut);
+                knot.Rotation=rotation;spline.SetKnot(i,knot);
+            }
         }
 
         internal static float KnotParameter(Spline spline, int index) => SplineUtility.ConvertIndexUnit(spline, index, PathIndexUnit.Knot, PathIndexUnit.Normalized);
@@ -137,7 +176,7 @@ namespace YasudaHaruto.RollerCoaster.Editor
             if (course.Spline == null) throw new InvalidOperationException("Splineが未設定です。");
             ApplyLayout(course, new Layout
             {
-                Spline = course.Spline.Spline, Crest = course.CrestKnot,
+                Spline = course.Spline.Spline, HasLaunchExtension=course.HasExtendedLaunch, Crest = course.CrestKnot,
                 SpiralStart = course.SpiralStartKnot, SpiralEnd = course.SpiralEndKnot,
                 FallStart = course.FallStartKnot, FallEnd = course.FallEndKnot, HillStart = course.HillStartKnot, ReturnSections = course.ReturnSectionKnots
             });
@@ -145,6 +184,8 @@ namespace YasudaHaruto.RollerCoaster.Editor
 
         private static void ApplyLayout(RollerCoasterCourse course, Layout layout)
         {
+            ApplyBanking(course, layout);
+
             if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("編集モードでコースを生成してください。");
             if (course.Spline == null || course.BeforeFall == null || course.AfterFall == null) throw new InvalidOperationException("経路・線路参照が未設定です。配置メニューから作成してください。");
             if (layout.FallStart < 0 || layout.FallEnd <= layout.FallStart || layout.FallEnd >= layout.Spline.Count)
@@ -165,7 +206,10 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 var table = new RailDistanceTable(stagingSpline);
                 float gapStart = table.DistanceAtParameter(KnotParameter(layout.Spline, layout.FallStart));
                 float gapEnd = table.DistanceAtParameter(KnotParameter(layout.Spline, layout.FallEnd));
-                var first = CopySettings(course.BeforeFall, temporary, stagingSpline, 0f, gapStart);
+                float railEnd=layout.HasLaunchExtension
+                    ? table.DistanceAtParameter(KnotParameter(layout.Spline,layout.FallStart+1))
+                    : Mathf.Min(gapStart+course.LaunchRailExtension,gapEnd-2f);
+                var first = CopySettings(course.BeforeFall, temporary, stagingSpline, 0f, railEnd);
                 var second = CopySettings(course.AfterFall, temporary, stagingSpline, gapEnd, 0f);
                 beforeMesh = RailSplineMeshGenerator.Build(first);
                 afterMesh = RailSplineMeshGenerator.Build(second);
@@ -179,7 +223,8 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 Undo.RegisterCompleteObjectUndo(course.AfterFall, "Build roller coaster course");
                 spline.Spline = layout.Spline;
                 course.SetGeneratedReferences(spline, course.BeforeFall, course.AfterFall, layout.Crest, layout.SpiralStart, layout.SpiralEnd, layout.FallStart, layout.FallEnd, layout.HillStart, layout.ReturnSections);
-                SetRange(course.BeforeFall, 0f, gapStart);
+                course.SetLaunchLayoutFlag(layout.HasLaunchExtension);
+                SetRange(course.BeforeFall, 0f, railEnd);
                 SetRange(course.AfterFall, gapEnd, 0f);
                 RailSplineMeshGenerator.SaveBuiltMesh(course.BeforeFall, beforeMesh);
                 beforeMesh = null;

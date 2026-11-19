@@ -1,3 +1,4 @@
+using System.Linq;
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -95,6 +96,8 @@ namespace YasudaHaruto.RollerCoaster.Editor
                     {
                         var triangle = new List<RailMeshBuilder.Vertex> { pieces[sub][i], pieces[sub][i + 1], pieces[sub][i + 2] };
                         var polygon = available < length - 1e-6f ? RailMeshBuilder.Clip(triangle, source.Bounds.min.z + available, false) : triangle;
+                        if(settings.SuppressSleeperMeters>0 && tileStart<start+settings.SuppressSleeperMeters &&
+                            polygon.All(v=>v.Position.y<source.Bounds.min.y+source.Bounds.size.y*.32f))continue;
                         for (int p = 1; p + 1 < polygon.Count; p++)
                         {
                             if (Vector3.Cross(polygon[p].Position - polygon[0].Position, polygon[p + 1].Position - polygon[0].Position).sqrMagnitude < 1e-16f) continue;
@@ -119,8 +122,9 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 if (!cache.TryGetValue(distance, out var frame))
                 {
                     table.Frame(distance, out frame.Position, out frame.Rotation);
-                    float before = Mathf.Max(0f, distance - 0.002f);
-                    float after = Mathf.Min(table.Length, distance + 0.002f);
+                    // レール外の空中軌道を終端の法線へ混ぜない。
+                    float before = Mathf.Max(start, distance - 0.002f);
+                    float after = Mathf.Min(end, distance + 0.002f);
                     table.Frame(before, out frame.BeforePosition, out frame.BeforeRotation);
                     table.Frame(after, out frame.AfterPosition, out frame.AfterRotation);
                     frame.Delta = after - before;
@@ -132,7 +136,7 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 jacobian.SetColumn(0, frame.Rotation * Vector3.right);
                 jacobian.SetColumn(1, frame.Rotation * Vector3.up);
                 jacobian.SetColumn(2, along);
-                if (jacobian.determinant < 0.001f) throw new ArgumentException("カーブが線路幅に対して急すぎて内側が潰れます。カーブを緩めてください。");
+                if (jacobian.determinant < 0.001f) throw new ArgumentException($"カーブが線路幅に対して急すぎて内側が潰れます。distance={distance:F5}, range={start:F5}..{end:F5}, determinant={jacobian.determinant:F5}, position={frame.Position:F4}");
                 var localJacobian = toLocal * jacobian;
                 vertex.Position = toLocal.MultiplyPoint3x4(frame.Position + frame.Rotation * cross);
                 vertex.Normal = localJacobian.inverse.transpose.MultiplyVector(vertex.Normal).normalized;

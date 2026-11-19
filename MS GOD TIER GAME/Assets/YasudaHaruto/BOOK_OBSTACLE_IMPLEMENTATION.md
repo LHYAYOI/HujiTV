@@ -74,3 +74,10 @@ Tools > YasudaHaruto > Obstacle Debug Windowを開き、BookSceneをPlay Modeに
 - 連続する入力点の間も画面上およそ1pxごとに判定し、両端が不透明でも途中の透明な隙間の距離を加算しない。既存の小移動除外・方向不変・数値での距離調整を維持する。
 - ObstacleMaskBakerがEditorで画像を読み込み、長辺256セル・1bit/cellの透過判定をRub.assetへ保存する（alpha約10%以上を汚れとして扱う）。PNG差し替え／設定変更時に更新する。PNGやImporterの原本は編集せず、実機でRead/WriteやGPU読戻しを追加しない。輪郭の判定精度はこの縮小マスク相当。
 - BookObstacle COMPLETE／BookObstacleRuntime COMPLETE。新規8枚の判定領域、透明位置からの押下不可、透明位置への移動で進捗不変、不透明な両端間の隙間除外、再入場・清掃再開・4番枠解除、通常／Live Turnの撮影を確認。キャプチャで配置も確認。Android実機での物理タッチは未確認。
+
+## 薄くなった時点で完全消去する閾値（2026-11-19）
+
+- 1〜4番枠ごとに「完全消去する残り濃さ」を設定できる。初期値は各0.15（残り15%）。閾値までは従来どおり線形に薄くなり、到達したら不透明度を0にして実際の枠状態も解除する。4番枠の本体・飛沫は同時に消え、操作制限も解除される。
+- Tools > YasudaHaruto > Obstacle Debug Windowの「薄くなったら完全消去」に各枠のスライダーを追加。Rub.assetのInspectorからも編集可能。大きいほど早く解除、0なら従来どおり清掃進捗100%まで擦る。値は0〜0.95。
+- 画像自体のalphaとは別に、Graphic全体に掛ける残り不透明度（設定色alpha×残り進捗）を判定する。元画像、擦り距離の単位、透明領域除外、4枠の付与／個別状態は維持。
+- コンパイル、Unity内の閾値直前／到達／枠別／0指定／4番解除の検証、BookObstacleRuntime COMPLETEを確認。実マウス／Android実機での見え方の最終調整は未実施。

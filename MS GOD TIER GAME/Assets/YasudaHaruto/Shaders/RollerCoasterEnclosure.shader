@@ -15,11 +15,15 @@ Shader "YasudaHaruto/RollerCoaster Enclosure"
         Pass
         {
             Name "Enclosure"
-            Tags { "LightMode"="SRPDefaultUnlit" }
+            Tags { "LightMode"="UniversalForward" }
             HLSLPROGRAM
             #pragma vertex Vert
             #pragma fragment Frag
+            #pragma multi_compile_fog
+            #pragma multi_compile _ _CLUSTER_LIGHT_LOOP
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
             CBUFFER_START(UnityPerMaterial)
                 float4 _BaseColor;
@@ -28,13 +32,15 @@ Shader "YasudaHaruto/RollerCoaster Enclosure"
                 float _TileMeters;
             CBUFFER_END
             struct Attributes { float4 positionOS:POSITION; float3 normalOS:NORMAL; float2 uv:TEXCOORD0; };
-            struct Varyings { float4 positionCS:SV_POSITION; float3 normalWS:TEXCOORD0; float2 uv:TEXCOORD1; };
+            struct Varyings { float4 positionCS:SV_POSITION; float3 normalWS:TEXCOORD0; float2 uv:TEXCOORD1; float3 positionWS:TEXCOORD2; float fog:TEXCOORD3; };
             Varyings Vert(Attributes input)
             {
                 Varyings output;
                 output.positionCS=TransformObjectToHClip(input.positionOS.xyz);
                 output.normalWS=TransformObjectToWorldNormal(input.normalOS);
                 output.uv=input.uv;
+                output.positionWS=TransformObjectToWorld(input.positionOS.xyz);
+                output.fog=ComputeFogFactor(output.positionCS.z);
                 return output;
             }
             half4 Frag(Varyings input):SV_Target
@@ -45,7 +51,19 @@ Shader "YasudaHaruto/RollerCoaster Enclosure"
                 float2 atlasUV=_AtlasRect.xy+lerp(0.003,1-0.003,phase)*_AtlasRect.zw;
                 half3 pattern=SAMPLE_TEXTURE2D(_BaseMap,sampler_BaseMap,atlasUV).rgb*_BaseColor.rgb;
                 half shade=0.8+0.2*saturate(dot(normalize(input.normalWS),normalize(float3(0.3,0.8,-0.4))));
-                return half4(pattern*shade,1);
+                float3 normal=normalize(input.normalWS);
+                half3 illumination=SampleSH(normal);
+                Light main=GetMainLight();
+                illumination+=main.color*(.25+.75*abs(dot(normal,main.direction)))*main.distanceAttenuation;
+                uint count=GetAdditionalLightsCount();
+                InputData inputData=(InputData)0;
+                inputData.positionWS=input.positionWS;
+                inputData.normalizedScreenSpaceUV=GetNormalizedScreenSpaceUV(input.positionCS);
+                LIGHT_LOOP_BEGIN(count)
+                    Light light=GetAdditionalLight(lightIndex,input.positionWS);
+                    illumination+=light.color*light.distanceAttenuation*(.3+.7*abs(dot(normal,light.direction)));
+                LIGHT_LOOP_END
+                return half4(MixFog(pattern*shade*illumination,input.fog),1);
             }
             ENDHLSL
         }

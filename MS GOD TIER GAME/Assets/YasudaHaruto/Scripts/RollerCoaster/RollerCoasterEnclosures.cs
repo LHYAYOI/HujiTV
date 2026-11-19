@@ -16,6 +16,10 @@ namespace YasudaHaruto.RollerCoaster
         [SerializeField, Range(0f, 2f)] private float m_overlap = 1.4f;
         [SerializeField] private int m_colorSeed = 173;
         [SerializeField] private bool m_smooth = true;
+        [SerializeField] private bool m_useSourceDuct;
+        public bool UseSourceDuct => m_useSourceDuct;
+        [SerializeField, Range(0f,.8f)] private float m_cornerRadius=.45f;
+        public float CornerRadius => m_cornerRadius;
         [SerializeField, Range(0.1f, 0.5f)] private float m_meshStep = 0.25f;
         [SerializeField, Min(3f)] private float m_fallClearance = 6f;
         [SerializeField, HideInInspector] private GameObject m_generatedRoot;

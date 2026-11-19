@@ -7,6 +7,7 @@ public sealed class ObstaclePatchGraphic : MaskableGraphic
 {
     private ObstacleInstance m_instance;
     private float m_progress = -1f;
+    private float m_opacity = -1f;
     private Rect m_uv = new Rect(0, 0, 1, 1);
     private Texture2D m_texture;
     public Rect UVRect => m_uv;
@@ -17,7 +18,9 @@ public sealed class ObstaclePatchGraphic : MaskableGraphic
     {
         bool replaced = !ReferenceEquals(m_instance, instance) || m_texture != texture;
         float progress = instance != null ? instance.Progress : 0f;
-        if (!replaced && m_progress == progress && m_uv == uv) return false;
+        float opacity = instance != null ? instance.Opacity : 0f;
+        if (!replaced && m_progress == progress && m_uv == uv && m_opacity == opacity) return false;
+        m_opacity = opacity;
         m_uv = uv;
         m_progress = progress;
         if (replaced) { m_instance = instance; m_texture = texture; SetMaterialDirty(); }
@@ -30,7 +33,7 @@ public sealed class ObstaclePatchGraphic : MaskableGraphic
         if (m_instance == null) return;
         Rect rect = GetPixelAdjustedRect();
         Color tint = m_instance.Data.Color;
-        tint.a *= 1f - m_instance.Progress;
+        tint.a = m_instance.Opacity;
         vh.AddVert(new Vector3(rect.xMin, rect.yMin), tint, new Vector2(m_uv.xMin, m_uv.yMin));
         vh.AddVert(new Vector3(rect.xMin, rect.yMax), tint, new Vector2(m_uv.xMin, m_uv.yMax));
         vh.AddVert(new Vector3(rect.xMax, rect.yMax), tint, new Vector2(m_uv.xMax, m_uv.yMax));

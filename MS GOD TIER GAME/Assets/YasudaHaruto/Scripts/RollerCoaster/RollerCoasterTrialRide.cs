@@ -102,7 +102,7 @@ namespace YasudaHaruto.RollerCoaster
         public void RefreshRouteFrames()
         {
             m_length = m_course.Spline.CalculateLength();
-            m_gapStart = SplineUtility.ConvertIndexUnit(m_course.Spline.Spline, m_course.FallStartKnot, PathIndexUnit.Knot, PathIndexUnit.Normalized);
+            m_gapStart = m_course.FallLaunchParameter;
             m_gapEnd = SplineUtility.ConvertIndexUnit(m_course.Spline.Spline, m_course.FallEndKnot, PathIndexUnit.Knot, PathIndexUnit.Normalized);
             m_course.Spline.Evaluate(0, m_gapStart, out _, out var takeoff, out var takeoffUp);
             m_course.Spline.Evaluate(0, m_gapEnd, out _, out var landing, out var landingUp);
@@ -121,17 +121,21 @@ namespace YasudaHaruto.RollerCoaster
             if (parameter >= m_gapStart && parameter <= m_gapEnd && m_gapEnd > m_gapStart)
             {
                 float progress = Mathf.InverseLerp(m_gapStart, m_gapEnd, parameter);
-                Quaternion falling = m_fallHeading * Quaternion.Euler(m_fallPitch, 0f, 0f);
+                Quaternion falling = m_speedProfile != null && m_speedProfile.UseSectionSpeeds
+                    ? m_takeoffRotation * Quaternion.Euler(m_speedProfile.DropTipDegrees * m_speedProfile.DropTipWeight + 12f * m_speedProfile.DropReleaseTiltWeight, 0f, 0f)
+                    : m_fallHeading * Quaternion.Euler(m_fallPitch, 0f, 0f);
                 // 落下の接線はほぼ鉛直になり、水平成分が途中で反転する場合がある。
                 // その接線を視線へ使わず、離陸時の方位と着地時の姿勢を直接つなぐ。
-                if (progress < 0.25f)
-                    return Quaternion.Slerp(m_takeoffRotation, falling, Mathf.SmoothStep(0f, 1f, progress / 0.25f));
-                if (progress > 0.75f)
-                    return Quaternion.Slerp(falling, m_landingRotation, Mathf.SmoothStep(0f, 1f, (progress - 0.75f) / 0.25f));
+                // ブレーキ時の前傾を引き継ぎ、空中へ出た直後に浅い角度へ戻さない。
+                if (progress > 0.65f)
+                    return Quaternion.Slerp(falling, m_landingRotation, Mathf.SmoothStep(0f, 1f, (progress - 0.65f) / 0.35f));
                 return falling;
             }
             m_course.Spline.Evaluate(0, parameter, out _, out var tangent, out var up);
-            return Quaternion.LookRotation(tangent, up);
+            Quaternion rotation = Quaternion.LookRotation(tangent, up);
+            if (parameter < m_gapStart && m_speedProfile != null)
+                rotation *= Quaternion.Euler(m_speedProfile.DropTipDegrees * m_speedProfile.DropTipWeight + 12f * m_speedProfile.DropReleaseTiltWeight, 0f, 0f);
+            return rotation;
         }
 
         public void TogglePause()
@@ -147,6 +151,8 @@ namespace YasudaHaruto.RollerCoaster
             if (!m_started) return;
             m_paused = false;
             m_finished = false;
+            var lighting=GetComponent<RollerCoasterDuctLighting>();
+            if(lighting!=null)lighting.RestartLighting();
             m_cart.SetSpline(m_course.Spline, m_startProgress * m_length, false, true);
             if (m_speedProfile != null) m_speedProfile.Initialize(m_course, m_cart, m_startProgress);
             m_cart.SetSpeed(CurrentTargetSpeed());

@@ -244,7 +244,7 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 {
                     File.AppendAllText(Folder+"/result.txt",$"Close pass roots {s_closeDistances[0]:F3}/{s_closeDistances[1]:F3}m, view clearance {s_minViewClearance:F3}m\n");
                     if(s_seen.Any(x=>!x)||s_passed.Any(x=>!x))throw new InvalidOperationException("Both encounters must complete");
-                    if(s_visibleOpponentSpeed>3.4f)throw new InvalidOperationException("Oncoming cart exceeded its approach speed");
+                    if(s_visibleOpponentSpeed>encounters.Max(x=>x.ApproachSpeed)+.5f)throw new InvalidOperationException("Oncoming cart exceeded its approach speed");
                     File.AppendAllText(Folder+"/result.txt",$"PASS Both encounters completed with permanently visible branches; clearance {s_minEncounterDistance:F3}m, opponent speed peak {s_visibleOpponentSpeed:F3}m/s\n");
                     if (motion != null)
                     {

@@ -24,6 +24,7 @@ public static class BookObstacleValidation
         Texture2D decoded = null;
         try
         {
+            CheckClearThresholds(data);
             var state = new PageObstacleState();
             state.Apply(data);
             var first = state[0];
@@ -152,6 +153,39 @@ public static class BookObstacleValidation
             if (graphicObject != null) UnityEngine.Object.DestroyImmediate(graphicObject);
             if (decoded != null) UnityEngine.Object.DestroyImmediate(decoded);
         }
+    }
+
+    private static void CheckClearThresholds(ObstacleData data)
+    {
+        var serialized = new SerializedObject(data);
+        var values = serialized.FindProperty("m_clearOpacityThresholds");
+        float[] thresholds = { 0.25f, 0.1f, 0f, 0.4f };
+        for (int i = 0; i < 4; i++) values.GetArrayElementAtIndex(i).floatValue = thresholds[i];
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+        var state = new PageObstacleState(); state.Apply(data, 4);
+        var first = state[0]; first.Begin(Vector2.zero); first.Move(new Vector2(2.96f, 0));
+        Check(!first.Complete && Mathf.Abs(first.Opacity - 0.26f) < 0.0001f,
+            "Fading remains linear before the threshold");
+        first.Move(new Vector2(3f, 0));
+        Check(first.Complete && first.Progress < 1f && first.Opacity == 0f,
+            "At threshold the remaining opacity snaps to zero before full rubbing distance");
+        Check(state.Clear(0, first) && state[0] == null, "Threshold completion removes the actual obstacle state");
+        state[1].Begin(Vector2.zero); state[1].Move(new Vector2(3f, 0));
+        Check(!state[1].Complete && Mathf.Abs(state[1].Opacity - 0.25f) < 0.0001f,
+            "Each slot uses its own threshold");
+        state[2].Begin(Vector2.zero); state[2].Move(new Vector2(3.9f, 0));
+        Check(!state[2].Complete, "Zero threshold retains the original full-distance requirement");
+        state[2].Move(new Vector2(4f, 0));
+        Check(state[2].Complete && state[2].Opacity == 0f, "Zero threshold completes at the full distance");
+        state[3].Begin(Vector2.zero); state[3].Move(new Vector2(2.4f, 0));
+        Check(state[3].Complete && state[3].Opacity == 0f && state.BlocksActions,
+            "Fourth-slot threshold makes all its shared fragments fully transparent");
+        Check(state.Clear(3, state[3]) && !state.BlocksActions && state[1] != null,
+            "Clearing at the fourth threshold unlocks actions without removing other slots");
+        serialized.Update();
+        values = serialized.FindProperty("m_clearOpacityThresholds");
+        for (int i = 0; i < 4; i++) values.GetArrayElementAtIndex(i).floatValue = 0.15f;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
     }
 
     public static void Preview(byte slotCount)

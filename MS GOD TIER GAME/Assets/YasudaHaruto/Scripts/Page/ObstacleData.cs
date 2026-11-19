@@ -23,6 +23,9 @@ public sealed class ObstacleData : ScriptableObject
     [InspectorName("消えるまでに必要な擦り距離")]
     [Tooltip("汚れの表示範囲の短辺を1とした合計移動距離。小さいほど早く消えます。2なら4の半分の距離で解除。方向は問いません。")]
     [SerializeField, Min(0.1f)] private float m_requiredDistance = 4f;
+    [InspectorName("完全消去する残り濃さ（1〜4番枠）")]
+    [Tooltip("この不透明度以下になったら残りを一気に消して解除します。0.15なら残り15%で解除。0なら従来どおり最後まで擦ります。4番枠の飛沫は共通です。")]
+    [SerializeField, Range(0f, 0.95f)] private float[] m_clearOpacityThresholds = { 0.15f, 0.15f, 0.15f, 0.15f };
     [Tooltip("Movements smaller than this distance from the last anchor are ignored.")]
     [SerializeField, Range(0.001f, 0.02f)] private float m_minimumMovement = 0.003f;
     public Texture2D Texture => m_texture;
@@ -60,5 +63,7 @@ public sealed class ObstacleData : ScriptableObject
         ? m_stagePlacements[slot] : new Rect(0, 0, 1, 1);
     public Color Color => m_color;
     public float RequiredDistance => Mathf.Max(0.1f, m_requiredDistance);
+    public float GetClearOpacityThreshold(int slot) => m_clearOpacityThresholds != null && slot >= 0 && slot < m_clearOpacityThresholds.Length
+        ? Mathf.Clamp(m_clearOpacityThresholds[slot], 0f, 0.95f) : 0.15f;
     public float MinimumMovement => Mathf.Clamp(m_minimumMovement, 0.001f, 0.02f);
 }

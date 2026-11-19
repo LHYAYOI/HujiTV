@@ -48,7 +48,8 @@ public sealed class ObstacleInstance
     private Vector2 m_previous;
     private bool m_tracking;
     public float Progress => Mathf.Clamp01(m_distance / Data.RequiredDistance);
-    public bool Complete => Progress >= 1f;
+    public bool Complete => Data.Color.a * (1f - Progress) <= Data.GetClearOpacityThreshold(Slot);
+    public float Opacity => Complete ? 0f : Data.Color.a * (1f - Progress);
 
     public ObstacleInstance(ObstacleData data, long sequence, int slot = 0)
     {

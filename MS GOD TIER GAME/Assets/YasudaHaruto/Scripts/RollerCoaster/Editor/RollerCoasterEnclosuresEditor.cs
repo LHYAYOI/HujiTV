@@ -53,6 +53,7 @@ namespace YasudaHaruto.RollerCoaster.Editor
 
         internal static void ApplyAtlasColors(RollerCoasterEnclosures settings)
         {
+            if(settings.UseSourceDuct)return;
             // 元Atlasにある緑・青・桃色の模様を使い分ける。原TextureやUVは変更しない。
             var uv = settings.SourceMesh.uv;
             Vector2 min = new Vector2(uv.Min(x=>x.x), uv.Min(x=>x.y));

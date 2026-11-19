@@ -294,6 +294,9 @@ public static class BookObstacleRuntimeValidation
                     s_input.OnPointerUp(pointer);
                     Require(s_page.Obstacles[3] == null && !s_obstacles.BlocksActions && s_rune.IsInputAvailable && s_page.Obstacles[0] != null,
                         "Rubbing fourth stain clears it independently and restores normal input");
+                    if (s_obstacles.Settings.GetClearOpacityThreshold(3) > 0f)
+                        Require(fourthStain.Progress < 1f && fourthStain.Complete && fourthStain.Opacity == 0f,
+                            "Fourth stain snaps away at its opacity threshold before full-distance completion");
                     s_obstacles.SetConnected(false);
                     Require(s_page.Obstacles[0] != null, "Connection change preserves remaining obstacles");
                     File.AppendAllText(Report, "BookObstacleRuntime COMPLETE\n");
