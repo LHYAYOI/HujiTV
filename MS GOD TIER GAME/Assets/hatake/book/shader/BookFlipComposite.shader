@@ -338,7 +338,7 @@ Shader "Book/Page Flip Composite"
                 h.kind = h.layer == BOOK_LAYER_NONE ? 0 : BookSlotKind(h.dest, h.right);
                 if ((h.layer == BOOK_LAYER_FLAT || h.layer == BOOK_LAYER_UNDER) && abs(h.kind - BOOK_SLOT_EMPTY) < 0.5) h.layer = BOOK_LAYER_NONE;
                 float4 col;
-                float turnFade = saturate(h.foldLength * 4);
+                float turnFade = h.turnFade;
                 float curlWidth = max(_CurlWidth * saturate(h.foldLength * 1.5), 1e-4) * (1 + _TurnThickness.w);
                 if (h.flapEdge > 0)
                 {
@@ -360,14 +360,14 @@ Shader "Book/Page Flip Composite"
                         if (!cover && BookSlotKind(0, frontRight) < 0.5)
                         {
                             float3 through = BookSamplePage(0, frontRight, saturate(BookPageUV(h.sheetPos))).rgb;
-                            c *= lerp(1, saturate(through * 1.15), _ShowThrough);
+                            c *= lerp(1, saturate(through * 1.15), _ShowThrough * turnFade);
                         }
                         float dd = -h.fold;
                         float bend = 1 - smoothstep(0, curlWidth, dd);
                         c *= lerp(1, _CurlDark, bend * bend * turnFade);
                         float band = (dd - curlWidth * 0.45) / (curlWidth * 0.22);
                         c += _CurlSpec * exp(-band * band) * turnFade;
-                        c *= lerp(0.85, 1, smoothstep(0, 0.012, h.flapInside));
+                        c *= lerp(1, lerp(0.85, 1, smoothstep(0, 0.012, h.flapInside)), turnFade);
                     }
                     else
                     {

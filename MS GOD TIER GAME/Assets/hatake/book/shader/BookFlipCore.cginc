@@ -67,6 +67,7 @@ struct BookFlipHit
     float kind; // 面の種類（BOOK_SLOT_*）
     float fold; // 折り目からの符号付き距離（Turn space、負がめくれた紙の側）
     float foldLength; // 角の移動量。めくり始めのカールの幅に使用
+    float turnFade; // めくり中だけの陰影（カールの陰・照り返し・落ち影・折り目の影・透け）の強さ。めくり始めと終わりで 0
     float2 foldNormal; // 折り目の法線（本座標）
     float flapInside; // 裏面：反射点のページ端からの距離
     float flapOutside; // 裏面以外：めくれた紙の外形からの距離（落ち影用）
@@ -123,6 +124,9 @@ BookFlipHit BookFlipResolve(float2 p)
     float2 axis = _Fold.xy - _Fold.zw;
     float len = length(axis);
     h.foldLength = len;
+    // 始めは角の移動量に合わせて強め、終わり（角が反対側の端 x = -1 へ着く。len = 2）で 0 に戻す。
+    // 置いた見開きにはこれらの陰影が無いので、着いた瞬間に影・透けが消えて見えないようにする
+    h.turnFade = saturate(len * 4) * smoothstep(0, 0.45, 2 - len);
 
     // BOOK_STILL：めくっていない見開き専用のシェーダー（めくり・板の回転のコードを書き出さない。
     // _Turning が 0 なら通らないコードだが、書き出してあるだけでモバイルの GPU では画素ごとの負荷になる）
@@ -136,6 +140,7 @@ BookFlipHit BookFlipResolve(float2 p)
         float sinT = sqrt(saturate(1 - c * c));
         float width = 1 + _CoverMargin.x;
         h.foldLength = 1;
+        h.turnFade = 1;
         
         // 板の小口：立つほど厚みの面が見える
         // 開いた側（内側が上）に寝るほど、置いてある開いた本の板と同じ L 字の小口（外側と下）になる。
@@ -236,7 +241,8 @@ BookFlipHit BookFlipResolve(float2 p)
             float2 sq = abs(sp - (sMin + sMax) * 0.5) - (sMax - sMin) * 0.5 + sr;
             float shadowSd = length(max(sq, 0)) + min(max(sq.x, sq.y), 0) - sr;
             h.flapOutside = max(shadowSd, 0); // 板の角丸の外の隙間も影の中
-            h.foldLength = fade * 0.25; // 合成側で影の濃さに掛かる（saturate(foldLength * 4)）
+            h.foldLength = fade * 0.25;
+            h.turnFade = saturate(fade); // 合成側で影の濃さに掛かる
         }
         if (q.x >= 0 && BookPageInside(q, 0, 1) >= 0)
         {
