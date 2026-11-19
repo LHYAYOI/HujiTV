@@ -58,7 +58,7 @@
                 bool turning = h.fold < 1e2;
                 // めくり始めは角だけが小さく反るので、カールの幅を角の移動量に合わせる
                 float curlWidth = max(_CurlWidth * saturate(h.foldLength * 1.5), 1e-4) * (1 + _TurnThickness.w);
-                float turnFade = saturate(h.foldLength * 4);
+                float turnFade = h.turnFade;
 
             #if !defined(BOOK_STILL)
                 if (h.layer == BOOK_LAYER_BACK)
@@ -68,7 +68,7 @@
                     if (!cover && BookSlotKind(0, frontRight) < 0.5)
                     {
                         float3 through = BookSamplePage(0, frontRight, saturate(BookPageUV(h.sheetPos))).rgb;
-                        c *= lerp(1, saturate(through * 1.15), _ShowThrough);
+                        c *= lerp(1, saturate(through * 1.15), _ShowThrough * turnFade);
                     }
 
                     float dd = h.rigid > 0.5 ? 1e3 : -h.fold;   // 硬い板は曲がらない
@@ -77,7 +77,7 @@
                     normal = normalize(float3(h.foldNormal * bend * 1.2, 1));
                     float band = (dd - curlWidth * 0.45) / (curlWidth * 0.22);
                     c += _CurlSpec * exp(-band * band) * turnFade;
-                    if (h.rigid < 0.5) c *= lerp(0.85, 1, smoothstep(0, 0.012, h.flapInside));
+                    if (h.rigid < 0.5) c *= lerp(1, lerp(0.85, 1, smoothstep(0, 0.012, h.flapInside)), turnFade);
                 }
                 else if (h.layer == BOOK_LAYER_FRONT && turning)
                 {
@@ -184,7 +184,7 @@
                 // めくれた紙が下の紙・表紙・背景に落とす影
                 if (h.layer != BOOK_LAYER_BACK && h.flapOutside < 1e2)
                 {
-                    float shadow = (1 - smoothstep(0, _DropShadowWidth + _TurnThickness.z, h.flapOutside)) * _DropShadow * saturate(h.foldLength * 4);
+                    float shadow = (1 - smoothstep(0, _DropShadowWidth + _TurnThickness.z, h.flapOutside)) * _DropShadow * h.turnFade;
                     col.rgb *= 1 - shadow;
                     col.a = max(col.a, shadow);
                 }
@@ -206,7 +206,7 @@
                 #else
                     float sparkle = BookLookNoise(float2(along * 38 - _Time.y * 5, _Time.y * 0.7));
                 #endif
-                    col.rgb += _FoldGlowColor.rgb * _TurnGlow * glow * (0.35 + 0.65 * sparkle * sparkle);
+                    col.rgb += _FoldGlowColor.rgb * _TurnGlow * glow * (0.35 + 0.65 * sparkle * sparkle) * h.turnFade;
                 }
 
                 return col;
