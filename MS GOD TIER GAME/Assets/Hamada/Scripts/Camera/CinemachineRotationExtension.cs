@@ -1,10 +1,11 @@
-using Unity.Cinemachine;
+ï»¿using Unity.Cinemachine;
 using UnityEngine;
 
 public class CinemachineRotationExtension:CinemachineExtension
 {
     private Vector3 m_shakeRotationOffset;
     private Vector3 m_tiltRotationOffset;
+    private Vector3 m_kickRotationOffset;
 
     public void SetShakeRotationOffset(Vector3 offset) 
     {
@@ -16,12 +17,17 @@ public class CinemachineRotationExtension:CinemachineExtension
         m_tiltRotationOffset = offset;
     }
 
-    //‰ñ“]‚ğ‡¬‚µÅI“I‚Èp¨‚ğŒˆ’è‚·‚é
+    public void SetKickRotationOffset(Vector3 offset)
+    {
+        m_kickRotationOffset = offset;
+    }
+
+    //å›è»¢ã‚’åˆæˆã—æœ€çµ‚çš„ãªå§¿å‹¢ã‚’æ±ºå®šã™ã‚‹
     protected override void PostPipelineStageCallback(CinemachineVirtualCameraBase vcam, CinemachineCore.Stage stage, ref CameraState state, float deltaTime)
     {
         if (stage == CinemachineCore.Stage.Finalize) 
         {
-            Quaternion rotation = Quaternion.Euler(m_shakeRotationOffset + m_tiltRotationOffset);
+            Quaternion rotation = Quaternion.Euler(m_shakeRotationOffset + m_tiltRotationOffset + m_kickRotationOffset);
 
             state.OrientationCorrection *= rotation;
         }
