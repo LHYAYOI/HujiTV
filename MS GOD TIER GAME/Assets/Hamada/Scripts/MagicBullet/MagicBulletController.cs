@@ -19,6 +19,8 @@ public class MagicBulletController : MonoBehaviour
 
     [SerializeField] GameObject m_hitEffect;
 
+    [SerializeField] GameObject m_kiranEffect;
+
     [SerializeField] float m_moveSpeed;
 
     [SerializeField] List<BezierControlPoint> m_bezierControlPoints;
@@ -26,6 +28,11 @@ public class MagicBulletController : MonoBehaviour
     TargetHitUIManager m_hitUIManager;
 
     Vector3 m_controlPoint;
+
+    public GameObject GetKiranEffect() 
+    {
+        return m_kiranEffect;
+    }
 
     public MagicData GetMagicData()
     {
@@ -118,12 +125,4 @@ public class MagicBulletController : MonoBehaviour
 
         Destroy(gameObject);
     }
-
-    //発射音再生 
-
-    //---何か当たった時に呼び出してほしい処理---//
-
-    //エフェクト再生
-
-    //ヒット時の音再生
 }

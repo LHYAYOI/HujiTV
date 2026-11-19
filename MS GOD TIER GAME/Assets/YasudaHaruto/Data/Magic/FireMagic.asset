@@ -15,5 +15,8 @@ MonoBehaviour:
   m_magicId: 1
   m_displayName: FireMagic
   m_magicType: 0
+  m_eventMagicType: 0
   m_aimType: 0
-  m_impactRuneTexture: {fileID: 0}
+  m_castType: 0
+  m_instantMagicPrefab: {fileID: 0}
+  m_impactRuneTexture: {fileID: 21300000, guid: a9636dff5be0bb744b3ac022a20085dc, type: 3}

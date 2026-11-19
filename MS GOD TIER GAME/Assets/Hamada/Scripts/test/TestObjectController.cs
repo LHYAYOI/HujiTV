@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class TestObjectController : EnemyBase
 {
@@ -18,12 +18,11 @@ public class TestObjectController : EnemyBase
     {
     }
 
-    // ƒoƒgƒ‹ŠJn‚Ìˆ—‚ğs‚¤ŠÖ”
     public override void BattleStart() 
     {
     }
 
-    // ƒoƒgƒ‹I—¹‚Ìˆ—‚ğs‚¤ŠÖ”
+    // ãƒãƒˆãƒ«çµ‚äº†æ™‚ã®å‡¦ç†ã‚’è¡Œã†é–¢æ•°
     public override void BattleEnd() 
     {
     }
