@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6964058608245578042}
   - component: {fileID: 9094747855056817349}
+  - component: {fileID: 8068737374305560547}
   m_Layer: 0
   m_Name: KeyGhostBath
   m_TagString: Untagged
@@ -48,13 +49,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KeyGhost
   m_enemyData: {fileID: 11400000, guid: f571eecbeaad2444e9b014b175958dd2, type: 2}
   m_targetableObject: {fileID: 3847091103198808768}
+  m_targetableEnableRatio: 0.4
   m_movableObject: {fileID: 3457703006706740348}
   m_moveTarget: {fileID: 2466466017933717985}
   m_moveDuration: 1.5
-  m_viewMargin: 0.3
+  m_stayDuration: 1
+  m_viewMarginX: 0.35
+  m_viewMarginY: 0.2
   m_minViewDepth: 1
-  m_maxViewDepth: 10
+  m_maxViewDepth: 6
   m_lidController: {fileID: 0}
+--- !u!114 &8068737374305560547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2503411773482243315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4f08179a51bfe5499cf8de03364ab65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KeyGhostRotationChange
 --- !u!1 &4612758747096025869
 GameObject:
   m_ObjectHideFlags: 0
@@ -82,7 +98,7 @@ Transform:
   m_GameObject: {fileID: 4612758747096025869}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.06, z: 0}
+  m_LocalPosition: {x: 0, y: 1.189, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -155,8 +171,8 @@ GameObject:
   m_Component:
   - component: {fileID: 9001922429702532171}
   - component: {fileID: 3847091103198808768}
-  - component: {fileID: 3306435566547382730}
   - component: {fileID: 7129298524869078153}
+  - component: {fileID: 3529967875718563508}
   m_Layer: 0
   m_Name: Collider
   m_TagString: Untagged
@@ -173,7 +189,7 @@ Transform:
   m_GameObject: {fileID: 8259076927784955505}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.26, z: 0}
+  m_LocalPosition: {x: 0, y: 1.064, z: 0.02}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -192,27 +208,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TargetableObject
   m_IsTargetableFlag: 1
---- !u!65 &3306435566547382730
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8259076927784955505}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.49, y: 0.23, z: 0.49}
-  m_Center: {x: -0.0075216293, y: 0.96, z: 0.000000029802322}
 --- !u!114 &7129298524869078153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -246,6 +241,27 @@ MonoBehaviour:
   m_onExit:
     m_PersistentCalls:
       m_Calls: []
+--- !u!135 &3529967875718563508
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8259076927784955505}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &4384738359267830969
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -298,6 +314,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3614080728353087569, guid: b74aec569b1fdb847b52f0bb6d9e4839, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 55ee5afe5538bd9428af10299cebd7a7, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

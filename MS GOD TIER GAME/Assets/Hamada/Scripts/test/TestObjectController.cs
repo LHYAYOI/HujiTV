@@ -17,4 +17,13 @@ public class TestObjectController : EnemyBase
     public override void Initialize()
     {
     }
+
+    public override void BattleStart()
+    {
+        
+    }
+    public override void BattleEnd()
+    {
+
+    }
 }

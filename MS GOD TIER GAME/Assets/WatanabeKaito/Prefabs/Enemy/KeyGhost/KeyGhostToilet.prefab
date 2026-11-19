@@ -49,10 +49,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KeyGhost
   m_enemyData: {fileID: 11400000, guid: b91df5c88e345184a9dbf00bc1472a06, type: 2}
   m_targetableObject: {fileID: 8071369442788470093}
+  m_targetableEnableRatio: 0.4
   m_movableObject: {fileID: 6369155751271852801}
   m_moveTarget: {fileID: 2466466017933717985}
   m_moveDuration: 1.5
-  m_viewMargin: 0.3
+  m_stayDuration: 1
+  m_viewMarginX: 0.3
+  m_viewMarginY: 0.15
   m_minViewDepth: 1
   m_maxViewDepth: 5
   m_lidController: {fileID: 4842780721820421703}
@@ -66,8 +69,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2550705262572944640}
   - component: {fileID: 8071369442788470093}
-  - component: {fileID: 7080535902709594877}
   - component: {fileID: 778596265595238173}
+  - component: {fileID: 618491438949887722}
   m_Layer: 0
   m_Name: Collider
   m_TagString: Untagged
@@ -84,7 +87,7 @@ Transform:
   m_GameObject: {fileID: 3943758845136047983}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.395, z: 0}
+  m_LocalPosition: {x: 0, y: 0.45, z: -0.05}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -103,27 +106,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TargetableObject
   m_IsTargetableFlag: 1
---- !u!65 &7080535902709594877
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3943758845136047983}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.38, y: 0.18, z: 0.41}
-  m_Center: {x: -0.03, y: 0.42, z: 0}
 --- !u!114 &778596265595238173
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,6 +139,27 @@ MonoBehaviour:
   m_onExit:
     m_PersistentCalls:
       m_Calls: []
+--- !u!135 &618491438949887722
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3943758845136047983}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.1
+  m_Center: {x: 0, y: 0, z: 0.06}
 --- !u!1 &4612758747096025869
 GameObject:
   m_ObjectHideFlags: 0
@@ -451,6 +454,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6964058608245578042}
     m_Modifications:
+    - target: {fileID: 1708326099046787423, guid: d5d9922da5a9b754dbe0aa1b6bbf0377, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2f99da397226d2747b768457104b8681, type: 2}
     - target: {fileID: 5844439998411057224, guid: d5d9922da5a9b754dbe0aa1b6bbf0377, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

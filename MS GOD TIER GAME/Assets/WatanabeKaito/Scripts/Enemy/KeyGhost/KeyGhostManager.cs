@@ -1,9 +1,14 @@
+
 using UnityEngine;
 
 public class KeyGhostManager : EnemyBase, IEventMagicReceiver
 {
     [Header("TargetableObject")]
     [SerializeField] private TargetableObject m_targetableObject;
+
+    [Header("照準を有効にするタイミング")]
+    [SerializeField, Range(0f, 1f)]
+    private float m_targetableEnableRatio = 0.9f;
 
     [Header("動かすオブジェクト")]
     [SerializeField] private GameObject m_movableObject;
@@ -12,11 +17,17 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
     [SerializeField] private Transform m_moveTarget;
 
     [Header("ターゲットまでの移動時間")]
-    [SerializeField] private float m_moveDuration = 2.0f;
+    [SerializeField] private float m_moveDuration = 1.5f;
 
-    [Header("視界判定の余白（画面端からの割合）")]
+    [Header("上昇後の待機時間")]
+    [SerializeField] private float m_stayDuration = 1.0f;
+
+    [Header("視界判定の余白")]
     [SerializeField, Range(0f, 0.49f)]
-    private float m_viewMargin = 0.2f;
+    private float m_viewMarginX = 0.2f;
+
+    [SerializeField, Range(0f, 0.49f)]
+    private float m_viewMarginY = 0.2f;
 
     [Header("奥行の判定範囲")]
     [SerializeField] private float m_minViewDepth = 1.0f;
@@ -27,7 +38,7 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
 
 
     private Camera m_targetCamera;          // 視界判定用のカメラ
-    private Renderer m_visibilityRenderer; // 視界判定用のRenderer
+    private Renderer m_visibilityRenderer;  // 視界判定用のRenderer
 
     private Vector3 m_originalPosition;     // 元の位置
     private Vector3 m_moveStartPosition;    // 移動開始位置
@@ -35,14 +46,21 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
     private Vector3 m_returnStartPosition;  // 戻る際の開始位置
 
     private float m_moveTimer;  // 移動タイマー
+    private float m_stayTimer;  // 待機タイマー
 
+    private bool m_isMovingUp;      // 上昇中かどうか
+    private bool m_isLidOpening;    // ふたを開くアニメーション中かどうか
+
+    private bool m_startedBattle = false; // バトル開始フラグ
+
+    private bool m_isTargetableEnabled = false; // ターゲットを有効化したかどうか
 
     // 現在の状態
     private enum KEY_GHOST_STATE
     {
         HIDE,   // 隠れている
         MOVE,   // 移動中
-        STAY,   // ターゲット位置で待機中
+        STAY,   // 上の位置で待機中
         RETURN  // 元の位置に戻る
     }
 
@@ -85,9 +103,13 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
         m_originalPosition = m_movableObject.transform.localPosition;
 
         m_moveTimer = 0f;
+        m_stayTimer = 0f;
 
         // 初期状態は隠れている状態
         m_currentState = KEY_GHOST_STATE.HIDE;
+
+        // 上昇方向に設定
+        m_isMovingUp = true;
 
         // ターゲット不可にする
         m_targetableObject.SetTargetable(false);
@@ -97,6 +119,7 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
     public override void BattleStart()
     {
         // バトル開始時の処理
+        m_startedBattle = true;
     }
 
 
@@ -112,7 +135,8 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
             m_visibilityRenderer == null ||
             m_moveTarget == null ||
             m_movableObject == null ||
-            m_targetableObject == null)
+            m_targetableObject == null ||
+            !m_startedBattle)
         {
             return;
         }
@@ -133,8 +157,8 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
 
                 break;
 
-            case KEY_GHOST_STATE.MOVE:
 
+            case KEY_GHOST_STATE.MOVE:
             case KEY_GHOST_STATE.STAY:
 
                 // 視界から外れたら隠れる
@@ -144,6 +168,7 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
                 }
 
                 break;
+
 
             case KEY_GHOST_STATE.RETURN:
 
@@ -156,6 +181,7 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
                 break;
         }
 
+
         // 現在の状態に応じた処理
         switch (m_currentState)
         {
@@ -163,9 +189,11 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
                 UpdateMoving();
                 break;
 
+
             case KEY_GHOST_STATE.STAY:
-                // 視界から外れるまで待機
+                UpdateStaying();
                 break;
+
 
             case KEY_GHOST_STATE.RETURN:
                 UpdateReturning();
@@ -196,15 +224,19 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
             return false;
         }
 
-        // 画面の判定範囲
-        float min = m_viewMargin;
-        float max = 1.0f - m_viewMargin;
+        // X軸の判定範囲
+        float minX = m_viewMarginX;
+        float maxX = 1.0f - m_viewMarginX;
 
-        // 画面中央の範囲内にあるか判定
-        return viewportPosition.x >= min &&
-               viewportPosition.x <= max &&
-               viewportPosition.y >= min &&
-               viewportPosition.y <= max;
+        // Y軸の判定範囲
+        float minY = m_viewMarginY;
+        float maxY = 1.0f - m_viewMarginY;
+
+        // X軸・Y軸それぞれの範囲内にあるか判定
+        return viewportPosition.x >= minX &&
+               viewportPosition.x <= maxX &&
+               viewportPosition.y >= minY &&
+               viewportPosition.y <= maxY;
     }
 
 
@@ -214,10 +246,13 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
         // 現在位置から移動を開始
         m_moveStartPosition = m_movableObject.transform.localPosition;
 
-        // ターゲット位置を保存
+        // 上の位置を移動先に設定
         m_moveEndPosition = m_moveTarget.localPosition;
 
         m_moveTimer = 0f;
+
+        // 上昇方向に設定
+        m_isMovingUp = true;
 
         // ふたを開く
         if (m_lidController != null)
@@ -225,8 +260,13 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
             m_lidController.StartOpening();
         }
 
+        // ふたの開閉アニメーションを有効にする
+        m_isLidOpening = true;
+
         // ターゲット不可にする
         m_targetableObject.SetTargetable(false);
+
+        m_isTargetableEnabled = false;
 
         m_currentState = KEY_GHOST_STATE.MOVE;
     }
@@ -251,7 +291,7 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
         float easeT = Easing.EaseOutSine(t);
 
         // ふたを開く
-        if (m_lidController != null)
+        if (m_lidController != null && m_isLidOpening)
         {
             m_lidController.UpdateRotation(easeT);
         }
@@ -263,15 +303,76 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
             easeT
         );
 
+        // 上昇中、指定した割合に達したらターゲット可能にする
+        if (m_isMovingUp && !m_isTargetableEnabled && t >= m_targetableEnableRatio)
+        {
+            m_targetableObject.SetTargetable(true);
+            m_isTargetableEnabled = true;
+        }
+
         // 移動完了
         if (t >= 1f)
         {
             m_movableObject.transform.localPosition = m_moveEndPosition;
 
-            // ターゲット可能にする
-            m_targetableObject.SetTargetable(true);
+            // 上昇が完了した場合
+            if (m_isMovingUp)
+            {
+                // 待機タイマーをリセット
+                m_stayTimer = 0f;
 
-            m_currentState = KEY_GHOST_STATE.STAY;
+                // 待機状態にする
+                m_currentState = KEY_GHOST_STATE.STAY;
+
+                m_isLidOpening = false;
+            }
+            else
+            {
+                // 下降が完了した場合
+
+                m_isTargetableEnabled = false;
+
+                // 次は上昇する
+                m_isMovingUp = true;
+
+                // 現在位置を移動開始位置にする
+                m_moveStartPosition = m_movableObject.transform.localPosition;
+
+                // 上の位置を移動先にする
+                m_moveEndPosition = m_moveTarget.localPosition;
+
+                // 移動タイマーをリセット
+                m_moveTimer = 0f;
+            }
+        }
+    }
+
+
+    // 上の位置で待機する処理
+    private void UpdateStaying()
+    {
+        m_stayTimer += Time.deltaTime;
+
+        // 待機時間が終了したら下降を開始
+        if (m_stayTimer >= m_stayDuration)
+        {
+            // 現在位置を移動開始位置にする
+            m_moveStartPosition = m_movableObject.transform.localPosition;
+
+            // 元の位置を移動先にする
+            m_moveEndPosition = m_originalPosition;
+
+            // 移動タイマーをリセット
+            m_moveTimer = 0f;
+
+            // 下降方向に設定
+            m_isMovingUp = false;
+
+            // ターゲット不可にする
+            m_targetableObject.SetTargetable(false);
+
+            // 移動状態にする
+            m_currentState = KEY_GHOST_STATE.MOVE;
         }
     }
 
@@ -288,6 +389,9 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
         {
             m_lidController.StartClosing();
         }
+
+        // ふたの開閉アニメーションを終了
+        m_isLidOpening = false;
 
         // ターゲット不可にする
         m_targetableObject.SetTargetable(false);
@@ -320,7 +424,7 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
             m_lidController.UpdateRotation(easeT);
         }
 
-        // 移動
+        // 元の位置へ移動
         m_movableObject.transform.localPosition = Vector3.Lerp(
             m_returnStartPosition,
             m_originalPosition,
@@ -333,11 +437,13 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
             m_movableObject.transform.localPosition = m_originalPosition;
 
             m_moveTimer = 0f;
+            m_stayTimer = 0f;
 
             // 再び隠れている状態にする
             m_currentState = KEY_GHOST_STATE.HIDE;
         }
     }
+
 
     public void OnKeyGhostHit(HitData hitData)
     {
@@ -351,6 +457,7 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
             }
         }
     }
+
 
     public bool TryReceiveEventMagic(EVENT_MAGIC_TYPE eventMagicType)
     {
