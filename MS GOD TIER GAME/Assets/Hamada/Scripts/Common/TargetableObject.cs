@@ -22,6 +22,14 @@ public class TargetableObject : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        if (TargetSelector.Instance != null)
+        {
+            TargetSelector.Instance.RegisterTarget(this);
+        }
+    }
+
     private void LateUpdate()
     {
         SetWasHitFlag(false);
