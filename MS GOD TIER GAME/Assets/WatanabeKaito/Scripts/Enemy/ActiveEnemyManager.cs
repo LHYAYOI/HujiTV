@@ -66,4 +66,21 @@ public class ActiveEnemyManager : MonoBehaviour
             }
         }
     }
+
+    // アクティブなカギオバケのY軸を半回転させる
+    public void RotateAllActiveKeyGhostsY()
+    {
+        foreach (var enemy in m_activeEnemies)
+        {
+            if (enemy != null && enemy is KeyGhostManager keyGhost)
+            {
+                KeyGhostRotationChange rotationChange = keyGhost.GetComponent<KeyGhostRotationChange>();
+
+                if (rotationChange != null)
+                {
+                    rotationChange.HarfRotateY();
+                }
+            }
+        }
+    }
 }
