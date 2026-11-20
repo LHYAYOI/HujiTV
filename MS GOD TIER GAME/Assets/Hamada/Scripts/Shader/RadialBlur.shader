@@ -15,10 +15,36 @@
             #pragma vertex Vert
             #pragma fragment Frag
 
-            #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            TEXTURE2D_X(_BlitTexture);
 
             float _BlurStrength;
             float2 _BlurCenter;
+
+            struct Attributes
+            {
+                uint vertexID : SV_VertexID;
+            };
+
+            struct Varyings
+            {
+                float4 positionCS : SV_POSITION;
+                float2 texcoord : TEXCOORD0;
+                UNITY_VERTEX_OUTPUT_STEREO
+            };
+
+            Varyings Vert(Attributes input)
+            {
+                Varyings output;
+
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
+
+                output.positionCS = GetFullScreenTriangleVertexPosition(input.vertexID);
+                output.texcoord = GetFullScreenTriangleTexCoord(input.vertexID);
+
+                return output;
+            }
 
             half4 Frag(Varyings input) : SV_Target
             {
@@ -26,10 +52,9 @@
 
                 float2 uv = input.texcoord;
 
-                // ブラー中心から現在のピクセルへの方向
                 float2 toCenter = _BlurCenter - uv;
 
-                const int SAMPLE_COUNT = 8;
+                const int SAMPLE_COUNT = 10;
 
                 half4 result = 0;
 
@@ -38,15 +63,9 @@
                 {
                     float t = (float)i / (SAMPLE_COUNT - 1);
 
-                    // 中心方向にサンプリング位置を移動
-                    float2 sampleUV =
-                        uv + toCenter * (_BlurStrength * t);
+                    float2 sampleUV = uv + toCenter * (_BlurStrength * t);
 
-                    result += SAMPLE_TEXTURE2D_X(
-                        _BlitTexture,
-                        sampler_LinearClamp,
-                        sampleUV
-                    );
+                    result += SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_LinearClamp, sampleUV);
                 }
 
                 return result / SAMPLE_COUNT;

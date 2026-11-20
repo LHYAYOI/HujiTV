@@ -13,11 +13,12 @@ public class RadialBlurRendererFeature : ScriptableRendererFeature
 
     public override void Create()
     {
+
         CoreUtils.Destroy(m_material);
 
         if (m_shader == null)
         {
-            m_shader = Shader.Find("Hidden/Hamada/RadialBlur");
+            m_shader = Shader.Find("Custom/RadialBlur");
         }
 
         m_material = m_shader != null
@@ -33,30 +34,19 @@ public class RadialBlurRendererFeature : ScriptableRendererFeature
         ScriptableRenderer renderer,
         ref RenderingData renderingData)
     {
-        var cameraData = renderingData.cameraData;
-        Camera camera = cameraData.camera;
+        RadialBlurController controller = RadialBlurController.Instance;
 
-        // 不要なカメラでは実行しない
-        if (m_pass == null ||
-            cameraData.isPreviewCamera ||
-            camera.cameraType == CameraType.Reflection ||
-            cameraData.renderType != CameraRenderType.Base)
+        if (controller == null)
         {
             return;
         }
 
-        // カメラに付いている制御コンポーネントを取得
-        var controller = camera.GetComponent<RadialBlurController>();
-
-        if (controller == null || controller.Intensity <= 0.0001f)
+        if (controller.Intensity <= 0.0001f)
         {
             return;
         }
 
-        m_pass.Setup(
-            controller.Intensity,
-            controller.Center
-        );
+        m_pass.Setup(controller.Intensity, controller.Center);
 
         renderer.EnqueuePass(m_pass);
     }
@@ -102,6 +92,16 @@ public class RadialBlurRendererFeature : ScriptableRendererFeature
             ContextContainer frameData)
         {
             var resources = frameData.Get<UniversalResourceData>();
+
+            if (resources.isActiveTargetBackBuffer)
+            {
+                return;
+            }
+
+            if (!resources.activeColorTexture.IsValid())
+            {
+                return;
+            }
 
             if (resources.isActiveTargetBackBuffer ||
                 !resources.activeColorTexture.IsValid())

@@ -109,6 +109,7 @@ public class SpiderController : EnemyBase
     public void IntroEffect()
     {
         CameraManager.Instance.ShakeCamera(2, 3);
+        RadialBlurController.Instance.Play(1, .3f);
     }
 
     public void AttackPlayer() 

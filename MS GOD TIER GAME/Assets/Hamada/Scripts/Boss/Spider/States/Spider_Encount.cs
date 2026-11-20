@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 [CreateAssetMenu(fileName = "Spider_Encount", menuName = "Scriptable Objects/Spider_Encount")]
 public class Spider_Encount : StateBase
@@ -22,11 +22,9 @@ public class Spider_Encount : StateBase
 
     public override void UpdateState()
     {
-        //ƒAƒjƒ[ƒVƒ‡ƒ“I‚í‚Á‚½‚çƒAƒCƒhƒ‹‚É–ß‚é
+        //ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³çµ‚ã‚ã£ãŸã‚‰ã‚¢ã‚¤ãƒ‰ãƒ«ã«æˆ»ã‚‹
         if (m_controller.IsAnimationFinished("Encount"))
         {
-            Debug.Log("ƒGƒ“ƒJƒEƒ“ƒgI‚í‚è");
-
             m_controller.ChangeState("Idle_State");
         }
     }
