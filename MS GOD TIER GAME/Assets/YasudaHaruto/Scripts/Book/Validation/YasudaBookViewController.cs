@@ -75,10 +75,66 @@ namespace YasudaHaruto.BookValidation
                 PreparePageDecoration(m_captureSpread, m_leftPageView, m_rightPageView, m_captureCamera);
         }
 
-        private void PreparePageDecoration(int spread, BookPageView left, BookPageView right, Camera camera)
+        private Text m_leftPageNumber;
+        private Text m_rightPageNumber;
+        private Text m_liveLeftPageNumber;
+        private Text m_liveRightPageNumber;
+
+        private void PreparePageDecoration(int spread, BookPageView left, BookPageView right, Camera camera,
+            int? pageCount = null)
         {
             if (camera == m_captureCamera) m_captureSpread = spread;
             m_pageDecoration?.Invoke(spread, left, right, camera);
+
+            int count = pageCount ?? PageCount;
+            int leftIndex = spread * 2;
+            if (camera == m_liveCamera)
+            {
+                SetPageNumber(ref m_liveLeftPageNumber, left, leftIndex, count, true);
+                SetPageNumber(ref m_liveRightPageNumber, right, leftIndex + 1, count, false);
+            }
+            else
+            {
+                SetPageNumber(ref m_leftPageNumber, left, leftIndex, count, true);
+                SetPageNumber(ref m_rightPageNumber, right, leftIndex + 1, count, false);
+            }
+        }
+
+        private void SetPageNumber(ref Text label, BookPageView page, int index, int count, bool left)
+        {
+            if (page == null || IsCoverInside(index) || index >= count)
+            {
+                if (label != null) label.enabled = false;
+                return;
+            }
+
+            if (label == null)
+            {
+                var number = new GameObject("Page Number", typeof(RectTransform), typeof(Text), typeof(Outline));
+                number.layer = page.gameObject.layer;
+                number.transform.SetParent(page.transform, false);
+                label = number.GetComponent<Text>();
+                label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                label.fontSize = 16;
+                label.fontStyle = FontStyle.Bold;
+                label.color = Color.white;
+                label.alignment = left ? TextAnchor.LowerLeft : TextAnchor.LowerRight;
+                label.raycastTarget = false;
+                number.GetComponent<Outline>().effectColor = new Color(0.39f, 0.25f, 0.13f, 0.95f);
+
+                var rect = label.rectTransform;
+                Vector2 corner = new Vector2(left ? 0f : 1f, 0f);
+                rect.anchorMin = corner;
+                rect.anchorMax = corner;
+                rect.pivot = corner;
+                rect.anchoredPosition = new Vector2(left ? 9f : -9f, 7f);
+                rect.sizeDelta = new Vector2(52f, 24f);
+            }
+
+            label.transform.SetAsLastSibling();
+            int numberOnPaper = m_frontInsideSlot ? index : index + 1;
+            label.text = numberOnPaper.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            label.enabled = true;
         }
         private readonly List<BookPageData> m_runtimePages = new List<BookPageData>();
         private Action<bool> m_inventoryCompletion;
@@ -124,7 +180,7 @@ namespace YasudaHaruto.BookValidation
             int left = targetSpread * 2;
             m_leftPageView.ShowPage(candidate[left]);
             m_rightPageView.ShowPage(left + 1 < candidate.Count ? candidate[left + 1] : null);
-            PreparePageDecoration(targetSpread, m_leftPageView, m_rightPageView, m_captureCamera);
+            PreparePageDecoration(targetSpread, m_leftPageView, m_rightPageView, m_captureCamera, candidate.Count);
             m_captureCamera.targetTexture = target;
             m_captureCamera.enabled = true;
             Canvas.ForceUpdateCanvases();

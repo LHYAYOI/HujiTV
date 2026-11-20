@@ -1,5 +1,14 @@
 # Project Status
 
+## 最終作業：本のノンブルとページ追加設定の棚卸し（2026-11-20）
+
+- ユーザー確定：初期・獲得ページのPageId昇順を維持。固定ページを含めて最初の紙面から1始まりで通し番号を表示し、表紙・裏表紙の内側は対象外。
+- YasudaBookViewControllerのページ撮影にノンブルを追加。通常の見開き、めくり中の元ページ、取り消し後、閉じた状態での撮影、追加候補の撮影で番号を揃える。左右外側の下角へ表示し、入力を遮らない。番号は現在の紙面順に従う。
+- 追加キューが参照していないMaxPendingRequestsとそのInspector値を削除。MaxGamePageCountは初期構成のチェックに使われ、追加時の上限としては機能していない。PageIdは通信・DB・重複防止・並び順に使用中。
+- 整理候補：PageDataの旧InsertType（END／AFTER_CURRENT／RANDOM）と、その設定を使う旧検証。交換・辞退・削除の互換API、NEEDS_SELECTION、旧交換UI、旧検証は一体で扱う。交換UIはBookSceneに非アクティブ参照とBookValidation.prefabに参照がある。BookRaycastTest／DebugRuneTraceView／BookNetworkTestUIは検証Prefab、BookFlipCoordinateTestはBookSceneと検証Prefabから参照される。今回はこれらの候補を記録し、Scene／Prefabの編集やファイル削除は未実施。
+- Unity 6000.3.23f1のRoslynでRuntime全体を作業領域へ別出力コンパイル成功（警告3件）。Unity Play Mode・描画確認は未実施。ローカル追跡参照との比較は0/0。Gitの作業ツリー調査は親リポジトリへのアクセス制限、fetchはFETCH_HEADの書き込み制限により未確認。
+
+
 ## 最終作業：右の奥の遮蔽を強め、対向車のすれ違いを接近（2026-11-17）
 - 最新ユーザー指定を実装しRollerCoaster Scene保存。1回目の右進行ルートだけ囲いの開始を分岐の実距離6m先へ寄せ、局所幅4.8→3.6mへ絞る（分岐+2〜5mで補間、+18〜24mで復元）。左の枝のSpline・囲いの接続位置12m／幅4.8mを維持。主線Splineと自車の速度設定は変更しない。
 - 分岐手前5mの視点から右レールの12m先が壁に隠れることをrayで確認。左右線路は常時表示し、滑らかな接線接続と曲がった先の通路を保持。右へ進んでから自然に奥が開ける。生成囲い23,944頂点。UVは実距離基準のため幅を絞っても引き延ばさない。

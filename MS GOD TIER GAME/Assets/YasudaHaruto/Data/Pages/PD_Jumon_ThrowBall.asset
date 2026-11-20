@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0348284d6c830c745b43a7bc4bbddec7, type: 3}
+  m_Name: PD_Jumon_ThrowBall
+  m_EditorClassIdentifier: Assembly-CSharp::PageData
+  m_pageId: 5
+  m_insertType: 0
+  m_displayName: ThrowBall
+  m_pageType: 0
+  m_interaction:
+    m_type: 1
+    m_runeData: {fileID: 11400000, guid: da40a7625f4cc0c41b98e3c3fb0fc6d4, type: 2}
+    m_runeImageIndex: -1
+  m_action:
+    m_type: 1
+    m_magicData: {fileID: 11400000, guid: fd84468c9ad10ad489611b6288bb8c24, type: 2}
+  m_leftVisualData: {fileID: 11400000, guid: 533e2a72e1de0cf459a5e2fe8308991f, type: 2}
+  m_rightVisualData: {fileID: 11400000, guid: ce9c014acf9d0094baf3610e0f6d1b92, type: 2}

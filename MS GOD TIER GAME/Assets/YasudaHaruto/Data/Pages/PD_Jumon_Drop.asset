@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0348284d6c830c745b43a7bc4bbddec7, type: 3}
+  m_Name: PD_Jumon_Drop
+  m_EditorClassIdentifier: Assembly-CSharp::PageData
+  m_pageId: 2
+  m_insertType: 0
+  m_displayName: Drop
+  m_pageType: 0
+  m_interaction:
+    m_type: 1
+    m_runeData: {fileID: 11400000, guid: 9e94760834bb16941936c57adcef5dec, type: 2}
+    m_runeImageIndex: -1
+  m_action:
+    m_type: 1
+    m_magicData: {fileID: 11400000, guid: 1fc6fe6d07825934aa2aa07117f42783, type: 2}
+  m_leftVisualData: {fileID: 11400000, guid: eebd1b8540130aa4a998b71b64315c82, type: 2}
+  m_rightVisualData: {fileID: 11400000, guid: 31aacccdab3ec6a45a6d97d6e68aad0a, type: 2}

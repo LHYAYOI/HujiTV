@@ -34,7 +34,6 @@ public class BookGameController : MonoBehaviour
     private bool m_editing;
     private Func<bool> m_canEdit;
     private int m_maxPageCount;
-    private int m_maxPendingRequests;
     public IReadOnlyList<PageInstance> Pages => m_inventory?.Pages;
     public bool IsInputBlocked => !m_initialized || m_editing;
     public bool IsInitialized => m_initialized;
@@ -45,7 +44,6 @@ public class BookGameController : MonoBehaviour
     public bool IsEditing => m_editing;
     public PageData PendingPage => null;
     public int MaxPageCount => m_maxPageCount;
-    public int MaxPendingRequests => m_maxPendingRequests;
     public event Action ReplacementRequested { add { } remove { } }
     public event Action ReplacementDismissed { add { } remove { } }
     public event Action<bool> InventoryEditFinished;
@@ -65,7 +63,6 @@ public class BookGameController : MonoBehaviour
         }
 
         m_maxPageCount = m_inventorySettings != null ? m_inventorySettings.MaxGamePageCount : 0;
-        m_maxPendingRequests = m_inventorySettings != null ? m_inventorySettings.MaxPendingRequests : 1;
 
         if (m_bookController == null || pageFactory == null || m_initialPages == null ||
             m_inventorySettings == null || m_initialPages.Length > MaxPageCount)
