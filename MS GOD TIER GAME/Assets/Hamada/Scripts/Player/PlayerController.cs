@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private MagicDatabase m_magicDatabase;
     [SerializeField] private TargetSelector m_targetSelector;
     [SerializeField] private BookNetworkServer m_bookNetworkServer;
+    [SerializeField] private ScreenEffectManager m_screenEffectManager;
 
     [SerializeField] private MagicData magicData;
 
@@ -41,8 +42,9 @@ public class PlayerController : MonoBehaviour
     //ダメージ処理
     public void TakeDamage(byte dirtAmount) 
     {
-        //汚れの付着
 
+
+        //汚れの付着
         BookNetworkServer server = BookNetworkServer.Instance;
 
         if (server != null) 
@@ -52,6 +54,7 @@ public class PlayerController : MonoBehaviour
         }
 
         //ダメージエフェクト
+        m_screenEffectManager.DoDamageScreen();
 
         //シェイク
         CameraManager.Instance.ShakeCamera(.5f, 10);

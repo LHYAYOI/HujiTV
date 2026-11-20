@@ -2,13 +2,37 @@
 using System.Collections.Generic;
 using System.Collections;
 
-public class SpiderController : MonoBehaviour
+public class SpiderController : EnemyBase
 {
     [SerializeField] StateMachine m_stateMachine;
 
     [SerializeField] Animator m_animator;
 
+    [SerializeField] GameObject m_webShootPoint;
+
+    [SerializeField] GameObject m_spiderWeb;
+
+    [SerializeField] PlayerController m_playerController;
+
     [SerializeField] List<SpiderHitColliderController> m_colliders;
+
+    // スポナーからの呼び出し用初期化関数
+    public override void Initialize() 
+    {
+    
+    }
+
+    // バトル開始時の処理を行う関数
+    public override void BattleStart() 
+    {
+    
+    }
+
+    // バトル終了時の処理を行う関数
+    public override void BattleEnd() 
+    {
+    
+    }
 
     private void OnEnable()
     {
@@ -84,6 +108,19 @@ public class SpiderController : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void IntroEffect()
+    {
+        CameraManager.Instance.ShakeCamera(2, 3);
+        RadialBlurController.Instance.Play(1, .3f);
+    }
+
+    public void AttackPlayer() 
+    {
+        Instantiate(m_spiderWeb, m_webShootPoint.transform.position, m_webShootPoint.transform.rotation);
+
+        m_playerController.TakeDamage((byte)m_enemyData.m_attack);
     }
 
     public Animator GetAnimator() 
