@@ -8,6 +8,10 @@ public class SpiderController : EnemyBase
 
     [SerializeField] Animator m_animator;
 
+    [SerializeField] GameObject m_webShootPoint;
+
+    [SerializeField] GameObject m_spiderWeb;
+
     [SerializeField] PlayerController m_playerController;
 
     [SerializeField] List<SpiderHitColliderController> m_colliders;
@@ -114,6 +118,8 @@ public class SpiderController : EnemyBase
 
     public void AttackPlayer() 
     {
+        Instantiate(m_spiderWeb, m_webShootPoint.transform.position, m_webShootPoint.transform.rotation);
+
         m_playerController.TakeDamage((byte)m_enemyData.m_attack);
     }
 
