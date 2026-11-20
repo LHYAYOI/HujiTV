@@ -106,6 +106,11 @@ public class SpiderController : EnemyBase
         return false;
     }
 
+    public void IntroEffect()
+    {
+        CameraManager.Instance.ShakeCamera(2, 3);
+    }
+
     public void AttackPlayer() 
     {
         m_playerController.TakeDamage((byte)m_enemyData.m_attack);
