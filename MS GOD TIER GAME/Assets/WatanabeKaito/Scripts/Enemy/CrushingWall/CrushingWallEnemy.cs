@@ -1,11 +1,16 @@
 
+using NUnit.Framework;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Splines;
 
 public class CrushingWallEnemy : SplineMoveEnemy
 {
+    [Header("アニメーター")]
+    [SerializeField] private Animator m_animator;
+
     [Header("移動速度グラフ")]
     [SerializeField]
     private AnimationCurve m_speedCurve =
@@ -26,6 +31,9 @@ public class CrushingWallEnemy : SplineMoveEnemy
 
     [Header("プレイヤー移動開始から自身の移動開始までの時間")]
     [SerializeField] private float m_playerMoveToSelfMoveDelay = 1f;
+
+    [Header("Targetable")]
+    [SerializeField] private List<TargetableObject> m_targetableObjects = new List<TargetableObject>();
 
     private float m_speedElapsedTime = 0f; // 移動速度グラフの経過時間
 
@@ -150,12 +158,15 @@ public class CrushingWallEnemy : SplineMoveEnemy
     // 攻撃のコルーチン
     public IEnumerator AttackCoroutine(CartController cartController)
     {
+        // TargetableObject全てを非アクティブにする
+        DeactivateAllTargetableObjects();
+
         // お互いに移動を止める
         cartController.SetSpeed(0f);
         m_isAttackingFlag = true;
 
         // 攻撃アニメーション
-
+        m_animator.SetTrigger("tAttack");
 
         // 攻撃終了後、プレイヤーの移動を再開するまでの待機
         yield return new WaitForSeconds(m_attackToPlayerMoveDelay);
@@ -168,5 +179,26 @@ public class CrushingWallEnemy : SplineMoveEnemy
 
         // 自身の移動を再開
         m_isAttackingFlag = false;
+
+        // TargetableObject全てをアクティブにする
+        ActivateAllTargetableObjects();
+    }
+
+    // TargetableObject全てをアクティブにする
+    public void ActivateAllTargetableObjects()
+    {
+        foreach (var targetable in m_targetableObjects)
+        {
+            targetable.SetTargetable(true);
+        }
+    }
+
+    // TargetableObject全てを非アクティブにする
+    public void DeactivateAllTargetableObjects()
+    {
+        foreach (var targetable in m_targetableObjects)
+        {
+            targetable.SetTargetable(false);
+        }
     }
 }
