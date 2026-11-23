@@ -1,6 +1,6 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "Spider_Idle", menuName = "Scriptable Objects/Spider_Idle")]
+[CreateAssetMenu(fileName = "Spider_Idle", menuName = "Scriptable Objects/Spider/Spider_Idle")]
 public class Spider_Idle : StateBase
 {
     [SerializeField] float m_doAttackTime = 10;

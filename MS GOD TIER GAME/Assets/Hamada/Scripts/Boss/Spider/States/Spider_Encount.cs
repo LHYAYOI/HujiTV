@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "Spider_Encount", menuName = "Scriptable Objects/Spider_Encount")]
+[CreateAssetMenu(fileName = "Spider_Encount", menuName = "Scriptable Objects/Spider/Spider_Encount")]
 public class Spider_Encount : StateBase
 {
     SpiderController m_controller;

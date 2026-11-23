@@ -1,6 +1,6 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "Spider_Damageable", menuName = "Scriptable Objects/Spider_Damageable")]
+[CreateAssetMenu(fileName = "Spider_Damageable", menuName = "Scriptable Objects/Spider/Spider_Damageable")]
 public class Spider_Damageable : StateBase
 {
     [SerializeField] float m_damageableDuration = 10;

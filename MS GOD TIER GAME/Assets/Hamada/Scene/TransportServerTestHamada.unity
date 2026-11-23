@@ -461,6 +461,64 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 408630909}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &445313434
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 445313435}
+  - component: {fileID: 445313437}
+  - component: {fileID: 445313436}
+  m_Layer: 0
+  m_Name: SelectCollider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &445313435
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 445313434}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 818427786}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &445313436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 445313434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cbaad71236fc3847a357071779833c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TargetableObject
+  m_IsTargetableFlag: 1
+--- !u!114 &445313437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 445313434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4abef53da95ebe74e93f06fc42790a2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::testHitSender
 --- !u!1 &460017166
 GameObject:
   m_ObjectHideFlags: 0
@@ -775,7 +833,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &568092639
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1221,7 +1279,8 @@ Transform:
   m_LocalPosition: {x: 0, y: -0.18, z: 0}
   m_LocalScale: {x: 1, y: 1.7, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 445313435}
   m_Father: {fileID: 956464052}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &818427787
@@ -1416,7 +1475,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &956464052
 Transform:
   m_ObjectHideFlags: 0
@@ -1449,7 +1508,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97348d25989e18147a6c82bbb51f9f15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StateMachine
-  m_stateList: []
+  m_stateList:
+  - {fileID: 11400000, guid: ff8e3c5d34e1d104b86e2e75ea16f00a, type: 2}
+  - {fileID: 11400000, guid: 7b170fe38be569d4f9284b285fe9cf87, type: 2}
+  - {fileID: 11400000, guid: e4b70102468abca49a0a576497725d92, type: 2}
+  - {fileID: 11400000, guid: 1469368db45f06044aa48784ec60008c, type: 2}
+  - {fileID: 11400000, guid: c161ce5de4583ee40aee71c856c83af7, type: 2}
+  - {fileID: 11400000, guid: 6c1b618b68fbc8841b17aa98e33cf5b7, type: 2}
+  - {fileID: 11400000, guid: c5601c0f3d1bb5e449dd068b4800ba3f, type: 2}
 --- !u!114 &956464054
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1507,7 +1573,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1035992087
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1730,7 +1796,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1078199874
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3127,7 +3193,7 @@ PrefabInstance:
     - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
       propertyPath: magicData
       value: 
-      objectReference: {fileID: 11400000, guid: fd84468c9ad10ad489611b6288bb8c24, type: 2}
+      objectReference: {fileID: 11400000, guid: 17ef150f604effd4e91c6dfb9950d6c0, type: 2}
     - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
       propertyPath: m_bulletManager
       value: 
