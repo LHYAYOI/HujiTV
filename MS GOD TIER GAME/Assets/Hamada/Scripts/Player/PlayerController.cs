@@ -42,8 +42,6 @@ public class PlayerController : MonoBehaviour
     //ダメージ処理
     public void TakeDamage(byte dirtAmount) 
     {
-
-
         //汚れの付着
         BookNetworkServer server = BookNetworkServer.Instance;
 

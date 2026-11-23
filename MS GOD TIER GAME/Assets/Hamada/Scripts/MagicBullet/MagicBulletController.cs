@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
+using static UnityEngine.ParticleSystem;
 
 public class MagicBulletController : MonoBehaviour
 {
@@ -15,7 +16,7 @@ public class MagicBulletController : MonoBehaviour
 
     [SerializeField] MagicData m_magicData;
 
-    [SerializeField] GameObject m_trail;
+    [SerializeField] List<ParticleController> m_particles;
 
     [SerializeField] GameObject m_hitEffect;
 
@@ -82,6 +83,7 @@ public class MagicBulletController : MonoBehaviour
         {
             if (target == null) 
             {
+                TargetUnExistProcess();
                 yield break;
             }
 
@@ -104,6 +106,20 @@ public class MagicBulletController : MonoBehaviour
         return u * u * start + 2f * u * rate * controlPoint + rate * rate * end;
     }
 
+    private void TargetUnExistProcess() 
+    {
+        foreach (ParticleController particle in m_particles) 
+        {
+            if (particle == null) 
+            {
+                continue;
+            }
+
+            particle.MakeParticlesDestroyable(1);
+            particle.transform.parent = null;
+        }
+    }
+
     public void HitProcess(HitData hitData) 
     {
         if (hitData == null) 
@@ -117,11 +133,16 @@ public class MagicBulletController : MonoBehaviour
             m_hitUIManager.ShowHitUI(hitData.GetHitObject, m_magicData.ImpactRuneTexture);
         }
 
-        m_trail.transform.parent = null;
+        foreach (ParticleController particle in m_particles) 
+        {
+            if (particle.GetParticleType() == ParticleController.PARTICLE_TYPE.TRAIL) 
+            {
+                particle.gameObject.transform.parent = null;
+            }
+        }
 
         //ヒットエフェクト
         Instantiate(m_hitEffect, transform.position, quaternion.identity);
-
 
         Destroy(gameObject);
     }
