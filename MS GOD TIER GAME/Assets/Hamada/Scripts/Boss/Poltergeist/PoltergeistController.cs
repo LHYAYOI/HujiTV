@@ -5,7 +5,8 @@ public class PoltergeistController : EnemyBase
 {
     [SerializeField] StateMachine m_stateMachine;
 
-    [SerializeField] List<TargetableObject> m_selectPhaseColliders;
+    [SerializeField] List<TargetableObject> m_selectStateColliders;
+    [SerializeField] List<TargetableObject> m_stunStateColliders;
 
     GameObject m_shotObject;
 
@@ -24,6 +25,11 @@ public class PoltergeistController : EnemyBase
     // バトル終了時の処理を行う関数
     public override void BattleEnd() 
     {
+    }
+
+    private void Start()
+    {
+        ChangeState("Encounter");
     }
 
     public void ChangeState(string stateName) 
@@ -57,9 +63,9 @@ public class PoltergeistController : EnemyBase
     }
 
     //額縁が全て攻撃されたか
-    public bool IsAllAttacked() 
+    public void CheckIfIsAllPictureFrameAttacked() 
     {
-        foreach (TargetableObject collider in m_selectPhaseColliders) 
+        foreach (TargetableObject collider in m_selectStateColliders) 
         {
             if (collider == null) 
             {
@@ -68,10 +74,25 @@ public class PoltergeistController : EnemyBase
 
             if(collider.IsTargetable())
             {
-                return false;
+                return;
             }
         }
 
-        return true;
+        //スタン状態へ
+        ChangeState("Stun");
+    }
+
+    //額縁のコライダーをまた狙えるようにする
+    public void ActiveAllPictureFrameCollider() 
+    {
+        foreach (TargetableObject collider in m_selectStateColliders)
+        {
+            if (collider == null)
+            {
+                continue;
+            }
+
+            collider.SetTargetable(true);
+        }
     }
 }
