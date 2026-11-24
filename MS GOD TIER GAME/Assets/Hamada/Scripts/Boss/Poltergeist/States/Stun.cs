@@ -6,6 +6,8 @@ public class Stun : StateBase
 {
     [SerializeField] float m_stunDuration;
 
+    bool m_startTimerFlag = false;
+
     float m_timer;
 
     PoltergeistController m_controller;
@@ -22,11 +24,24 @@ public class Stun : StateBase
 
     public override void EnterState()
     {
+        m_timer = 0;
+
+        m_startTimerFlag = false;
+
         Debug.Log("スタン");
+
+        m_controller.StunStateCollidersActivateFlag(true);
+
+        RoutineRunner.instance.RunRoutine(BringBackBodyPartsRoutine());
     }
 
     public override void UpdateState()
     {
+        if (!m_startTimerFlag) 
+        {
+            return;
+        }
+
         m_timer += Time.deltaTime;
 
         if (m_timer >= m_stunDuration) 
@@ -43,5 +58,7 @@ public class Stun : StateBase
     IEnumerator BringBackBodyPartsRoutine()
     {
         yield return m_controller.ResetBodyPartsPosition(2);
+
+        m_startTimerFlag = true;
     }
 }

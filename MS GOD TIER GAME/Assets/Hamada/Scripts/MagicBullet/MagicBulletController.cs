@@ -45,7 +45,7 @@ public class MagicBulletController : MonoBehaviour
         m_hitUIManager = manager;
     }
 
-    public void FireBullet(GameObject target, MAGIC_CAST_DIRECTION direction)
+    public void FireBullet(TargetableObject target, MAGIC_CAST_DIRECTION direction)
     {
         if (target == null) 
         {
@@ -73,7 +73,7 @@ public class MagicBulletController : MonoBehaviour
         m_controlPoint = centerPoint + Vector3.up * curveHeight + Vector3.right * curveWidth;
     }
 
-    private IEnumerator HomingRoutine(GameObject target, float duration)
+    private IEnumerator HomingRoutine(TargetableObject target, float duration)
     {
         Vector3 startPosition = transform.position;
 
@@ -81,7 +81,7 @@ public class MagicBulletController : MonoBehaviour
 
         while (deltaTime < duration)
         {
-            if (target == null) 
+            if (target == null || !target.IsTargetable()) 
             {
                 TargetUnExistProcess();
                 yield break;

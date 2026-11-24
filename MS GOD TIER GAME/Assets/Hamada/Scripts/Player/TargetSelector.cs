@@ -259,7 +259,7 @@ public class TargetSelector : MonoBehaviour
         return false;
     }
 
-    public GameObject GetSelectedTarget(MAGIC_CAST_DIRECTION index) 
+    public TargetableObject GetSelectedTarget(MAGIC_CAST_DIRECTION index) 
     {
         int intIndex = (int)index;
 
@@ -275,14 +275,7 @@ public class TargetSelector : MonoBehaviour
             return null;
         }
 
-        GameObject target = targetable.gameObject;
-
-        if (target == null) 
-        {
-            return null;
-        }
-
-        return target;
+        return targetable;
     }
 
     private void OnGUI()

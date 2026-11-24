@@ -15,7 +15,7 @@ public class Attack : StateBase
 
     public override void EnterState()
     {
-
+        Debug.Log("Attack");
     }
 
     public override void UpdateState()

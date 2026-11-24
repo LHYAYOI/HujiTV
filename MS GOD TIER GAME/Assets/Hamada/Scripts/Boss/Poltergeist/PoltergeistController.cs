@@ -93,6 +93,22 @@ public class PoltergeistController : EnemyBase
         ChangeState("Stun");
     }
 
+    public void StunColliderHitProcess() 
+    {
+        m_attackedCount++;
+
+        StunStateCollidersActivateFlag(false);
+
+        if (m_attackedCount >= 2)
+        {
+            ChangeState("Death");
+        }
+        else 
+        {
+            ChangeState("Attacked");
+        }
+    }
+
     public void SelectStateCollidersActivateFlag(bool flag) 
     {
         ActiveAllPictureFrameCollider(m_selectStateColliders, flag);

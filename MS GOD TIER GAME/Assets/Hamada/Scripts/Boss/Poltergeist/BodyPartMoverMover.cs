@@ -15,10 +15,14 @@ public class BodyPartMover : MonoBehaviour
     //目も
     //ノイズのレートとsinのレートをトランジションさせる
 
+    private void Awake()
+    {
+        m_startAnchorPosition = m_anchor.transform.localPosition;
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        m_startAnchorPosition = m_anchor.transform.localPosition;
         m_seed = Random.Range(0, 1000);
     }
 
@@ -35,7 +39,7 @@ public class BodyPartMover : MonoBehaviour
 
         Vector3 offset = new Vector3(noiseX * m_amplitudeX, noiseY * m_amplitudeY, 0);
 
-        transform.position = m_parent.transform.position + m_anchor.localPosition + offset;
+        transform.localPosition = m_anchor.localPosition + offset;
     }
 
     public void TransitionRate(float fromRate, float ToRate, float transitionRate) 

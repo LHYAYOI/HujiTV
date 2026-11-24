@@ -70,7 +70,7 @@ public class PlayerController : MonoBehaviour
     //弾の発射
     public void FireBullet(MagicData magicData, MAGIC_CAST_DIRECTION direction)
     {
-        GameObject target = m_targetSelector.GetSelectedTarget(direction);
+        TargetableObject target = m_targetSelector.GetSelectedTarget(direction);
 
         if (target == null) 
         {

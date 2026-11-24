@@ -31,6 +31,7 @@ public class Select : StateBase
 
         if (m_timer >= m_timeLimit) 
         {
+            m_controller.SelectStateCollidersActivateFlag(false);
             m_controller.ChangeState("Attack");
         }
     }
