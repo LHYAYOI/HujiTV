@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 using UnityEngine;
 
 public class PoltergeistController : EnemyBase
@@ -7,6 +10,10 @@ public class PoltergeistController : EnemyBase
 
     [SerializeField] List<TargetableObject> m_selectStateColliders;
     [SerializeField] List<TargetableObject> m_stunStateColliders;
+    [SerializeField] List<BodyPartMover> m_upperBody;
+    [SerializeField] List<BodyPartMover> m_legs;
+
+    List<BodyPartMover> m_wholeBody;
 
     GameObject m_shotObject;
 
@@ -29,6 +36,10 @@ public class PoltergeistController : EnemyBase
 
     private void Start()
     {
+        m_wholeBody = m_upperBody.Concat(m_legs).ToList();
+        SelectStateCollidersActivateFlag(false);
+        StunStateCollidersActivateFlag(false);
+        SetBodyPartsPosition(new Vector3(0, -5, 0));
         ChangeState("Encounter");
     }
 
@@ -82,17 +93,156 @@ public class PoltergeistController : EnemyBase
         ChangeState("Stun");
     }
 
-    //額縁のコライダーをまた狙えるようにする
-    public void ActiveAllPictureFrameCollider() 
+    public void SelectStateCollidersActivateFlag(bool flag) 
     {
-        foreach (TargetableObject collider in m_selectStateColliders)
+        ActiveAllPictureFrameCollider(m_selectStateColliders, flag);
+    }
+
+    public void StunStateCollidersActivateFlag(bool flag)
+    {
+        ActiveAllPictureFrameCollider(m_stunStateColliders, flag);
+    }
+
+    //額縁のコライダーをまた狙えるようにする
+    private void ActiveAllPictureFrameCollider(List<TargetableObject> colliderList, bool activeFlag)
+    {
+        foreach (TargetableObject collider in colliderList)
         {
             if (collider == null)
             {
                 continue;
             }
 
-            collider.SetTargetable(true);
+            collider.SetTargetable(activeFlag);
+            collider.gameObject.SetActive(activeFlag);
         }
     }
+
+    public void SetBodyPartsPosition(Vector3 position) 
+    {
+        foreach (BodyPartMover part in m_wholeBody) 
+        {
+            Vector3 movePosition = part.GetAnchorPosition() + position;
+            part.SetAnchorPosition(movePosition);
+        }
+    }
+
+    //全部移動
+    public void MoveAllParts(Vector3 targetPosition,float duration) 
+    {
+        StartCoroutine(MoveAllPartsRoutine(targetPosition, duration));
+    }
+
+    public IEnumerator MoveAllPartsRoutine(Vector3 targetPosition, float duration) 
+    {
+        float elapsedTime = 0;
+
+        Vector3[] startPosition = new Vector3[m_wholeBody.Count];
+        Vector3[] endPosition = new Vector3[m_wholeBody.Count];
+
+        for (int i = 0; i < m_wholeBody.Count; i++)
+        {
+            startPosition[i] = m_wholeBody[i].GetAnchorPosition();
+            endPosition[i] = startPosition[i] + targetPosition;
+        }
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+
+            float rate = Easing.EaseInOutCubic(elapsedTime / duration);
+
+            rate = Mathf.Clamp01(rate);
+
+            for (int i = 0; i < m_wholeBody.Count; i++)
+            {
+                Vector3 position = Vector3.Lerp(startPosition[i], endPosition[i], rate);
+                m_wholeBody[i].SetAnchorPosition(position);
+            }
+
+            yield return null;
+        }
+    }
+
+    //上半身移動
+    public IEnumerator MoveUpperBody(Vector3 targetPosition, float duration)
+    {
+        yield return MoveBodyPartsRoutine(m_upperBody,targetPosition, duration);
+    }
+
+    //足移動
+    public IEnumerator MoveLegs(Vector3 targetPosition, float duration)
+    {
+        yield return MoveBodyPartsRoutine(m_legs, targetPosition, duration);
+    }
+
+    private IEnumerator MoveBodyPartsRoutine(List<BodyPartMover> parts, Vector3 targetPosition, float duration) 
+    {
+        float elapsedTime = 0;
+
+        Vector3[] startPosition = new Vector3[parts.Count];
+        Vector3[] endPosition = new Vector3[parts.Count];
+
+        for (int i = 0; i < parts.Count; i++)
+        {
+            startPosition[i] = parts[i].GetAnchorPosition();
+            endPosition[i] = startPosition[i] + targetPosition;
+        }
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+
+            float rate = Easing.EaseInOutCubic(elapsedTime / duration);
+
+            rate = Mathf.Clamp01(rate);
+
+            for (int i = 0; i < parts.Count; i++)
+            {
+                Vector3 position = Vector3.Lerp(startPosition[i], endPosition[i], rate);
+                parts[i].SetAnchorPosition(position);
+            }
+
+            yield return null;
+        }
+    }
+
+    public IEnumerator ResetBodyPartsPosition(float duration) 
+    {
+        yield return ResetBodyPartsPositionRoutine(duration);
+    }
+
+    //体の各パーツを元の位置に戻す
+    IEnumerator ResetBodyPartsPositionRoutine(float duration) 
+    {
+        float elapsedTime = 0;
+
+        Vector3[] startPosition = new Vector3[m_wholeBody.Count];
+        Vector3[] endPosition = new Vector3[m_wholeBody.Count];
+
+        for (int i = 0; i < m_wholeBody.Count; i++)
+        {
+            startPosition[i] = m_wholeBody[i].GetAnchorPosition();
+            endPosition[i] = m_wholeBody[i].GetAnchorStartPosition();
+        }
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+
+            float rate = Easing.EaseInOutCubic(elapsedTime / duration);
+
+            rate = Mathf.Clamp01(rate);
+
+            for (int i = 0; i < m_wholeBody.Count; i++)
+            {
+                Vector3 position = Vector3.Lerp(startPosition[i], endPosition[i], rate);
+                m_wholeBody[i].SetAnchorPosition(position);
+            }
+
+            yield return null;
+        }
+    }
+
+    //上の３つだけ移動
 }
