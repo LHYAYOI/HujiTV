@@ -318,6 +318,17 @@ namespace YasudaHaruto.RollerCoaster.Editor
     {
         public override void OnInspectorGUI()
         {
+            var imageCourse=UnityEngine.Object.FindFirstObjectByType<RollerCoasterStoryboard>();
+            if(imageCourse!=null&&imageCourse.GetComponent<RollerCoasterTrialRide>().Course==(RollerCoasterCourse)target)
+            {
+                EditorGUILayout.HelpBox("画像①〜⑪のコースです。速度・ワゴン・天井はTrial RideのStoryboardから調整できます。",MessageType.Info);
+                if(GUILayout.Button("速度と演出の設定を選択"))Selection.activeGameObject=imageCourse.gameObject;
+                if(GUILayout.Button("走行用スプラインを選択"))Selection.activeGameObject=((RollerCoasterCourse)target).Spline.gameObject;
+                using(new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
+                    if(GUILayout.Button("画像①〜⑪からコースを再生成"))
+                        try{RollerCoasterStoryboardBuilder.Build();}catch(Exception error){Debug.LogException(error);}
+                return;
+            }
             DrawDefaultInspector();
             EditorGUILayout.HelpBox("黒＝平坦、赤＝上り、青＝下り。形の再生成はSplineの手編集を置き換えます。速度と停止時間はTrial RideのSpeed Profileで調整します。入口・出口とワープは仮設定です。", MessageType.Info);
             if (GUILayout.Button("設計値からコースと線路を再生成"))
@@ -338,6 +349,13 @@ namespace YasudaHaruto.RollerCoaster.Editor
             var course = (RollerCoasterCourse)target;
             if (course.Spline == null || course.Spline.Spline.Count < 2) return;
             var spline = course.Spline.Spline;
+            var imageCourse=UnityEngine.Object.FindFirstObjectByType<RollerCoasterStoryboard>();
+            if(imageCourse!=null&&imageCourse.GetComponent<RollerCoasterTrialRide>().Course==course)
+            {
+                string[] names={"① 上り頂点","② 急降下","③ 大きな下降カーブ","④ 右回避","⑤ 左回避","⑥ 左のワゴンと並走","⑦ 上がる天井","⑧ 天井・線路切れ・右回避","⑨ 横断ワゴン","⑩ 横断ワゴン","⑪ ブレーキ・落下"};
+                for(int i=0;i<names.Length;i++)Handles.Label((Vector3)course.Spline.EvaluatePosition(0,imageCourse.Markers[i])+Vector3.up,names[i]);
+                return;
+            }
             Label(0, "入口（仮）"); Label(course.CrestKnot, "下り直前／停止候補");
             Label(course.SpiralStartKnot, "らせん開始"); Label(course.SpiralEndKnot, "らせん終了");
             Label(course.FallStartKnot, "線路終了／落下開始"); Label(course.FallEndKnot, "線路再開"); Label(spline.Count - 1, "出口（仮）");

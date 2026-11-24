@@ -171,6 +171,12 @@ namespace YasudaHaruto.RollerCoaster.Editor
     {
         public override void OnInspectorGUI()
         {
+            var imageCourse=UnityEngine.Object.FindFirstObjectByType<RollerCoasterStoryboard>();
+            if(imageCourse!=null&&imageCourse.GetComponent<RollerCoasterTrialRide>().Course==((RollerCoasterEnclosures)target).Course)
+            {
+                EditorGUILayout.HelpBox("これは旧コースの囲い設定です。現在の囲いは画像①〜⑪のコース生成で更新します。",MessageType.Info);
+                return;
+            }
             DrawDefaultInspector();
             EditorGUILayout.HelpBox("Smoothで連続した囲いを生成します。落下部分は閉じた縦長空間に接続。色はSeedで固定。生成root内は再生成で置き換えるため、手置き物は外へ置いてください。", MessageType.Info);
             using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))

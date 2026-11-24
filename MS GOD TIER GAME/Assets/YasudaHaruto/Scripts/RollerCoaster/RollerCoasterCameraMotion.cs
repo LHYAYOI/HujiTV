@@ -88,7 +88,7 @@ namespace YasudaHaruto.RollerCoaster
             LandingImpactCount = 0;
             m_driving = true;
             m_verticalNoise=m_virtualCamera.GetComponent<RollerCoasterVerticalNoiseExtension>();
-            m_encounters=m_course.GetComponentsInChildren<RollerCoasterEncounter>(true);
+            m_encounters=GetComponent<RollerCoasterStoryboard>()!=null?new RollerCoasterEncounter[0]:m_course.GetComponentsInChildren<RollerCoasterEncounter>(true);
             m_lookExtension=m_virtualCamera.GetComponent<CinemachineRotationExtension>();m_lookYaw=0f;
             m_shake.StopAllCoroutines();
             if(m_verticalNoise!=null)m_verticalNoise.VerticalScale=1f;
@@ -158,7 +158,8 @@ namespace YasudaHaruto.RollerCoaster
             }
             m_previousProgress = progress;
             m_previousSlope = slope;
-            float look=0f;
+            var storyLook=GetComponent<RollerCoasterStoryboard>();
+            float look=storyLook!=null?storyLook.LookYawAt(progress):0f;
             if(m_encounters!=null)foreach(var encounter in m_encounters)
             {
                 float weight=Mathf.SmoothStep(0,1,Mathf.InverseLerp(encounter.Begin-.025f,encounter.Begin-.004f,progress))*
@@ -177,12 +178,16 @@ namespace YasudaHaruto.RollerCoaster
                 rattleTime=m_speedProfile.DropBrakeElapsed;
                 rattle=Mathf.Sin(Mathf.PI*m_speedProfile.DropBrakeProgress);
             }
+            var storyboard=GetComponent<RollerCoasterStoryboard>();
+            if(storyboard!=null&&storyboard.BrakeFailing){rattleTime=storyboard.BrakePhase*2f;rattle=1f;}
+            Vector3 bankJolt=storyboard!=null?storyboard.BankReturnShakeAt(progress):Vector3.zero;
+            float bankDip=storyboard!=null?storyboard.BankReturnDipAt(progress):0;
             BrakeRattleRotation=new Vector3(Mathf.Sin(rattleTime*2f*Mathf.PI*23f),.3f*Mathf.Sin(rattleTime*2f*Mathf.PI*29f),
                 .5f*Mathf.Sin(rattleTime*2f*Mathf.PI*18f))*m_brakeRattleDegrees*rattle;
             if(m_lookExtension!=null)m_lookExtension.SetShakeRotationOffset(new Vector3(
                 Mathf.Sin(m_landingElapsed*45f)*m_landingPitch,
                 Mathf.Sin(m_landingElapsed*37f)*m_landingYaw,
-                Mathf.Sin(m_landingElapsed*41f)*m_landingRoll)*impact*impact+BrakeRattleRotation);
+                Mathf.Sin(m_landingElapsed*41f)*m_landingRoll)*impact*impact+BrakeRattleRotation+bankJolt);
             float sink=m_landingElapsed<.65f?-.18f*Mathf.Sin(Mathf.PI*m_landingElapsed/.65f):0f;
             float brake=0f;
             if(m_speedProfile!=null&&m_speedProfile.DropBrakeStarted)
@@ -192,7 +197,7 @@ namespace YasudaHaruto.RollerCoaster
                 brake=Mathf.SmoothStep(0f,1f,elapsed/.14f)*(1f-recovery);
             }
             BrakeLeanWeight=brake;
-            m_virtualCamera.transform.localPosition=m_baseCameraPosition+new Vector3(0,m_floatHeight*airWeight+sink-.06f*brake+.009f*rattle*Mathf.Sin(rattleTime*2f*Mathf.PI*27f),m_brakeForward*brake);
+            m_virtualCamera.transform.localPosition=m_baseCameraPosition+new Vector3(0,m_floatHeight*airWeight+sink+bankDip-.06f*brake+.009f*rattle*Mathf.Sin(rattleTime*2f*Mathf.PI*27f),m_brakeForward*brake);
             var lens=m_virtualCamera.Lens;
             lens.FieldOfView=m_baseFov+Mathf.Clamp01(m_cart.Speed/36f)*5f+m_fallFovBoost*airWeight;
             m_virtualCamera.Lens=lens;

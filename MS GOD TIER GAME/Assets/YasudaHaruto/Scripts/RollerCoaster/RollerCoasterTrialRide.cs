@@ -15,6 +15,8 @@ namespace YasudaHaruto.RollerCoaster
         [SerializeField] private Light m_trialLight;
         [SerializeField] private RollerCoasterSpeedProfile m_speedProfile;
         [SerializeField] private RollerCoasterCameraMotion m_cameraMotion;
+        [SerializeField,Tooltip("乗車視点に表示する車体部分。走行用の車体を隠す処理から除外する。")]
+        private Transform m_foregroundVisual;
         [SerializeField, Min(0.1f), Tooltip("区間速度が無効なときの一定速度。")]
         private float m_speed = 12f;
         [SerializeField, Range(0f, 0.99f)] private float m_startProgress;
@@ -22,6 +24,9 @@ namespace YasudaHaruto.RollerCoaster
         private readonly List<Camera> m_disabledCameras = new List<Camera>();
         private readonly List<AudioListener> m_disabledListeners = new List<AudioListener>();
         private readonly List<CinemachineBrain> m_disabledBrains = new List<CinemachineBrain>();
+        private RollerCoasterStoryboard m_storyboard;
+        private readonly List<(GameObject Object,int Layer)> m_riderLayers=new List<(GameObject,int)>();
+        private int m_originalCameraMask;
         private bool m_started;
         private bool m_paused;
         private bool m_finished;
@@ -38,6 +43,7 @@ namespace YasudaHaruto.RollerCoaster
         public float Progress => m_length > 0f && m_cart != null ? Mathf.Clamp01(m_cart.SplineOffset / m_length) : 0f;
         public bool Finished => m_finished;
         public bool Paused => m_paused;
+        public Transform ForegroundVisual => m_foregroundVisual;
 
         private void Start()
         {
@@ -47,6 +53,7 @@ namespace YasudaHaruto.RollerCoaster
                 enabled = false;
                 return;
             }
+            m_storyboard=GetComponent<RollerCoasterStoryboard>();
             RefreshRouteFrames();
             if (m_length <= 0f) { enabled = false; return; }
             foreach (var camera in FindObjectsByType<Camera>(FindObjectsSortMode.None))
@@ -62,6 +69,16 @@ namespace YasudaHaruto.RollerCoaster
                 if (!listener.enabled || listener.gameObject == m_rideCamera.gameObject || listener.gameObject.scene != gameObject.scene) continue;
                 m_disabledListeners.Add(listener);
                 listener.enabled = false;
+            }
+            m_originalCameraMask=m_rideCamera.cullingMask;
+            if(m_storyboard!=null)
+            {
+                foreach(var renderer in m_cart.GetComponentsInChildren<Renderer>(true))
+                {
+                    if(m_foregroundVisual!=null&&renderer.transform.IsChildOf(m_foregroundVisual))continue;
+                    m_riderLayers.Add((renderer.gameObject,renderer.gameObject.layer));renderer.gameObject.layer=2;
+                }
+                m_rideCamera.cullingMask&=~(1<<2);
             }
             m_rideCamera.enabled = true;
             if (m_trialLight != null) m_trialLight.enabled = true;
@@ -79,9 +96,10 @@ namespace YasudaHaruto.RollerCoaster
         private void LateUpdate()
         {
             if (!m_started) return;
-            if (!m_paused && !m_finished && m_speedProfile != null)
+            if (!m_paused && !m_finished && (m_speedProfile != null || m_storyboard != null))
             {
-                if (m_speedProfile.UseSectionSpeeds) m_speedProfile.Tick(Progress, Time.deltaTime, m_speed);
+                if(m_storyboard!=null&&m_storyboard.enabled)m_storyboard.Tick(Progress,Time.deltaTime);
+                else if (m_speedProfile.UseSectionSpeeds) m_speedProfile.Tick(Progress, Time.deltaTime, m_speed);
                 else m_cart.SetSpeed(m_speed);
             }
             ApplyPose(Progress);
@@ -95,6 +113,7 @@ namespace YasudaHaruto.RollerCoaster
         public void ApplyPose(float parameter)
         {
             Vector3 position = m_course.Spline.EvaluatePosition(0, Mathf.Clamp01(parameter));
+            if(m_storyboard!=null&&m_storyboard.enabled)position+=m_storyboard.WheelPivotOffset(parameter);
             // 既存の回転Lerp遅延を、この確認用車両に限って補正する。
             m_cart.transform.SetPositionAndRotation(position, EvaluateRideRotation(parameter));
         }
@@ -118,6 +137,7 @@ namespace YasudaHaruto.RollerCoaster
         public Quaternion EvaluateRideRotation(float parameter)
         {
             parameter = Mathf.Clamp01(parameter);
+            if(m_storyboard!=null&&m_storyboard.enabled)return m_storyboard.RotationAt(parameter);
             if (parameter >= m_gapStart && parameter <= m_gapEnd && m_gapEnd > m_gapStart)
             {
                 float progress = Mathf.InverseLerp(m_gapStart, m_gapEnd, parameter);
@@ -155,6 +175,7 @@ namespace YasudaHaruto.RollerCoaster
             if(lighting!=null)lighting.RestartLighting();
             m_cart.SetSpline(m_course.Spline, m_startProgress * m_length, false, true);
             if (m_speedProfile != null) m_speedProfile.Initialize(m_course, m_cart, m_startProgress);
+            if(m_storyboard!=null&&m_storyboard.enabled)m_storyboard.RestartSequence();
             m_cart.SetSpeed(CurrentTargetSpeed());
             ApplyPose(m_startProgress);
             if (m_cameraMotion != null) m_cameraMotion.BeginRide(m_startProgress);
@@ -163,6 +184,9 @@ namespace YasudaHaruto.RollerCoaster
         private void OnDisable()
         {
             if (m_cameraMotion != null) m_cameraMotion.EndRide();
+            foreach(var entry in m_riderLayers)if(entry.Object!=null)entry.Object.layer=entry.Layer;
+            m_riderLayers.Clear();
+            if(m_started&&m_rideCamera!=null)m_rideCamera.cullingMask=m_originalCameraMask;
             if (m_started && m_cart != null) m_cart.SetSpeed(0f);
             foreach (var camera in m_disabledCameras) if (camera != null) camera.enabled = true;
             foreach (var listener in m_disabledListeners) if (listener != null) listener.enabled = true;
@@ -183,6 +207,7 @@ namespace YasudaHaruto.RollerCoaster
         }
 
 #if UNITY_EDITOR
+        public void SetForegroundVisual(Transform visual){m_foregroundVisual=visual;}
         public void SetSpeedProfile(RollerCoasterSpeedProfile profile) { m_speedProfile = profile; }
         public void SetCameraMotion(RollerCoasterCameraMotion motion) { m_cameraMotion = motion; }
         public void Configure(RollerCoasterCourse course, CartController cart, Camera camera, Light light)
@@ -190,6 +215,6 @@ namespace YasudaHaruto.RollerCoaster
             m_course = course; m_cart = cart; m_rideCamera = camera; m_trialLight = light;
         }
 #endif
-        private float CurrentTargetSpeed() => m_speedProfile != null ? m_speedProfile.CurrentSpeed(Progress, m_speed) : m_speed;
+        private float CurrentTargetSpeed() => m_storyboard!=null&&m_storyboard.enabled?m_storyboard.SpeedAt(Progress):m_speedProfile != null ? m_speedProfile.CurrentSpeed(Progress, m_speed) : m_speed;
     }
 }

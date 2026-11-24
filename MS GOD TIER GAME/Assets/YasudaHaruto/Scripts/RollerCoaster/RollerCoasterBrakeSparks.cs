@@ -8,6 +8,7 @@ namespace YasudaHaruto.RollerCoaster
         [SerializeField] private Material m_material;
         private RollerCoasterTrialRide m_ride;
         private RollerCoasterSpeedProfile m_profile;
+        private RollerCoasterStoryboard m_storyboard;
         private readonly ParticleSystem[] m_sides=new ParticleSystem[2];
         private float m_emissionRemainder;
         private float m_previousBrakeTime;
@@ -17,14 +18,15 @@ namespace YasudaHaruto.RollerCoaster
 
         private void Start()
         {
-            m_ride=GetComponent<RollerCoasterTrialRide>();m_profile=GetComponent<RollerCoasterSpeedProfile>();
+            m_ride=GetComponent<RollerCoasterTrialRide>();m_profile=GetComponent<RollerCoasterSpeedProfile>();m_storyboard=GetComponent<RollerCoasterStoryboard>();
             for(int side=0;side<2;side++)
             {
                 var go=new GameObject(side==0?"Left Brake Sparks":"Right Brake Sparks");
-                go.transform.SetParent(m_ride.Cart.transform,false);go.transform.localPosition=new Vector3(side==0?-.88f:.88f,.2f,.7f);
+                go.transform.SetParent(m_ride.Cart.transform,false);go.transform.localPosition=m_storyboard!=null?
+                    new Vector3(side==0?-.7f:.7f,.25f,1.2f):new Vector3(side==0?-.88f:.88f,.2f,.7f);
                 var system=go.AddComponent<ParticleSystem>();system.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);
                 var main=system.main;main.loop=true;main.playOnAwake=false;main.simulationSpace=ParticleSystemSimulationSpace.World;
-                main.startLifetime=new ParticleSystem.MinMaxCurve(.14f,.28f);main.startSize=new ParticleSystem.MinMaxCurve(.016f,.035f);
+                main.startLifetime=new ParticleSystem.MinMaxCurve(.18f,.32f);main.startSize=new ParticleSystem.MinMaxCurve(.025f,.055f);
                 main.startSpeed=0f;main.gravityModifier=1f;main.maxParticles=180;main.cullingMode=ParticleSystemCullingMode.AlwaysSimulate;
                 var emission=system.emission;emission.enabled=false;var shape=system.shape;shape.enabled=false;
                 var gradient=new Gradient();gradient.SetKeys(new[]{new GradientColorKey(new Color(1f,.95f,.55f),0),new GradientColorKey(new Color(1f,.32f,.025f),1)},
@@ -40,13 +42,15 @@ namespace YasudaHaruto.RollerCoaster
         private void LateUpdate()
         {
             if(m_ride==null||m_sides[0]==null)return;
-            if(m_profile.DropBrakeElapsed<m_previousBrakeTime||!m_profile.DropBrakeStarted)
+            bool braking=m_storyboard!=null?m_storyboard.BrakeFailing:m_profile.DropBrakeStarted&&m_profile.DropStage==RollerCoasterSpeedProfile.DROP_STAGE.APPROACH;
+            float brakeTime=m_storyboard!=null?m_storyboard.BrakePhase:m_profile.DropBrakeElapsed;
+            if(brakeTime<m_previousBrakeTime||!braking)
             {foreach(var side in m_sides)side.Clear();m_emissionRemainder=0f;}
-            m_previousBrakeTime=m_profile.DropBrakeElapsed;
+            m_previousBrakeTime=brakeTime;
             if(m_ride.Paused)
             {foreach(var side in m_sides)if(!side.isPaused)side.Pause();return;}
             foreach(var side in m_sides)if(side.isPaused)side.Play();
-            if(!m_profile.DropBrakeStarted||m_profile.DropStage!=RollerCoasterSpeedProfile.DROP_STAGE.APPROACH||m_ride.Cart.Speed<.15f)return;
+            if(!braking||m_ride.Cart.Speed<.15f)return;
             m_emissionRemainder+=Time.deltaTime*Mathf.Lerp(70f,180f,Mathf.Clamp01(m_ride.Cart.Speed/16f));
             int count=Mathf.FloorToInt(m_emissionRemainder);m_emissionRemainder-=count;
             for(int side=0;side<2;side++)for(int i=0;i<count;i++)
@@ -54,6 +58,9 @@ namespace YasudaHaruto.RollerCoaster
                 var source=m_sides[side].transform;
                 var velocity=new Vector3((side==0?-1:1)*Random.Range(.3f,.9f),Random.Range(2.8f,4.5f),-Random.Range(3f,5f));
                 Vector3 worldVelocity=source.TransformDirection(velocity)+m_ride.Cart.transform.forward*m_ride.Cart.Speed*.6f;
+                if(m_storyboard!=null)
+                    worldVelocity=source.TransformDirection(new Vector3((side==0?-1:1)*Random.Range(.15f,.5f),Random.Range(4f,6f),-Random.Range(7f,11f)))+
+                        m_ride.Cart.transform.forward*m_ride.Cart.Speed;
                 LastRelativeForwardSpeed=Vector3.Dot(worldVelocity-m_ride.Cart.transform.forward*m_ride.Cart.Speed,m_ride.Cart.transform.forward);
                 var particle=new ParticleSystem.EmitParams{position=source.position,velocity=worldVelocity};
                 m_sides[side].Emit(particle,1);
