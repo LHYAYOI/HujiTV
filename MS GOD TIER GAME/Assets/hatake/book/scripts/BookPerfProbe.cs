@@ -26,6 +26,7 @@ namespace hatake
         [SerializeField] private bool m_benchmark;
         [SerializeField] private BookController m_controller;
         private bool m_benchIdleDone;
+        private bool m_benchIdleOpenDone; // 開いた見開きの静止（閉じた本の静止とは別に測る）
         private bool m_benchTurnDone;
         private bool m_benchCoverTurnDone;
         private bool m_benchEffectDone;
@@ -41,6 +42,7 @@ namespace hatake
         private float m_next;
         private string m_text = "";
         private int m_lastRenderCount;
+        private int m_lastMarkDirty, m_lastContentDirty, m_lastDelta;
         // メインスレッドの処理の時間（Update の始め〜フレームの終わり）。フレームの時間より大幅に短ければ GPU 待ち
         private double m_frameStart;
         private float m_workSum;
@@ -53,6 +55,24 @@ namespace hatake
             StartCoroutine(MeasureWork());
         }
 
+        // 計測用：シーンに BookPerfProbe が無くても、端末の persistentDataPath に probe を置くと起動時に足す
+        // （他の人のシーンを書き換えずに測るため。置かなければ何もしない）
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void AttachForMeasurement()
+        {
+            if (!System.IO.File.Exists(System.IO.Path.Combine(Application.persistentDataPath, "probe"))) return;
+            // fps60 も置くと、フレームレートの上限を 60 にして余力を測る（シーンの設定は変えない）
+            if (System.IO.File.Exists(System.IO.Path.Combine(Application.persistentDataPath, "fps60"))) Application.targetFrameRate = 60;
+            if (FindAnyObjectByType<BookPerfProbe>() != null) return;
+            BookFlipView flipView = FindAnyObjectByType<BookFlipView>();
+            if (flipView == null) return;
+            var holder = new GameObject("BookPerfProbe (measurement)");
+            holder.SetActive(false);
+            BookPerfProbe probe = holder.AddComponent<BookPerfProbe>();
+            probe.m_flipView = flipView;
+            holder.SetActive(true);
+        }
+
         private string m_prevNote = "";
         private float m_lastGpu;
         private bool m_logTurns; // 端末に turnlog を置くと、めくり中の全フレームを [BookSpike] に書く
@@ -60,6 +80,7 @@ namespace hatake
 
         private IEnumerator MeasureWork()
         {
+            Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
             while (true)
             {
                 yield return m_endOfFrame;
@@ -67,9 +88,9 @@ namespace hatake
                 if (m_compare && m_flipView != null && Time.unscaledTime > 3f) RunCompareIfDue();
                 if (m_benchmark && m_flipView != null)
                 {
-                    int before = (m_benchIdleDone ? 1 : 0) + (m_benchTurnDone ? 1 : 0) + (m_benchCoverTurnDone ? 1 : 0) + (m_benchEffectDone ? 1 : 0);
+                    int before = (m_benchIdleDone ? 1 : 0) + (m_benchIdleOpenDone ? 1 : 0) + (m_benchTurnDone ? 1 : 0) + (m_benchCoverTurnDone ? 1 : 0) + (m_benchEffectDone ? 1 : 0);
                     RunBenchmarkIfDue();
-                    benched = before != (m_benchIdleDone ? 1 : 0) + (m_benchTurnDone ? 1 : 0) + (m_benchCoverTurnDone ? 1 : 0) + (m_benchEffectDone ? 1 : 0);
+                    benched = before != (m_benchIdleDone ? 1 : 0) + (m_benchIdleOpenDone ? 1 : 0) + (m_benchTurnDone ? 1 : 0) + (m_benchCoverTurnDone ? 1 : 0) + (m_benchEffectDone ? 1 : 0);
                 }
                 if (m_frameStart <= 0) continue;
                 float work = (float)((Time.realtimeSinceStartupAsDouble - m_frameStart) * 1000.0);
@@ -80,9 +101,9 @@ namespace hatake
                     // 目標のフレーム間隔（targetFrameRate）より長くかかったフレーム
                     float budget = Application.targetFrameRate > 0 ? 1000f / Application.targetFrameRate : 33.4f;
                     // 前のフレームの処理（GPU の描画）が長いと、このフレームの間隔が延びる。前のフレームの内容も一緒に書く
-                    if ((frame > budget * 1.25f || m_flipView.IsPlayingEffect || (m_logTurns && m_flipView.IsTurning)) && Time.unscaledTime > 4f)
+                    if ((frame > budget * 1.25f || (m_logTurns && m_flipView.IsTurning)) && Time.unscaledTime > 4f)
                         Debug.Log("[BookSpike] main=" + work.ToString("0.0") + "ms frame=" + frame.ToString("0.0") + "ms" +
-                                  (m_flipView.IsTurning ? " turning" : "") + (m_flipView.IsPlayingEffect ? " effect" : "") + " note=" + m_flipView.FrameNote +
+                                  (m_flipView.IsTurning ? " turning" : "") + " note=" + m_flipView.FrameNote +
                                   " gpu=" + m_lastGpu.ToString("0.0") + " | prev main=" + m_prevWork.ToString("0.0") + " note=" + m_prevNote);
                     m_prevNote = m_flipView.FrameNote;
                     m_prevWork = work;
@@ -127,7 +148,7 @@ namespace hatake
             // 見た目の確認用：端末に leather を置くと、表紙の絵を外して革の表紙で表示する
             if (System.IO.File.Exists(System.IO.Path.Combine(Application.persistentDataPath, "leather")) && m_flipView != null)
                 m_flipView.SetCovers(null, null);
-            // 演出の負荷の計測用：端末に fxtest を置くと、起動から 24 秒後に見開きを燃やす
+            // ページ操作の計測用：端末に fxtest を置くと、起動から 24 秒後に見開きを取り除く（燃焼の演出は削除した）
             // （ファイルに秒数が書いてあればその秒数後）
             string fxPath = System.IO.Path.Combine(Application.persistentDataPath, "fxtest");
             m_fxTestAt = -1f;
@@ -209,7 +230,18 @@ namespace hatake
                 // 合成を描き直した回数（静止中は 0 になるのが正常）
                 int renders = m_flipView.RenderCount - m_lastRenderCount;
                 m_lastRenderCount = m_flipView.RenderCount;
+                // 描き直しの理由（計測用）：MarkDirty・中身だけの変化の通知・中身だけの更新の回数と、全体を描き直した理由
+                int markDirty = m_flipView.DebugMarkDirtyCount - m_lastMarkDirty;
+                int contentDirty = m_flipView.DebugContentDirtyCount - m_lastContentDirty;
+                int delta = m_flipView.ContentDeltaCount - m_lastDelta;
+                m_lastMarkDirty = m_flipView.DebugMarkDirtyCount;
+                m_lastContentDirty = m_flipView.DebugContentDirtyCount;
+                m_lastDelta = m_flipView.ContentDeltaCount;
+                string reason = m_flipView.DebugRedrawReason;
+                m_flipView.DebugRedrawReason = "";
+                if (reason.Length > 120) reason = reason.Substring(0, 120);
                 state = (m_flipView.IsTurning ? "turning" : "idle") + " cover=" + m_flipView.CoverState +
+                        " markDirty=" + markDirty + " contentDirty=" + contentDirty + " delta=" + delta + " why=[" + reason + "]" +
                         " dim=" + m_flipView.Dim.ToString("0.00") +
                         " redraw=" + (renders / Mathf.Max(m_interval, 0.01f)).ToString("0.0") + "/s" +
                         (m_flipView.UsesMobileSettings ? " mobile" : "");
@@ -249,7 +281,7 @@ namespace hatake
         private void RunCompareIfDue()
         {
             bool turning = m_flipView.IsTurning;
-            bool effect = m_flipView.IsPlayingEffect;
+            bool effect = false; // 燃焼・復活の演出は削除した
             bool coverTurn = turning && m_flipView.CoverState != BookCoverState.Open;
             string kind;
             if (effect) { if (m_compareFxDone) return; m_compareFxDone = true; kind = "fx"; }
@@ -333,14 +365,18 @@ namespace hatake
         {
             if (Time.unscaledTime < m_benchStart) return;
             bool turning = m_flipView.IsTurning;
-            bool effect = m_flipView.IsPlayingEffect;
+            bool effect = false; // 燃焼・復活の演出は削除した
             // 表紙をめくっている間（閉じた状態から開く・閉じる）と、本文のめくり・燃焼などの演出を別に測る
             bool coverTurn = turning && m_flipView.CoverState != BookCoverState.Open;
-            if (effect ? m_benchEffectDone : coverTurn ? m_benchCoverTurnDone : turning ? m_benchTurnDone : m_benchIdleDone) return;
+            bool idleOpen = !turning && !effect && m_flipView.CoverState == BookCoverState.Open;
+            // 開いた見開きの静止は、めくり終えて描き直しが済んでから測る
+            if (idleOpen && m_flipView.IsBusyRendering) return;
+            if (effect ? m_benchEffectDone : coverTurn ? m_benchCoverTurnDone : turning ? m_benchTurnDone : idleOpen ? m_benchIdleOpenDone : m_benchIdleDone) return;
             RenderTexture output = m_flipView.OutputTexture;
             if (output == null || !output.IsCreated()) return;
             if (effect) m_benchEffectDone = true;
-            else if (coverTurn) m_benchCoverTurnDone = true; else if (turning) m_benchTurnDone = true; else m_benchIdleDone = true;
+            else if (coverTurn) m_benchCoverTurnDone = true; else if (turning) m_benchTurnDone = true;
+            else if (idleOpen) m_benchIdleOpenDone = true; else m_benchIdleDone = true;
 
             // GPU のクロックを上げてから測る（軽い処理が続いた後はクロックが下がっていて遅く出る）
             {
@@ -402,6 +438,44 @@ namespace hatake
                 RenderTexture.ReleaseTemporary(finish);
             }
 
+            // 静止：めくっていない見開き専用のバリアント（BOOK_STILL）と従来の描き方を比べる（時間と、絵の差）
+            if (!turning && !effect && m_flipView.UsesMobileSettings)
+            {
+                bool still = m_flipView.BenchStillVariant;
+                RenderTexture baseTexture = RenderTexture.GetTemporary(output.width, output.height, 0, hdr);
+                RenderTexture finish = RenderTexture.GetTemporary(output.width, output.height, 0, hdr);
+                RenderTexture stillImage = RenderTexture.GetTemporary(output.width, output.height, 0, hdr);
+                RenderTexture oldImage = RenderTexture.GetTemporary(output.width, output.height, 0, hdr);
+                m_flipView.BenchStillVariant = false;
+                sb.Append(" OLDcomposite=").Append(Measure(finish, n, () => m_flipView.BenchComposite(finish)).ToString("0.0"));
+                string[] names = { "OLDpOutside", "OLDpPage", "OLDpCover", "OLDpFinish" };
+                for (int pass = 1; pass <= 4; pass++)
+                {
+                    int captured = pass;
+                    sb.Append(" " + names[pass - 1] + "=").Append(Measure(finish, n, () => m_flipView.BenchSplitPass(baseTexture, finish, captured)).ToString("0.0"));
+                }
+                m_flipView.BenchComposite(oldImage);
+                m_flipView.BenchStillVariant = true;
+                m_flipView.BenchComposite(stillImage);
+                m_flipView.BenchStillVariant = still;
+                sb.Append(" stillDiff=").Append(CompareImages(stillImage, oldImage));
+                // ページの中身だけの更新（パス 11）：全体の描き直しと同じ絵になるか・左ページに1回描く時間
+                if (m_flipView.CoverState == BookCoverState.Open)
+                {
+                    System.Action deltaDraw = m_flipView.BenchContentDelta(stillImage, oldImage);
+                    if (deltaDraw != null)
+                    {
+                        sb.Append(" deltaDiff=").Append(CompareImages(stillImage, oldImage));
+                        sb.Append(" deltaPassLeft=").Append(Measure(oldImage, n, deltaDraw).ToString("0.0"));
+                    }
+                    m_flipView.BenchContentDeltaEnd();
+                }
+                RenderTexture.ReleaseTemporary(baseTexture);
+                RenderTexture.ReleaseTemporary(finish);
+                RenderTexture.ReleaseTemporary(stillImage);
+                RenderTexture.ReleaseTemporary(oldImage);
+            }
+
             if (turning || effect)
             {
                 // 実際の1フレーム（動いている間の解像度の合成 + 後処理）
@@ -422,14 +496,30 @@ namespace hatake
             }
             sb.Append(" post=").Append(Measure(output, n, () => m_flipView.BenchPost()).ToString("0.0"));
             sb.Append(" postNoBloom=").Append(Measure(output, n, () => m_flipView.BenchPostNoBloom()).ToString("0.0"));
+            sb.Append(" postReuse=").Append(Measure(output, n, () => m_flipView.BenchPostVariant(0, true)).ToString("0.0"));
+            sb.Append(" postDiv8=").Append(Measure(output, n, () => m_flipView.BenchPostVariant(8, false)).ToString("0.0"));
+            sb.Append(" postDiv16=").Append(Measure(output, n, () => m_flipView.BenchPostVariant(16, false)).ToString("0.0"));
+            sb.Append(" postDiv2=").Append(Measure(output, n, () => m_flipView.BenchPostVariant(2, false)).ToString("0.0"));
+            sb.Append(" postBloom1=").Append(Measure(output, n, () => m_flipView.BenchPostBloomSteps(1)).ToString("0.0"));
+            sb.Append(" postBloom2=").Append(Measure(output, n, () => m_flipView.BenchPostBloomSteps(2)).ToString("0.0"));
             if (!turning) sb.Append(" strip=").Append(Measure(output, n, () => m_flipView.BenchProgressStrip()).ToString("0.0"));
             sb.Append(" copy=").Append(Measure(output, n, () => m_flipView.BenchCopy()).ToString("0.0"));
 
-            if (m_controller != null)
             {
-                RenderTexture page = m_controller.BenchCurrentTexture;
-                Camera live = m_controller.BenchLiveCamera;
-                Camera capture = m_controller.BenchCaptureCamera;
+                RenderTexture page = m_controller != null ? m_controller.BenchCurrentTexture : null;
+                Camera live = m_controller != null ? m_controller.BenchLiveCamera : null;
+                Camera capture = m_controller != null ? m_controller.BenchCaptureCamera : null;
+                // hatake の BookController 以外（別のコントローラー）：ページの表示から撮影カメラを探す
+                if (m_controller == null)
+                    foreach (BookPageView view in BookPageView.ActiveViews)
+                    {
+                        Camera c = view.CaptureCamera;
+                        if (c == null || c.targetTexture == null || !c.enabled) continue;
+                        capture = c;
+                        page = c.targetTexture;
+                        sb.Append(" captureAlwaysOn=" + c.enabled);
+                        break;
+                    }
                 if (page != null)
                 {
                     sb.Append(" pageRT=" + page.width + "x" + page.height + " " + page.format + " mips=" + page.useMipMap +
@@ -441,6 +531,78 @@ namespace hatake
                         bool enabled = cam.enabled;
                         cam.targetTexture = page;
                         sb.Append(live != null ? " liveCam=" : " captureCam=").Append(Measure(page, n, () => cam.Render()).ToString("0.0"));
+                        // 撮影の設定を変えたときの時間（撮影テクスチャのアセット・撮影カメラの設定を決めるための比較）
+                        var cameraData = cam.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+                        if (cameraData != null && !cameraData.renderPostProcessing)
+                        {
+                            cameraData.renderPostProcessing = true;
+                            sb.Append(" capPostOn=").Append(Measure(page, n, () => cam.Render()).ToString("0.0"));
+                            cameraData.renderPostProcessing = false;
+                        }
+                        void TryCapture(string label, DescriptorChange change)
+                        {
+                            RenderTextureDescriptor d = page.descriptor;
+                            change(ref d);
+                            RenderTexture variant = RenderTexture.GetTemporary(d);
+                            cam.targetTexture = variant;
+                            sb.Append(" " + label + "=").Append(Measure(variant, n, () => cam.Render()).ToString("0.0"));
+                            cam.targetTexture = page;
+                            RenderTexture.ReleaseTemporary(variant);
+                        }
+                        TryCapture("capNoDepth", (ref RenderTextureDescriptor d) =>
+                        {
+                            d.depthStencilFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.None;
+                        });
+                        TryCapture("capNoMip", (ref RenderTextureDescriptor d) => { d.useMipMap = false; d.autoGenerateMips = false; });
+                        TryCapture("cap8bit", (ref RenderTextureDescriptor d) =>
+                        {
+                            d.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_SRGB;
+                        });
+                        {
+                            var urp = UnityEngine.Rendering.Universal.UniversalRenderPipeline.asset;
+                            if (urp != null) sb.Append(" urpScale=" + urp.renderScale + " urpHDR=" + urp.supportsHDR + " urpMSAA=" + urp.msaaSampleCount);
+                            bool camHdr = cam.allowHDR;
+                            cam.allowHDR = false;
+                            sb.Append(" capNoHDR=").Append(Measure(page, n, () => cam.Render()).ToString("0.0"));
+                            cam.allowHDR = camHdr;
+                            if (cameraData != null)
+                            {
+                                var color = cameraData.requiresColorOption; var depth = cameraData.requiresDepthOption;
+                                cameraData.requiresColorOption = UnityEngine.Rendering.Universal.CameraOverrideOption.Off;
+                                cameraData.requiresDepthOption = UnityEngine.Rendering.Universal.CameraOverrideOption.Off;
+                                sb.Append(" capNoReq=").Append(Measure(page, n, () => cam.Render()).ToString("0.0"));
+                                cam.allowHDR = false;
+                                sb.Append(" capNoReqNoHDR=").Append(Measure(page, n, () => cam.Render()).ToString("0.0"));
+                                cam.allowHDR = camHdr;
+                                cameraData.requiresColorOption = color; cameraData.requiresDepthOption = depth;
+                            }
+                        }
+                        TryCapture("capR11NoMip", (ref RenderTextureDescriptor d) =>
+                        {
+                            d.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.B10G11R11_UFloatPack32;
+                            d.useMipMap = false; d.autoGenerateMips = false;
+                        });
+                        TryCapture("capR11Mip", (ref RenderTextureDescriptor d) =>
+                        {
+                            d.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.B10G11R11_UFloatPack32;
+                        });
+                        TryCapture("capR11NoMip1280", (ref RenderTextureDescriptor d) =>
+                        {
+                            d.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.B10G11R11_UFloatPack32;
+                            d.useMipMap = false; d.autoGenerateMips = false;
+                            d.width = 1280; d.height = 720;
+                        });
+                        TryCapture("capHalfNoMip1280", (ref RenderTextureDescriptor d) =>
+                        {
+                            d.useMipMap = false; d.autoGenerateMips = false;
+                            d.width = 1280; d.height = 720;
+                        });
+                        TryCapture("capNoDepthNoMip", (ref RenderTextureDescriptor d) =>
+                        {
+                            d.depthStencilFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.None;
+                            d.useMipMap = false;
+                            d.autoGenerateMips = false;
+                        });
                         cam.targetTexture = before;
                         cam.enabled = enabled;
                     }
@@ -458,6 +620,38 @@ namespace hatake
             RenderTexture.ReleaseTemporary(sync);
             Debug.Log(sb.ToString() + " (ms/回)");
         }
+
+        // 2枚の絵の差（8bit に丸めて比べる）：「最大の差/255 違う画素の数」
+        private static string CompareImages(RenderTexture a, RenderTexture b)
+        {
+            Color32[] pa = ReadImage(a), pb = ReadImage(b);
+            int max = 0, differ = 0;
+            for (int i = 0; i < pa.Length && i < pb.Length; i++)
+            {
+                int d = Mathf.Max(Mathf.Max(Mathf.Abs(pa[i].r - pb[i].r), Mathf.Abs(pa[i].g - pb[i].g)),
+                                  Mathf.Max(Mathf.Abs(pa[i].b - pb[i].b), Mathf.Abs(pa[i].a - pb[i].a)));
+                if (d > max) max = d;
+                if (d > 1) differ++;
+            }
+            return max + "/255(" + differ + "px)";
+        }
+
+        private static Color32[] ReadImage(RenderTexture source)
+        {
+            var ldr = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.ARGB32);
+            Graphics.Blit(source, ldr);
+            var texture = new Texture2D(source.width, source.height, TextureFormat.RGBA32, false);
+            RenderTexture previous = RenderTexture.active;
+            RenderTexture.active = ldr;
+            texture.ReadPixels(new Rect(0, 0, source.width, source.height), 0, 0, false);
+            RenderTexture.active = previous;
+            RenderTexture.ReleaseTemporary(ldr);
+            Color32[] pixels = texture.GetPixels32();
+            Destroy(texture);
+            return pixels;
+        }
+
+        private delegate void DescriptorChange(ref RenderTextureDescriptor descriptor);
 
         private static RenderTexture s_sync;
 

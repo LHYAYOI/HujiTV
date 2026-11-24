@@ -1,15 +1,15 @@
-using System.Collections;
+Ôªøusing System.Collections;
 using UnityEngine;
 
 public class CameraTilt : MonoBehaviour
 {
     [SerializeField] CinemachineRotationExtension m_cinemachineRotationExtension;
 
-    float m_tiltDegree = 0.0f; // åXÇ´ÇÃó 
+    Vector3 m_tiltDegree = new Vector3(0, 0, 0); // ÂÇæ„Åç„ÅÆÈáè
 
     Coroutine m_tiltCoroutine;
 
-    public void Tilt(float duration, float TiltAmount)
+    public void Tilt(float duration, Vector3 TiltAmount)
     {
         if (m_tiltCoroutine != null)
         {
@@ -19,11 +19,11 @@ public class CameraTilt : MonoBehaviour
         m_tiltCoroutine = StartCoroutine(TiltCoroutine(duration, TiltAmount));
     }
 
-    IEnumerator TiltCoroutine(float duration, float TiltAmount)
+    IEnumerator TiltCoroutine(float duration, Vector3 TiltAmount)
     {
         float elapsedTime = 0.0f;
 
-        float startTilt = m_tiltDegree;
+        Vector3 startTilt = m_tiltDegree;
 
         while (elapsedTime < duration) 
         {
@@ -31,7 +31,7 @@ public class CameraTilt : MonoBehaviour
 
             elapsedTime += Time.deltaTime;
 
-            float newTilt = Mathf.Lerp(startTilt, TiltAmount, rate);
+            Vector3 newTilt = Vector3.Lerp(startTilt, TiltAmount, rate);
 
             SetTilt(newTilt);
 
@@ -39,7 +39,7 @@ public class CameraTilt : MonoBehaviour
         }
     }
 
-    public void SetTilt(float tiltDegree)
+    public void SetTilt(Vector3 tiltDegree)
     {
         if (m_cinemachineRotationExtension == null) 
         {
@@ -47,6 +47,6 @@ public class CameraTilt : MonoBehaviour
         }
 
         m_tiltDegree = tiltDegree;
-        m_cinemachineRotationExtension.SetTiltRotationOffset(new Vector3(0, 0, m_tiltDegree));
+        m_cinemachineRotationExtension.SetTiltRotationOffset(m_tiltDegree);
     }
 }

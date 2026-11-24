@@ -2239,11 +2239,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1805963002013783076}
         m_TargetAssemblyTypeName: ConductorGhostManager, Assembly-CSharp
-        m_MethodName: OnLowerDrawerHit
-        m_Mode: 2
+        m_MethodName: 
+        m_Mode: 1
         m_Arguments:
-          m_ObjectArgument: {fileID: 7715726503034513189}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Collider, UnityEngine
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -2478,8 +2478,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1805963002013783076}
         m_TargetAssemblyTypeName: ConductorGhostManager, Assembly-CSharp
-        m_MethodName: OnUpperDrawerHit
-        m_Mode: 2
+        m_MethodName: 
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 8455753040948527871}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Collider, UnityEngine

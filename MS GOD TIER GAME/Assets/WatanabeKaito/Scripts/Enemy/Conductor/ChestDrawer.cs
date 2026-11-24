@@ -1,17 +1,9 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.InputSystem;
-
-[System.Serializable]
-public class ColliderEvent : UnityEvent<Collider>
-{
-}
 
 public class ChestDrawer : MonoBehaviour
 {
-    [SerializeField] private ColliderEvent m_onHit;
-
     [Header("引き出しの移動先のローカル位置")]
     [SerializeField] private Vector3 m_targetPosition;
 
@@ -116,14 +108,4 @@ public class ChestDrawer : MonoBehaviour
     {
         return m_targetPosition;
     }
-
-    //private void OnTriggerEnter(Collider collision)
-    //{
-    //    if (collision.gameObject.CompareTag("MagicBullet"))
-    //    {
-    //        m_onHit.Invoke(collision);
-
-    //        m_IsTargetableFlag = false;
-    //    }
-    //}
 }

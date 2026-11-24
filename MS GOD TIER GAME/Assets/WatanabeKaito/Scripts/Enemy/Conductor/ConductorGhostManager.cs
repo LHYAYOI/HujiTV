@@ -16,6 +16,8 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
 
     private bool m_isUpperFlag = false;
 
+    private bool m_battleEndFlag = false; // 戦闘終了フラグ
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -42,30 +44,36 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
     // Update is called once per frame
     void Update()
     {
-       // デバック
-        //if (Keyboard.current != null &&
-        //        Keyboard.current.bKey.wasPressedThisFrame)
-        //{
-        //    m_conductorGhost.SetUpperDrawerLockedFlag(true);
-        //    StartCoroutine(m_conductorGhost.LockUpperChest());
-        //}
+        if(m_battleEndFlag)
+        {
+            return;
+        }
 
-        //if (Keyboard.current != null &&
-        //       Keyboard.current.nKey.wasPressedThisFrame)
-        //{
-        //    m_conductorGhost.SetLowerDrawerLockedFlag(true);
-        //    StartCoroutine(m_conductorGhost.LockLowerChest());
-        //}
+        BattleEndCheck();
     }
 
-    public void StartBattle()
+    private void BattleEndCheck()
+    {
+        if (m_conductorGhost.GetUpperDrawerLockedFlag() && m_conductorGhost.GetLowerDrawerLockedFlag()
+            && m_conductorGhost.GetSwarmGhostCurrentHealth() == 0)
+        {
+            // 上下の引き出しがロックされていて、群れお化けの体力が0になったら戦闘終了
+            EndBattle();
+
+            m_activeEnemyManager.RemoveActiveEnemy(this);
+
+            m_battleEndFlag = true;
+        }
+    }
+
+    private void StartBattle()
     {
         m_conductorGhost.StartBattle();
 
         m_battleStartFlag = true;
     }
 
-    public void EndBattle()
+    private void EndBattle()
     {
         m_conductorGhost.SetUpperDrawerLockedFlag(true);
         m_conductorGhost.SetLowerDrawerLockedFlag(true);
@@ -76,10 +84,8 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
         m_conductorGhost.DeactivateAllSwarmGhosts();
     }
 
-    public void OnChestHit()
-    {
 
-    }
+ 
 
     // MagicBulletが当たったときの処理
     private void HandleMagicBulletHit(HitData hitData)
@@ -97,7 +103,7 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
             {
                 TryReceiveEventMagic(magicData.EventMagicType);
 
-                if (magicData.EventMagicType == EVENT_MAGIC_TYPE.CLOSE)
+                //if (magicData.EventMagicType == EVENT_MAGIC_TYPE.CLOSE)
                 {
 
                     if (m_isUpperFlag)

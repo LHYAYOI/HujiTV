@@ -17,6 +17,7 @@ Shader "Hidden/Book/Page Flip Post"
     float4 _BloomThreshold;   // x 閾値, y ニー, z 上限, w 散乱（上位レベルへの足し込み）
     float4 _BloomTint;        // rgb 色, a 強さ
     float _DimBlur, _Tonemap, _Exposure;
+    float _DownSpread;
     float _PrefilterSpread; // 最初の縮小で読む範囲（元の画素の何個分ずらすか）。1/2 へ縮めるなら 0.5、1/4 なら 1
 
     struct VertexInput { float4 vertex : POSITION; float2 uv : TEXCOORD0; };
@@ -65,7 +66,10 @@ Shader "Hidden/Book/Page Flip Post"
     float4 FragPrefilter(VertexOutput i) : SV_Target
     {
         // 1/4 へ一度に縮めるとき（モバイル）は、斜めの点を元の1画素分ずらして 4x4 の範囲を読む（間引きのちらつきを防ぐ）
-        float4 c = DownSpread(i.uv, max(_PrefilterSpread, 0.5));
+        // _PrefilterSpread = 0（モバイルの簡略化）：1点だけ読む（2x2 の平均）。元の絵を読む量が 1/4 以下になる
+        float4 c;
+        if (_PrefilterSpread <= 0) c = Tap(_MainTex, i.uv);
+        else c = DownSpread(i.uv, max(_PrefilterSpread, 0.5));
         // 本の外（透明）の色は使わない
         c.rgb *= saturate(c.a * 4);
         float bright = max(c.r, max(c.g, c.b));
@@ -76,7 +80,8 @@ Shader "Hidden/Book/Page Flip Post"
         return float4(min(c.rgb * contribution, _BloomThreshold.z), 1);
     }
 
-    float4 FragDown(VertexOutput i) : SV_Target { return Down(i.uv); }
+    // _DownSpread：縮小で読む範囲。未設定（0）なら 0.5（1/2 へ縮める）。1/4 へ一度に縮めるときは 1
+    float4 FragDown(VertexOutput i) : SV_Target { return DownSpread(i.uv, max(_DownSpread, 0.5)); }
 
     float4 FragUpAdd(VertexOutput i) : SV_Target
     {

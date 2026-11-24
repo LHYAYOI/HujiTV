@@ -564,4 +564,9 @@ public class ConductorGhost : MonoBehaviour
     {
         return m_isLowerVisibleFlag;
     }
+
+    public int GetSwarmGhostCurrentHealth()
+    {
+        return m_swarmGhostManager.GetCurrentHealth();
+    }
 }

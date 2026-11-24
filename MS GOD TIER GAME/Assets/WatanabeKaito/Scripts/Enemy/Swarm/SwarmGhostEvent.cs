@@ -50,17 +50,13 @@ public class SwarmGhostEvent : SplineMoveEnemy
 
     public override void BattleStart()
     {
-       Debug.Log("SwarmGhostEvent: BattleStart called.");
     }
 
     public override void BattleEnd()
     {
-        Debug.Log("SwarmGhostEvent: BattleEnd called.");
         m_isMovingFlag = false;
 
         m_groupLeader.RemoveAllOyoguSwarmGhosts();
-
-        Debug.Log("SwarmGhostEvent: BattleEnd called, all swarm ghosts removed.");
     }
 
 

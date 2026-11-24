@@ -170,6 +170,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostEnemy
   m_enemyData: {fileID: 11400000, guid: d57e1e492585fd34a91c0444e1e44935, type: 2}
   m_moveDirection: -1
+  m_moveSpeed: 1
   m_timeLimit: 15
   m_kickFirePoint: {fileID: 4230615318380201651}
   m_throwFirePoint: {fileID: 1847888665569345119}
@@ -218,7 +219,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostMoveState
   m_moveSpeed: 1
   m_rotateWithSplineFlag: 0
-  m_fireInterval: 3
+  m_fireInterval: 4
 --- !u!114 &4122682875455443804
 MonoBehaviour:
   m_ObjectHideFlags: 0

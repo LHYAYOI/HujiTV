@@ -7,13 +7,24 @@ public class MiniGhostDyingState : MiniGhostState
     [Header("縮小にかかる時間（秒）")]
     [SerializeField] private float m_shrinkDuration = 2.0f;
 
+    [Header("縮小からパーティクルが再生されるまでの時間（秒）")]
+    [SerializeField] private float m_particleDelay = 1.0f;
+
+    [Header("パーティクルの再生時間（秒）")]
+    [SerializeField] private float m_particleDuration = 1.0f;
+
     [Header("パーティクル")]
     [SerializeField] private GameObject m_deathParticle;
+
+    [Header("パーティクルの再生位置のオフセット")]
+    [SerializeField] private Transform m_particleOffsetTransform;
 
     private GameObject m_spawnedDeathParticle;  // 生成されたパーティクルの参照
 
     private Animator m_animator;    // Animatorコンポーネント
     private Coroutine m_shrinkCoroutine;    // 実行中の縮小コルーチン
+
+    private bool m_isParticlePlayed = false; // パーティクル再生済みフラグ
 
     public override void InitializeState(MiniGhostEnemy owner)
     {
@@ -37,9 +48,6 @@ public class MiniGhostDyingState : MiniGhostState
 
         m_shrinkCoroutine = StartCoroutine(ShrinkCoroutine());
 
-        // パーティクルを再生
-        PlayDeathEffect(m_owner.transform.position);
-
         // 元のマテリアルから透明マテリアルに切り替える
         StartCoroutine(m_owner.SwitchMaterialBlendCoroutine(0, 1));
     }
@@ -52,6 +60,7 @@ public class MiniGhostDyingState : MiniGhostState
             m_shrinkCoroutine = null;   
         }
     }
+
 
     // 縮小のコルーチン
     private IEnumerator ShrinkCoroutine()
@@ -72,8 +81,22 @@ public class MiniGhostDyingState : MiniGhostState
             float t = Mathf.Clamp01(elapsed / m_shrinkDuration);
             float easedT = Easing.EaseInSine(t);
             m_owner.transform.localScale = Vector3.Lerp(originalScale, Vector3.zero, easedT);
+
+            if (!m_isParticlePlayed)
+            {
+                if (elapsed >= m_particleDelay)
+                {
+                    PlayDeathEffect(m_particleOffsetTransform.position);
+                    m_isParticlePlayed = true;
+                }
+            }
+
             yield return null;
         }
+
+        
+
+        yield return new WaitForSeconds(m_particleDuration); // パーティクルの再生時間を待つ
 
         m_owner.transform.localScale = Vector3.zero;
 

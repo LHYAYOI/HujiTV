@@ -70,9 +70,6 @@ public class BattleManager : MonoBehaviour
         // エネミーをバトル開始状態にする
         m_activeEnemyManager.SetAllActiveEnemiesToBattleStart();
 
-
-
-
         // バトル始まります
         float time = 0.0f;
         time = Time.time;
@@ -87,17 +84,20 @@ public class BattleManager : MonoBehaviour
                 break;
             }
 
-            // バトル時間が経過するまで待機する
-            if ( Time.time - time > m_currentBattleData.BattleTime)
+            if(m_currentBattleData.HasTimeLimit)
             {
-                // アクティブな敵が残っている場合はバトルを終了する
-                if (m_activeEnemyManager.GetActiveEnemies().Count() != 0)
+                // バトル時間が経過するまで待機する
+                if (Time.time - time > m_currentBattleData.BattleTime)
                 {
-                    m_activeEnemyManager.SetAllActiveEnemiesToBattleEnd();
+                    // アクティブな敵が残っている場合はバトルを終了する
+                    if (m_activeEnemyManager.GetActiveEnemies().Count() != 0)
+                    {
+                        m_activeEnemyManager.SetAllActiveEnemiesToBattleEnd();
+                    }
+                    break;
                 }
-                break;
             }
-
+   
         }
         
 
