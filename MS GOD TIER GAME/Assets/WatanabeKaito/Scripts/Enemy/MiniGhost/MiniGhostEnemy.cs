@@ -68,6 +68,19 @@ public class MiniGhostEnemy : SplineMoveEnemy
         ChangeState(MINI_GHOST_STATE_TYPE.SPAWN);
     }
 
+    public override void BattleStart()
+    {
+        base.BattleStart();
+        StartTimeLimit();
+    }
+
+    public override void BattleEnd()
+    {
+        base.BattleEnd();
+        m_targetableObject.SetTargetable(false);
+        ChangeState(MINI_GHOST_STATE_TYPE.IDLE);
+    }
+
     protected override void Update()
     {
         //if (m_timeLimitStarted && !m_isDying)
@@ -336,16 +349,36 @@ public class MiniGhostEnemy : SplineMoveEnemy
         }
     }
 
-    private void OnTriggerEnter(Collider collision)
-    {
-        if (collision.gameObject.CompareTag("MagicBullet"))
-        {
-            if(!m_timeLimitStarted || m_isDying)
-            {
-                return;
-            }
+    //private void OnTriggerEnter(Collider collision)
+    //{
+    //    if (collision.gameObject.CompareTag("MagicBullet"))
+    //    {
+    //        if(!m_timeLimitStarted || m_isDying)
+    //        {
+    //            return;
+    //        }
 
-            BeginDying();
+    //        BeginDying();
+    //    }
+    //}
+
+    public void OnMiniGhostHit(HitData hitData)
+    {
+        if (!m_timeLimitStarted || m_isDying)
+        {
+            return;
+        }
+
+        if (hitData != null)
+        {
+            MagicData magicData = hitData.GetMagicData;
+            if (magicData != null)
+            {
+                //if (magicData.EventMagicType == EVENT_MAGIC_TYPE.CLOSE)
+                {
+                    BeginDying();
+                }
+            }
         }
     }
 }

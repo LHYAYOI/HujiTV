@@ -12,6 +12,11 @@ namespace hatake
     ///   I：ページを光の粒とともに挿入する（入手）。Revive Spread（見開きセット）があれば見開きで、
     ///      無ければ Revive Page を見開き両面（既定）か一枚（旧）で。
     ///   C：閉じていれば開く、開いていれば表紙で閉じる。
+    ///   D：マウスが載っているページだけを暗転（もう一度で解除）。F：見開き両面を暗転。
+    ///   B：マウスが載っているページを未獲得（白紙）にする / 戻す。
+    ///   G：マウスが載っているページを獲得する演出（マウス位置から見開き全体が指定色に光り、光の中からページが現れる）。
+    ///   PageDown / PageUp：Bundle Count 見開き分をまとめてめくる（厚みのある束を1枚めくる）。
+    ///   ページの状態は BookPageState にページごとに残るので、めくっても開き直しても続く。
     /// それぞれ Use ～ で使うかどうかを選べる。Use Keys をOFFにすると全部止まる。
     /// ゲーム本編では同じ処理を BookController.BurnLeaf / InsertLeaf と BookFlipView.SetSpot で呼ぶ。
     /// </summary>
@@ -35,6 +40,7 @@ namespace hatake
         [SerializeField] private bool m_useBurn = true;
         [SerializeField] private bool m_useRevive = true;
         [SerializeField] private bool m_useOpenClose = true;
+        [SerializeField] private bool m_usePageState = true;
 
         [Header("キー")]
 #if ENABLE_INPUT_SYSTEM
@@ -42,11 +48,23 @@ namespace hatake
         [SerializeField] private Key m_burnKey = Key.L;
         [SerializeField] private Key m_reviveKey = Key.I;
         [SerializeField] private Key m_openCloseKey = Key.C;
+        [SerializeField] private Key m_pageDimKey = Key.D;
+        [SerializeField] private Key m_spreadDimKey = Key.F;
+        [SerializeField] private Key m_blankKey = Key.B;
+        [SerializeField] private Key m_acquireKey = Key.G;
+        [SerializeField] private Key m_bundleForwardKey = Key.PageDown;
+        [SerializeField] private Key m_bundleBackKey = Key.PageUp;
 #else
         [SerializeField] private KeyCode m_spotKey = KeyCode.O;
         [SerializeField] private KeyCode m_burnKey = KeyCode.L;
         [SerializeField] private KeyCode m_reviveKey = KeyCode.I;
         [SerializeField] private KeyCode m_openCloseKey = KeyCode.C;
+        [SerializeField] private KeyCode m_pageDimKey = KeyCode.D;
+        [SerializeField] private KeyCode m_spreadDimKey = KeyCode.F;
+        [SerializeField] private KeyCode m_blankKey = KeyCode.B;
+        [SerializeField] private KeyCode m_acquireKey = KeyCode.G;
+        [SerializeField] private KeyCode m_bundleForwardKey = KeyCode.PageDown;
+        [SerializeField] private KeyCode m_bundleBackKey = KeyCode.PageUp;
 #endif
 
         [Header("O：暗転スポット")]
@@ -59,6 +77,17 @@ namespace hatake
         [SerializeField, Min(0)] private float m_spotFollow = 18f;
         [SerializeField, Min(0)] private float m_fadeDuration = 0.3f;
         [SerializeField, Range(0, BookFlipView.MaxSpots - 1)] private int m_spotSlot;
+
+        [Header("D / F / B / G：ページの状態")]
+        [SerializeField, Range(0, 1)] private float m_pageDimAmount = 0.75f;
+        [SerializeField, Min(0)] private float m_pageDimFade = 0.3f;
+        [SerializeField] private Color m_acquireColor = new Color(0.95f, 0.78f, 0.35f, 1f);
+        [SerializeField, Min(0.05f)] private float m_acquireSpreadDuration = 1.2f;
+        [SerializeField, Min(0)] private float m_acquireHoldDuration = 0.25f;
+        [SerializeField, Min(0.05f)] private float m_acquireRevealDuration = 0.8f;
+
+        [Header("PageDown / PageUp：まとめてめくる")]
+        [SerializeField, Min(2)] private int m_bundleCount = 5;
 
         [Header("L / I：単位")]
         [Tooltip("Spread：見開き両面。Leaf：旧方式の一枚（表と裏）。見開きセットのページは常に見開き単位")]
@@ -108,6 +137,8 @@ namespace hatake
                     : m_bookController.CloseBook(true);
                 if (!accepted) Debug.Log("開閉できません（処理中・表紙が無効）", this);
             }
+            if (WasPressed(m_bundleForwardKey)) m_bookController.TurnSpreads(m_bundleCount);
+            if (WasPressed(m_bundleBackKey)) m_bookController.TurnSpreads(-m_bundleCount);
             if (m_spotFlag && hasPoint)
             {
                 float t = m_spotFollow <= 0 ? 1f : 1f - Mathf.Exp(-m_spotFollow * Time.unscaledDeltaTime);
@@ -118,6 +149,7 @@ namespace hatake
 
             if (!hasPoint || !m_flipView.ContainsPage(point)) return;
             bool rightPage = point.x >= 0f;
+            if (m_usePageState && !m_bookController.IsClosed) UpdatePageState(point, rightPage);
             if (m_useBurn && WasPressed(m_burnKey))
             {
                 int pageIndex = m_bookController.CurrentSpread * 2 + (rightPage ? 1 : 0);
@@ -142,6 +174,33 @@ namespace hatake
                 else
                     accepted = m_bookController.InsertLeaf(rightPage, m_revivePage, m_reviveBackPage, point);
                 if (!accepted) Debug.Log("ページを挿入できません（処理中・閉じている・見開きセットの間）", this);
+            }
+        }
+
+        private void UpdatePageState(Vector2 point, bool rightPage)
+        {
+            int leftIndex = m_bookController.CurrentSpread * 2;
+            BookPageData left = m_bookController.GetPage(leftIndex);
+            BookPageData right = m_bookController.GetPage(leftIndex + 1);
+            BookPageData page = rightPage ? right : left;
+            BookPageData partner = rightPage ? left : right;
+            if (WasPressed(m_pageDimKey) && page != null)
+                BookPageState.SetDim(page, BookPageState.GetDim(page) > 0f ? 0f : m_pageDimAmount, m_pageDimFade);
+            if (WasPressed(m_spreadDimKey))
+            {
+                bool on = left != null && BookPageState.GetDim(left) <= 0f || right != null && BookPageState.GetDim(right) <= 0f;
+                BookPageState.SetSpreadDim(left, right, on ? m_pageDimAmount : 0f, m_pageDimFade);
+            }
+            if (WasPressed(m_blankKey) && page != null)
+                BookPageState.SetAcquired(page, !BookPageState.IsAcquired(page));
+            if (WasPressed(m_acquireKey) && page != null)
+            {
+                BookPageState.AcquireSettings settings = BookPageState.AcquireSettings.Default;
+                settings.Color = m_acquireColor;
+                settings.SpreadDuration = m_acquireSpreadDuration;
+                settings.HoldDuration = m_acquireHoldDuration;
+                settings.RevealDuration = m_acquireRevealDuration;
+                BookPageState.PlayAcquire(page, partner, rightPage, m_flipView.BookToSpreadUv(point), settings);
             }
         }
 

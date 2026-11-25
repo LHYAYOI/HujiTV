@@ -529,6 +529,12 @@ public class ConductorGhost : MonoBehaviour
         m_swarmGhostManager.RemoveAllSwarmGhosts();
     }
 
+    // 群れお化けを全て非アクティブにする
+    public void DeactivateAllSwarmGhosts()
+    {
+        m_swarmGhostManager.DeactivateAllSwarmGhosts();
+    }
+
     public void SetUpperDrawerLockedFlag(bool flag)
     {
         m_upperDrawerLockedFlag = flag;
@@ -557,5 +563,10 @@ public class ConductorGhost : MonoBehaviour
     public bool GetIsLowerVisibleFlag()
     {
         return m_isLowerVisibleFlag;
+    }
+
+    public int GetSwarmGhostCurrentHealth()
+    {
+        return m_swarmGhostManager.GetCurrentHealth();
     }
 }

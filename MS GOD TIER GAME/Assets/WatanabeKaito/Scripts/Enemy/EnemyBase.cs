@@ -28,21 +28,11 @@ public abstract class EnemyBase : MonoBehaviour
     // スポナーからの呼び出し用初期化関数
     public abstract void Initialize();
 
-    // ダメージを受ける関数
-    public virtual void TakeDamage(int damage)
-    {
-        m_currentHealth -= damage;
-        if (m_currentHealth <= 0)
-        {
-            OnDestroy();
-        }
-    }
+    // バトル開始時の処理を行う関数
+    public abstract void BattleStart();
 
-    // エネミーが死亡する関数
-    protected virtual void OnDestroy()
-    {
-        Destroy(gameObject);
-    }
+    // バトル終了時の処理を行う関数
+    public abstract void BattleEnd();
 
     // エネミーデータを取得する関数
     public EnemyData GetEnemyData()

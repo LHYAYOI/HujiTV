@@ -64,7 +64,8 @@ MonoBehaviour:
   - {fileID: 3491485417942563190}
   - {fileID: -7501149763445359270}
   - {fileID: 9086274398206220444}
-  m_RendererFeatureMap: ad6b866f10d7b46cbfbf647320950ab77639ec2a7d3f74305a7dd56e0890e6979cd8ce8c6cee187e
+  - {fileID: 3496144889061596338}
+  m_RendererFeatureMap: ad6b866f10d7b46cbfbf647320950ab77639ec2a7d3f74305a7dd56e0890e6979cd8ce8c6cee187eb25cd0d340cd8430
   m_UseNativeRenderPass: 1
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -107,6 +108,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LightShaftLab.BlackLightFeature
   m_Active: 1
   m_decalShader: {fileID: 4800000, guid: 832f393363693794482ccb6bb01d808a, type: 3}
+--- !u!114 &3496144889061596338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7fcde8d102b39e4e988a9339e4785ad, type: 3}
+  m_Name: RadialBlurRendererFeature
+  m_EditorClassIdentifier: Assembly-CSharp::RadialBlurRendererFeature
+  m_Active: 1
+  m_shader: {fileID: 4800000, guid: 329ebfc87cea20f4fb13636fead04ea7, type: 3}
 --- !u!114 &7833122117494664109
 MonoBehaviour:
   m_ObjectHideFlags: 0

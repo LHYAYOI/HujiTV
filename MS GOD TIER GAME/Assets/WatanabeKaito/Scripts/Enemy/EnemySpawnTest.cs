@@ -33,6 +33,6 @@ public class EnemySpawnTest : MonoBehaviour
 
     public void OnSpawnEnemy()
     {
-        m_enemySpawnManager.SpawnSplineMoveEnemy("MiniGhost_A", "test_spline", "testPosition");
+        //m_enemySpawnManager.SpawnSplineMoveEnemy("MiniGhost_A", "test_spline", "testPosition");
     }
 }

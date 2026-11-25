@@ -233,11 +233,9 @@ GameObject:
   - component: {fileID: 2846553606419501028}
   - component: {fileID: 4122682875455443804}
   - component: {fileID: 1547004853171550175}
-  - component: {fileID: 7345820583372488224}
-  - component: {fileID: 4513015687074161669}
   m_Layer: 0
   m_Name: MiniGhostA
-  m_TagString: Target
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -251,7 +249,7 @@ Transform:
   m_GameObject: {fileID: 1309553552582454145}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -4.06}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -261,6 +259,7 @@ Transform:
   - {fileID: 5967129915259381927}
   - {fileID: 4020020040202100225}
   - {fileID: 1162221029419607616}
+  - {fileID: 7455040393925201523}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &7927228099763986070
@@ -299,6 +298,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostEnemy
   m_enemyData: {fileID: 11400000, guid: 365664065c0684f46a34e5dccbe179eb, type: 2}
   m_moveDirection: -1
+  m_moveSpeed: 1
   m_timeLimit: 15
   m_kickFirePoint: {fileID: 4230615318380201651}
   m_throwFirePoint: {fileID: 1847888665569345119}
@@ -387,43 +387,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdc09a0965b5f644ca86461f2aa85aac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostDyingState
-  m_shrinkDuration: 1.5
-  m_deathParticle: {fileID: 4058022614410997813, guid: 35cd01bb2e56f4040b5647a3b6df40eb, type: 3}
---- !u!114 &7345820583372488224
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1309553552582454145}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00c512fd8e70c5e4ca1cb396d258c2c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
---- !u!136 &4513015687074161669
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1309553552582454145}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.3
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.5, z: 0}
+  m_shrinkDuration: 2
+  m_particleDelay: 1
+  m_particleDuration: 1
+  m_deathParticle: {fileID: 8948492735044646950, guid: 807e7b9d0777fd343b9da501fbec7cbb, type: 3}
+  m_particleOffsetTransform: {fileID: 7455040393925201523}
 --- !u!1 &5747816450418076520
 GameObject:
   m_ObjectHideFlags: 0
@@ -514,6 +482,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &6845317405952373799
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7455040393925201523}
+  m_Layer: 0
+  m_Name: ParticleOffsetTransform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7455040393925201523
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6845317405952373799}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7850703199708027995}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &9110975981948125441
 GameObject:
   m_ObjectHideFlags: 0
@@ -526,6 +525,9 @@ GameObject:
   - component: {fileID: 6539245423305334306}
   - component: {fileID: 9136852837638487847}
   - component: {fileID: 7398052889439737372}
+  - component: {fileID: 6442530064760724667}
+  - component: {fileID: 6974482493823726173}
+  - component: {fileID: 8014723631962726581}
   m_Layer: 0
   m_Name: Target
   m_TagString: Untagged
@@ -542,7 +544,7 @@ Transform:
   m_GameObject: {fileID: 9110975981948125441}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: -0.019}
+  m_LocalPosition: {x: 0, y: 0.717, z: -0.238}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -618,6 +620,72 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9110975981948125441}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &6442530064760724667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9110975981948125441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ced5332850543c24ca276d1983454a1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitReceiverController
+  m_onHit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3282884335062489158}
+        m_TargetAssemblyTypeName: MiniGhostEnemy, Assembly-CSharp
+        m_MethodName: OnMiniGhostHit
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_onStay:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onExit:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &6974482493823726173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9110975981948125441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00c512fd8e70c5e4ca1cb396d258c2c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniGhostHitSender
+--- !u!135 &8014723631962726581
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9110975981948125441}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.05
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &6144379352803512140
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -871,6 +939,10 @@ PrefabInstance:
     - target: {fileID: 4058022614410997813, guid: 3dbf4b8f91a59d0458adcb85ffe4c1b5, type: 3}
       propertyPath: m_Name
       value: ObakeParticle 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4058022614410997813, guid: 3dbf4b8f91a59d0458adcb85ffe4c1b5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9083663694919727919, guid: 3dbf4b8f91a59d0458adcb85ffe4c1b5, type: 3}
       propertyPath: m_LocalPosition.z

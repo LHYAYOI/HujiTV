@@ -1,11 +1,10 @@
-// BookFlipComposite の各パスで共有するコード。パスごとに BOOK_PASS_PAGE / BOOK_PASS_COVER / BOOK_FX を
+// BookFlipComposite の各パスで共有するコード。パスごとに BOOK_PASS_PAGE / BOOK_PASS_COVER / BOOK_STILL を
 // 定義してから include する（定義によって使わないコードを書き出さない）
 #ifndef BOOK_FLIP_COMPOSITE_COMMON_INCLUDED
 #define BOOK_FLIP_COMPOSITE_COMMON_INCLUDED
         #include "UnityCG.cginc"
         #include "BookFlipCore.cginc"
         #include "BookFlipLook.cginc"
-        #include "BookFlipEffects.cginc"
 
         struct VertexInput { float4 vertex : POSITION; float2 uv : TEXCOORD0; };
         struct VertexOutput { float4 vertex : SV_POSITION; float2 uv : TEXCOORD0; };
@@ -58,9 +57,10 @@
 
                 bool turning = h.fold < 1e2;
                 // めくり始めは角だけが小さく反るので、カールの幅を角の移動量に合わせる
-                float curlWidth = max(_CurlWidth * saturate(h.foldLength * 1.5), 1e-4);
-                float turnFade = saturate(h.foldLength * 4);
+                float curlWidth = max(_CurlWidth * saturate(h.foldLength * 1.5), 1e-4) * (1 + _TurnThickness.w);
+                float turnFade = h.turnFade;
 
+            #if !defined(BOOK_STILL)
                 if (h.layer == BOOK_LAYER_BACK)
                 {
                     // 裏から透ける表面の印刷（紙の元の位置で読む）
@@ -68,7 +68,7 @@
                     if (!cover && BookSlotKind(0, frontRight) < 0.5)
                     {
                         float3 through = BookSamplePage(0, frontRight, saturate(BookPageUV(h.sheetPos))).rgb;
-                        c *= lerp(1, saturate(through * 1.15), _ShowThrough);
+                        c *= lerp(1, saturate(through * 1.15), _ShowThrough * turnFade);
                     }
 
                     float dd = h.rigid > 0.5 ? 1e3 : -h.fold;   // 硬い板は曲がらない
@@ -77,7 +77,7 @@
                     normal = normalize(float3(h.foldNormal * bend * 1.2, 1));
                     float band = (dd - curlWidth * 0.45) / (curlWidth * 0.22);
                     c += _CurlSpec * exp(-band * band) * turnFade;
-                    if (h.rigid < 0.5) c *= lerp(0.85, 1, smoothstep(0, 0.012, h.flapInside));
+                    if (h.rigid < 0.5) c *= lerp(1, lerp(0.85, 1, smoothstep(0, 0.012, h.flapInside)), turnFade);
                 }
                 else if (h.layer == BOOK_LAYER_FRONT && turning)
                 {
@@ -89,6 +89,7 @@
                 {
                     c *= 1 - _FoldShadow * exp(-h.fold / _FoldShadowWidth) * turnFade;
                 }
+            #endif
 
                 // 紙の繊維の凹凸（と燃える縁の反り）で法線を傾け、光の向きで明暗を付ける
                 float3 baseNormal = normal;
@@ -115,18 +116,6 @@
                 fxPage = false;
                 fxEdge = 0;
                 curlTilt = 0;
-            #if defined(BOOK_FX)
-                // 燃焼／復活：境界の内側は変化後の見開きを見せる
-                fxPage = h.layer == BOOK_LAYER_FLAT && BookFxOnPage(p);
-                fxEdge = fxPage ? BookFxEdge(p) : 0;
-                if (fxPage && fxEdge > 0) h.dest = 1;
-                if (fxPage)
-                {
-                    // && は短絡しないので、対象ページ以外で勾配を計算しないよう分ける
-                    float2 curlShift;
-                    if (BookFxCurl(p, fxEdge, curlShift, curlTilt) > 0) h.uv = saturate(h.uv + curlShift);
-                }
-            #endif
                 return h;
             }
 
@@ -136,26 +125,39 @@
                 return h.rigidEdge > 0.5 || h.rigidMargin > 0.5 || (h.kind > 0.5 && h.kind < 2.5);
             }
 
-            // 面の色（角金具・板の明るさ・燃焼の色まで）。この後に BookFinish を掛ける
+            // 面の色（板の明るさまで）。この後に BookFinish を掛ける
             float4 BookBaseColor(BookFlipHit h, float2 p, bool fxPage, float fxEdge, float2 curlTilt)
             {
                 float4 col;
             #if defined(BOOK_PASS_PAGE)
+            #if !defined(BOOK_STILL)
+                if (h.flapEdge > 0) col = float4(BookTurnEdgeColor(h.flapEdge), 1);
+                else
+            #endif
                 col = float4(ShadePage(h, BookSamplePage(h.dest, h.right, h.uv).rgb, curlTilt), 1);
             #else
             #if !defined(BOOK_PASS_COVER)
                 if (h.layer == BOOK_LAYER_NONE) col = BookOutside(p);
                 else
             #endif
+            #if defined(BOOK_STILL)
+                // めくっていない見開きに回る板は無い
+                col = float4(ShadePage(h, BookSamplePage(h.dest, h.right, h.uv).rgb, curlTilt), 1);
+            #else
                 if (h.rigidEdge > 0.5)
                 {
                     // 回っている板の小口
                     col = float4(BookBoardEdgeColor(h.sheetPos.x + h.sheetPos.y, saturate(h.flapInside)), 1);
                 }
+                else if (h.flapEdge > 0)
+                {
+                    // まとめてめくる束の小口
+                    col = float4(BookTurnEdgeColor(h.flapEdge), 1);
+                }
                 else if (h.rigidMargin > 0.5)
                 {
                     // 硬い表紙の板のページより外：表側なら閉じた表紙の縁、内側なら開いた本の縁（着地した位置で）。
-                    // 置いてある板と同じ関数で描くので、金の罫・角金具・革の模様が着地の前後で変わらない
+                    // 置いてある板と同じ関数で描くので、金の罫・革の模様が着地の前後で変わらない
                     // 内側の縁には、その側のページの束（小口）も板に載って一緒に回る
                     bool coverFace = h.kind > 0.5 && h.kind < 2.5;
                     float4 carried = coverFace ? float4(0, 0, 0, 0) : BookStackCarried(h.flatPos);
@@ -164,23 +166,10 @@
                     else col = float4(BookOpenBoardColor(h.flatPos), 1);
                 }
                 else col = float4(ShadePage(h, BookSamplePage(h.dest, h.right, h.uv).rgb, curlTilt), 1);
-                // 角金具：回っている板の表側（全体）と、閉じた表紙の上（板の縁はページの外で BookCover が描く）。
-                // 2つは同時に起きないので、位置だけ選んで1回だけ描く（同じ大きな処理を2回書き出さない）
-                bool coverFaceKind = h.kind > 0.5 && h.kind < 2.5;
-                bool rigidMetal = h.rigid > 0.5 && h.rigidEdge < 0.5 && h.rigidMargin < 0.5 && coverFaceKind;
-                bool flatMetal = h.layer == BOOK_LAYER_FLAT && coverFaceKind;
-                if (rigidMetal || flatMetal)
-                {
-                    float2 metalPos = rigidMetal ? h.flatPos : p;
-                    float2 boxCenter, boxHalf;
-                    BookCoverBox(rigidMetal ? h.flatPos.x >= 0 : h.kind < 1.5, boxCenter, boxHalf);
-                    float boxSd = BookSdRoundBox(metalPos - boxCenter, boxHalf, _CoverRadius);
-                    col.rgb = BookCornerMetal(col.rgb, metalPos - boxCenter, boxHalf, boxSd);
-                }
             #endif
+            #endif
+            #if !defined(BOOK_STILL)
                 if (h.rigid > 0.5) col.rgb *= h.rigidShade;
-            #if defined(BOOK_FX)
-                if (fxPage) col.rgb = BookFxShadePage(col.rgb, p, fxEdge);
             #endif
                 return col;
             }
@@ -188,10 +177,14 @@
             // めくりの落ち影と魔法の光（姿勢の明暗の後、暗転の前に重ねる）
             float4 BookTurnOverlay(float4 col, BookFlipHit h, float2 p)
             {
+            #if defined(BOOK_STILL)
+                // めくっていない見開きには、めくれた紙の影も折り目の光も無い
+                return col;
+            #else
                 // めくれた紙が下の紙・表紙・背景に落とす影
                 if (h.layer != BOOK_LAYER_BACK && h.flapOutside < 1e2)
                 {
-                    float shadow = (1 - smoothstep(0, _DropShadowWidth, h.flapOutside)) * _DropShadow * saturate(h.foldLength * 4);
+                    float shadow = (1 - smoothstep(0, _DropShadowWidth + _TurnThickness.z, h.flapOutside)) * _DropShadow * h.turnFade;
                     col.rgb *= 1 - shadow;
                     col.a = max(col.a, shadow);
                 }
@@ -213,10 +206,11 @@
                 #else
                     float sparkle = BookLookNoise(float2(along * 38 - _Time.y * 5, _Time.y * 0.7));
                 #endif
-                    col.rgb += _FoldGlowColor.rgb * _TurnGlow * glow * (0.35 + 0.65 * sparkle * sparkle);
+                    col.rgb += _FoldGlowColor.rgb * _TurnGlow * glow * (0.35 + 0.65 * sparkle * sparkle) * h.turnFade;
                 }
 
                 return col;
+            #endif
             }
 
             // 面の色に重ねる仕上げ：姿勢の明暗・落ち影・魔法の光・暗転・燃えかす・画面フェード
@@ -225,23 +219,17 @@
                 // 本の姿勢による明暗（光の向きは一定、本が光へ向く・背ける）。魔法の光・暗転・燃えかすはこの後に重ねる（自ら光るので暗くしない）
                 col.rgb *= BookPoseShade();
 
+            #if defined(BOOK_STILL)
+                // めくっていない・暗転していない見開き：姿勢の明暗だけ（BookFlipView が暗転 0 のときだけこのバリアントを選ぶ）
+                return BookApplyScreenFade(col);
+            #else
                 col = BookTurnOverlay(col, h, p);
 
                 col = BookApplyDim(col, p);
 
-            #if defined(BOOK_FX)
-                // 燃えかすと粒は暗転の上に描く
-                float4 ash = BookFxAsh(p);
-                col.rgb = col.rgb * (1 - ash.a) + ash.rgb;
-                col.a = max(col.a, ash.a);
-
-                float3 particles = BookFxParticles(p);
-                col.rgb += particles;
-                col.a = max(col.a, saturate(max(particles.r, max(particles.g, particles.b))));
-            #endif
-
                 // 画面フェード（後処理を使うときは BookFlipView が 0 にし、後処理の最後で掛ける）
                 return BookApplyScreenFade(col);
+            #endif
             }
 
             // 分割パスの面の色（1〜3）を読む

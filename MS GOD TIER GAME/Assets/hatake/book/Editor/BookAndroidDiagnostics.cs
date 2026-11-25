@@ -288,7 +288,7 @@ namespace hatake.EditorTools
             RunText(adb, "shell wm dismiss-keyguard");
         }
 
-        private static string FindLayer(string adb, string package)
+        internal static string FindLayer(string adb, string package)
         {
             foreach (string line in RunText(adb, "shell dumpsys SurfaceFlinger --list").Split('\n'))
             {
@@ -299,7 +299,7 @@ namespace hatake.EditorTools
         }
 
         // SurfaceFlinger --latency の出力から、fps と最も長いフレームの時間を出す
-        private static string Summarize(string latency)
+        internal static string Summarize(string latency)
         {
             var times = new System.Collections.Generic.List<long>();
             foreach (string line in latency.Split('\n'))
@@ -343,7 +343,7 @@ namespace hatake.EditorTools
             return start >= 0 ? text.Substring(start + 1) : text;
         }
 
-        private static void CaptureScreen(string adb, string path)
+        internal static void CaptureScreen(string adb, string path)
         {
             try
             {
