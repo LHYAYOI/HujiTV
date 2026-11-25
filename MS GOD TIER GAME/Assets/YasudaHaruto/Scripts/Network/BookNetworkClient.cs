@@ -14,6 +14,7 @@ public class BookNetworkClient : MonoBehaviour
 {
     private static BookNetworkClient s_instance;
 
+
     public static BookNetworkClient Instance => s_instance;
 
     [SerializeField] private float m_connectionTimeoutSeconds = 5.0f;
@@ -33,20 +34,32 @@ public class BookNetworkClient : MonoBehaviour
     private float m_reconnectDelay = 1f;
 
     private bool m_transportConnected;
-    public bool HasGameStarted { get; private set; }
-    public string LastConnectionError { get; private set; }
+
+    public bool HasGameStarted
+    {
+        get; private set;
+    }
+
+    public string LastConnectionError
+    {
+        get; private set;
+    }
     public event Action GameStarted;
 
+
     public bool IsReconnecting => m_shouldReconnect && ConnectionState != BOOK_CONNECTION_STATE.CONNECTED;
+
 
     public BOOK_CONNECTION_STATE ConnectionState { get; private set; } = BOOK_CONNECTION_STATE.DISCONNECTED;
 
     public event Action<BOOK_CONNECTION_STATE> OnConnectionStateChanged;
     private readonly System.Collections.Generic.HashSet<byte> m_acquiredPageIds = new();
+
     public System.Collections.Generic.IEnumerable<byte> AcquiredPageIds => m_acquiredPageIds;
     public event Action<byte, bool> AcquiredPageReceived;
     public event System.Action<byte> AddPageReceived;
     public event System.Action<uint, byte> ObstacleReceived;
+
 
 
     private void Awake()
@@ -62,28 +75,34 @@ public class BookNetworkClient : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+
     private void Start()
     {
         InitializeDriver();
     }
 
+
     private void InitializeDriver()
     {
-        if (m_driver.IsCreated) return;
+        if (m_driver.IsCreated)
+            return;
         m_driver = NetworkDriver.Create();
         m_reliablePipeline = m_driver.CreatePipeline(typeof(ReliableSequencedPipelineStage));
     }
 
+
     private void Update()
     {
-        if (!m_driver.IsCreated) return;
+        if (!m_driver.IsCreated)
+            return;
         m_driver.ScheduleUpdate().Complete();
 
         // Finish processing the old connection before a retry replaces its handle.
         while (m_connection.IsCreated)
         {
             NetworkEvent.Type eventType = m_connection.PopEvent(m_driver, out DataStreamReader reader);
-            if (eventType == NetworkEvent.Type.Empty) break;
+            if (eventType == NetworkEvent.Type.Empty)
+                break;
             switch (eventType)
             {
                 case NetworkEvent.Type.Connect:
@@ -110,6 +129,7 @@ public class BookNetworkClient : MonoBehaviour
             BeginConnection();
         }
     }
+
 
     public void Connect(string ipAddress, PLAYER_SLOT playerSlot)
     {
@@ -151,6 +171,7 @@ public class BookNetworkClient : MonoBehaviour
         BeginConnection();
     }
 
+
     private void BeginConnection()
     {
         m_transportConnected = false;
@@ -165,6 +186,7 @@ public class BookNetworkClient : MonoBehaviour
         SetConnectionState(BOOK_CONNECTION_STATE.CONNECTING);
     }
 
+
     public void Disconnect()
     {
         // Explicit disconnect also cancels all future retries.
@@ -174,6 +196,7 @@ public class BookNetworkClient : MonoBehaviour
         CloseConnection();
         SetConnectionState(BOOK_CONNECTION_STATE.DISCONNECTED);
     }
+
 
     private void CloseConnection()
     {
@@ -185,12 +208,14 @@ public class BookNetworkClient : MonoBehaviour
         m_connection = default;
     }
 
+
     private void OnConnected()
     {
         m_transportConnected = true;
         m_connectionDeadline = Time.unscaledTime + Mathf.Max(0.1f, m_connectionTimeoutSeconds);
         SendRegisterController();
     }
+
 
     private void OnDisconnected()
     {
@@ -201,6 +226,7 @@ public class BookNetworkClient : MonoBehaviour
         m_reconnectDelay = Mathf.Min(8f, m_reconnectDelay * 2f);
         SetConnectionState(BOOK_CONNECTION_STATE.DISCONNECTED);
     }
+
 
     private void SetConnectionState(BOOK_CONNECTION_STATE state)
     {
@@ -215,6 +241,7 @@ public class BookNetworkClient : MonoBehaviour
         // 接続状態変更イベントを通知
         OnConnectionStateChanged?.Invoke(state);
     }
+
 
 
     private void SendRegisterController()
@@ -247,6 +274,7 @@ public class BookNetworkClient : MonoBehaviour
 
         Debug.Log($"Controller登録送信 : {m_playerSlot}");
     }
+
 
     public void SendTestPing(int value)
     {
@@ -281,16 +309,20 @@ public class BookNetworkClient : MonoBehaviour
         Debug.Log($"TestPing送信 : {value}");
     }
 
+
     // CastSkillメッセージを送信する
     public bool SendCastSelection(bool active)
     {
-        if (!CanSend()) return false;
+        if (!CanSend())
+            return false;
         int result = m_driver.BeginSend(m_reliablePipeline, m_connection, out DataStreamWriter writer);
-        if (result != 0) return false;
+        if (result != 0)
+            return false;
         writer.WriteByte((byte)BOOK_MESSAGE_TYPE.CAST_SELECTION);
         writer.WriteByte(active ? (byte)1 : (byte)0);
         return m_driver.EndSend(writer) >= 0;
     }
+
 
     public bool SendCastSkill(byte skillId, MAGIC_CAST_DIRECTION direction)
     {
@@ -334,6 +366,7 @@ public class BookNetworkClient : MonoBehaviour
         return true;
     }
 
+
     public void SendVector2(Vector2 value)
     {
         if (!CanSend())
@@ -364,11 +397,13 @@ public class BookNetworkClient : MonoBehaviour
         Debug.Log($"Vector2送信 : {value}");
     }
 
+
     private bool CanSend()
     {
         // 接続状態がCONNECTEDであり、接続が作成されている場合に送信可能
         return m_driver.IsCreated && ConnectionState == BOOK_CONNECTION_STATE.CONNECTED && m_connection.IsCreated;
     }
+
 
     private void ReceiveData(DataStreamReader reader)
     {
@@ -383,17 +418,20 @@ public class BookNetworkClient : MonoBehaviour
         switch (messageType)
         {
             case BOOK_MESSAGE_TYPE.REGISTRATION_ACCEPTED:
-                if (reader.Length != 1 || !m_transportConnected || ConnectionState != BOOK_CONNECTION_STATE.CONNECTING) break;
+                if (reader.Length != 1 || !m_transportConnected || ConnectionState != BOOK_CONNECTION_STATE.CONNECTING)
+                    break;
                 m_reconnectDelay = 1f;
                 SetConnectionState(BOOK_CONNECTION_STATE.CONNECTED);
                 break;
             case BOOK_MESSAGE_TYPE.REGISTRATION_REJECTED:
-                if (reader.Length != 1 || !m_transportConnected) break;
+                if (reader.Length != 1 || !m_transportConnected)
+                    break;
                 LastConnectionError = "Player slot is already in use. Select another Player.";
                 Disconnect();
                 break;
             case BOOK_MESSAGE_TYPE.GAME_STARTED:
-                if (reader.Length != 1 || !CanSend() || HasGameStarted) break;
+                if (reader.Length != 1 || !CanSend() || HasGameStarted)
+                    break;
                 HasGameStarted = true;
                 GameStarted?.Invoke();
                 break;
@@ -402,17 +440,27 @@ public class BookNetworkClient : MonoBehaviour
                 break;
 
             case BOOK_MESSAGE_TYPE.APPLY_OBSTACLE:
-                if (reader.Length - reader.GetBytesRead() < 5) { Debug.LogWarning("Truncated obstacle packet."); break; }
+                if (reader.Length - reader.GetBytesRead() < 5)
+                {
+                    Debug.LogWarning("Truncated obstacle packet.");
+                    break;
+                }
                 uint eventId = reader.ReadUInt();
                 byte obstacleId = reader.ReadByte();
                 // Legacy types 1 and 2 used one and two slots respectively.
-                if (obstacleId == 1 || obstacleId == 2) ObstacleReceived?.Invoke(eventId, obstacleId);
+                if (obstacleId == 1 || obstacleId == 2)
+                    ObstacleReceived?.Invoke(eventId, obstacleId);
                 break;
             case BOOK_MESSAGE_TYPE.APPLY_DIRT:
-                if (reader.Length - reader.GetBytesRead() != 5) { Debug.LogWarning("Invalid dirt packet."); break; }
+                if (reader.Length - reader.GetBytesRead() != 5)
+                {
+                    Debug.LogWarning("Invalid dirt packet.");
+                    break;
+                }
                 uint dirtEventId = reader.ReadUInt();
                 byte slotCount = reader.ReadByte();
-                if (slotCount >= 1 && slotCount <= 4) ObstacleReceived?.Invoke(dirtEventId, slotCount);
+                if (slotCount >= 1 && slotCount <= 4)
+                    ObstacleReceived?.Invoke(dirtEventId, slotCount);
                 break;
             case BOOK_MESSAGE_TYPE.ADD_PAGE:
                 ReceiveAddPage(reader);
@@ -424,6 +472,7 @@ public class BookNetworkClient : MonoBehaviour
                 break;
         }
     }
+
 
     private void ReceiveTestPong(DataStreamReader reader)
     {
@@ -442,6 +491,7 @@ public class BookNetworkClient : MonoBehaviour
 
         Debug.Log($"TestPong受信 : {value}");
     }
+
 
     private void ReceiveAddPage(DataStreamReader reader)
     {
@@ -464,6 +514,7 @@ public class BookNetworkClient : MonoBehaviour
         }
         AddPageReceived?.Invoke(pageId);
     }
+
     private void OnDestroy()
     {
         if (s_instance != this)

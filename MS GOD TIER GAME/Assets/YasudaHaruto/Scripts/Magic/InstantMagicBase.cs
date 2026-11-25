@@ -6,5 +6,6 @@ using UnityEngine;
 /// </summary>
 public abstract class InstantMagicBase : MonoBehaviour
 {
+
     public abstract void Execute();
 }

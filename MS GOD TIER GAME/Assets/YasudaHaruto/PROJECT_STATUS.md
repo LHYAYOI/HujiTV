@@ -1,5 +1,14 @@
 # Project Status
 
+## 最新調整：カーブ復帰の揺れ軽減・使用コードの可読性整理（2026-11-25）
+- 現状確認：現行RollerCoasterはRollerCoasterStoryboardが11区間の速度・車体姿勢・5台の遭遇・2枚の天井・最終落下後の停止再発進を制御。旧SpeedProfileだけを調整しても現行の復帰演出には反映されない。ユーザーの既存Scene差分（乗車用ワゴン・ライト・位置/参照変更）と.vs変更を保持。
+- カーブ復帰：StoryboardのBank Snap Metersを2→2.6mへ変更し、バンクから戻る時間を少し長くした。Bank Return Strengthを追加（初期値0.65、Inspector調整可）し、復帰直後の回転振動と視点の沈み込みを従来の65%へ。レールのバンク角・経路・速度・ブレーキ/着地振動は維持。現行Sceneは既存差分に対してm_bankSnapMetersの1行だけを変更。
+- ユーザー指定の範囲はAssets/YasudaHaruto内の使用中スクリプトすべて（本を含む）。全152本を調査し、Scene/Prefab/assetのGUID参照・他担当コードからの型参照・依存関係と保守用Editorツールを合わせて149本を対象に、146本を整形/説明補足。参照のないPageNavigationDirection、PageNavigationInput、RuneParticleGraphicの3本は除外、残る3本は既に整形済みで変更不要。既存の検証/再生成ツールも読みやすく整理したが、再生成コマンドは実行していない。
+- 圧縮されていた複数文/ブロックを展開し、インデント、演算子周辺の空白、メソッド/設定グループの間隔を整理。既存の数式/引数の改行は保持。役割の説明と、ページ変更候補を表示成功後に確定する理由、ルーン軌跡のコピー、演出時計・姿勢・車体表示・カーブ復帰の扱いをコメントで補足。UTF-8/Shift-JIS、既存コメント、型名・フィールド名・公開API・meta/GUIDを保持。
+- 検証：Roslynで全152本の整形前後のC#トークンをEditor定義あり/なしの両方で比較し、Storyboardと専用検証コード以外の150本は一致。既存コメント/文字コードの復元一致、metaのバイト一致、作業前Sceneとの差分が上記1行のみであることを確認。スクリプトのgit diff --checkもPASS。Sceneにある末尾空白2件は作業前からの既存差分なので保持。
+- 起動済みUnityで最終版のAssembly-CSharp/Editorを11:32:41/43にコンパイル成功後、現行Storyboardのplay検証を実施。全11区間、全5台の可視/通過、両天井、乗車用ワゴン表示、復帰振動、着地停止/視点復帰/再発進、Pause/Resume、ゴール停止、RestartがPASS、実行時Errorなし。復帰回転振動最大1.512度、沈み込み最大0.0339m、姿勢変化最大5.652度/検査サンプル。視点と相手車両の最小余裕0.458m。記録はTemp/RollerCoasterStoryboard/result.txtと画像。検証後は編集モード。本側のPlay/端末間通信の再試験およびユーザー自身の揺れの最終体感は未確認。
+- 作業前のスクリプト一式（meta含む）と既存差分込みSceneをBackups~/Before-readability-20261125-112542へコピー。整形前スナップショットもBackups~/Readability-*へ保存。Git status/fetch/追跡先比較実施、追跡先との差分なし。担当外/共有設定の編集、Commit/Push等の禁止Git操作はなし。
+
 ## 最新調整：wagonをさらに35cm手前へ（2026-11-24）
 - ユーザー指定でRide Wagon ForegroundのlocalPositionを(0,0.51,0.85)→(0,0.51,0.5)へ変更。さらにカメラ側へ35cm移動。高さ0.51とscale1.15は維持。Sceneと再配置コードを反映。
 - Unityの乗車画面tuning-0.pngで通常の前向き視点を確認。ワゴンの前面が画面下へ続き、車体の下から床が見える隙間を解消。前方の線路は判別可能。カメラのnear clip等のユーザー設定は変えていない。

@@ -2,12 +2,14 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // Created by the bootstrap; requires no scene references and never captures input.
+/// <summary>本の接続状態を表示へ反映し、接続操作とは分離して扱う。</summary>
 public sealed class BookConnectionStatusView : MonoBehaviour
 {
     private BookNetworkClient m_client;
     private GameObject m_panel;
     private Text m_label;
     private Font m_font;
+
 
     public void Initialize(BookNetworkClient client)
     {
@@ -49,18 +51,23 @@ public sealed class BookConnectionStatusView : MonoBehaviour
         Update();
     }
 
+
     private void Update()
     {
-        if (m_panel == null) return;
+        if (m_panel == null)
+            return;
         bool disconnected = m_client != null && m_client.ConnectionState != BOOK_CONNECTION_STATE.CONNECTED;
         m_panel.SetActive(disconnected);
         if (disconnected)
             m_label.text = m_client.IsReconnecting ? "再接続中… ページめくりのみ操作できます" : "未接続：ページめくりのみ操作できます";
     }
 
+
     private void OnDestroy()
     {
-        if (m_panel != null) Destroy(m_panel);
-        if (m_font != null) Destroy(m_font);
+        if (m_panel != null)
+            Destroy(m_panel);
+        if (m_font != null)
+            Destroy(m_font);
     }
 }

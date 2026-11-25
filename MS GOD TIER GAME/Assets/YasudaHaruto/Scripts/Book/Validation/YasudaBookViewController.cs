@@ -11,19 +11,25 @@ namespace YasudaHaruto.BookValidation
 {
     public sealed class YasudaBookViewController : MonoBehaviour
     {
+
         [Header("ページ表示")]
         [SerializeField] private BookPageView m_leftPageView;
         [SerializeField] private BookPageView m_rightPageView;
+
         [Header("撮影")]
         [SerializeField] private Camera m_captureCamera;
         [SerializeField] private RenderTexture m_textureA;
         [SerializeField] private RenderTexture m_textureB;
+
         [Header("画面表示")]
         [SerializeField] private RawImage m_displayImage;
+
         [Header("3D表示（未設定なら従来の2D表示）")]
         [SerializeField] private BookModelView m_modelView;
+
         [Header("シェーダー合成のめくり表示（設定するとこちらを優先）")]
         [SerializeField] private BookFlipView m_flipView;
+
         [Header("表紙（Flip View のみ）")]
         [Tooltip("最初の見開きの前に表紙、最後の見開きの後に裏表紙を置き、閉じた本にめくれるようにする")]
         [SerializeField] private bool m_useCovers = true;
@@ -33,6 +39,7 @@ namespace YasudaHaruto.BookValidation
         [SerializeField] private bool m_coverInsides = true;
         [Tooltip("ON：最初の見開きで「前へ」、最後で「次へ」をすると閉じる。OFF（既定）：閉じるのは CloseBook だけ")]
         [SerializeField] private bool m_autoCloseAtEnds;
+
         [Header("めくり中のページ更新")]
         [Tooltip("めくり・燃焼・復活の間も、元の見開き（持っているページ）を撮影し続ける。撮影Cameraと撮影用Canvasを実行時に複製する")]
         [SerializeField] private bool m_liveTurningPages = true;
@@ -42,31 +49,51 @@ namespace YasudaHaruto.BookValidation
         private RenderTexture m_currentTexture;
         private RenderTexture m_previousTexture;
 
+
         public RenderTexture CurrentTexture => m_currentTexture;
+
         public RenderTexture PreviousTexture => m_previousTexture;
+
         public RawImage DisplayImage => m_displayImage;
+
         public BookModelView ModelView => m_flipView != null ? null : m_modelView;
+
         public BookFlipView FlipView => m_flipView;
+
         public int SpreadCount => Mathf.Max(1, (PageCount + 1) / 2);
+
         public bool CoversEnabled => m_useCovers && m_flipView != null;
+
         public BookCoverState CoverState => m_coverState;
+
         public bool IsClosed => m_coverState != BookCoverState.Open;
         /// <summary>表紙の開閉が終わったとき</summary>
         public event Action<BookCoverState> CoverChanged;
+
         public bool CanTurnForward => !IsBusy && (m_coverState == BookCoverState.FrontCover ||
             (m_coverState == BookCoverState.Open && (m_spreadIndex + 1 < SpreadCount || (CoversEnabled && m_autoCloseAtEnds))));
+
         public bool CanTurnBackward => !IsBusy && (m_coverState == BookCoverState.BackCover ||
             (m_coverState == BookCoverState.Open && (m_spreadIndex > 0 || (CoversEnabled && m_autoCloseAtEnds))));
-        public bool AutoCloseAtEnds { get => m_autoCloseAtEnds; set => m_autoCloseAtEnds = value; }
+
+        public bool AutoCloseAtEnds
+        {
+            get => m_autoCloseAtEnds; set => m_autoCloseAtEnds = value;
+        }
+
         public int CurrentSpread => m_spreadIndex;
+
         public bool IsBusy => m_captureFlag;
+
         public bool IsReady => m_inventoryInitialized && isActiveAndEnabled && !IsBusy &&
             m_flipView != null && !m_flipView.IsTurning;
         private bool m_inventoryInitialized;
+
         public int PageCount => m_runtimePages.Count;
         public event Action<int> SpreadShown;
         private Action<int, BookPageView, BookPageView, Camera> m_pageDecoration;
         private int m_captureSpread;
+
 
         internal void SetPageDecoration(Action<int, BookPageView, BookPageView, Camera> decoration)
         {
@@ -80,10 +107,12 @@ namespace YasudaHaruto.BookValidation
         private Text m_liveLeftPageNumber;
         private Text m_liveRightPageNumber;
 
+
         private void PreparePageDecoration(int spread, BookPageView left, BookPageView right, Camera camera,
             int? pageCount = null)
         {
-            if (camera == m_captureCamera) m_captureSpread = spread;
+            if (camera == m_captureCamera)
+                m_captureSpread = spread;
             m_pageDecoration?.Invoke(spread, left, right, camera);
 
             int count = pageCount ?? PageCount;
@@ -100,11 +129,13 @@ namespace YasudaHaruto.BookValidation
             }
         }
 
+
         private void SetPageNumber(ref Text label, BookPageView page, int index, int count, bool left)
         {
             if (page == null || IsCoverInside(index) || index >= count)
             {
-                if (label != null) label.enabled = false;
+                if (label != null)
+                    label.enabled = false;
                 return;
             }
 
@@ -139,22 +170,30 @@ namespace YasudaHaruto.BookValidation
         private readonly List<BookPageData> m_runtimePages = new List<BookPageData>();
         private Action<bool> m_inventoryCompletion;
 
+
         public bool TryBeginPageDrag(Vector2 point, BookFlipCorner? corner, bool closeAtEnds)
         {
             bool forward = point.x >= 0f;
             if (!IsReady || !(closeAtEnds ? CanFlick(forward) : forward ? CanTurnForward : CanTurnBackward))
                 return false;
             m_flipView.BeginDrag(point, corner);
-            if (closeAtEnds) Flick(forward);
-            else if (forward) ShowNextSpread();
-            else ShowPreviousSpread();
-            if (IsBusy) return true;
+            if (closeAtEnds)
+                Flick(forward);
+            else if (forward)
+                ShowNextSpread();
+            else
+                ShowPreviousSpread();
+            if (IsBusy)
+                return true;
             m_flipView.CancelDrag();
             return false;
         }
 
+
         public void UpdatePageDrag(Vector2 point) => m_flipView?.UpdateDrag(point);
+
         public void EndPageDrag() => m_flipView?.EndDrag();
+
 
         // The inventory owner supplies a complete candidate; no partial pair edits escape.
         internal bool TryApplyInventory(IReadOnlyList<BookPageData> pages, int targetSpread, bool present, Action<bool> completed)
@@ -164,14 +203,19 @@ namespace YasudaHaruto.BookValidation
                 pages == null || pages.Count < 3 || (pages.Count & 1) == 0 ||
                 targetSpread < 0 || targetSpread >= (pages.Count + 1) / 2 ||
                 pages[0] != null || pages[1] != GetPage(1) ||
-                pages[pages.Count - 1] != GetPage(PageCount - 1)) return false;
-            for (int i = 1; i < pages.Count; i++) if (pages[i] == null) return false;
+                pages[pages.Count - 1] != GetPage(PageCount - 1))
+                return false;
+            for (int i = 1; i < pages.Count; i++)
+                if (pages[i] == null)
+                    return false;
             var candidate = new List<BookPageData>(pages.Count);
-            for (int i = 0; i < pages.Count; i++) candidate.Add(pages[i]);
+            for (int i = 0; i < pages.Count; i++)
+                candidate.Add(pages[i]);
             m_inventoryCompletion = completed;
             StartCoroutine(ApplyInventory(candidate, targetSpread, present));
             return true;
         }
+
 
         private IEnumerator ApplyInventory(List<BookPageData> candidate, int targetSpread, bool present)
         {
@@ -200,7 +244,8 @@ namespace YasudaHaruto.BookValidation
             m_currentTexture = target;
             m_spreadIndex = targetSpread;
             m_flipView.SetDisplay(m_displayImage);
-            if (!IsClosed) m_flipView.ShowSpread(target);
+            if (!IsClosed)
+                m_flipView.ShowSpread(target);
             m_flipView.SetReadingProgress(targetSpread, SpreadCount);
             m_displayImage.texture = m_flipView.OutputTexture;
             m_displayImage.enabled = true;
@@ -215,6 +260,7 @@ namespace YasudaHaruto.BookValidation
         private Coroutine m_acquisitionGlow;
         private Color m_displayColorBeforeGlow;
 
+
         internal void PlayAcquisitionEffect()
         {
             StopAcquisitionGlow();
@@ -222,13 +268,16 @@ namespace YasudaHaruto.BookValidation
             m_acquisitionGlow = StartCoroutine(AcquisitionGlow());
         }
 
+
         private void StopAcquisitionGlow()
         {
-            if (m_acquisitionGlow == null) return;
+            if (m_acquisitionGlow == null)
+                return;
             StopCoroutine(m_acquisitionGlow);
             m_acquisitionGlow = null;
             m_displayImage.color = m_displayColorBeforeGlow;
         }
+
 
         private IEnumerator AcquisitionGlow()
         {
@@ -255,30 +304,40 @@ namespace YasudaHaruto.BookValidation
         private int m_pendingSpread = -1;
         private int m_pendingPage = -1;
         private bool m_pendingInstant;
+
         public Image GetCurrentRuneImage(int imageIndex)
         {
             BookPageData page = GetPage(m_spreadIndex * 2);
-            if (page == null || m_leftPageView == null || page.Images.Count == 0) return null;
+            if (page == null || m_leftPageView == null || page.Images.Count == 0)
+                return null;
             int index = imageIndex < 0 ? page.Images.Count - 1 : imageIndex;
-            if (index >= page.Images.Count) return null;
+            if (index >= page.Images.Count)
+                return null;
             BookImageData data = page.Images[index];
-            if (data == null || data.Sprite == null) return null;
+            if (data == null || data.Sprite == null)
+                return null;
             Image result = null;
             foreach (Image image in m_leftPageView.GetComponentsInChildren<Image>())
             {
-                if (image.sprite != data.Sprite) continue;
+                if (image.sprite != data.Sprite)
+                    continue;
                 Vector2 expected = new Vector2(data.Position.x, -data.Position.y);
                 if ((image.rectTransform.anchoredPosition - expected).sqrMagnitude < 0.01f &&
-                    (image.rectTransform.sizeDelta - data.Size).sqrMagnitude < 0.01f) result = image;
+                    (image.rectTransform.sizeDelta - data.Size).sqrMagnitude < 0.01f)
+                    result = image;
             }
             return result;
         }
 
+
         private void Awake()
         {
-            if (m_startClosed && CoversEnabled) m_coverState = BookCoverState.FrontCover;
-            if (m_liveTurningPages && Application.isPlaying) CreateLiveRig();
+            if (m_startClosed && CoversEnabled)
+                m_coverState = BookCoverState.FrontCover;
+            if (m_liveTurningPages && Application.isPlaying)
+                CreateLiveRig();
         }
+
 
         // Called before the first capture; the game inventory is the only authoring source.
         internal bool InitializeInventory(IReadOnlyList<BookPageData> pages)
@@ -288,37 +347,48 @@ namespace YasudaHaruto.BookValidation
                 !m_captureCamera.gameObject.activeInHierarchy || m_displayImage == null ||
                 m_textureA == null || m_textureB == null || m_textureA == m_textureB ||
                 pages == null || pages.Count < 3 || pages.Count % 2 == 0 || pages[0] != null ||
-                !m_flipView.Initialize()) return false;
-            for (int i = 1; i < pages.Count; i++) if (pages[i] == null) return false;
+                !m_flipView.Initialize())
+                return false;
+            for (int i = 1; i < pages.Count; i++)
+                if (pages[i] == null)
+                    return false;
             m_runtimePages.Clear();
-            for (int i = 0; i < pages.Count; i++) m_runtimePages.Add(pages[i]);
+            for (int i = 0; i < pages.Count; i++)
+                m_runtimePages.Add(pages[i]);
             m_frontInsideSlot = true;
             m_inventoryInitialized = true;
             ShowSpread(m_spreadIndex);
             return true;
         }
 
+
         public BookPageData GetPage(int index) => index >= 0 && index < PageCount ? m_runtimePages[index] : null;
+
 
         /// <summary>index が表紙の内側の枠（最初の見開きの左）か。ページではないので燃焼・挿入・削除できない</summary>
         public bool IsCoverInside(int pageIndex) => m_frontInsideSlot && pageIndex == 0;
 
+
         /// <summary>データ上のページ番号（BookData の順、0始まり）→ 本の中の番号</summary>
         public int ToBookIndex(int dataIndex) => dataIndex + (m_frontInsideSlot ? 1 : 0);
+
 
         // 撮影した見開きの左右が表紙・裏表紙の内側かを Flip View に伝える
         private void TagCoverInsides(RenderTexture texture, int spreadIndex, int pageCount)
         {
-            if (m_flipView == null) return;
+            if (m_flipView == null)
+                return;
             int spreadCount = Mathf.Max(1, (pageCount + 1) / 2);
             bool left = m_frontInsideSlot && spreadIndex == 0;
             bool right = CoversEnabled && m_coverInsides && spreadIndex == spreadCount - 1 && spreadIndex * 2 + 1 >= pageCount;
             m_flipView.SetCoverInsides(texture, left, right);
         }
 
+
         private void ResumePendingSpread()
         {
-            if (m_pendingSpread < 0) return;
+            if (m_pendingSpread < 0)
+                return;
             int pending = m_pendingSpread;
             bool instant = m_pendingInstant;
             m_pendingSpread = -1;
@@ -326,9 +396,11 @@ namespace YasudaHaruto.BookValidation
             ShowSpreadInternal(pending, instant);
         }
 
+
         public void ShowPage(int index, bool instant = false)
         {
-            if (index < 0 || index >= PageCount) return;
+            if (index < 0 || index >= PageCount)
+                return;
             if (IsBusy)
             {
                 m_pendingSpread = index / 2;
@@ -339,22 +411,34 @@ namespace YasudaHaruto.BookValidation
             ShowSpreadInternal(index / 2, instant);
         }
 
+
         private void OnEnable()
         {
-            if (m_displayImage != null) m_displayImage.enabled = false;
+            if (m_displayImage != null)
+                m_displayImage.enabled = false;
             ShowSpread(m_spreadIndex);
         }
+
 
         public void ShowSpread(int spreadIndex)
         {
             ShowSpreadInternal(spreadIndex, false);
         }
 
+
         private void ShowSpreadInternal(int spreadIndex, bool instant)
         {
-            if (!isActiveAndEnabled || !m_inventoryInitialized) return;
-            if (spreadIndex < 0 || spreadIndex >= Mathf.Max(1, (PageCount + 1) / 2)) return;
-            if (IsBusy) { m_pendingSpread = spreadIndex; m_pendingPage = spreadIndex * 2; m_pendingInstant = instant; return; }
+            if (!isActiveAndEnabled || !m_inventoryInitialized)
+                return;
+            if (spreadIndex < 0 || spreadIndex >= Mathf.Max(1, (PageCount + 1) / 2))
+                return;
+            if (IsBusy)
+            {
+                m_pendingSpread = spreadIndex;
+                m_pendingPage = spreadIndex * 2;
+                m_pendingInstant = instant;
+                return;
+            }
             if (m_leftPageView == null ||
                 m_rightPageView == null || m_captureCamera == null ||
                 m_displayImage == null || m_textureA == null || m_textureB == null)
@@ -380,42 +464,62 @@ namespace YasudaHaruto.BookValidation
             }
             BookPageData leftPage = GetPage(spreadIndex * 2);
             BookPageData rightPage = GetPage(spreadIndex * 2 + 1);
-            if (m_flipView != null) { if (!m_flipView.Initialize()) return; }
-            else if (m_modelView != null && !m_modelView.Initialize()) return;
+            if (m_flipView != null)
+            {
+                if (!m_flipView.Initialize())
+                    return;
+            }
+            else if (m_modelView != null && !m_modelView.Initialize())
+                return;
             StartCoroutine(CaptureSpread(spreadIndex, leftPage, rightPage, instant));
         }
+
 
         /// <summary>次へ。表紙を閉じていれば開く。最後の見開きでは Auto Close At Ends のときだけ裏表紙を閉じる</summary>
         public void ShowNextSpread()
         {
             if (CoversEnabled && !IsBusy)
             {
-                if (m_coverState == BookCoverState.FrontCover) { OpenBook(); return; }
-                if (m_coverState == BookCoverState.BackCover) return;
+                if (m_coverState == BookCoverState.FrontCover)
+                {
+                    OpenBook();
+                    return;
+                }
+                if (m_coverState == BookCoverState.BackCover)
+                    return;
                 if (m_spreadIndex + 1 >= SpreadCount)
                 {
-                    if (m_autoCloseAtEnds) CloseBook(false);
+                    if (m_autoCloseAtEnds)
+                        CloseBook(false);
                     return;
                 }
             }
             ShowSpread(m_spreadIndex + 1);
         }
 
+
         /// <summary>前へ。裏表紙を閉じていれば開く。最初の見開きでは Auto Close At Ends のときだけ表紙を閉じる</summary>
         public void ShowPreviousSpread()
         {
             if (CoversEnabled && !IsBusy)
             {
-                if (m_coverState == BookCoverState.BackCover) { OpenBook(); return; }
-                if (m_coverState == BookCoverState.FrontCover) return;
+                if (m_coverState == BookCoverState.BackCover)
+                {
+                    OpenBook();
+                    return;
+                }
+                if (m_coverState == BookCoverState.FrontCover)
+                    return;
                 if (m_spreadIndex <= 0)
                 {
-                    if (m_autoCloseAtEnds) CloseBook(true);
+                    if (m_autoCloseAtEnds)
+                        CloseBook(true);
                     return;
                 }
             }
             ShowSpread(m_spreadIndex - 1);
         }
+
 
         /// <summary>
         /// ドラッグ・フリック用：forward（右をつかむ）でめくれるか。端の見開きでは、表紙・裏表紙を閉じるめくりも含める
@@ -423,33 +527,54 @@ namespace YasudaHaruto.BookValidation
         /// </summary>
         public bool CanFlick(bool forward)
         {
-            if (IsBusy) return false;
-            if (m_coverState == BookCoverState.FrontCover) return forward;
-            if (m_coverState == BookCoverState.BackCover) return !forward;
+            if (IsBusy)
+                return false;
+            if (m_coverState == BookCoverState.FrontCover)
+                return forward;
+            if (m_coverState == BookCoverState.BackCover)
+                return !forward;
             return forward ? (m_spreadIndex + 1 < SpreadCount || CoversEnabled) : (m_spreadIndex > 0 || CoversEnabled);
         }
+
 
         /// <summary>ドラッグ・フリックでめくる。端の見開きでは本を閉じる</summary>
         public void Flick(bool forward)
         {
-            if (!CanFlick(forward)) return;
-            if (m_coverState != BookCoverState.Open) { OpenBook(); return; }
-            if (forward && m_spreadIndex + 1 >= SpreadCount) { CloseBook(false); return; }
-            if (!forward && m_spreadIndex <= 0) { CloseBook(true); return; }
+            if (!CanFlick(forward))
+                return;
+            if (m_coverState != BookCoverState.Open)
+            {
+                OpenBook();
+                return;
+            }
+            if (forward && m_spreadIndex + 1 >= SpreadCount)
+            {
+                CloseBook(false);
+                return;
+            }
+            if (!forward && m_spreadIndex <= 0)
+            {
+                CloseBook(true);
+                return;
+            }
             ShowSpread(m_spreadIndex + (forward ? 1 : -1));
         }
+
 
         /// <summary>閉じた本を開く（閉じる前の見開き）。戻り値は受付</summary>
         public bool OpenBook() => OpenBook(-1);
 
+
         /// <summary>閉じた本を targetSpread の見開きで開く（負なら閉じる前の見開き）。見えないところで撮影してから開く</summary>
         public bool OpenBook(int targetSpread)
         {
-            if (!CoversEnabled || !IsClosed || IsBusy || m_currentTexture == null || !isActiveAndEnabled) return false;
+            if (!CoversEnabled || !IsClosed || IsBusy || m_currentTexture == null || !isActiveAndEnabled)
+                return false;
             int target = targetSpread < 0 ? m_spreadIndex : Mathf.Clamp(targetSpread, 0, SpreadCount - 1);
             StartCoroutine(OpenRoutine(target));
             return true;
         }
+
 
         /// <summary>
         /// 本を完全に閉じる。front = true で表紙、false で裏表紙が上になる。
@@ -457,29 +582,37 @@ namespace YasudaHaruto.BookValidation
         /// </summary>
         public bool CloseBook(bool front = true)
         {
-            if (!CoversEnabled || IsClosed || IsBusy || m_currentTexture == null || !isActiveAndEnabled) return false;
+            if (!CoversEnabled || IsClosed || IsBusy || m_currentTexture == null || !isActiveAndEnabled)
+                return false;
             StartCoroutine(CloseRoutine(front));
             return true;
         }
 
+
         /// <summary>旧名。OpenBook() と同じ</summary>
         public bool OpenCover() => OpenBook();
+
 
         /// <summary>旧名。CloseBook(front) と同じ</summary>
         public bool CloseCover(bool front) => CloseBook(front);
 
+
         private IEnumerator OpenRoutine(int target)
         {
             m_captureFlag = true;
-            if (target != m_spreadIndex) yield return CaptureHidden(target);
+            if (target != m_spreadIndex)
+                yield return CaptureHidden(target);
             PrepareFlipDisplay();
             BookCoverState cover = m_coverState;
             yield return m_flipView.PlayCoverTurn(m_currentTexture, cover, true);
-            if (m_flipView.LastTurnCommitted) SetCoverState(BookCoverState.Open);
+            if (m_flipView.LastTurnCommitted)
+                SetCoverState(BookCoverState.Open);
             m_captureFlag = false;
-            if (!IsClosed) SpreadShown?.Invoke(m_spreadIndex);
+            if (!IsClosed)
+                SpreadShown?.Invoke(m_spreadIndex);
             ResumePendingSpread();
         }
+
 
         private IEnumerator CloseRoutine(bool front)
         {
@@ -491,11 +624,13 @@ namespace YasudaHaruto.BookValidation
             {
                 SetCoverState(cover);
                 int edge = front ? 0 : SpreadCount - 1;
-                if (m_spreadIndex != edge) yield return CaptureHidden(edge);
+                if (m_spreadIndex != edge)
+                    yield return CaptureHidden(edge);
             }
             m_captureFlag = false;
             ResumePendingSpread();
         }
+
 
         private void PrepareFlipDisplay()
         {
@@ -503,6 +638,7 @@ namespace YasudaHaruto.BookValidation
             m_displayImage.texture = m_flipView.OutputTexture;
             m_displayImage.enabled = true;
         }
+
 
         // 閉じている間に別の見開きを撮影して差し替える（画面は閉じた本のまま）
         private IEnumerator CaptureHidden(int spreadIndex)
@@ -521,15 +657,19 @@ namespace YasudaHaruto.BookValidation
             m_spreadIndex = spreadIndex;
             if (m_flipView != null)
             {
-                if (IsClosed) m_flipView.ShowClosed(targetTexture, m_coverState == BookCoverState.FrontCover);
-                else m_flipView.ShowSpread(targetTexture);
+                if (IsClosed)
+                    m_flipView.ShowClosed(targetTexture, m_coverState == BookCoverState.FrontCover);
+                else
+                    m_flipView.ShowSpread(targetTexture);
                 m_flipView.SetReadingProgress(m_spreadIndex, SpreadCount);
             }
         }
 
+
         private void SetCoverState(BookCoverState state)
         {
-            if (m_coverState == state) return;
+            if (m_coverState == state)
+                return;
             m_coverState = state;
             CoverChanged?.Invoke(state);
         }
@@ -540,12 +680,15 @@ namespace YasudaHaruto.BookValidation
         // ------------------------------------------------------------------
         private static readonly Vector3 s_liveOffset = new Vector3(10000f, 0f, 0f);
 
+
         private void CreateLiveRig()
         {
-            if (m_leftPageView == null || m_rightPageView == null || m_captureCamera == null) return;
+            if (m_leftPageView == null || m_rightPageView == null || m_captureCamera == null)
+                return;
             Canvas leftCanvas = m_leftPageView.GetComponentInParent<Canvas>();
             Canvas rightCanvas = m_rightPageView.GetComponentInParent<Canvas>();
-            if (leftCanvas == null || rightCanvas == null || leftCanvas.rootCanvas != rightCanvas.rootCanvas) return;
+            if (leftCanvas == null || rightCanvas == null || leftCanvas.rootCanvas != rightCanvas.rootCanvas)
+                return;
             Canvas canvas = leftCanvas.rootCanvas;
             Transform canvasRoot = canvas.transform;
             bool cameraInside = m_captureCamera.transform.IsChildOf(canvasRoot);
@@ -562,31 +705,39 @@ namespace YasudaHaruto.BookValidation
                 cameraCopy.name = m_captureCamera.name + " (Live Turn)";
                 m_liveCamera = cameraCopy.GetComponent<Camera>();
             }
-            if (m_liveCamera.TryGetComponent(out AudioListener listener)) Destroy(listener);
+            if (m_liveCamera.TryGetComponent(out AudioListener listener))
+                Destroy(listener);
             m_liveCamera.transform.position += s_liveOffset;
             m_liveCamera.targetTexture = null;
             m_liveCamera.enabled = false;
 
             Canvas canvasCopy = m_liveCanvas.GetComponent<Canvas>();
             canvasCopy.worldCamera = m_liveCamera;
-            if (canvasCopy.renderMode == RenderMode.WorldSpace) m_liveCanvas.transform.position += s_liveOffset;
-            if (m_liveCanvas.TryGetComponent(out GraphicRaycaster raycaster)) raycaster.enabled = false;
+            if (canvasCopy.renderMode == RenderMode.WorldSpace)
+                m_liveCanvas.transform.position += s_liveOffset;
+            if (m_liveCanvas.TryGetComponent(out GraphicRaycaster raycaster))
+                raycaster.enabled = false;
             m_liveLeftView = FindCopy(canvasRoot, m_liveCanvas.transform, m_leftPageView.transform).GetComponent<BookPageView>();
             m_liveRightView = FindCopy(canvasRoot, m_liveCanvas.transform, m_rightPageView.transform).GetComponent<BookPageView>();
         }
 
+
         private static Transform FindCopy(Transform originalRoot, Transform copyRoot, Transform original)
         {
             var path = new List<int>();
-            for (Transform t = original; t != originalRoot; t = t.parent) path.Insert(0, t.GetSiblingIndex());
+            for (Transform t = original; t != originalRoot; t = t.parent)
+                path.Insert(0, t.GetSiblingIndex());
             Transform result = copyRoot;
-            foreach (int index in path) result = result.GetChild(index);
+            foreach (int index in path)
+                result = result.GetChild(index);
             return result;
         }
 
+
         private void BeginLiveCurrent()
         {
-            if (m_liveCamera == null || m_liveLeftView == null || m_liveRightView == null || m_currentTexture == null) return;
+            if (m_liveCamera == null || m_liveLeftView == null || m_liveRightView == null || m_currentTexture == null)
+                return;
             m_liveLeftView.ShowPage(GetPage(m_spreadIndex * 2));
             m_liveRightView.ShowPage(GetPage(m_spreadIndex * 2 + 1));
             PreparePageDecoration(m_spreadIndex, m_liveLeftView, m_liveRightView, m_liveCamera);
@@ -595,18 +746,24 @@ namespace YasudaHaruto.BookValidation
             m_liveCamera.enabled = true;
         }
 
+
         private void EndLiveCurrent()
         {
-            if (m_liveCamera == null) return;
+            if (m_liveCamera == null)
+                return;
             m_liveCamera.enabled = false;
             m_liveCamera.targetTexture = null;
         }
 
+
         private void OnDestroy()
         {
-            if (m_liveCanvas != null) Destroy(m_liveCanvas);
-            if (m_liveCamera != null && m_liveCamera.gameObject != m_liveCanvas) Destroy(m_liveCamera.gameObject);
+            if (m_liveCanvas != null)
+                Destroy(m_liveCanvas);
+            if (m_liveCamera != null && m_liveCamera.gameObject != m_liveCanvas)
+                Destroy(m_liveCamera.gameObject);
         }
+
 
         private IEnumerator CaptureSpread(
             int spreadIndex, BookPageData leftPage, BookPageData rightPage, bool instant)
@@ -616,7 +773,8 @@ namespace YasudaHaruto.BookValidation
             bool turnFlag = !instant && m_currentTexture != null && spreadIndex != m_spreadIndex;
             RenderTexture targetTexture = m_currentTexture == m_textureA ? m_textureB : m_textureA;
             // 持っているページ（元の見開き）は複製した撮影で更新し続ける
-            if (turnFlag) BeginLiveCurrent();
+            if (turnFlag)
+                BeginLiveCurrent();
 
             m_captureCamera.targetTexture = targetTexture;
             m_leftPageView.ShowPage(leftPage);
@@ -696,12 +854,19 @@ namespace YasudaHaruto.BookValidation
             ResumePendingSpread();
         }
 
+
         private static IEnumerator WaitForCameraFrame(Camera camera)
         {
             // Editor batch mode does not issue WaitForEndOfFrame callbacks.
-            if (Application.isBatchMode) { camera.Render(); yield return null; }
-            else yield return new WaitForEndOfFrame();
+            if (Application.isBatchMode)
+            {
+                camera.Render();
+                yield return null;
+            }
+            else
+                yield return new WaitForEndOfFrame();
         }
+
 
         private void OnDisable()
         {
@@ -714,9 +879,12 @@ namespace YasudaHaruto.BookValidation
             m_pendingPage = -1;
             m_captureFlag = false;
             EndLiveCurrent();
-            if (m_captureCamera != null) m_captureCamera.enabled = false;
-            if (m_modelView != null) m_modelView.StopDisplay();
-            if (m_flipView != null) m_flipView.StopDisplay();
+            if (m_captureCamera != null)
+                m_captureCamera.enabled = false;
+            if (m_modelView != null)
+                m_modelView.StopDisplay();
+            if (m_flipView != null)
+                m_flipView.StopDisplay();
             if (m_displayImage != null)
             {
                 m_displayImage.enabled = false;

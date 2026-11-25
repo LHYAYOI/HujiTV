@@ -7,11 +7,14 @@ using UnityEngine.Splines;
 
 namespace YasudaHaruto.RollerCoaster.Editor
 {
+    /// <summary>レール生成のInspectorと再生成処理を提供する。</summary>
     internal sealed class RailDistanceTable
     {
         private readonly SplineContainer m_container;
         private readonly float[] m_distances;
+
         public float Length => m_distances[m_distances.Length - 1];
+
 
         public RailDistanceTable(SplineContainer container)
         {
@@ -27,20 +30,25 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 m_distances[i] = m_distances[i - 1] + Vector3.Distance(previous, next);
                 previous = next;
             }
-            if (!float.IsFinite(Length) || Length < 0.001f) throw new ArgumentException("Splineの長さが不足しています。");
+            if (!float.IsFinite(Length) || Length < 0.001f)
+                throw new ArgumentException("Splineの長さが不足しています。");
         }
 
+
         private Vector3 Position(float t) => m_container.EvaluatePosition(0, t);
+
 
         public float Parameter(float distance)
         {
             distance = Mathf.Clamp(distance, 0f, Length);
             int found = Array.BinarySearch(m_distances, distance);
-            if (found >= 0) return (float)found / (m_distances.Length - 1);
+            if (found >= 0)
+                return (float)found / (m_distances.Length - 1);
             int high = Mathf.Clamp(~found, 1, m_distances.Length - 1);
             float fraction = Mathf.InverseLerp(m_distances[high - 1], m_distances[high], distance);
             return (high - 1 + fraction) / (m_distances.Length - 1);
         }
+
 
         public float DistanceAtParameter(float parameter)
         {
@@ -49,16 +57,19 @@ namespace YasudaHaruto.RollerCoaster.Editor
             return Mathf.Lerp(m_distances[first], m_distances[first + 1], index - first);
         }
 
+
         public void Frame(float distance, out Vector3 position, out Quaternion rotation)
         {
             m_container.Evaluate(0, Parameter(distance), out var p, out var tangent, out var up);
             position = p;
             Vector3 forward = tangent;
             Vector3 vertical = up;
-            if (forward.sqrMagnitude < 1e-10f) throw new ArgumentException("接線が0の地点があります。Splineのノットとハンドルを調整してください。");
+            if (forward.sqrMagnitude < 1e-10f)
+                throw new ArgumentException("接線が0の地点があります。Splineのノットとハンドルを調整してください。");
             forward.Normalize();
             vertical -= forward * Vector3.Dot(vertical, forward);
-            if (vertical.sqrMagnitude < 1e-8f) throw new ArgumentException("Splineの上方向と接線が平行です。ノットの回転を調整してください。");
+            if (vertical.sqrMagnitude < 1e-8f)
+                throw new ArgumentException("Splineの上方向と接線が平行です。ノットの回転を調整してください。");
             rotation = Quaternion.LookRotation(forward, vertical.normalized);
         }
     }
@@ -67,11 +78,14 @@ namespace YasudaHaruto.RollerCoaster.Editor
     {
         internal const string OutputFolder = "Assets/YasudaHaruto/Data/RollerCoaster/Generated";
 
+
         internal static Mesh Build(RailSplineMesh settings)
         {
-            if (settings.MaxSegmentLength < 0.02f || !float.IsFinite(settings.MaxSegmentLength)) throw new ArgumentException("分割間隔は0.02m以上にしてください。");
+            if (settings.MaxSegmentLength < 0.02f || !float.IsFinite(settings.MaxSegmentLength))
+                throw new ArgumentException("分割間隔は0.02m以上にしてください。");
             Vector3 scale = settings.SourceScale;
-            if (scale.x <= 0f || scale.y <= 0f || scale.z <= 0f) throw new ArgumentException("素材Scaleは各軸とも正の値にしてください。");
+            if (scale.x <= 0f || scale.y <= 0f || scale.z <= 0f)
+                throw new ArgumentException("素材Scaleは各軸とも正の値にしてください。");
             var source = RailMeshBuilder.Read(settings.SourceMesh, Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(settings.SourceRotation), scale));
             var pieces = RailMeshBuilder.Subdivide(source, settings.MaxSegmentLength);
             var table = new RailDistanceTable(settings.Spline);
@@ -82,9 +96,11 @@ namespace YasudaHaruto.RollerCoaster.Editor
             end = Mathf.Min(end, table.Length);
             float length = source.Bounds.size.z;
             int tiles = Mathf.CeilToInt((end - start) / length);
-            if (tiles > 8192) throw new ArgumentException("素材の反復数が多すぎます。素材Scaleまたは生成区間を見直してください。");
+            if (tiles > 8192)
+                throw new ArgumentException("素材の反復数が多すぎます。素材Scaleまたは生成区間を見直してください。");
             var output = new List<RailMeshBuilder.Vertex>[pieces.Length];
-            for (int sub = 0; sub < output.Length; sub++) output[sub] = new List<RailMeshBuilder.Vertex>();
+            for (int sub = 0; sub < output.Length; sub++)
+                output[sub] = new List<RailMeshBuilder.Vertex>();
             int count = 0;
             for (int tile = 0; tile < tiles; tile++)
             {
@@ -96,17 +112,22 @@ namespace YasudaHaruto.RollerCoaster.Editor
                     {
                         var triangle = new List<RailMeshBuilder.Vertex> { pieces[sub][i], pieces[sub][i + 1], pieces[sub][i + 2] };
                         var polygon = available < length - 1e-6f ? RailMeshBuilder.Clip(triangle, source.Bounds.min.z + available, false) : triangle;
-                        if(settings.SuppressSleeperMeters>0 && tileStart<start+settings.SuppressSleeperMeters &&
-                            polygon.All(v=>v.Position.y<source.Bounds.min.y+source.Bounds.size.y*.32f))continue;
+                        if (settings.SuppressSleeperMeters > 0 && tileStart < start + settings.SuppressSleeperMeters &&
+                            polygon.All(v => v.Position.y < source.Bounds.min.y + source.Bounds.size.y * .32f))
+                            continue;
                         for (int p = 1; p + 1 < polygon.Count; p++)
                         {
-                            if (Vector3.Cross(polygon[p].Position - polygon[0].Position, polygon[p + 1].Position - polygon[0].Position).sqrMagnitude < 1e-16f) continue;
-                            Add(polygon[0]); Add(polygon[p]); Add(polygon[p + 1]);
+                            if (Vector3.Cross(polygon[p].Position - polygon[0].Position, polygon[p + 1].Position - polygon[0].Position).sqrMagnitude < 1e-16f)
+                                continue;
+                            Add(polygon[0]);
+                            Add(polygon[p]);
+                            Add(polygon[p + 1]);
                         }
                     }
                     void Add(RailMeshBuilder.Vertex vertex)
                     {
-                        if (++count > RailMeshBuilder.VertexLimit) throw new ArgumentException("生成頂点数が60万を超えます。区間を分けるか分割間隔を広げてください。");
+                        if (++count > RailMeshBuilder.VertexLimit)
+                            throw new ArgumentException("生成頂点数が60万を超えます。区間を分けるか分割間隔を広げてください。");
                         vertex.Position.z = Mathf.Clamp(tileStart + vertex.Position.z - source.Bounds.min.z, start, end);
                         output[sub].Add(vertex);
                     }
@@ -136,7 +157,8 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 jacobian.SetColumn(0, frame.Rotation * Vector3.right);
                 jacobian.SetColumn(1, frame.Rotation * Vector3.up);
                 jacobian.SetColumn(2, along);
-                if (jacobian.determinant < 0.001f) throw new ArgumentException($"カーブが線路幅に対して急すぎて内側が潰れます。distance={distance:F5}, range={start:F5}..{end:F5}, determinant={jacobian.determinant:F5}, position={frame.Position:F4}");
+                if (jacobian.determinant < 0.001f)
+                    throw new ArgumentException($"カーブが線路幅に対して急すぎて内側が潰れます。distance={distance:F5}, range={start:F5}..{end:F5}, determinant={jacobian.determinant:F5}, position={frame.Position:F4}");
                 var localJacobian = toLocal * jacobian;
                 vertex.Position = toLocal.MultiplyPoint3x4(frame.Position + frame.Rotation * cross);
                 vertex.Normal = localJacobian.inverse.transpose.MultiplyVector(vertex.Normal).normalized;
@@ -154,15 +176,20 @@ namespace YasudaHaruto.RollerCoaster.Editor
             public float Delta;
         }
 
+
         internal static void Generate(RailSplineMesh settings, bool withUndo = true)
         {
-            if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("編集モードで生成してください。");
-            if (EditorUtility.IsPersistent(settings)) throw new InvalidOperationException("PrefabをシーンまたはPrefab Modeで開いてから生成してください。");
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new InvalidOperationException("編集モードで生成してください。");
+            if (EditorUtility.IsPersistent(settings))
+                throw new InvalidOperationException("PrefabをシーンまたはPrefab Modeで開いてから生成してください。");
             GameObject oldRoot = settings.GeneratedRoot;
-            if (oldRoot != null && oldRoot.transform.parent != settings.transform) throw new InvalidOperationException("生成物が別の場所へ移動しています。元の親へ戻してから再生成してください。");
+            if (oldRoot != null && oldRoot.transform.parent != settings.transform)
+                throw new InvalidOperationException("生成物が別の場所へ移動しています。元の親へ戻してから再生成してください。");
             Mesh mesh = Build(settings); // 成功するまで既存生成物へ触れない。
             SaveBuiltMesh(settings, mesh, withUndo);
         }
+
 
         internal static void SaveBuiltMesh(RailSplineMesh settings, Mesh mesh, bool withUndo = true)
         {
@@ -188,13 +215,15 @@ namespace YasudaHaruto.RollerCoaster.Editor
                     Undo.RegisterCreatedObjectUndo(root, "Generate spline rail");
                     // 旧rootの破棄で参照がnullになる前にスナップショットを確定する。
                     Undo.RegisterCompleteObjectUndo(settings, "Generate spline rail");
-                    if (oldRoot != null) Undo.DestroyObjectImmediate(oldRoot);
+                    if (oldRoot != null)
+                        Undo.DestroyObjectImmediate(oldRoot);
                     settings.SetGeneratedRoot(root);
                     Undo.CollapseUndoOperations(group);
                 }
                 else
                 {
-                    if (oldRoot != null) UnityEngine.Object.DestroyImmediate(oldRoot);
+                    if (oldRoot != null)
+                        UnityEngine.Object.DestroyImmediate(oldRoot);
                     settings.SetGeneratedRoot(root);
                 }
                 EditorUtility.SetDirty(settings);
@@ -203,19 +232,24 @@ namespace YasudaHaruto.RollerCoaster.Editor
             }
             catch
             {
-                if (root != null && settings.GeneratedRoot != root) UnityEngine.Object.DestroyImmediate(root);
+                if (root != null && settings.GeneratedRoot != root)
+                    UnityEngine.Object.DestroyImmediate(root);
                 if (settings.GeneratedRoot != root)
                 {
-                    if (path != null) AssetDatabase.DeleteAsset(path);
-                    else UnityEngine.Object.DestroyImmediate(mesh);
+                    if (path != null)
+                        AssetDatabase.DeleteAsset(path);
+                    else
+                        UnityEngine.Object.DestroyImmediate(mesh);
                 }
                 throw;
             }
         }
 
+
         internal static void EnsureFolder(string path)
         {
-            if (AssetDatabase.IsValidFolder(path)) return;
+            if (AssetDatabase.IsValidFolder(path))
+                return;
             int slash = path.LastIndexOf('/');
             EnsureFolder(path.Substring(0, slash));
             AssetDatabase.CreateFolder(path.Substring(0, slash), path.Substring(slash + 1));
@@ -225,6 +259,7 @@ namespace YasudaHaruto.RollerCoaster.Editor
     [CustomEditor(typeof(RailSplineMesh))]
     public sealed class RailSplineMeshEditor : UnityEditor.Editor
     {
+
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
@@ -236,7 +271,10 @@ namespace YasudaHaruto.RollerCoaster.Editor
             {
                 if (GUILayout.Button("線路を再生成・保存"))
                 {
-                    try { RailSplineMeshGenerator.Generate((RailSplineMesh)target); }
+                    try
+                    {
+                        RailSplineMeshGenerator.Generate((RailSplineMesh)target);
+                    }
                     catch (Exception exception) { Debug.LogException(exception, target); EditorUtility.DisplayDialog("線路を生成できません", exception.Message, "OK"); }
                 }
                 if (GUILayout.Button("生成した線路を選択") && ((RailSplineMesh)target).GeneratedRoot != null)

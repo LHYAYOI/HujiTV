@@ -28,21 +28,31 @@ public class PageData : ScriptableObject
     [SerializeField] private string m_displayName;
     [SerializeField] private PAGE_TYPE m_pageType;
 
+
     [Header("Interaction")]
     [SerializeField] private PageInteractionData m_interaction;
     [SerializeField] private PageActionData m_action;
+
 
     [Header("Page Visual")]
     [SerializeField] private BookPageData m_leftVisualData;
     [SerializeField] private BookPageData m_rightVisualData;
 
+
     public byte PageId => m_pageId;
+
     public PAGE_INSERT_TYPE InsertType => m_insertType;
+
     public string DisplayName => m_displayName;
+
     public PAGE_TYPE PageType => m_pageType;
+
     public PageInteractionData Interaction => m_interaction;
+
     public PageActionData Action => m_action;
 
+
     public BookPageData LeftVisualData => m_leftVisualData;
+
     public BookPageData RightVisualData => m_rightVisualData;
 }

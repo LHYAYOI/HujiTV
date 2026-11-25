@@ -7,10 +7,27 @@
 
 public class RuneTraceResult
 {
-    public float Coverage { get; }
-    public float Accuracy { get; }
-    public int StrokeCount { get; }
-    public bool IsSuccess { get; }
+
+    public float Coverage
+    {
+        get;
+    }
+
+    public float Accuracy
+    {
+        get;
+    }
+
+    public int StrokeCount
+    {
+        get;
+    }
+
+    public bool IsSuccess
+    {
+        get;
+    }
+
 
     public RuneTraceResult(float coverage, float accuracy, int strokeCount, bool isSuccess)
     {

@@ -9,10 +9,12 @@ public static class RuneTraceToleranceValidation
 {
     private const string Report = "Temp/RuneTraceToleranceValidation/result.txt";
 
+
     static RuneTraceToleranceValidation()
     {
         const string request = "Temp/RuneTraceToleranceValidation/runtime-request";
-        if (!File.Exists(request)) return;
+        if (!File.Exists(request))
+            return;
         EditorApplication.delayCall += () =>
         {
             File.Delete(request);
@@ -30,6 +32,7 @@ public static class RuneTraceToleranceValidation
             }
         };
     }
+
 
     public static void Verify()
     {
@@ -73,7 +76,8 @@ public static class RuneTraceToleranceValidation
 
         trace = Create(line);
         trace.Begin(line[0]);
-        for (int i = 0; i < 50; i++) trace.EvaluateSegment(line[0], line[0]);
+        for (int i = 0; i < 50; i++)
+            trace.EvaluateSegment(line[0], line[0]);
         Require(trace.Progress < 0.001f && !trace.IsCompleted, "Repeated stationary samples do not advance through the route");
         trace.Reset();
         Require(!trace.IsCompleted && !trace.HasFailed && trace.Progress == 0f, "Reset clears coverage and completion");
@@ -102,27 +106,34 @@ public static class RuneTraceToleranceValidation
         }
     }
 
+
     private static RuneTraceRealtimeEvaluator Create(IReadOnlyList<Vector2> reference,
         float distance = 0.05f, float start = 0.02f, float end = 0.025f)
         => new RuneTraceRealtimeEvaluator(reference, distance, start, end, 0.005f);
+
 
     private static RUNE_REALTIME_RESULT Trace(IReadOnlyList<Vector2> reference, IReadOnlyList<Vector2> input,
         float distance = 0.05f, float start = 0.02f, float end = 0.025f)
     {
         var trace = Create(reference, distance, start, end);
-        if (!trace.Begin(input[0])) return RUNE_REALTIME_RESULT.FAILED;
+        if (!trace.Begin(input[0]))
+            return RUNE_REALTIME_RESULT.FAILED;
         RUNE_REALTIME_RESULT result = RUNE_REALTIME_RESULT.IN_PROGRESS;
         for (int i = 1; i < input.Count; i++)
         {
             result = trace.EvaluateSegment(input[i - 1], input[i]);
-            if (result != RUNE_REALTIME_RESULT.IN_PROGRESS) return result;
+            if (result != RUNE_REALTIME_RESULT.IN_PROGRESS)
+                return result;
         }
         return result;
     }
 
+
     private static void Require(bool value, string message)
     {
-        if (!value) throw new InvalidOperationException(message);
-        if (File.Exists(Report)) File.AppendAllText(Report, "PASS: " + message + "\n");
+        if (!value)
+            throw new InvalidOperationException(message);
+        if (File.Exists(Report))
+            File.AppendAllText(Report, "PASS: " + message + "\n");
     }
 }

@@ -7,40 +7,58 @@ using UnityEngine.Rendering.Universal;
 
 namespace YasudaHaruto.RollerCoaster.Editor
 {
+    /// <summary>専用試走シーンの車体・カメラ・走行制御を接続する。</summary>
     internal static class RollerCoasterTrialSetup
     {
-        internal static void StrengthenVerticalShake(RollerCoasterTrialRide trial,float vertical=1.8f,float pitch=1.25f,float airborne=.025f)
+
+        internal static void StrengthenVerticalShake(RollerCoasterTrialRide trial, float vertical = 1.8f, float pitch = 1.25f, float airborne = .025f)
         {
-            var motion=AddCameraMotion(trial);
-            if(motion.VirtualCamera.GetComponent<RollerCoasterVerticalNoiseExtension>()==null)
+            var motion = AddCameraMotion(trial);
+            if (motion.VirtualCamera.GetComponent<RollerCoasterVerticalNoiseExtension>() == null)
                 Undo.AddComponent<RollerCoasterVerticalNoiseExtension>(motion.VirtualCamera.gameObject);
-            string path="Assets/YasudaHaruto/Data/RollerCoaster/RideVerticalNoise.asset";
-            var profile=AssetDatabase.LoadAssetAtPath<NoiseSettings>(path);
-            var source=AssetDatabase.LoadAssetAtPath<NoiseSettings>(AssetDatabase.GUIDToAssetPath("e9ce97b7a206dc64d90931ea044e0c72"));
-            bool created=profile==null;
-            if(created)
+            string path = "Assets/YasudaHaruto/Data/RollerCoaster/RideVerticalNoise.asset";
+            var profile = AssetDatabase.LoadAssetAtPath<NoiseSettings>(path);
+            var source = AssetDatabase.LoadAssetAtPath<NoiseSettings>(AssetDatabase.GUIDToAssetPath("e9ce97b7a206dc64d90931ea044e0c72"));
+            bool created = profile == null;
+            if (created)
             {
-                profile=UnityEngine.Object.Instantiate(source);profile.name="Ride Vertical Noise";
+                profile = UnityEngine.Object.Instantiate(source);
+                profile.name = "Ride Vertical Noise";
             }
-            else Undo.RecordObject(profile,"Tune vertical noise");
-            profile.PositionNoise=source.PositionNoise.ToArray();profile.OrientationNoise=source.OrientationNoise.ToArray();
-            for(int i=0;i<profile.PositionNoise.Length;i++)profile.PositionNoise[i].Y.Amplitude*=vertical;
-            for(int i=0;i<profile.OrientationNoise.Length;i++)profile.OrientationNoise[i].X.Amplitude*=pitch;
-            if(created)AssetDatabase.CreateAsset(profile,path);else EditorUtility.SetDirty(profile);
-            var noise=motion.VirtualCamera.GetComponent<CinemachineBasicMultiChannelPerlin>();
-            Undo.RecordObject(noise,"Increase vertical ride shake");noise.NoiseProfile=profile;EditorUtility.SetDirty(noise);
-            Undo.RecordObject(motion,"Increase vertical landing shake");
-            var data=new SerializedObject(motion);data.FindProperty("m_landingPitch").floatValue=3.5f;data.ApplyModifiedPropertiesWithoutUndo();
-            data.FindProperty("m_airborneStrength").floatValue=airborne;data.ApplyModifiedPropertiesWithoutUndo();
+            else
+                Undo.RecordObject(profile, "Tune vertical noise");
+            profile.PositionNoise = source.PositionNoise.ToArray();
+            profile.OrientationNoise = source.OrientationNoise.ToArray();
+            for (int i = 0; i < profile.PositionNoise.Length; i++)
+                profile.PositionNoise[i].Y.Amplitude *= vertical;
+            for (int i = 0; i < profile.OrientationNoise.Length; i++)
+                profile.OrientationNoise[i].X.Amplitude *= pitch;
+            if (created)
+                AssetDatabase.CreateAsset(profile, path);
+            else
+                EditorUtility.SetDirty(profile);
+            var noise = motion.VirtualCamera.GetComponent<CinemachineBasicMultiChannelPerlin>();
+            Undo.RecordObject(noise, "Increase vertical ride shake");
+            noise.NoiseProfile = profile;
+            EditorUtility.SetDirty(noise);
+            Undo.RecordObject(motion, "Increase vertical landing shake");
+            var data = new SerializedObject(motion);
+            data.FindProperty("m_landingPitch").floatValue = 3.5f;
+            data.ApplyModifiedPropertiesWithoutUndo();
+            data.FindProperty("m_airborneStrength").floatValue = airborne;
+            data.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(motion);
         }
+
         internal static RollerCoasterCameraMotion AddCameraMotion(RollerCoasterTrialRide trial)
         {
             var existing = trial.GetComponent<RollerCoasterCameraMotion>();
-            if (existing != null && existing.VirtualCamera != null) return existing;
+            if (existing != null && existing.VirtualCamera != null)
+                return existing;
             string noisePath = AssetDatabase.GUIDToAssetPath("e9ce97b7a206dc64d90931ea044e0c72");
             var noiseSettings = AssetDatabase.LoadAssetAtPath<NoiseSettings>(noisePath);
-            if (noiseSettings == null) throw new InvalidOperationException("既存トロッコと同じNoise Profileが見つかりません。");
+            if (noiseSettings == null)
+                throw new InvalidOperationException("既存トロッコと同じNoise Profileが見つかりません。");
             Undo.IncrementCurrentGroup();
             int group = Undo.GetCurrentGroup();
             Undo.SetCurrentGroupName("Connect Hamada camera shake");
@@ -54,7 +72,9 @@ namespace YasudaHaruto.RollerCoaster.Editor
             virtualCamera.Priority = 1000;
             virtualCamera.OutputChannel = OutputChannels.Channel02;
             var lens = virtualCamera.Lens;
-            lens.FieldOfView = camera.fieldOfView; lens.NearClipPlane = camera.nearClipPlane; lens.FarClipPlane = camera.farClipPlane;
+            lens.FieldOfView = camera.fieldOfView;
+            lens.NearClipPlane = camera.nearClipPlane;
+            lens.FarClipPlane = camera.farClipPlane;
             virtualCamera.Lens = lens;
             var noise = rig.AddComponent<CinemachineBasicMultiChannelPerlin>();
             noise.NoiseProfile = noiseSettings;
@@ -69,7 +89,8 @@ namespace YasudaHaruto.RollerCoaster.Editor
             shakeData.FindProperty("m_frequencyGain").floatValue = 1.5f;
             shakeData.ApplyModifiedPropertiesWithoutUndo();
             var brain = camera.GetComponent<CinemachineBrain>();
-            if (brain == null) brain = Undo.AddComponent<CinemachineBrain>(camera.gameObject);
+            if (brain == null)
+                brain = Undo.AddComponent<CinemachineBrain>(camera.gameObject);
             Undo.RecordObject(brain, "Configure ride brain");
             brain.enabled = false;
             brain.UpdateMethod = CinemachineBrain.UpdateMethods.ManualUpdate;
@@ -81,25 +102,32 @@ namespace YasudaHaruto.RollerCoaster.Editor
             Undo.RecordObject(trial, "Connect ride camera motion");
             trial.SetCameraMotion(motion);
             Undo.RegisterCreatedObjectUndo(rig, "Create ride virtual camera");
-            EditorUtility.SetDirty(trial); EditorUtility.SetDirty(motion); EditorUtility.SetDirty(brain);
+            EditorUtility.SetDirty(trial);
+            EditorUtility.SetDirty(motion);
+            EditorUtility.SetDirty(brain);
             Undo.CollapseUndoOperations(group);
             return motion;
         }
+
         internal static RollerCoasterSpeedProfile AddSectionSpeeds(RollerCoasterTrialRide trial)
         {
             var profile = trial.GetComponent<RollerCoasterSpeedProfile>();
-            if (profile == null) profile = Undo.AddComponent<RollerCoasterSpeedProfile>(trial.gameObject);
+            if (profile == null)
+                profile = Undo.AddComponent<RollerCoasterSpeedProfile>(trial.gameObject);
             Undo.RecordObject(trial, "Connect section speeds");
             trial.SetSpeedProfile(profile);
             EditorUtility.SetDirty(trial);
             return profile;
         }
+
         internal static RollerCoasterTrialRide Create(RollerCoasterCourse course)
         {
             var existing = course.gameObject.scene.GetRootGameObjects().SelectMany(x => x.GetComponentsInChildren<RollerCoasterTrialRide>(true)).SingleOrDefault();
-            if (existing != null) return existing;
+            if (existing != null)
+                return existing;
             var source = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Arai/Prefabs/Stage/TrokkoController.prefab");
-            if (source == null) throw new InvalidOperationException("既存トロッコPrefabが見つかりません。");
+            if (source == null)
+                throw new InvalidOperationException("既存トロッコPrefabが見つかりません。");
             var root = new GameObject("Trial Ride");
             UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(root, course.gameObject.scene);
             try

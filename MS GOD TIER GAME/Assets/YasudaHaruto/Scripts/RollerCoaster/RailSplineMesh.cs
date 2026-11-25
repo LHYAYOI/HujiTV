@@ -21,25 +21,41 @@ namespace YasudaHaruto.RollerCoaster
         private float m_startDistance;
         [SerializeField, Min(0f), Tooltip("生成終了位置の実距離（m）。0は終点。")]
         private float m_endDistance;
-        [SerializeField,Min(0f)] private float m_suppressSleeperMeters;
-        public float SuppressSleeperMeters=>m_suppressSleeperMeters;
+        [SerializeField, Min(0f)] private float m_suppressSleeperMeters;
+
+        public float SuppressSleeperMeters => m_suppressSleeperMeters;
         [SerializeField, Range(0.02f, 2f), Tooltip("素材を長手方向に分割する最大間隔（m）。小さいほど滑らかになります。")]
         private float m_maxSegmentLength = 0.2f;
         [SerializeField, HideInInspector] private GameObject m_generatedRoot;
 
+
         public SplineContainer Spline => m_spline;
+
         public Mesh SourceMesh => m_sourceMesh;
+
         public Material[] Materials => m_materials;
+
         public Vector3 SourceRotation => m_sourceRotation;
+
         public Vector3 SourceScale => m_sourceScale;
+
         public Vector2 CrossSectionOffset => m_crossSectionOffset;
+
         public float StartDistance => m_startDistance;
+
         public float EndDistance => m_endDistance;
+
         public float MaxSegmentLength => m_maxSegmentLength;
+
         public GameObject GeneratedRoot => m_generatedRoot;
 
+
 #if UNITY_EDITOR
-        public void SetGeneratedRoot(GameObject root) { m_generatedRoot = root; }
+        public void SetGeneratedRoot(GameObject root)
+        {
+            m_generatedRoot = root;
+        }
+
         public void Configure(SplineContainer spline, Mesh source, Material[] materials)
         {
             m_spline = spline;

@@ -41,6 +41,7 @@ public class RuneTraceController
     private bool m_pointerReleased;
     private bool m_failureNotified;
     private bool m_inputAvailable = true;
+
     public bool IsInputAvailable => m_inputAvailable;
 
     private const float MIN_POINT_DISTANCE = 0.005f;
@@ -48,18 +49,27 @@ public class RuneTraceController
     private const float END_TOLERANCE = 0.025f;
     private const float SAMPLE_INTERVAL = 0.005f;
 
+
     public bool IsTracing => m_state != RUNE_TRACE_STATE.INACTIVE;
+
     public RUNE_TRACE_STATE State => m_state;
+
     public int CurrentStrokeIndex => m_strokeIndex;
+
     public float Progress => m_evaluator?.Progress ?? 0f;
 
+
     public bool UsesThreeDirections => m_aimType != MAGIC_AIM_TYPE.NONE;
+
 
     public bool IsAwaitingCast => m_state == RUNE_TRACE_STATE.WAITING_CAST_RELEASE ||
         m_state == RUNE_TRACE_STATE.WAITING_CAST_START || m_state == RUNE_TRACE_STATE.CHARGING;
 
+
     public bool CanBeginStroke => m_inputAvailable && m_state == RUNE_TRACE_STATE.WAITING_STROKE;
+
     public float CooldownRemaining => m_cooldownRemaining;
+
     public float CooldownProgress => m_cooldownSeconds > 0f
         ? 1f - Mathf.Clamp01(m_cooldownRemaining / m_cooldownSeconds) : 1f;
 
@@ -70,11 +80,14 @@ public class RuneTraceController
     public event Action<RuneTraceResult> TraceFailed;
     public event Action<MAGIC_CAST_DIRECTION> CastConfirmed;
 
+
     public void SetInputAvailable(bool available)
     {
-        if (m_inputAvailable == available) return;
+        if (m_inputAvailable == available)
+            return;
         m_inputAvailable = available;
-        if (available || m_state == RUNE_TRACE_STATE.INACTIVE) return;
+        if (available || m_state == RUNE_TRACE_STATE.INACTIVE)
+            return;
         if (m_state == RUNE_TRACE_STATE.COOLDOWN)
         {
             // A lost pointer must not freeze an already started cooldown.
@@ -84,29 +97,36 @@ public class RuneTraceController
         ResetAttempt();
     }
 
+
     public void ResumeCooldown(float remaining)
     {
-        if (remaining <= 0f || m_runeData == null) return;
+        if (remaining <= 0f || m_runeData == null)
+            return;
         m_state = RUNE_TRACE_STATE.COOLDOWN;
         m_cooldownRemaining = remaining;
         m_pointerReleased = true;
-        if (m_view is IRuneCooldownView cooldown) cooldown.ShowCooldown(1f - CooldownProgress);
+        if (m_view is IRuneCooldownView cooldown)
+            cooldown.ShowCooldown(1f - CooldownProgress);
     }
+
 
     public void SetCooldown(float seconds)
     {
         m_cooldownSeconds = Mathf.Max(0f, seconds);
     }
 
+
     public RuneTraceController(IRuneTraceView view)
     {
         m_view = view;
     }
 
+
     public void BeginTrace(RuneData runeData, MAGIC_AIM_TYPE aimType = MAGIC_AIM_TYPE.THREE_DIRECTIONS)
     {
         Cancel();
-        if (runeData == null || runeData.TraceData.Strokes.Count == 0) return;
+        if (runeData == null || runeData.TraceData.Strokes.Count == 0)
+            return;
 
         m_runeData = runeData;
         m_aimType = aimType;
@@ -114,9 +134,11 @@ public class RuneTraceController
         ResetAttempt();
     }
 
+
     public void BeginStroke(Vector2 normalizedPosition)
     {
-        if (!CanBeginStroke) return;
+        if (!CanBeginStroke)
+            return;
 
         IReadOnlyList<Vector2> points = m_runeData.TraceData.Strokes[m_strokeIndex].Points;
         RuneTraceRule rule = m_runeData.Rule;
@@ -138,12 +160,15 @@ public class RuneTraceController
         m_view.UpdateCurrentStroke(m_currentStroke);
     }
 
+
     public void AddPoint(Vector2 normalizedPosition)
     {
-        if (!m_inputAvailable || m_state != RUNE_TRACE_STATE.DRAWING) return;
+        if (!m_inputAvailable || m_state != RUNE_TRACE_STATE.DRAWING)
+            return;
 
         Vector2 previous = m_currentStroke[m_currentStroke.Count - 1];
-        if (Vector2.Distance(previous, normalizedPosition) < MIN_POINT_DISTANCE) return;
+        if (Vector2.Distance(previous, normalizedPosition) < MIN_POINT_DISTANCE)
+            return;
 
         RUNE_REALTIME_RESULT result = m_evaluator.EvaluateSegment(previous, normalizedPosition);
 
@@ -159,10 +184,12 @@ public class RuneTraceController
             return;
         }
 
-        if (result != RUNE_REALTIME_RESULT.COMPLETED) return;
+        if (result != RUNE_REALTIME_RESULT.COMPLETED)
+            return;
 
         CompleteCurrentStroke();
     }
+
 
     public void EndStroke()
     {
@@ -203,6 +230,7 @@ public class RuneTraceController
         }
     }
 
+
     // 現在のストロークを完了する
     private void CompleteCurrentStroke()
     {
@@ -214,7 +242,8 @@ public class RuneTraceController
 
         if (m_strokeIndex == m_runeData.TraceData.Strokes.Count - 1)
         {
-            if (m_view is IRuneTraceFeedbackView feedback) feedback.PlayCompletion();
+            if (m_view is IRuneTraceFeedbackView feedback)
+                feedback.PlayCompletion();
             // すべてのストロークが完了した場合、詠唱を確定する
             m_state = RUNE_TRACE_STATE.WAITING_CAST_RELEASE;
             SetCastSelectionActive(true);
@@ -226,20 +255,24 @@ public class RuneTraceController
         }
     }
 
+
     // ルーンの詠唱を確定する
     public bool TryBeginCast()
     {
         if (!m_inputAvailable || m_state != RUNE_TRACE_STATE.WAITING_CAST_START ||
-            (m_view is IRuneCastPresentation presentation && !presentation.IsCastReady)) return false;
+            (m_view is IRuneCastPresentation presentation && !presentation.IsCastReady))
+            return false;
         m_state = RUNE_TRACE_STATE.CHARGING;
         return true;
     }
+
 
     public void CancelCastGesture()
     {
         if (m_state == RUNE_TRACE_STATE.CHARGING)
             m_state = RUNE_TRACE_STATE.WAITING_CAST_START;
     }
+
 
     public void ConfirmCast(MAGIC_CAST_DIRECTION direction)
     {
@@ -248,14 +281,17 @@ public class RuneTraceController
             return;
         }
 
-        if (!UsesThreeDirections && direction != MAGIC_CAST_DIRECTION.CENTER) return;
+        if (!UsesThreeDirections && direction != MAGIC_CAST_DIRECTION.CENTER)
+            return;
 
         Debug.Log($"Rune : Cast Confirmed / Direction={direction}");
-        if (m_view is IRuneCastPresentation presentation) presentation.LaunchCast(direction);
+        if (m_view is IRuneCastPresentation presentation)
+            presentation.LaunchCast(direction);
         m_castSelectionActive = false; // CAST_MAGIC closes the selection on the PC.
         StartCooldown(true);
         CastConfirmed?.Invoke(UsesThreeDirections ? direction : MAGIC_CAST_DIRECTION.NONE);
     }
+
 
 
     private void StartCooldown(bool pointerReleased)
@@ -263,10 +299,13 @@ public class RuneTraceController
         m_state = RUNE_TRACE_STATE.COOLDOWN;
         m_cooldownRemaining = m_cooldownSeconds;
         m_pointerReleased = pointerReleased;
-        if (m_view is IRuneCooldownReleaseView release) release.PlayCooldownRelease(m_cooldownSeconds);
-        if (m_view is IRuneCooldownView cooldown) cooldown.ShowCooldown(1f);
+        if (m_view is IRuneCooldownReleaseView release)
+            release.PlayCooldownRelease(m_cooldownSeconds);
+        if (m_view is IRuneCooldownView cooldown)
+            cooldown.ShowCooldown(1f);
         Debug.Log($"Rune : Cooldown Started / {m_cooldownSeconds:F1}s");
     }
+
 
     public void Tick(float deltaTime)
     {
@@ -277,7 +316,8 @@ public class RuneTraceController
 
         // クールダウンを進める
         m_cooldownRemaining = Mathf.Max(0f, m_cooldownRemaining - deltaTime);
-        if (m_view is IRuneCooldownView cooldown) cooldown.ShowCooldown(1f - CooldownProgress);
+        if (m_view is IRuneCooldownView cooldown)
+            cooldown.ShowCooldown(1f - CooldownProgress);
 
         if (m_cooldownRemaining > 0f)
         {// クールダウン中
@@ -288,6 +328,7 @@ public class RuneTraceController
         Debug.Log("Rune : Cooldown Finished");
         ResetAttempt();
     }
+
 
     public void Cancel()
     {
@@ -304,27 +345,33 @@ public class RuneTraceController
         m_pointerReleased = true;
     }
 
+
     private void UpdateDeviation()
     {
         if (m_view is IRuneTraceFeedbackView feedback)
             feedback.SetTraceDeviation(m_evaluator?.NormalizedDeviation ?? 0f);
     }
 
+
     private void SetCastSelectionActive(bool active)
     {
-        if (m_castSelectionActive == active) return;
+        if (m_castSelectionActive == active)
+            return;
         m_castSelectionActive = active;
         CastSelectionChanged?.Invoke(active);
     }
 
+
     private void NotifyFailure()
     {
-        if (m_failureNotified) return;
+        if (m_failureNotified)
+            return;
         m_failureNotified = true;
         var result = new RuneTraceResult(0f, 0f, m_session.StrokeCount, false);
         m_view.PlayFailure(result);
         TraceFailed?.Invoke(result);
     }
+
 
     private void ResetAttempt()
     {

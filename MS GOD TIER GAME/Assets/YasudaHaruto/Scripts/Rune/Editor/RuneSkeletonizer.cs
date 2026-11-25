@@ -9,6 +9,7 @@ using UnityEngine;
 
 public static class RuneSkeletonizer
 {
+
     // 二値画像を細線化するメソッド
     public static bool[,] Skeletonize(bool[,] source)
     {
@@ -91,6 +92,7 @@ public static class RuneSkeletonizer
         return result;
     }
 
+
     private static bool ShouldRemoveStep1(bool[,] image, int x, int y)
     {
         GetNeighbors(image, x, y, out bool p2, out bool p3, out bool p4,
@@ -124,6 +126,7 @@ public static class RuneSkeletonizer
 
         return true;
     }
+
 
     private static bool ShouldRemoveStep2(bool[,] image, int x, int y)
     {
@@ -159,6 +162,7 @@ public static class RuneSkeletonizer
         return true;
     }
 
+
     private static void GetNeighbors(
         bool[,] image,
         int x,
@@ -188,6 +192,7 @@ public static class RuneSkeletonizer
         p9 = image[x - 1, y + 1];
     }
 
+
     private static int CountNeighbors(
         bool p2,
         bool p3,
@@ -200,17 +205,26 @@ public static class RuneSkeletonizer
     {
         int count = 0;
 
-        if (p2) count++;
-        if (p3) count++;
-        if (p4) count++;
-        if (p5) count++;
-        if (p6) count++;
-        if (p7) count++;
-        if (p8) count++;
-        if (p9) count++;
+        if (p2)
+            count++;
+        if (p3)
+            count++;
+        if (p4)
+            count++;
+        if (p5)
+            count++;
+        if (p6)
+            count++;
+        if (p7)
+            count++;
+        if (p8)
+            count++;
+        if (p9)
+            count++;
 
         return count;
     }
+
 
     private static int CountTransitions(
         bool p2,

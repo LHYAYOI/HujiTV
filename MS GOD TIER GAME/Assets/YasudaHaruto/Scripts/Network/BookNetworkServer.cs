@@ -15,20 +15,27 @@ public class BookNetworkServer : MonoBehaviour
     [SerializeField] private MagicManager m_magicManager;
 
     private static BookNetworkServer s_instance;
+
     public static BookNetworkServer Instance => s_instance;
+
     private BookNetworkServer Owner => s_instance != null ? s_instance : this;
     private bool m_isListening;
     private bool m_isGameStarted;
+
     public bool IsListening => Owner.m_isListening;
+
     public bool IsGameStarted => Owner.m_isGameStarted;
     private readonly Dictionary<NetworkConnection, BOOK_MESSAGE_TYPE> m_registrationReplies = new();
     private readonly List<byte> m_acquiredPages = new();
     private readonly Dictionary<NetworkConnection, (int Next, int ReplayCount)> m_pageDelivery = new();
 
+
     public bool AcquirePageForBoth(byte pageId)
     {
-        if (Owner != this) return Owner.AcquirePageForBoth(pageId);
-        if (!m_isGameStarted || pageId == 0 || m_acquiredPages.Contains(pageId)) return false;
+        if (Owner != this)
+            return Owner.AcquirePageForBoth(pageId);
+        if (!m_isGameStarted || pageId == 0 || m_acquiredPages.Contains(pageId))
+            return false;
         m_acquiredPages.Add(pageId);
         return true;
     }
@@ -42,51 +49,75 @@ public class BookNetworkServer : MonoBehaviour
 
     public event System.Action<PLAYER_SLOT, bool> CastSelectionChanged
     {
-        add { Owner.m_castSelectionChanged += value; }
-        remove { Owner.m_castSelectionChanged -= value; }
+        add
+        {
+            Owner.m_castSelectionChanged += value;
+        }
+        remove
+        {
+            Owner.m_castSelectionChanged -= value;
+        }
     }
 
+
     public bool IsPlayerSelectingCast(PLAYER_SLOT slot) => Owner.m_castSelectingPlayers.Contains(slot);
+
 
     private void SetCastSelection(PLAYER_SLOT slot, bool active)
     {
         bool changed = active ? m_castSelectingPlayers.Add(slot) : m_castSelectingPlayers.Remove(slot);
-        if (changed) m_castSelectionChanged?.Invoke(slot, active);
+        if (changed)
+            m_castSelectionChanged?.Invoke(slot, active);
     }
+
 
     private void ReceiveCastSelection(NetworkConnection connection, DataStreamReader reader)
     {
         if (!m_isGameStarted || reader.Length - reader.GetBytesRead() != 1 ||
-            !m_playerSlots.TryGetValue(connection, out PLAYER_SLOT slot)) return;
+            !m_playerSlots.TryGetValue(connection, out PLAYER_SLOT slot))
+            return;
         byte active = reader.ReadByte();
-        if (active > 1) return;
+        if (active > 1)
+            return;
         SetCastSelection(slot, active == 1);
     }
+
 
     // Scene-local servers remain as reference adapters for existing Inspector links.
     private void Awake()
     {
-        if (s_instance != null && s_instance != this) return;
+        if (s_instance != null && s_instance != this)
+            return;
         s_instance = this;
         DontDestroyOnLoad(gameObject);
     }
 
+
     public bool IsPlayerConnected(PLAYER_SLOT slot)
     {
-        if (Owner != this) return Owner.IsPlayerConnected(slot);
+        if (Owner != this)
+            return Owner.IsPlayerConnected(slot);
         foreach (var pair in m_playerSlots)
-            if (pair.Value == slot && IsConnectionAlive(pair.Key)) return true;
+            if (pair.Value == slot && IsConnectionAlive(pair.Key))
+                return true;
         return false;
     }
+
 
     private bool IsConnectionAlive(NetworkConnection connection) => m_driver.IsCreated &&
         connection.IsCreated && m_driver.GetConnectionState(connection) == NetworkConnection.State.Connected;
 
+
     // Called by the game flow only after the PC game scene has loaded.
     public void BeginGame()
     {
-        if (Owner != this) { Owner.BeginGame(); return; }
-        if (!m_isListening || m_isGameStarted) return;
+        if (Owner != this)
+        {
+            Owner.BeginGame();
+            return;
+        }
+        if (!m_isListening || m_isGameStarted)
+            return;
         m_isGameStarted = true;
     }
 
@@ -104,13 +135,21 @@ public class BookNetworkServer : MonoBehaviour
 
     public event System.Action<PLAYER_SLOT, byte, MAGIC_CAST_DIRECTION> CastMagicReceived
     {
-        add { Owner.m_castMagicReceived += value; }
-        remove { Owner.m_castMagicReceived -= value; }
+        add
+        {
+            Owner.m_castMagicReceived += value;
+        }
+        remove
+        {
+            Owner.m_castMagicReceived -= value;
+        }
     }
+
 
     private void Start()
     {
-        if (Owner != this) return;
+        if (Owner != this)
+            return;
         m_driver = NetworkDriver.Create();
 
         // Clientと同じPipelineを同じ順番で作る
@@ -145,6 +184,7 @@ public class BookNetworkServer : MonoBehaviour
         Debug.Log($"Book Network Server開始 : Port {Port}");
     }
 
+
     private void Update()
     {
         if (Owner != this || !m_driver.IsCreated)
@@ -166,6 +206,7 @@ public class BookNetworkServer : MonoBehaviour
         SendAcquiredPages();
     }
 
+
     private void RemoveDisconnectedClients()
     {
         for (int i = 0; i < m_connections.Length; i++)
@@ -178,6 +219,7 @@ public class BookNetworkServer : MonoBehaviour
         }
     }
 
+
     private void AcceptClients()
     {
         NetworkConnection connection;
@@ -189,6 +231,7 @@ public class BookNetworkServer : MonoBehaviour
             Debug.Log("Book Clientが接続しました");
         }
     }
+
 
     private void ProcessEvents()
     {
@@ -230,18 +273,24 @@ public class BookNetworkServer : MonoBehaviour
     }
 
     private uint m_obstacleEvent;
+
     // Compatibility for previous callers: old Rub=1, old Ink=2.
     public bool SendObstacle(PLAYER_SLOT playerSlot, byte obstacleId) =>
         obstacleId == 1 || obstacleId == 2 ? SendDirt(playerSlot, obstacleId) : false;
 
+
     public bool SendDirt(PLAYER_SLOT playerSlot, byte slotCount = 1)
     {
-        if (Owner != this) return Owner.SendDirt(playerSlot, slotCount);
-        if (slotCount < 1 || slotCount > 4 || !m_driver.IsCreated) return false;
+        if (Owner != this)
+            return Owner.SendDirt(playerSlot, slotCount);
+        if (slotCount < 1 || slotCount > 4 || !m_driver.IsCreated)
+            return false;
         foreach (var pair in m_playerSlots)
         {
-            if (pair.Value != playerSlot || !pair.Key.IsCreated) continue;
-            if (m_driver.BeginSend(m_reliablePipeline, pair.Key, out DataStreamWriter writer) != 0) return false;
+            if (pair.Value != playerSlot || !pair.Key.IsCreated)
+                continue;
+            if (m_driver.BeginSend(m_reliablePipeline, pair.Key, out DataStreamWriter writer) != 0)
+                return false;
             writer.WriteByte((byte)BOOK_MESSAGE_TYPE.APPLY_DIRT);
             writer.WriteUInt(++m_obstacleEvent);
             writer.WriteByte(slotCount);
@@ -249,9 +298,11 @@ public class BookNetworkServer : MonoBehaviour
         }
         return false;
     }
+
     public bool SendAddPage(PLAYER_SLOT playerSlot, byte pageId)
     {
-        if (Owner != this) return Owner.SendAddPage(playerSlot, pageId);
+        if (Owner != this)
+            return Owner.SendAddPage(playerSlot, pageId);
         if (pageId == 0)
         {
             Debug.LogWarning("PageId 0は送信できません");
@@ -290,6 +341,7 @@ public class BookNetworkServer : MonoBehaviour
         return false;
     }
 
+
     private void ReceiveData(NetworkConnection connection, DataStreamReader reader)
     {
         if (reader.Length < 1)
@@ -327,6 +379,7 @@ public class BookNetworkServer : MonoBehaviour
         }
     }
 
+
     private void ReceiveTestPing(NetworkConnection connection, DataStreamReader reader)
     {
         int remainingBytes = reader.Length - reader.GetBytesRead();
@@ -353,10 +406,12 @@ public class BookNetworkServer : MonoBehaviour
     }
 
 
+
     // 受信したCastMagicのデータを処理する
     private void ReceiveCastMagic(NetworkConnection connection, DataStreamReader reader)
     {
-        if (!m_isGameStarted) return;
+        if (!m_isGameStarted)
+            return;
         // CastMagicのデータはSkillId(1byte) + CastDirection(1byte) = 2byte
         int remainingBytes = reader.Length - reader.GetBytesRead();
 
@@ -395,6 +450,7 @@ public class BookNetworkServer : MonoBehaviour
     }
 
 
+
     private void ReceiveVector2(NetworkConnection connection, DataStreamReader reader)
     {
         int remainingBytes = reader.Length - reader.GetBytesRead();
@@ -423,10 +479,12 @@ public class BookNetworkServer : MonoBehaviour
         }
     }
 
+
     public Vector2 GetCursorPosition()
     {
         return Owner.m_cursorPosition;
     }
+
 
     private void SendTestPong(NetworkConnection connection, int value)
     {
@@ -459,6 +517,7 @@ public class BookNetworkServer : MonoBehaviour
 
         Debug.Log($"TestPong送信 : {value}");
     }
+
 
     private void ReceiveRegisterController(NetworkConnection connection, DataStreamReader reader)
     {
@@ -497,25 +556,32 @@ public class BookNetworkServer : MonoBehaviour
         Debug.Log($"Controller登録成功 : {playerSlot}");
     }
 
+
     private bool SendSessionMessage(NetworkConnection connection, BOOK_MESSAGE_TYPE type)
     {
         if (!IsConnectionAlive(connection) ||
-            m_driver.BeginSend(m_reliablePipeline, connection, out DataStreamWriter writer) != 0) return false;
+            m_driver.BeginSend(m_reliablePipeline, connection, out DataStreamWriter writer) != 0)
+            return false;
         writer.WriteByte((byte)type);
         return m_driver.EndSend(writer) >= 0;
     }
+
 
     private void SendSessionMessages()
     {
         // Retain messages if the reliable queue is temporarily full.
         m_replyBuffer.Clear();
         foreach (var pair in m_registrationReplies)
-            if (SendSessionMessage(pair.Key, pair.Value)) m_replyBuffer.Add(pair.Key);
-        foreach (var connection in m_replyBuffer) m_registrationReplies.Remove(connection);
-        if (!m_isGameStarted) return;
+            if (SendSessionMessage(pair.Key, pair.Value))
+                m_replyBuffer.Add(pair.Key);
+        foreach (var connection in m_replyBuffer)
+            m_registrationReplies.Remove(connection);
+        if (!m_isGameStarted)
+            return;
         foreach (var pair in m_playerSlots)
         {
-            if (m_registrationReplies.ContainsKey(pair.Key) || m_startNotified.Contains(pair.Key)) continue;
+            if (m_registrationReplies.ContainsKey(pair.Key) || m_startNotified.Contains(pair.Key))
+                continue;
             if (SendSessionMessage(pair.Key, BOOK_MESSAGE_TYPE.GAME_STARTED))
             {
                 m_startNotified.Add(pair.Key);
@@ -524,32 +590,39 @@ public class BookNetworkServer : MonoBehaviour
         }
     }
 
+
     private void SendAcquiredPages()
     {
         foreach (var pair in m_playerSlots)
         {
             NetworkConnection connection = pair.Key;
-            if (!m_pageDelivery.TryGetValue(connection, out var delivery)) continue;
+            if (!m_pageDelivery.TryGetValue(connection, out var delivery))
+                continue;
             while (delivery.Next < m_acquiredPages.Count)
             {
                 if (!IsConnectionAlive(connection) ||
-                    m_driver.BeginSend(m_reliablePipeline, connection, out DataStreamWriter writer) != 0) break;
+                    m_driver.BeginSend(m_reliablePipeline, connection, out DataStreamWriter writer) != 0)
+                    break;
                 writer.WriteByte((byte)BOOK_MESSAGE_TYPE.ADD_PAGE);
                 writer.WriteByte(m_acquiredPages[delivery.Next]);
                 writer.WriteByte(delivery.Next < delivery.ReplayCount ? (byte)0 : (byte)1);
-                if (m_driver.EndSend(writer) < 0) break;
+                if (m_driver.EndSend(writer) < 0)
+                    break;
                 delivery.Next++;
             }
             m_pageDelivery[connection] = delivery;
         }
     }
 
+
     private void OnDestroy()
     {
-        if (s_instance != this) return;
+        if (s_instance != this)
+            return;
         s_instance = null;
         m_isListening = false;
-        if (m_discovery != null) m_discovery.StopResponding();
+        if (m_discovery != null)
+            m_discovery.StopResponding();
         if (m_driver.IsCreated)
         {
             m_driver.Dispose();

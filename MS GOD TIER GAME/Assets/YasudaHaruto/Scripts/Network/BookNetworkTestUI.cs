@@ -4,6 +4,7 @@ public class BookNetworkTestUI : MonoBehaviour
 {
     private int m_pingValue;
 
+
     public void OnPingButtonPressed()
     {
         BookNetworkClient client =
@@ -20,6 +21,7 @@ public class BookNetworkTestUI : MonoBehaviour
 
         client.SendTestPing(m_pingValue);
     }
+
 
     public void OnCastSkillButtonPressed()
     {

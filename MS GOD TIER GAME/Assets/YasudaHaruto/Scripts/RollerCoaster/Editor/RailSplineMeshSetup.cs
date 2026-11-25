@@ -6,28 +6,34 @@ using UnityEngine.Splines;
 
 namespace YasudaHaruto.RollerCoaster.Editor
 {
+    /// <summary>レール素材の生成設定を担当側のコースへ配置するEditor補助。</summary>
     public static class RailSplineMeshSetup
     {
         internal const string SourcePath = "Assets/YasudaHaruto/Data/RollerCoaster/RailStraight.asset";
         internal const string SamplePath = "Assets/YasudaHaruto/Prefabs/RollerCoaster/RailSplineSample.prefab";
         internal const string ModelPath = "Assets/map/bunki/duct_lane.fbx";
 
+
         [MenuItem("Tools/Roller Coaster/Create Rail Sample")]
         public static void CreateSample()
         {
-            if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                return;
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(SamplePath);
-            if (prefab == null) prefab = SaveSample();
+            if (prefab == null)
+                prefab = SaveSample();
             var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
             Undo.RegisterCreatedObjectUndo(instance, "Create rail sample");
             Selection.activeGameObject = instance;
             SceneView.lastActiveSceneView?.FrameSelected();
         }
 
+
         internal static GameObject SaveSample()
         {
             GameObject model = AssetDatabase.LoadAssetAtPath<GameObject>(ModelPath);
-            if (model == null) throw new InvalidOperationException("線路FBXが見つかりません: " + ModelPath);
+            if (model == null)
+                throw new InvalidOperationException("線路FBXが見つかりません: " + ModelPath);
             MeshFilter filter = model.GetComponentsInChildren<MeshFilter>(true).Single(x => x.name == "rail_straight");
             var renderer = filter.GetComponent<MeshRenderer>();
             Mesh sourceMesh = AssetDatabase.LoadAssetAtPath<Mesh>(SourcePath);
@@ -35,7 +41,9 @@ namespace YasudaHaruto.RollerCoaster.Editor
             {
                 Matrix4x4 matrix = filter.transform.localToWorldMatrix;
                 // FBX内の素材展示位置を除く。形状に必要な回転とScaleは維持する。
-                matrix.m03 = 0f; matrix.m13 = 0f; matrix.m23 = 0f;
+                matrix.m03 = 0f;
+                matrix.m13 = 0f;
+                matrix.m23 = 0f;
                 var source = RailMeshBuilder.Read(filter.sharedMesh, matrix);
                 var triangles = new System.Collections.Generic.List<RailMeshBuilder.Vertex>[source.Indices.Length];
                 for (int sub = 0; sub < triangles.Length; sub++)
@@ -52,7 +60,8 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 var container = root.AddComponent<SplineContainer>();
                 var spline = new Spline();
                 Vector3[] points = { Vector3.zero, new Vector3(0, 0, 9), new Vector3(4, 0, 18), new Vector3(10, 2, 27), new Vector3(12, 5, 39), new Vector3(8, 5, 51) };
-                foreach (var point in points) spline.Add(new BezierKnot(point), TangentMode.AutoSmooth);
+                foreach (var point in points)
+                    spline.Add(new BezierKnot(point), TangentMode.AutoSmooth);
                 container.Spline = spline;
                 var rail = root.AddComponent<RailSplineMesh>();
                 rail.Configure(container, sourceMesh, renderer.sharedMaterials);

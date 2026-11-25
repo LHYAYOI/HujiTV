@@ -6,14 +6,20 @@ using UnityEngine;
 
 namespace YasudaHaruto.RollerCoaster.Editor
 {
+    /// <summary>囲いの生成設定を編集し、コースに沿う背景を再生成する。</summary>
     internal static class RollerCoasterEnclosureBuilder
     {
         private const string Folder = "Assets/YasudaHaruto/Data/RollerCoaster/Enclosures";
 
+
         internal static RollerCoasterEnclosures Create(RollerCoasterCourse course)
         {
             var existing = course.GetComponentInChildren<RollerCoasterEnclosures>(true);
-            if (existing != null) { Generate(existing); return existing; }
+            if (existing != null)
+            {
+                Generate(existing);
+                return existing;
+            }
             RailSplineMeshGenerator.EnsureFolder(Folder);
             var model = AssetDatabase.LoadAssetAtPath<GameObject>(RailSplineMeshSetup.ModelPath);
             var filter = model.GetComponentsInChildren<MeshFilter>(true).Single(x => x.name == "duct_straight");
@@ -32,11 +38,13 @@ namespace YasudaHaruto.RollerCoaster.Editor
             var palette = new Material[5];
             for (int i = 0; i < palette.Length; i++)
             {
-                string path = Folder + $"/DuctColor{i+1}.mat";
+                string path = Folder + $"/DuctColor{i + 1}.mat";
                 palette[i] = AssetDatabase.LoadAssetAtPath<Material>(path);
-                if (palette[i] != null) continue;
-                palette[i] = new Material(AssetDatabase.LoadAssetAtPath<Material>("Assets/map/bunki/odoriba_duct_rail.mat")) { name = $"DuctColor{i+1}" };
-                if (palette[i].HasProperty("_Cull")) palette[i].SetFloat("_Cull", 0f);
+                if (palette[i] != null)
+                    continue;
+                palette[i] = new Material(AssetDatabase.LoadAssetAtPath<Material>("Assets/map/bunki/odoriba_duct_rail.mat")) { name = $"DuctColor{i + 1}" };
+                if (palette[i].HasProperty("_Cull"))
+                    palette[i].SetFloat("_Cull", 0f);
                 palette[i].doubleSidedGI = true;
                 palette[i].enableInstancing = true;
                 AssetDatabase.CreateAsset(palette[i], path);
@@ -51,52 +59,65 @@ namespace YasudaHaruto.RollerCoaster.Editor
             return settings;
         }
 
+
         internal static void ApplyAtlasColors(RollerCoasterEnclosures settings)
         {
-            if(settings.UseSourceDuct)return;
+            if (settings.UseSourceDuct)
+                return;
             // 元Atlasにある緑・青・桃色の模様を使い分ける。原TextureやUVは変更しない。
             var uv = settings.SourceMesh.uv;
-            Vector2 min = new Vector2(uv.Min(x=>x.x), uv.Min(x=>x.y));
-            Vector2 size = new Vector2(uv.Max(x=>x.x)-min.x, uv.Max(x=>x.y)-min.y);
+            Vector2 min = new Vector2(uv.Min(x => x.x), uv.Min(x => x.y));
+            Vector2 size = new Vector2(uv.Max(x => x.x) - min.x, uv.Max(x => x.y) - min.y);
             Rect[] patches = { new Rect(.84f,.4f,.06f,.35f), new Rect(.35f,.53f,.28f,.15f),
                 new Rect(.2f,.08f,.5f,.13f), new Rect(.84f,.4f,.06f,.35f), new Rect(.35f,.53f,.28f,.15f) };
-            Color[] tints = { Color.white, Color.white, Color.white, new Color(.85f,.9f,1f), new Color(.85f,1f,.9f) };
-            var shader=Shader.Find("YasudaHaruto/RollerCoaster Enclosure");
-            if(shader==null)throw new InvalidOperationException("囲い用Shaderが読み込まれていません。");
+            Color[] tints = { Color.white, Color.white, Color.white, new Color(.85f, .9f, 1f), new Color(.85f, 1f, .9f) };
+            var shader = Shader.Find("YasudaHaruto/RollerCoaster Enclosure");
+            if (shader == null)
+                throw new InvalidOperationException("囲い用Shaderが読み込まれていません。");
             for (int i = 0; i < settings.Palette.Length; i++)
             {
                 var material = settings.Palette[i];
-                var patch = patches[i%patches.Length];
-                var texture=material.GetTexture("_BaseMap");
-                material.shader=shader;
-                material.SetTexture("_BaseMap",texture);
-                material.SetVector("_AtlasRect",new Vector4(patch.x,patch.y,patch.width,patch.height));
-                material.SetFloat("_TileMeters",3f);
-                material.SetVector("_ScrollVelocity",new Vector4(.012f,.004f,0f,0f));
-                Vector2 scale = new Vector2(patch.width/size.x,patch.height/size.y);
-                Vector2 offset = patch.min-Vector2.Scale(min,scale);
+                var patch = patches[i % patches.Length];
+                var texture = material.GetTexture("_BaseMap");
+                material.shader = shader;
+                material.SetTexture("_BaseMap", texture);
+                material.SetVector("_AtlasRect", new Vector4(patch.x, patch.y, patch.width, patch.height));
+                material.SetFloat("_TileMeters", 3f);
+                material.SetVector("_ScrollVelocity", new Vector4(.012f, .004f, 0f, 0f));
+                Vector2 scale = new Vector2(patch.width / size.x, patch.height / size.y);
+                Vector2 offset = patch.min - Vector2.Scale(min, scale);
                 foreach (string property in new[] { "_BaseMap", "_BumpMap", "_MetallicGlossMap", "_ParallaxMap" })
                 {
-                    if (!material.HasProperty(property)) continue;
-                    material.SetTextureScale(property,scale); material.SetTextureOffset(property,offset);
+                    if (!material.HasProperty(property))
+                        continue;
+                    material.SetTextureScale(property, scale);
+                    material.SetTextureOffset(property, offset);
                 }
-                material.SetColor("_BaseColor",tints[i%tints.Length]);
-                material.shaderKeywords=new string[0];
+                material.SetColor("_BaseColor", tints[i % tints.Length]);
+                material.shaderKeywords = new string[0];
                 EditorUtility.SetDirty(material);
             }
         }
 
+
         internal static void Generate(RollerCoasterEnclosures settings)
         {
-            if (settings.Smooth) { RollerCoasterSmoothEnclosureBuilder.Generate(settings); return; }
+            if (settings.Smooth)
+            {
+                RollerCoasterSmoothEnclosureBuilder.Generate(settings);
+                return;
+            }
             GenerateStraight(settings);
         }
 
+
         private static void GenerateStraight(RollerCoasterEnclosures settings)
         {
-            if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("編集モードで配置してください。");
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new InvalidOperationException("編集モードで配置してください。");
             if (settings.Course == null || settings.SourceMesh == null || settings.Palette == null ||
-                settings.Palette.Length < 1 || settings.Palette.Any(x => x == null)) throw new ArgumentException("コース・素材・色を設定してください。");
+                settings.Palette.Length < 1 || settings.Palette.Any(x => x == null))
+                throw new ArgumentException("コース・素材・色を設定してください。");
             if (settings.Width < 3f || settings.Height < 3f || settings.Spacing < .5f || settings.Spacing > 3f || settings.Overlap < 0f)
                 throw new ArgumentException("囲い寸法・間隔を設定範囲内にしてください。");
             if (settings.GeneratedRoot != null && settings.GeneratedRoot.transform.parent != settings.transform)
@@ -104,7 +125,8 @@ namespace YasudaHaruto.RollerCoaster.Editor
             var table = new RailDistanceTable(settings.Course.Spline);
             float gapStart = table.DistanceAtParameter(RollerCoasterCourseBuilder.KnotParameter(settings.Course.Spline.Spline, settings.Course.FallStartKnot));
             float gapEnd = table.DistanceAtParameter(RollerCoasterCourseBuilder.KnotParameter(settings.Course.Spline.Spline, settings.Course.FallEndKnot));
-            if (Mathf.CeilToInt(table.Length/settings.Spacing) > 1500) throw new ArgumentException("配置数が多すぎます。");
+            if (Mathf.CeilToInt(table.Length / settings.Spacing) > 1500)
+                throw new ArgumentException("配置数が多すぎます。");
             var root = new GameObject("Generated Enclosures");
             root.transform.SetParent(settings.transform, false);
             var random = new System.Random(settings.ColorSeed);
@@ -115,41 +137,53 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 if (bag.Count == 0)
                 {
                     bag.AddRange(Enumerable.Range(0, settings.Palette.Length));
-                    for (int j = bag.Count-1; j > 0; j--) { int k = random.Next(j+1); (bag[j],bag[k]) = (bag[k],bag[j]); }
+                    for (int j = bag.Count - 1; j > 0; j--)
+                    {
+                        int k = random.Next(j + 1);
+                        (bag[j], bag[k]) = (bag[k], bag[j]);
+                    }
                 }
                 int pick = bag.FindIndex(x => x != previous);
-                if (pick < 0) pick = 0;
-                int value = bag[pick]; bag.RemoveAt(pick); previous = value; return value;
+                if (pick < 0)
+                    pick = 0;
+                int value = bag[pick];
+                bag.RemoveAt(pick);
+                previous = value;
+                return value;
             }
             try
             {
                 foreach (var range in new[] { new Vector2(0f, gapStart), new Vector2(gapEnd, table.Length) })
                 {
-                    int count = Mathf.CeilToInt((range.y-range.x)/settings.Spacing);
-                    float step = (range.y-range.x)/count;
+                    int count = Mathf.CeilToInt((range.y - range.x) / settings.Spacing);
+                    float step = (range.y - range.x) / count;
                     for (int i = 0; i < count; i++)
                     {
-                        float a = Mathf.Max(range.x, range.x+i*step-settings.Overlap*.5f);
-                        float b = Mathf.Min(range.y, range.x+(i+1)*step+settings.Overlap*.5f);
-                        table.Frame((a+b)*.5f, out var position, out var rotation);
+                        float a = Mathf.Max(range.x, range.x + i * step - settings.Overlap * .5f);
+                        float b = Mathf.Min(range.y, range.x + (i + 1) * step + settings.Overlap * .5f);
+                        table.Frame((a + b) * .5f, out var position, out var rotation);
                         // 開口部は境界の接線に合わせ、落下区間へ伸ばさずレール幅を収める。
                         if (i == 0)
                         {
                             table.Frame(a, out position, out rotation);
-                            position += rotation*Vector3.forward*((b-a)*.5f);
+                            position += rotation * Vector3.forward * ((b - a) * .5f);
                         }
-                        else if (i == count-1)
+                        else if (i == count - 1)
                         {
                             table.Frame(b, out position, out rotation);
-                            position -= rotation*Vector3.forward*((b-a)*.5f);
+                            position -= rotation * Vector3.forward * ((b - a) * .5f);
                         }
-                        if (run-- <= 0) { color = NextColor(); run = random.Next(1, 4)-1; }
-                        var piece = new GameObject($"Enclosure {++number:000} Color {color+1}");
+                        if (run-- <= 0)
+                        {
+                            color = NextColor();
+                            run = random.Next(1, 4) - 1;
+                        }
+                        var piece = new GameObject($"Enclosure {++number:000} Color {color + 1}");
                         piece.transform.SetParent(root.transform, false);
-                        Vector3 scale = new Vector3(settings.Width/settings.SourceMesh.bounds.size.x,
-                            settings.Height/settings.SourceMesh.bounds.size.y, (b-a)/settings.SourceMesh.bounds.size.z);
-                        Vector3 center = position + rotation*Vector3.up*settings.CenterHeight;
-                        piece.transform.SetPositionAndRotation(center-rotation*Vector3.Scale(settings.SourceMesh.bounds.center, scale), rotation);
+                        Vector3 scale = new Vector3(settings.Width / settings.SourceMesh.bounds.size.x,
+                            settings.Height / settings.SourceMesh.bounds.size.y, (b - a) / settings.SourceMesh.bounds.size.z);
+                        Vector3 center = position + rotation * Vector3.up * settings.CenterHeight;
+                        piece.transform.SetPositionAndRotation(center - rotation * Vector3.Scale(settings.SourceMesh.bounds.center, scale), rotation);
                         piece.transform.localScale = scale;
                         piece.AddComponent<MeshFilter>().sharedMesh = settings.SourceMesh;
                         var renderer = piece.AddComponent<MeshRenderer>();
@@ -158,7 +192,8 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 }
                 Undo.RegisterCreatedObjectUndo(root, "Place track enclosures");
                 Undo.RecordObject(settings, "Update track enclosures");
-                if (settings.GeneratedRoot != null) Undo.DestroyObjectImmediate(settings.GeneratedRoot);
+                if (settings.GeneratedRoot != null)
+                    Undo.DestroyObjectImmediate(settings.GeneratedRoot);
                 settings.SetGeneratedRoot(root);
                 EditorUtility.SetDirty(settings);
             }
@@ -169,19 +204,23 @@ namespace YasudaHaruto.RollerCoaster.Editor
     [CustomEditor(typeof(RollerCoasterEnclosures))]
     internal sealed class RollerCoasterEnclosuresEditor : UnityEditor.Editor
     {
+
         public override void OnInspectorGUI()
         {
-            var imageCourse=UnityEngine.Object.FindFirstObjectByType<RollerCoasterStoryboard>();
-            if(imageCourse!=null&&imageCourse.GetComponent<RollerCoasterTrialRide>().Course==((RollerCoasterEnclosures)target).Course)
+            var imageCourse = UnityEngine.Object.FindFirstObjectByType<RollerCoasterStoryboard>();
+            if (imageCourse != null && imageCourse.GetComponent<RollerCoasterTrialRide>().Course == ((RollerCoasterEnclosures)target).Course)
             {
-                EditorGUILayout.HelpBox("これは旧コースの囲い設定です。現在の囲いは画像①〜⑪のコース生成で更新します。",MessageType.Info);
+                EditorGUILayout.HelpBox("これは旧コースの囲い設定です。現在の囲いは画像①〜⑪のコース生成で更新します。", MessageType.Info);
                 return;
             }
             DrawDefaultInspector();
             EditorGUILayout.HelpBox("Smoothで連続した囲いを生成します。落下部分は閉じた縦長空間に接続。色はSeedで固定。生成root内は再生成で置き換えるため、手置き物は外へ置いてください。", MessageType.Info);
             using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
                 if (GUILayout.Button("囲いを再配置"))
-                    try { RollerCoasterEnclosureBuilder.Generate((RollerCoasterEnclosures)target); }
+                    try
+                    {
+                        RollerCoasterEnclosureBuilder.Generate((RollerCoasterEnclosures)target);
+                    }
                     catch (Exception exception) { Debug.LogException(exception); }
         }
     }

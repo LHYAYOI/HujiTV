@@ -2,9 +2,13 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>ルーンの集合・待機・飛翔・発動を状態ごとに進める。</summary>
 public sealed class RuneSpellEffect : MonoBehaviour
 {
-    private enum PHASE { HIDDEN, GATHERING, READY, FLYING, ACTIVATING }
+    private enum PHASE
+    {
+        HIDDEN, GATHERING, READY, FLYING, ACTIVATING
+    }
 
     private const float TransformDuration = 0.18f;
     private const float ActivationDuration = 0.25f;
@@ -23,14 +27,23 @@ public sealed class RuneSpellEffect : MonoBehaviour
     private Color m_traceColor;
     private Vector2 m_drag, m_launchStart, m_launchDirection, m_center;
 
+
     public bool IsReady => m_phase == PHASE.READY;
+
     public bool IsFlying => m_phase == PHASE.FLYING;
+
     public bool IsActivating => m_phase == PHASE.ACTIVATING;
+
     public bool IsReleasing => IsFlying || IsActivating;
+
     public bool IsVisible => m_phase != PHASE.HIDDEN && gameObject.activeSelf;
+
     public Vector2 Center => m_center;
+
     public float GatherProgress => m_phase == PHASE.GATHERING ? Mathf.Clamp01(m_elapsed / GatherDuration) : 1f;
+
     private float GatherDuration => m_settings.FloatDuration + m_settings.GatherDuration;
+
 
     public void Play(IReadOnlyList<RuneStrokeData> strokes, Rect source, Func<Rect?> bookRect,
         Func<Vector2> origin, RuneSpellSettings settings, Color color, float width, float sideAngle, MagicData magic)
@@ -46,6 +59,7 @@ public sealed class RuneSpellEffect : MonoBehaviour
         m_elapsed = 0f;
         m_drag = Vector2.zero;
 
+        // 入力側が次のルーンを編集しても、発動中の軌跡が変化しないようコピーを保持する。
         var snapshot = new List<RuneStrokeData>(strokes.Count);
         Vector2 min = Vector2.one, max = Vector2.zero;
         foreach (RuneStrokeData stroke in strokes)
@@ -72,8 +86,10 @@ public sealed class RuneSpellEffect : MonoBehaviour
         if (bullet != null)
         {
             m_preview = new GameObject("Rune Bullet Preview").AddComponent<RuneBulletPreview>();
-            if (m_preview.Show(bullet, (RectTransform)transform)) m_preview.Hide();
-            else DisposePreview();
+            if (m_preview.Show(bullet, (RectTransform)transform))
+                m_preview.Hide();
+            else
+                DisposePreview();
         }
         m_phase = PHASE.GATHERING;
         gameObject.SetActive(true);
@@ -81,16 +97,20 @@ public sealed class RuneSpellEffect : MonoBehaviour
         Advance(0f);
     }
 
+
     public void SetDrag(Vector2 offset)
     {
-        if (!IsReady) return;
+        if (!IsReady)
+            return;
         m_dragging = true;
         m_drag = m_castType == MAGIC_CAST_TYPE.INSTANT ? Vector2.zero : offset;
     }
 
+
     public void CancelDrag()
     {
-        if (!IsReady) return;
+        if (!IsReady)
+            return;
         m_dragging = false;
         m_transformProgress = 0f;
         m_drag = Vector2.zero;
@@ -98,9 +118,11 @@ public sealed class RuneSpellEffect : MonoBehaviour
         Advance(0f);
     }
 
+
     public void Launch(MAGIC_CAST_DIRECTION direction)
     {
-        if (!IsReady || direction == MAGIC_CAST_DIRECTION.NONE) return;
+        if (!IsReady || direction == MAGIC_CAST_DIRECTION.NONE)
+            return;
         if (m_castType == MAGIC_CAST_TYPE.INSTANT)
         {
             m_drag = Vector2.zero;
@@ -112,27 +134,37 @@ public sealed class RuneSpellEffect : MonoBehaviour
         float angle = ((int)direction - 1) * m_sideAngle * Mathf.Deg2Rad;
         m_launchDirection = m_drag.sqrMagnitude > 0f ? m_drag.normalized : new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
         Advance(0f);
-        if (!IsReady) return;
+        if (!IsReady)
+            return;
         m_launchStart = m_center + m_drag * (1f - Mathf.SmoothStep(0f, 1f, m_transformProgress));
         m_elapsed = 0f;
         m_dragging = true;
         m_phase = PHASE.FLYING;
     }
 
+
+    // UI演出の時間はゲームの時間倍率から独立させる。
     private void LateUpdate() => Advance(Time.unscaledDeltaTime);
+
 
     public void Advance(float deltaTime)
     {
-        if (m_phase == PHASE.HIDDEN) return;
+        if (m_phase == PHASE.HIDDEN)
+            return;
         Rect? book = m_bookRect?.Invoke();
-        if (!book.HasValue || book.Value.height <= 0f) { Hide(); return; }
+        if (!book.HasValue || book.Value.height <= 0f)
+        {
+            Hide();
+            return;
+        }
         m_elapsed += Mathf.Max(0f, deltaTime);
         Vector2 origin = m_origin != null ? m_origin() : new Vector2(0.5f, 0.39f);
         Vector2 home = book.Value.min + Vector2.Scale(origin, book.Value.size);
         float height = book.Value.height;
         float progress = GatherProgress;
 
-        if (m_phase == PHASE.GATHERING && progress >= 1f) m_phase = PHASE.READY;
+        if (m_phase == PHASE.GATHERING && progress >= 1f)
+            m_phase = PHASE.READY;
         if (m_dragging && IsReady)
             m_transformProgress = Mathf.MoveTowards(m_transformProgress, 1f, deltaTime / TransformDuration);
         float morph = IsFlying ? 1f : Mathf.SmoothStep(0f, 1f, m_transformProgress);
@@ -150,13 +182,21 @@ public sealed class RuneSpellEffect : MonoBehaviour
         else if (IsActivating)
         {
             float t = Mathf.Clamp01(m_elapsed / ActivationDuration);
-            if (t >= 1f) { Hide(); return; }
+            if (t >= 1f)
+            {
+                Hide();
+                return;
+            }
             scale *= Mathf.Lerp(1f, 1.5f, Mathf.SmoothStep(0f, 1f, t));
         }
         else if (IsFlying)
         {
             float t = m_elapsed / m_settings.FlightDuration;
-            if (t >= 1f) { Hide(); return; }
+            if (t >= 1f)
+            {
+                Hide();
+                return;
+            }
             float distance = new Vector2(Screen.width, Screen.height).magnitude + height;
             m_center = m_launchStart + m_launchDirection * distance * t * t;
         }
@@ -167,16 +207,20 @@ public sealed class RuneSpellEffect : MonoBehaviour
         m_trace.rectTransform.anchoredPosition = local;
         m_trace.rectTransform.localScale = Vector3.one * (hasBullet ? scale * Mathf.Lerp(1f, 0.32f, morph) : scale);
         Color traceTint = m_traceColor;
-        if (IsActivating) traceTint.a *= 1f - Mathf.SmoothStep(0f, 1f, m_elapsed / ActivationDuration);
-        if (hasBullet) traceTint.a *= 1f - morph;
+        if (IsActivating)
+            traceTint.a *= 1f - Mathf.SmoothStep(0f, 1f, m_elapsed / ActivationDuration);
+        if (hasBullet)
+            traceTint.a *= 1f - morph;
         m_trace.color = traceTint;
         if (hasBullet && m_dragging)
             m_preview.Draw(local, height * m_settings.CoreSize * 18f * Mathf.Lerp(0.6f, 1f, morph), morph);
     }
 
+
     private void EnsureCanvas()
     {
-        if (m_trace != null) return;
+        if (m_trace != null)
+            return;
         var canvas = gameObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 30500;
@@ -185,24 +229,29 @@ public sealed class RuneSpellEffect : MonoBehaviour
         m_trace.raycastTarget = false;
     }
 
+
     public void Hide()
     {
         m_phase = PHASE.HIDDEN;
         m_dragging = false;
         m_transformProgress = 0f;
         m_drag = Vector2.zero;
-        if (m_trace != null) m_trace.Clear();
+        if (m_trace != null)
+            m_trace.Clear();
         DisposePreview();
         gameObject.SetActive(false);
     }
 
+
     private void DisposePreview()
     {
-        if (m_preview == null) return;
+        if (m_preview == null)
+            return;
         m_preview.Hide();
         Destroy(m_preview.gameObject);
         m_preview = null;
     }
+
 
     private void OnDestroy() => DisposePreview();
 }

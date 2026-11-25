@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace YasudaHaruto
 {
+    /// <summary>敵の撃破をページ報酬へ変換し、落下表示と取得待ちを管理する。</summary>
     public sealed class BattlePageDrops : MonoBehaviour
     {
         [Serializable]
@@ -14,7 +15,8 @@ namespace YasudaHaruto
             [Range(1, 255)] public int PageId;
         }
 
-        [SerializeField] private Assignment[] m_assignments =
+        [SerializeField]
+        private Assignment[] m_assignments =
         {
             new Assignment { EnemyId = "MiniGhost_A", PageId = 5 },
             new Assignment { EnemyId = "MiniGhost_B", PageId = 5 },
@@ -36,9 +38,11 @@ namespace YasudaHaruto
         private Material m_previewBubble;
         private Material m_previewPaper;
 
+
         public bool ReportEnemyDefeated(string enemyId, Vector3 position)
         {
-            if (!isActiveAndEnabled || string.IsNullOrEmpty(enemyId)) return false;
+            if (!isActiveAndEnabled || string.IsNullOrEmpty(enemyId))
+                return false;
             foreach (var assignment in m_assignments)
             {
                 if (assignment.EnemyId != enemyId || assignment.PageId < 1 || assignment.PageId > 255)
@@ -56,19 +60,23 @@ namespace YasudaHaruto
             return false;
         }
 
+
         public void CollectBattleDrops(Transform cartTarget)
         {
-            if (cartTarget == null || m_waitingDrops.Count == 0) return;
+            if (cartTarget == null || m_waitingDrops.Count == 0)
+                return;
             var drops = m_waitingDrops.ToArray();
             m_waitingDrops.Clear();
             StartCoroutine(CollectAfterLanding(drops, cartTarget));
         }
 
+
         private IEnumerator CollectAfterLanding(Drop[] drops, Transform cartTarget)
         {
             foreach (Drop drop in drops)
             {
-                while (!drop.Landed) yield return null;
+                while (!drop.Landed)
+                    yield return null;
             }
 
             if (cartTarget == null)
@@ -80,6 +88,7 @@ namespace YasudaHaruto
             foreach (Drop drop in drops)
                 StartCoroutine(FlyToCart(drop, cartTarget));
         }
+
 
         private static IEnumerator Fall(Drop drop, Vector3 from, Vector3 to)
         {
@@ -94,6 +103,7 @@ namespace YasudaHaruto
             drop.Landed = true;
         }
 
+
         private static IEnumerator FlyToCart(Drop drop, Transform target)
         {
             const float duration = 0.7f;
@@ -101,7 +111,8 @@ namespace YasudaHaruto
             Vector3 destination = target.position;
             for (float elapsed = 0f; elapsed < duration; elapsed += Time.deltaTime)
             {
-                if (target != null) destination = target.position;
+                if (target != null)
+                    destination = target.position;
                 float t = elapsed / duration;
                 drop.Visual.position = Vector3.Lerp(from, destination, t) +
                     Vector3.up * (Mathf.Sin(t * Mathf.PI) * 0.8f);
@@ -111,6 +122,7 @@ namespace YasudaHaruto
             BookNetworkServer.Instance?.AcquirePageForBoth(drop.PageId);
             Destroy(drop.Visual.gameObject);
         }
+
 
         private Transform CreateVisual(Vector3 position)
         {
@@ -133,6 +145,7 @@ namespace YasudaHaruto
             return root.transform;
         }
 
+
         private static void AddShape(PrimitiveType shape, Transform parent, Vector3 scale,
             Quaternion rotation, Material material)
         {
@@ -141,13 +154,16 @@ namespace YasudaHaruto
             part.transform.SetParent(parent, false);
             part.transform.localScale = scale;
             part.transform.localRotation = rotation;
-            if (material != null) part.GetComponent<Renderer>().sharedMaterial = material;
+            if (material != null)
+                part.GetComponent<Renderer>().sharedMaterial = material;
         }
+
 
         private static Material CreateMaterial(Color color, bool transparent)
         {
             Shader shader = Shader.Find("Universal Render Pipeline/Lit");
-            if (shader == null) return null;
+            if (shader == null)
+                return null;
             var material = new Material(shader) { color = color };
             if (transparent)
             {
@@ -161,24 +177,31 @@ namespace YasudaHaruto
             return material;
         }
 
+
         [ContextMenu("Preview / Drop Page Bubbles")]
         private void PreviewDrops()
         {
-            if (!Application.isPlaying) return;
+            if (!Application.isPlaying)
+                return;
             for (int i = 0; i < m_assignments.Length; i++)
                 ReportEnemyDefeated(m_assignments[i].EnemyId, transform.position + Vector3.right * i * 0.65f);
         }
 
+
         [ContextMenu("Preview / Collect Page Bubbles")]
         private void PreviewCollect()
         {
-            if (Application.isPlaying) CollectBattleDrops(m_previewCartTarget);
+            if (Application.isPlaying)
+                CollectBattleDrops(m_previewCartTarget);
         }
+
 
         private void OnDestroy()
         {
-            if (m_previewBubble != null) Destroy(m_previewBubble);
-            if (m_previewPaper != null) Destroy(m_previewPaper);
+            if (m_previewBubble != null)
+                Destroy(m_previewBubble);
+            if (m_previewPaper != null)
+                Destroy(m_previewPaper);
         }
     }
 }

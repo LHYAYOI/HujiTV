@@ -10,6 +10,7 @@ public class PageFactory
     private readonly BookInputController m_inputController;
     private readonly BookNetworkService m_networkService;
 
+
     public PageFactory(
         RuneTraceController runeTraceController, BookInputController inputController, BookNetworkService networkService)
     {
@@ -17,6 +18,7 @@ public class PageFactory
         m_inputController = inputController;
         m_networkService = networkService;
     }
+
 
     public PageInstance Create(PageData data)
     {
@@ -29,6 +31,7 @@ public class PageFactory
         IPageInteraction interaction = CreateInteraction(data.Interaction, data.Action, command);
         return new PageInstance(data, interaction);
     }
+
 
     private IPageCommand CreateCommand(PageActionData data)
     {
@@ -53,6 +56,7 @@ public class PageFactory
                 return null;
         }
     }
+
 
     private IPageInteraction CreateInteraction(PageInteractionData data, PageActionData action, IPageCommand command)
     {

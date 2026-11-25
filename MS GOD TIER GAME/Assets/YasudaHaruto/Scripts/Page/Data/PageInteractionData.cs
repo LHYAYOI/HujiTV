@@ -25,8 +25,11 @@ public class PageInteractionData
 
     [Tooltip("Index in the left visual page Images. -1 uses the last image. No sprite is duplicated here.")]
     [SerializeField, Min(-1)] private int m_runeImageIndex = -1;
+
     public int RuneImageIndex => m_runeImageIndex;
 
+
     public PAGE_INTERACTION_TYPE Type => m_type;
+
     public RuneData RuneData => m_runeData;
 }

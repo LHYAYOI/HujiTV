@@ -11,31 +11,41 @@ namespace YasudaHaruto.RollerCoaster.Editor
     public static class RailSplineMeshValidation
     {
         private const string ReportPath = "Temp/RailSplineValidation/result.txt";
+
         private static void Require(bool condition, string message)
         {
-            if (!condition) throw new InvalidOperationException(message);
+            if (!condition)
+                throw new InvalidOperationException(message);
             File.AppendAllText(ReportPath, "PASS " + message + "\n");
         }
+
 
         public static void RunBatch()
         {
             Directory.CreateDirectory("Temp/RailSplineValidation");
             File.WriteAllText(ReportPath, "Rail spline mesh validation\n");
-            try { Verify(); File.AppendAllText(ReportPath, "Rail Spline COMPLETE\n"); }
+            try
+            {
+                Verify();
+                File.AppendAllText(ReportPath, "Rail Spline COMPLETE\n");
+            }
             catch (Exception exception)
             {
                 File.AppendAllText(ReportPath, "FAIL " + exception + "\n");
                 Debug.LogException(exception);
-                if (Application.isBatchMode) EditorApplication.Exit(1);
+                if (Application.isBatchMode)
+                    EditorApplication.Exit(1);
                 throw;
             }
         }
+
 
         public static void Verify()
         {
             string importerBefore = File.ReadAllText(RailSplineMeshSetup.ModelPath + ".meta");
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(RailSplineMeshSetup.SamplePath);
-            if (prefab == null) prefab = RailSplineMeshSetup.SaveSample();
+            if (prefab == null)
+                prefab = RailSplineMeshSetup.SaveSample();
             Require(prefab != null, "Sample prefab is saved");
             GameObject instance = UnityEngine.Object.Instantiate(prefab);
             string testMeshPath = null;
@@ -54,7 +64,8 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 var startSection = sourceVertices.Where(v => Mathf.Abs(v.z - rail.SourceMesh.bounds.min.z) < 0.0001f).Select(v => new Vector2(v.x, v.y)).Distinct().ToArray();
                 var endSection = sourceVertices.Where(v => Mathf.Abs(v.z - rail.SourceMesh.bounds.max.z) < 0.0001f).Select(v => new Vector2(v.x, v.y)).Distinct().ToArray();
                 Require(startSection.Length > 0 && startSection.Length == endSection.Length && startSection.All(a => endSection.Any(b => Vector2.Distance(a, b) < 0.0001f)), "Real source endpoint cross-sections match for continuous repetitions");
-                foreach (var point in savedMesh.vertices) RequireBounds(savedMesh.bounds, point);
+                foreach (var point in savedMesh.vertices)
+                    RequireBounds(savedMesh.bounds, point);
                 File.AppendAllText(ReportPath, $"Sample bounds: {savedMesh.bounds}, vertices: {savedMesh.vertexCount}, source bounds: {rail.SourceMesh.bounds}\n");
 
                 // 直線上で反復の継ぎ目、端の切り詰め、距離指定を検証。
@@ -98,7 +109,11 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 Set(rail, "m_endDistance", 500f);
                 GameObject originalRoot = rail.GeneratedRoot;
                 bool rejected = false;
-                try { RailSplineMeshGenerator.Generate(rail, false); } catch (ArgumentException) { rejected = true; }
+                try
+                {
+                    RailSplineMeshGenerator.Generate(rail, false);
+                }
+                catch (ArgumentException) { rejected = true; }
                 Require(rejected && rail.GeneratedRoot == originalRoot && handPlaced != null, "Invalid range preserves previous output and hand-placed objects");
                 Set(rail, "m_endDistance", 11.37f);
                 RailSplineMeshGenerator.Generate(rail);
@@ -116,10 +131,12 @@ namespace YasudaHaruto.RollerCoaster.Editor
             {
                 UnityEngine.Object.DestroyImmediate(instance);
                 // この検証が生成したメッシュだけを除く。サンプルと利用者の出力は維持する。
-                if (testMeshPath != null) AssetDatabase.DeleteAsset(testMeshPath);
+                if (testMeshPath != null)
+                    AssetDatabase.DeleteAsset(testMeshPath);
             }
             Require(File.ReadAllText(RailSplineMeshSetup.ModelPath + ".meta") == importerBefore, "FBX importer remains unchanged");
         }
+
 
         public static void RenderBatch()
         {
@@ -164,23 +181,28 @@ namespace YasudaHaruto.RollerCoaster.Editor
             finally { preview.Cleanup(); }
         }
 
+
         private static void Set(RailSplineMesh rail, string field, float value)
         {
             var serialized = new SerializedObject(rail);
             serialized.FindProperty(field).floatValue = value;
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
+
         private static void Set(RailSplineMesh rail, string field, Vector2 value)
         {
             var serialized = new SerializedObject(rail);
             serialized.FindProperty(field).vector2Value = value;
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
+
         private static bool Finite(Vector3 value) => float.IsFinite(value.x) && float.IsFinite(value.y) && float.IsFinite(value.z);
+
         private static void RequireBounds(Bounds bounds, Vector3 point)
         {
             bounds.Expand(0.001f);
-            if (!bounds.Contains(point)) throw new InvalidOperationException("Generated bounds do not contain vertices");
+            if (!bounds.Contains(point))
+                throw new InvalidOperationException("Generated bounds do not contain vertices");
         }
     }
 }

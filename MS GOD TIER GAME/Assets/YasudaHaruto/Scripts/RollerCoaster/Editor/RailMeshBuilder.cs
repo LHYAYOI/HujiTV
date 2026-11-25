@@ -8,6 +8,7 @@ using UnityEngine.Rendering;
 namespace YasudaHaruto.RollerCoaster.Editor
 {
     // 各三角形を共通のZ平面で切ることで隣り合う面の分割位置を揃える。
+    /// <summary>レール素材を距離サンプルへ変形し、つながったメッシュへ組み立てる。</summary>
     internal static class RailMeshBuilder
     {
         internal const int VertexLimit = 600000;
@@ -18,6 +19,7 @@ namespace YasudaHaruto.RollerCoaster.Editor
             public Vector4 Tangent;
             public Color Color;
             public Vector4[] UV;
+
             public static Vertex Lerp(Vertex a, Vertex b, float t)
             {
                 var result = new Vertex
@@ -28,7 +30,8 @@ namespace YasudaHaruto.RollerCoaster.Editor
                     Color = UnityEngine.Color.LerpUnclamped(a.Color, b.Color, t),
                     UV = new Vector4[8]
                 };
-                for (int i = 0; i < 8; i++) result.UV[i] = Vector4.LerpUnclamped(a.UV[i], b.UV[i], t);
+                for (int i = 0; i < 8; i++)
+                    result.UV[i] = Vector4.LerpUnclamped(a.UV[i], b.UV[i], t);
                 return result;
             }
         }
@@ -42,16 +45,20 @@ namespace YasudaHaruto.RollerCoaster.Editor
             public Bounds Bounds;
         }
 
+
         internal static Source Read(Mesh mesh, Matrix4x4 matrix)
         {
-            if (mesh == null) throw new ArgumentException("線路素材を指定してください。");
-            if (matrix.determinant <= 0f) throw new ArgumentException("素材のScaleには正の値を指定してください。");
+            if (mesh == null)
+                throw new ArgumentException("線路素材を指定してください。");
+            if (matrix.determinant <= 0f)
+                throw new ArgumentException("素材のScaleには正の値を指定してください。");
             var source = new Source();
             using (var dataArray = MeshUtility.AcquireReadOnlyMeshData(mesh))
             {
                 var data = dataArray[0];
                 int count = data.vertexCount;
-                if (count == 0) throw new ArgumentException("素材に頂点がありません。");
+                if (count == 0)
+                    throw new ArgumentException("素材に頂点がありません。");
                 source.HasNormals = data.HasVertexAttribute(VertexAttribute.Normal);
                 source.HasTangents = data.HasVertexAttribute(VertexAttribute.Tangent);
                 source.HasColors = data.HasVertexAttribute(VertexAttribute.Color);
@@ -67,7 +74,8 @@ namespace YasudaHaruto.RollerCoaster.Editor
                     {
                         data.GetNormals(values);
                         var normalMatrix = matrix.inverse.transpose;
-                        for (int i = 0; i < count; i++) source.Vertices[i].Normal = normalMatrix.MultiplyVector(values[i]).normalized;
+                        for (int i = 0; i < count; i++)
+                            source.Vertices[i].Normal = normalMatrix.MultiplyVector(values[i]).normalized;
                     }
                 }
                 using (var values = new NativeArray<Vector4>(count, Allocator.Temp))
@@ -84,9 +92,11 @@ namespace YasudaHaruto.RollerCoaster.Editor
                     for (int channel = 0; channel < 8; channel++)
                     {
                         source.HasUV[channel] = data.HasVertexAttribute((VertexAttribute)((int)VertexAttribute.TexCoord0 + channel));
-                        if (!source.HasUV[channel]) continue;
+                        if (!source.HasUV[channel])
+                            continue;
                         data.GetUVs(channel, values);
-                        for (int i = 0; i < count; i++) source.Vertices[i].UV[channel] = values[i];
+                        for (int i = 0; i < count; i++)
+                            source.Vertices[i].UV[channel] = values[i];
                     }
                 }
                 if (source.HasColors)
@@ -94,14 +104,16 @@ namespace YasudaHaruto.RollerCoaster.Editor
                     using (var values = new NativeArray<Color>(count, Allocator.Temp))
                     {
                         data.GetColors(values);
-                        for (int i = 0; i < count; i++) source.Vertices[i].Color = values[i];
+                        for (int i = 0; i < count; i++)
+                            source.Vertices[i].Color = values[i];
                     }
                 }
                 source.Indices = new int[data.subMeshCount][];
                 for (int sub = 0; sub < data.subMeshCount; sub++)
                 {
                     var descriptor = data.GetSubMesh(sub);
-                    if (descriptor.topology != MeshTopology.Triangles) throw new ArgumentException("三角形の線路メッシュを指定してください。");
+                    if (descriptor.topology != MeshTopology.Triangles)
+                        throw new ArgumentException("三角形の線路メッシュを指定してください。");
                     using (var indices = new NativeArray<int>(descriptor.indexCount, Allocator.Temp))
                     {
                         data.GetIndices(indices, sub, true);
@@ -110,16 +122,20 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 }
             }
             source.Bounds = new Bounds(source.Vertices[0].Position, Vector3.zero);
-            foreach (var vertex in source.Vertices) source.Bounds.Encapsulate(vertex.Position);
+            foreach (var vertex in source.Vertices)
+                source.Bounds.Encapsulate(vertex.Position);
             return source;
         }
+
 
         internal static List<Vertex>[] Subdivide(Source source, float maxStep)
         {
             float length = source.Bounds.size.z;
-            if (length < 0.001f) throw new ArgumentException("素材の長手方向を+Zへ合わせてください。");
+            if (length < 0.001f)
+                throw new ArgumentException("素材の長手方向を+Zへ合わせてください。");
             int slices = Mathf.CeilToInt(length / maxStep);
-            if (slices > 4096) throw new ArgumentException("素材の長さまたは分割間隔を見直してください（最大4096分割）。");
+            if (slices > 4096)
+                throw new ArgumentException("素材の長さまたは分割間隔を見直してください（最大4096分割）。");
             float step = length / slices;
             var result = new List<Vertex>[source.Indices.Length];
             int total = 0;
@@ -140,10 +156,14 @@ namespace YasudaHaruto.RollerCoaster.Editor
                         polygon = Clip(polygon, source.Bounds.min.z + (slice + 1) * step, false);
                         for (int p = 1; p + 1 < polygon.Count; p++)
                         {
-                            if (Vector3.Cross(polygon[p].Position - polygon[0].Position, polygon[p + 1].Position - polygon[0].Position).sqrMagnitude < 1e-16f) continue;
-                            result[sub].Add(polygon[0]); result[sub].Add(polygon[p]); result[sub].Add(polygon[p + 1]);
+                            if (Vector3.Cross(polygon[p].Position - polygon[0].Position, polygon[p + 1].Position - polygon[0].Position).sqrMagnitude < 1e-16f)
+                                continue;
+                            result[sub].Add(polygon[0]);
+                            result[sub].Add(polygon[p]);
+                            result[sub].Add(polygon[p + 1]);
                             total += 3;
-                            if (total > VertexLimit) throw new ArgumentException("分割後の素材が大きすぎます。分割間隔を広げてください。");
+                            if (total > VertexLimit)
+                                throw new ArgumentException("分割後の素材が大きすぎます。分割間隔を広げてください。");
                         }
                     }
                 }
@@ -151,10 +171,12 @@ namespace YasudaHaruto.RollerCoaster.Editor
             return result;
         }
 
+
         internal static List<Vertex> Clip(List<Vertex> input, float z, bool keepAbove)
         {
             var output = new List<Vertex>();
-            if (input.Count == 0) return output;
+            if (input.Count == 0)
+                return output;
             Vertex previous = input[input.Count - 1];
             bool previousInside = keepAbove ? previous.Position.z >= z : previous.Position.z <= z;
             foreach (var current in input)
@@ -166,42 +188,63 @@ namespace YasudaHaruto.RollerCoaster.Editor
                     intersection.Position.z = z;
                     output.Add(intersection);
                 }
-                if (inside) output.Add(current);
-                previous = current; previousInside = inside;
+                if (inside)
+                    output.Add(current);
+                previous = current;
+                previousInside = inside;
             }
             return output;
         }
 
+
         internal static Mesh MakeMesh(Source source, List<Vertex>[] triangles, Func<Vertex, Vertex> deform)
         {
-            var positions = new List<Vector3>(); var normals = new List<Vector3>();
-            var tangents = new List<Vector4>(); var colors = new List<Color>();
+            var positions = new List<Vector3>();
+            var normals = new List<Vector3>();
+            var tangents = new List<Vector4>();
+            var colors = new List<Color>();
             var uv = new List<Vector4>[8];
-            for (int channel = 0; channel < 8; channel++) uv[channel] = new List<Vector4>();
+            for (int channel = 0; channel < 8; channel++)
+                uv[channel] = new List<Vector4>();
             var subIndices = new List<int>[triangles.Length];
             for (int sub = 0; sub < triangles.Length; sub++)
             {
                 subIndices[sub] = new List<int>();
                 foreach (var vertex in triangles[sub])
                 {
-                    if (positions.Count >= VertexLimit) throw new ArgumentException("生成頂点数の上限を超えました。生成区間を分けるか分割間隔を広げてください。");
+                    if (positions.Count >= VertexLimit)
+                        throw new ArgumentException("生成頂点数の上限を超えました。生成区間を分けるか分割間隔を広げてください。");
                     Vertex result = deform(vertex);
                     subIndices[sub].Add(positions.Count);
-                    positions.Add(result.Position); normals.Add(result.Normal); tangents.Add(result.Tangent); colors.Add(result.Color);
-                    for (int channel = 0; channel < 8; channel++) if (source.HasUV[channel]) uv[channel].Add(result.UV[channel]);
+                    positions.Add(result.Position);
+                    normals.Add(result.Normal);
+                    tangents.Add(result.Tangent);
+                    colors.Add(result.Color);
+                    for (int channel = 0; channel < 8; channel++)
+                        if (source.HasUV[channel])
+                            uv[channel].Add(result.UV[channel]);
                 }
             }
-            if (positions.Count == 0) throw new ArgumentException("生成区間内に面がありません。");
+            if (positions.Count == 0)
+                throw new ArgumentException("生成区間内に面がありません。");
             var mesh = new Mesh { name = "RailSplineMesh", indexFormat = positions.Count > 65535 ? IndexFormat.UInt32 : IndexFormat.UInt16 };
             mesh.SetVertices(positions);
-            if (source.HasNormals) mesh.SetNormals(normals);
-            if (source.HasColors) mesh.SetColors(colors);
-            for (int channel = 0; channel < 8; channel++) if (source.HasUV[channel]) mesh.SetUVs(channel, uv[channel]);
+            if (source.HasNormals)
+                mesh.SetNormals(normals);
+            if (source.HasColors)
+                mesh.SetColors(colors);
+            for (int channel = 0; channel < 8; channel++)
+                if (source.HasUV[channel])
+                    mesh.SetUVs(channel, uv[channel]);
             mesh.subMeshCount = triangles.Length;
-            for (int sub = 0; sub < triangles.Length; sub++) mesh.SetTriangles(subIndices[sub], sub, false);
-            if (!source.HasNormals) mesh.RecalculateNormals();
-            if (source.HasTangents) mesh.SetTangents(tangents);
-            else if (source.HasUV[0]) mesh.RecalculateTangents();
+            for (int sub = 0; sub < triangles.Length; sub++)
+                mesh.SetTriangles(subIndices[sub], sub, false);
+            if (!source.HasNormals)
+                mesh.RecalculateNormals();
+            if (source.HasTangents)
+                mesh.SetTangents(tangents);
+            else if (source.HasUV[0])
+                mesh.RecalculateTangents();
             mesh.RecalculateBounds();
             return mesh;
         }

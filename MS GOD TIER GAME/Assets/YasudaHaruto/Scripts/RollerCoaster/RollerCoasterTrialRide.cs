@@ -15,7 +15,7 @@ namespace YasudaHaruto.RollerCoaster
         [SerializeField] private Light m_trialLight;
         [SerializeField] private RollerCoasterSpeedProfile m_speedProfile;
         [SerializeField] private RollerCoasterCameraMotion m_cameraMotion;
-        [SerializeField,Tooltip("乗車視点に表示する車体部分。走行用の車体を隠す処理から除外する。")]
+        [SerializeField, Tooltip("乗車視点に表示する車体部分。走行用の車体を隠す処理から除外する。")]
         private Transform m_foregroundVisual;
         [SerializeField, Min(0.1f), Tooltip("区間速度が無効なときの一定速度。")]
         private float m_speed = 12f;
@@ -25,7 +25,7 @@ namespace YasudaHaruto.RollerCoaster
         private readonly List<AudioListener> m_disabledListeners = new List<AudioListener>();
         private readonly List<CinemachineBrain> m_disabledBrains = new List<CinemachineBrain>();
         private RollerCoasterStoryboard m_storyboard;
-        private readonly List<(GameObject Object,int Layer)> m_riderLayers=new List<(GameObject,int)>();
+        private readonly List<(GameObject Object, int Layer)> m_riderLayers = new List<(GameObject, int)>();
         private int m_originalCameraMask;
         private bool m_started;
         private bool m_paused;
@@ -37,13 +37,21 @@ namespace YasudaHaruto.RollerCoaster
         private Quaternion m_landingRotation;
         private Quaternion m_fallHeading;
 
+
         public CartController Cart => m_cart;
+
         public Camera RideCamera => m_rideCamera;
+
         public RollerCoasterCourse Course => m_course;
+
         public float Progress => m_length > 0f && m_cart != null ? Mathf.Clamp01(m_cart.SplineOffset / m_length) : 0f;
+
         public bool Finished => m_finished;
+
         public bool Paused => m_paused;
+
         public Transform ForegroundVisual => m_foregroundVisual;
+
 
         private void Start()
         {
@@ -53,54 +61,77 @@ namespace YasudaHaruto.RollerCoaster
                 enabled = false;
                 return;
             }
-            m_storyboard=GetComponent<RollerCoasterStoryboard>();
+            m_storyboard = GetComponent<RollerCoasterStoryboard>();
             RefreshRouteFrames();
-            if (m_length <= 0f) { enabled = false; return; }
+            if (m_length <= 0f)
+            {
+                enabled = false;
+                return;
+            }
             foreach (var camera in FindObjectsByType<Camera>(FindObjectsSortMode.None))
             {
-                if (camera == m_rideCamera || !camera.enabled || camera.gameObject.scene != gameObject.scene) continue;
+                if (camera == m_rideCamera || !camera.enabled || camera.gameObject.scene != gameObject.scene)
+                    continue;
                 m_disabledCameras.Add(camera);
                 camera.enabled = false;
                 var brain = camera.GetComponent<CinemachineBrain>();
-                if (brain != null && brain.enabled) { m_disabledBrains.Add(brain); brain.enabled = false; }
+                if (brain != null && brain.enabled)
+                {
+                    m_disabledBrains.Add(brain);
+                    brain.enabled = false;
+                }
             }
             foreach (var listener in FindObjectsByType<AudioListener>(FindObjectsSortMode.None))
             {
-                if (!listener.enabled || listener.gameObject == m_rideCamera.gameObject || listener.gameObject.scene != gameObject.scene) continue;
+                if (!listener.enabled || listener.gameObject == m_rideCamera.gameObject || listener.gameObject.scene != gameObject.scene)
+                    continue;
                 m_disabledListeners.Add(listener);
                 listener.enabled = false;
             }
-            m_originalCameraMask=m_rideCamera.cullingMask;
-            if(m_storyboard!=null)
+            m_originalCameraMask = m_rideCamera.cullingMask;
+            if (m_storyboard != null)
             {
-                foreach(var renderer in m_cart.GetComponentsInChildren<Renderer>(true))
+                foreach (var renderer in m_cart.GetComponentsInChildren<Renderer>(true))
                 {
-                    if(m_foregroundVisual!=null&&renderer.transform.IsChildOf(m_foregroundVisual))continue;
-                    m_riderLayers.Add((renderer.gameObject,renderer.gameObject.layer));renderer.gameObject.layer=2;
+                    // 乗車視点用の車体の縁だけは表示し、通常の自車モデルの非表示処理から除外する。
+                    if (m_foregroundVisual != null && renderer.transform.IsChildOf(m_foregroundVisual))
+                        continue;
+                    m_riderLayers.Add((renderer.gameObject, renderer.gameObject.layer));
+                    renderer.gameObject.layer = 2;
                 }
-                m_rideCamera.cullingMask&=~(1<<2);
+                m_rideCamera.cullingMask &= ~(1 << 2);
             }
             m_rideCamera.enabled = true;
-            if (m_trialLight != null) m_trialLight.enabled = true;
+            if (m_trialLight != null)
+                m_trialLight.enabled = true;
             m_started = true;
             Restart();
         }
 
+
         private void Update()
         {
-            if (!m_started) return;
-            if (Input.GetKeyDown(KeyCode.Space)) TogglePause();
-            if (Input.GetKeyDown(KeyCode.R)) Restart();
+            if (!m_started)
+                return;
+            if (Input.GetKeyDown(KeyCode.Space))
+                TogglePause();
+            if (Input.GetKeyDown(KeyCode.R))
+                Restart();
         }
+
 
         private void LateUpdate()
         {
-            if (!m_started) return;
+            if (!m_started)
+                return;
             if (!m_paused && !m_finished && (m_speedProfile != null || m_storyboard != null))
             {
-                if(m_storyboard!=null&&m_storyboard.enabled)m_storyboard.Tick(Progress,Time.deltaTime);
-                else if (m_speedProfile.UseSectionSpeeds) m_speedProfile.Tick(Progress, Time.deltaTime, m_speed);
-                else m_cart.SetSpeed(m_speed);
+                if (m_storyboard != null && m_storyboard.enabled)
+                    m_storyboard.Tick(Progress, Time.deltaTime);
+                else if (m_speedProfile.UseSectionSpeeds)
+                    m_speedProfile.Tick(Progress, Time.deltaTime, m_speed);
+                else
+                    m_cart.SetSpeed(m_speed);
             }
             ApplyPose(Progress);
             if (Progress >= 1f)
@@ -110,13 +141,16 @@ namespace YasudaHaruto.RollerCoaster
             }
         }
 
+
         public void ApplyPose(float parameter)
         {
             Vector3 position = m_course.Spline.EvaluatePosition(0, Mathf.Clamp01(parameter));
-            if(m_storyboard!=null&&m_storyboard.enabled)position+=m_storyboard.WheelPivotOffset(parameter);
+            if (m_storyboard != null && m_storyboard.enabled)
+                position += m_storyboard.WheelPivotOffset(parameter);
             // 既存の回転Lerp遅延を、この確認用車両に限って補正する。
             m_cart.transform.SetPositionAndRotation(position, EvaluateRideRotation(parameter));
         }
+
 
         public void RefreshRouteFrames()
         {
@@ -128,16 +162,21 @@ namespace YasudaHaruto.RollerCoaster
             m_takeoffRotation = Quaternion.LookRotation(takeoff, takeoffUp);
             m_landingRotation = Quaternion.LookRotation(landing, landingUp);
             Vector3 heading = Vector3.ProjectOnPlane(takeoff, Vector3.up);
-            if (heading.sqrMagnitude < 1e-6f) heading = Vector3.ProjectOnPlane(landing, Vector3.up);
-            if (heading.sqrMagnitude < 1e-6f) heading = Vector3.ProjectOnPlane(m_course.Spline.transform.forward, Vector3.up);
-            if (heading.sqrMagnitude < 1e-6f) heading = Vector3.forward;
+            if (heading.sqrMagnitude < 1e-6f)
+                heading = Vector3.ProjectOnPlane(landing, Vector3.up);
+            if (heading.sqrMagnitude < 1e-6f)
+                heading = Vector3.ProjectOnPlane(m_course.Spline.transform.forward, Vector3.up);
+            if (heading.sqrMagnitude < 1e-6f)
+                heading = Vector3.forward;
             m_fallHeading = Quaternion.LookRotation(heading.normalized, Vector3.up);
         }
+
 
         public Quaternion EvaluateRideRotation(float parameter)
         {
             parameter = Mathf.Clamp01(parameter);
-            if(m_storyboard!=null&&m_storyboard.enabled)return m_storyboard.RotationAt(parameter);
+            if (m_storyboard != null && m_storyboard.enabled)
+                return m_storyboard.RotationAt(parameter);
             if (parameter >= m_gapStart && parameter <= m_gapEnd && m_gapEnd > m_gapStart)
             {
                 float progress = Mathf.InverseLerp(m_gapStart, m_gapEnd, parameter);
@@ -158,63 +197,111 @@ namespace YasudaHaruto.RollerCoaster
             return rotation;
         }
 
+
         public void TogglePause()
         {
-            if (!m_started) return;
-            if (m_finished) { Restart(); return; }
+            if (!m_started)
+                return;
+            if (m_finished)
+            {
+                Restart();
+                return;
+            }
             m_paused = !m_paused;
             m_cart.SetSpeed(m_paused ? 0f : CurrentTargetSpeed());
         }
 
+
         public void Restart()
         {
-            if (!m_started) return;
+            if (!m_started)
+                return;
             m_paused = false;
             m_finished = false;
-            var lighting=GetComponent<RollerCoasterDuctLighting>();
-            if(lighting!=null)lighting.RestartLighting();
+            var lighting = GetComponent<RollerCoasterDuctLighting>();
+            if (lighting != null)
+                lighting.RestartLighting();
             m_cart.SetSpline(m_course.Spline, m_startProgress * m_length, false, true);
-            if (m_speedProfile != null) m_speedProfile.Initialize(m_course, m_cart, m_startProgress);
-            if(m_storyboard!=null&&m_storyboard.enabled)m_storyboard.RestartSequence();
+            if (m_speedProfile != null)
+                m_speedProfile.Initialize(m_course, m_cart, m_startProgress);
+            if (m_storyboard != null && m_storyboard.enabled)
+                m_storyboard.RestartSequence();
             m_cart.SetSpeed(CurrentTargetSpeed());
             ApplyPose(m_startProgress);
-            if (m_cameraMotion != null) m_cameraMotion.BeginRide(m_startProgress);
+            if (m_cameraMotion != null)
+                m_cameraMotion.BeginRide(m_startProgress);
         }
+
 
         private void OnDisable()
         {
-            if (m_cameraMotion != null) m_cameraMotion.EndRide();
-            foreach(var entry in m_riderLayers)if(entry.Object!=null)entry.Object.layer=entry.Layer;
+            if (m_cameraMotion != null)
+                m_cameraMotion.EndRide();
+            foreach (var entry in m_riderLayers)
+                if (entry.Object != null)
+                    entry.Object.layer = entry.Layer;
             m_riderLayers.Clear();
-            if(m_started&&m_rideCamera!=null)m_rideCamera.cullingMask=m_originalCameraMask;
-            if (m_started && m_cart != null) m_cart.SetSpeed(0f);
-            foreach (var camera in m_disabledCameras) if (camera != null) camera.enabled = true;
-            foreach (var listener in m_disabledListeners) if (listener != null) listener.enabled = true;
-            foreach (var brain in m_disabledBrains) if (brain != null) brain.enabled = true;
-            m_disabledCameras.Clear(); m_disabledListeners.Clear();
+            if (m_started && m_rideCamera != null)
+                m_rideCamera.cullingMask = m_originalCameraMask;
+            if (m_started && m_cart != null)
+                m_cart.SetSpeed(0f);
+            foreach (var camera in m_disabledCameras)
+                if (camera != null)
+                    camera.enabled = true;
+            foreach (var listener in m_disabledListeners)
+                if (listener != null)
+                    listener.enabled = true;
+            foreach (var brain in m_disabledBrains)
+                if (brain != null)
+                    brain.enabled = true;
+            m_disabledCameras.Clear();
+            m_disabledListeners.Clear();
             m_disabledBrains.Clear();
-            if (m_rideCamera != null) m_rideCamera.enabled = false;
-            if (m_trialLight != null) m_trialLight.enabled = false;
+            if (m_rideCamera != null)
+                m_rideCamera.enabled = false;
+            if (m_trialLight != null)
+                m_trialLight.enabled = false;
             m_started = false;
         }
 
+
         private void OnGUI()
         {
-            if (!m_started) return;
+            if (!m_started)
+                return;
             GUI.Box(new Rect(12f, 12f, 340f, 76f), "Trial Ride  " + Mathf.RoundToInt(Progress * 100f) + "%   Speed " + m_cart.Speed.ToString("F1"));
-            if (GUI.Button(new Rect(24f, 43f, 148f, 30f), m_finished ? "Restart (Space)" : m_paused ? "Resume (Space)" : "Pause (Space)")) TogglePause();
-            if (GUI.Button(new Rect(184f, 43f, 156f, 30f), "Restart (R)")) Restart();
+            if (GUI.Button(new Rect(24f, 43f, 148f, 30f), m_finished ? "Restart (Space)" : m_paused ? "Resume (Space)" : "Pause (Space)"))
+                TogglePause();
+            if (GUI.Button(new Rect(184f, 43f, 156f, 30f), "Restart (R)"))
+                Restart();
         }
 
+
 #if UNITY_EDITOR
-        public void SetForegroundVisual(Transform visual){m_foregroundVisual=visual;}
-        public void SetSpeedProfile(RollerCoasterSpeedProfile profile) { m_speedProfile = profile; }
-        public void SetCameraMotion(RollerCoasterCameraMotion motion) { m_cameraMotion = motion; }
+        public void SetForegroundVisual(Transform visual)
+        {
+            m_foregroundVisual = visual;
+        }
+
+        public void SetSpeedProfile(RollerCoasterSpeedProfile profile)
+        {
+            m_speedProfile = profile;
+        }
+
+        public void SetCameraMotion(RollerCoasterCameraMotion motion)
+        {
+            m_cameraMotion = motion;
+        }
+
         public void Configure(RollerCoasterCourse course, CartController cart, Camera camera, Light light)
         {
-            m_course = course; m_cart = cart; m_rideCamera = camera; m_trialLight = light;
+            m_course = course;
+            m_cart = cart;
+            m_rideCamera = camera;
+            m_trialLight = light;
         }
+
 #endif
-        private float CurrentTargetSpeed() => m_storyboard!=null&&m_storyboard.enabled?m_storyboard.SpeedAt(Progress):m_speedProfile != null ? m_speedProfile.CurrentSpeed(Progress, m_speed) : m_speed;
+        private float CurrentTargetSpeed() => m_storyboard != null && m_storyboard.enabled ? m_storyboard.SpeedAt(Progress) : m_speedProfile != null ? m_speedProfile.CurrentSpeed(Progress, m_speed) : m_speed;
     }
 }

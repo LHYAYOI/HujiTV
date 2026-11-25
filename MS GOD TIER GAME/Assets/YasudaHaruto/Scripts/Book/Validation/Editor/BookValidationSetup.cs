@@ -27,10 +27,12 @@ namespace YasudaHaruto.BookValidation.Editor
         private static BookPageReplacementPanel s_panel;
         private static bool s_selectionReopened;
 
+
         static BookValidationSetup()
         {
             EditorApplication.playModeStateChanged += OnPlayMode;
         }
+
 
         public static void VerifyExisting()
         {
@@ -44,25 +46,31 @@ namespace YasudaHaruto.BookValidation.Editor
             StartSmokeCheck();
         }
 
+
         private static void StartSmokeCheck()
         {
             SessionState.SetBool(Running, true);
             EditorApplication.EnterPlaymode();
         }
 
+
         public static void VerifyIntegratedBookScene()
         {
-            if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Exit Play Mode first.");
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new InvalidOperationException("Exit Play Mode first.");
             for (int i = 0; i < SceneManager.sceneCount; i++)
-                if (SceneManager.GetSceneAt(i).isDirty) throw new InvalidOperationException("An open scene has unsaved changes.");
+                if (SceneManager.GetSceneAt(i).isDirty)
+                    throw new InvalidOperationException("An open scene has unsaved changes.");
             EditorSceneManager.OpenScene("Assets/YasudaHaruto/Scenes/BookScene.unity", OpenSceneMode.Single);
             File.WriteAllText(ReportPath, "Verifying integrated BookScene.\n");
             StartSmokeCheck();
         }
 
+
         private static void OnPlayMode(PlayModeStateChange state)
         {
-            if (!SessionState.GetBool(Running, false)) return;
+            if (!SessionState.GetBool(Running, false))
+                return;
             if (state == PlayModeStateChange.EnteredPlayMode)
             {
                 s_step = 0;
@@ -73,28 +81,35 @@ namespace YasudaHaruto.BookValidation.Editor
             }
             else if (state == PlayModeStateChange.EnteredEditMode)
             {
-                if (s_endSample != null) UnityEngine.Object.DestroyImmediate(s_endSample);
+                if (s_endSample != null)
+                    UnityEngine.Object.DestroyImmediate(s_endSample);
                 SessionState.SetBool(Running, false);
                 EditorApplication.update -= Tick;
                 AssetDatabase.Refresh();
             }
         }
 
+
         private static void Require(bool condition, string message)
         {
-            if (!condition) throw new InvalidOperationException(message);
+            if (!condition)
+                throw new InvalidOperationException(message);
             File.AppendAllText(ReportPath, "PASS: " + message + "\n");
         }
 
+
         private static void Tick()
         {
-            if (!EditorApplication.isPlaying) return;
+            if (!EditorApplication.isPlaying)
+                return;
             try
             {
                 if (EditorApplication.timeSinceStartup > s_deadline)
                     throw new TimeoutException("Book operation did not finish within 120 seconds.");
-                if (EditorApplication.timeSinceStartup < s_next) return;
-                if (s_view != null && (s_view.IsBusy || s_view.FlipView.IsTurning)) return;
+                if (EditorApplication.timeSinceStartup < s_next)
+                    return;
+                if (s_view != null && (s_view.IsBusy || s_view.FlipView.IsTurning))
+                    return;
                 switch (s_step++)
                 {
                     case 0:
@@ -157,10 +172,10 @@ namespace YasudaHaruto.BookValidation.Editor
                     case 7:
                         if (!s_selectionReopened)
                         {
-                        ClickPanelButton("DeclineButton");
-                        Require(!s_panel.IsVisible && s_game.PendingPage == null, "Decline button closes selection");
-                        Require(s_game.Pages.Count == s_count && s_game.CurrentPage == s_survivor, "Decline preserves viewed instance");
-                        Require(s_game.RequestAdd(s_sample) == PAGE_ADD_RESULT.NEEDS_SELECTION, "Selection can reopen");
+                            ClickPanelButton("DeclineButton");
+                            Require(!s_panel.IsVisible && s_game.PendingPage == null, "Decline button closes selection");
+                            Require(s_game.Pages.Count == s_count && s_game.CurrentPage == s_survivor, "Decline preserves viewed instance");
+                            Require(s_game.RequestAdd(s_sample) == PAGE_ADD_RESULT.NEEDS_SELECTION, "Selection can reopen");
                             s_selectionReopened = true;
                             s_step--;
                             // Newly instantiated graphics receive their draw depth on the next rendered frame.
@@ -257,6 +272,7 @@ namespace YasudaHaruto.BookValidation.Editor
             }
         }
 
+
         private static void CheckInventory()
         {
             Require(s_view.PageCount == 3 + s_game.Pages.Count * 2, "Display count matches logical inventory");
@@ -267,10 +283,15 @@ namespace YasudaHaruto.BookValidation.Editor
                 "Fixed pages preserved");
         }
 
+
         private static void ClickPanelButton(string name)
         {
             foreach (var button in s_panel.GetComponentsInChildren<UnityEngine.UI.Button>(true))
-                if (button.name == name) { button.onClick.Invoke(); return; }
+                if (button.name == name)
+                {
+                    button.onClick.Invoke();
+                    return;
+                }
             throw new InvalidOperationException("Button not found: " + name);
         }
     }

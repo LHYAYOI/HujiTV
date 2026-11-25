@@ -15,10 +15,12 @@ public enum BOOK_PAGE_SIDE
 
 public class BookRaycastCoordinateMapper : MonoBehaviour
 {
+
     [Header("Display")]
     [SerializeField] private RectTransform m_displayImage;
     [SerializeField] private Camera m_modelCamera;
     [SerializeField] private Camera m_captureCamera;
+
 
     [Header("Book Mesh")]
     [SerializeField] private MeshCollider m_bookCollider;
@@ -28,6 +30,7 @@ public class BookRaycastCoordinateMapper : MonoBehaviour
     private static readonly int RIGHT_UV_ID = Shader.PropertyToID("_RightUv");
     private static readonly int LEFT_CROP_ID = Shader.PropertyToID("_LeftCrop");
     private static readonly int RIGHT_CROP_ID = Shader.PropertyToID("_RightCrop");
+
 
     // 画面座標から本のページ情報を取得する
     public bool TryGetCapturePosition(Vector2 screenPosition, out BOOK_PAGE_SIDE side, out Ray captureRay)
@@ -55,7 +58,7 @@ public class BookRaycastCoordinateMapper : MonoBehaviour
             return false;
         }
 
-        
+
 
         // 表示領域のサイズを取得
         Rect rect = m_displayImage.rect;
@@ -135,6 +138,7 @@ public class BookRaycastCoordinateMapper : MonoBehaviour
 
         return true;
     }
+
 
     // UV座標が指定された領域に含まれるかどうかを判定する
     private static bool ContainsUV(Vector2 uv, Vector4 region)

@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem.UI;
 
 // Scene-local UI; the separately rooted server and flow survive its destruction.
+/// <summary>参加スロットと開始可否をロビーへ表示する。</summary>
 public sealed class BookServerLobbyUI : MonoBehaviour
 {
     [SerializeField] private BookNetworkServer m_server;
@@ -14,10 +15,13 @@ public sealed class BookServerLobbyUI : MonoBehaviour
     private Button m_startButton;
     private Font m_font;
 
+
     private void Start()
     {
-        if (m_server == null) m_server = BookNetworkServer.Instance;
-        if (m_gameFlow == null && m_server != null) m_gameFlow = m_server.GetComponent<BookServerGameFlow>();
+        if (m_server == null)
+            m_server = BookNetworkServer.Instance;
+        if (m_gameFlow == null && m_server != null)
+            m_gameFlow = m_server.GetComponent<BookServerGameFlow>();
         m_font = Font.CreateDynamicFontFromOSFont(new[] { "Yu Gothic", "Meiryo", "Arial" }, 24);
         var canvasObject = new GameObject("Server Lobby Canvas", typeof(RectTransform), typeof(Canvas),
             typeof(CanvasScaler), typeof(GraphicRaycaster));
@@ -57,6 +61,7 @@ public sealed class BookServerLobbyUI : MonoBehaviour
         }
     }
 
+
     private Text CreateLabel(Transform parent, string value, float y, int size)
     {
         var labelObject = new GameObject("Label", typeof(RectTransform), typeof(Text));
@@ -75,9 +80,11 @@ public sealed class BookServerLobbyUI : MonoBehaviour
         return label;
     }
 
+
     private void Update()
     {
-        if (m_startButton == null) return;
+        if (m_startButton == null)
+            return;
         UpdatePlayer(m_player1, PLAYER_SLOT.PLAYER1, "Player 1");
         UpdatePlayer(m_player2, PLAYER_SLOT.PLAYER2, "Player 2");
         m_startButton.interactable = m_gameFlow != null && m_gameFlow.CanStart;
@@ -86,6 +93,7 @@ public sealed class BookServerLobbyUI : MonoBehaviour
             "タブレットを接続してください。1台の登録完了で開始できます。";
     }
 
+
     private void UpdatePlayer(Text label, PLAYER_SLOT slot, string name)
     {
         bool connected = m_server != null && m_server.IsPlayerConnected(slot);
@@ -93,6 +101,16 @@ public sealed class BookServerLobbyUI : MonoBehaviour
         label.color = connected ? new Color(0.4f, 0.95f, 0.65f) : new Color(0.65f, 0.68f, 0.75f);
     }
 
-    private void OnStartPressed() { if (m_gameFlow != null) m_gameFlow.StartGame(); }
-    private void OnDestroy() { if (m_font != null) Destroy(m_font); }
+
+    private void OnStartPressed()
+    {
+        if (m_gameFlow != null)
+            m_gameFlow.StartGame();
+    }
+
+    private void OnDestroy()
+    {
+        if (m_font != null)
+            Destroy(m_font);
+    }
 }

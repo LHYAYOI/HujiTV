@@ -7,16 +7,22 @@ namespace PhysicalMonster.YasudaHaruto
     {
         private const int StrandCount = 32;
         private const int PointCount = 18;
-
-        [SerializeField] private Shader m_strandShader;
-        [SerializeField] private bool m_playOnEnable = true;
-        [SerializeField] private bool m_destroyOnFinish = true;
-        [SerializeField, Min(0.1f)] private float m_distance = 8f;
-        [SerializeField, Min(0f)] private float m_spread = 2.1f;
-        [SerializeField, Min(0.05f)] private float m_travelTime = 0.26f;
-        [SerializeField, Min(0.05f)] private float m_fadeTime = 0.36f;
-        [SerializeField] private Color m_color = new Color(0.3f, 0.88f, 0.76f, 0.78f);
-
+        [SerializeField]
+        private Shader m_strandShader;
+        [SerializeField]
+        private bool m_playOnEnable = true;
+        [SerializeField]
+        private bool m_destroyOnFinish = true;
+        [SerializeField, Min(0.1f)]
+        private float m_distance = 8f;
+        [SerializeField, Min(0f)]
+        private float m_spread = 2.1f;
+        [SerializeField, Min(0.05f)]
+        private float m_travelTime = 0.26f;
+        [SerializeField, Min(0.05f)]
+        private float m_fadeTime = 0.36f;
+        [SerializeField]
+        private Color m_color = new Color(0.3f, 0.88f, 0.76f, 0.78f);
         private readonly LineRenderer[] m_strands = new LineRenderer[StrandCount];
         private readonly Vector3[] m_points = new Vector3[PointCount];
         private Material m_material;
@@ -29,25 +35,24 @@ namespace PhysicalMonster.YasudaHaruto
                 Play();
         }
 
+
         // Forward (+Z) points from the mouth toward the attack.
         public void Play()
         {
             if (!isActiveAndEnabled || m_strandShader == null)
                 return;
-
             if (m_material == null)
                 CreateStrands();
-
             m_elapsed = 0f;
             m_playing = true;
             Draw();
         }
 
+
         private void LateUpdate()
         {
             if (!m_playing)
                 return;
-
             m_elapsed += Time.deltaTime;
             if (m_elapsed >= m_travelTime + m_fadeTime)
             {
@@ -60,9 +65,13 @@ namespace PhysicalMonster.YasudaHaruto
             Draw();
         }
 
+
         private void CreateStrands()
         {
-            m_material = new Material(m_strandShader) { hideFlags = HideFlags.DontSave };
+            m_material = new Material(m_strandShader)
+            {
+                hideFlags = HideFlags.DontSave
+            };
             for (int index = 0; index < StrandCount; index++)
             {
                 var strandObject = new GameObject("Silk Strand");
@@ -80,6 +89,7 @@ namespace PhysicalMonster.YasudaHaruto
             }
         }
 
+
         private void Draw()
         {
             float fade = Mathf.Clamp01((m_elapsed - m_travelTime) / m_fadeTime);
@@ -92,22 +102,17 @@ namespace PhysicalMonster.YasudaHaruto
                 strand.enabled = head > tail;
                 if (!strand.enabled)
                     continue;
-
                 float angle = Sample(index, 7) * 2f * Mathf.PI;
                 float radius = Mathf.Sqrt(Sample(index, 11)) * m_spread;
                 var offset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle) * 0.48f, 0f) * radius;
                 float reach = m_distance * Mathf.Lerp(0.72f, 1f, Sample(index, 23));
                 float phase = angle + Sample(index, 31) * 4f;
-
                 for (int point = 0; point < PointCount; point++)
                 {
                     float t = Mathf.Lerp(tail, head, point / (PointCount - 1f));
                     float wave = t * radius * 0.24f;
                     float ripple = t * 15f - m_elapsed * 19f + phase;
-                    m_points[point] = offset * (t * t) + new Vector3(
-                        Mathf.Sin(ripple) * wave,
-                        Mathf.Cos(ripple * 0.77f) * wave - t * t * 0.24f,
-                        reach * t);
+                    m_points[point] = offset * (t * t) + new Vector3(Mathf.Sin(ripple) * wave, Mathf.Cos(ripple * 0.77f) * wave - t * t * 0.24f, reach * t);
                 }
 
                 strand.SetPositions(m_points);
@@ -119,15 +124,18 @@ namespace PhysicalMonster.YasudaHaruto
             }
         }
 
+
         private static float Sample(int index, int seed)
         {
             return Mathf.Repeat(Mathf.Sin(index * 71.17f + seed * 19.71f) * 4375.29f, 1f);
         }
 
+
         private void OnDisable()
         {
             Hide();
         }
+
 
         private void Hide()
         {
@@ -138,6 +146,7 @@ namespace PhysicalMonster.YasudaHaruto
                     strand.enabled = false;
             }
         }
+
 
         private void OnDestroy()
         {
