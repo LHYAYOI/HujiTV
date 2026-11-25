@@ -1,5 +1,40 @@
 # Project Status
 
+## ノートPCへの引き継ぎ（2026-11-26）
+
+- 本編への統合前に [PAGE_PICKUP_INTEGRATION.md](PAGE_PICKUP_INTEGRATION.md) の「ノートPCで作業を再開する」「本編シーンへ反映するときの確認順」を参照。Git fetch後、MS-166/Feature/GetPageと追跡先は0/0。ページ取得の資産は作業ツリーにあり、ノートPCへ移す際はシーン・コード・Page素材と.metaを含める。今回の変更は資料のみ。
+
+## ページ確認シーンをAlphaの一人称プレイへ差し替え（2026-11-26）
+
+- 前回のPagePickupDemoのパスとGUIDを使い、Main_Game_Scene_Alpha_PageRewardsの作業ツリーを複製して差し替え。Alphaのマップ・トロッコ・一人称カメラ・敵・戦闘停止・戦闘再開・魔法弾を流用。複製元および共有Sceneを編集せず、Git fetch後のブランチと追跡先は0/0。
+- 確認シーンのSpaceボタンはMagicBulletManagerの既存弾を近いミニお化けへ発射。Fは走行中に寝室出口手前へ進む確認用操作。報酬判定はPageRewardBattleおよびRoutePageRewardsを使用。到着したページIDを左上に表示。
+- 確認シーンだけFPSCameraの高さをPrefab標準の0.273mにし、置きページを廊下約5mの位置に設定。紙面が画面に収まるよう到着点と明るさを調整。接近判定は車両位置、飛行の到着点はカメラ前方。ページ落下の時間とローカル表示は確認シーンの設定。本編側の既定値は以前の動作を維持。PAGE_PICKUP_INTEGRATION.mdを新しい構成へ更新。
+- 親Prefabで命中受信が欠けていたB/Cは、MiniGhostB/C_PageRewardsを親にしたPagePickupDemo専用VariantへHitReceiverControllerを追加し、OnMiniGhostHitにつないだ。Play Modeで既存魔法弾を発射して2戦をクリアし、寝室から廊下へ走行してID 3→6→1を取得。別試行でFからID 1のみの取得を確認。一人称Gameビューで撃破後の紙、廊下の置きページ、開きながらの回収を確認。
+
+## ページの落下と道中回収を確認する専用デモ（2026-11-26）
+
+- Main_Game_Scene_AlphaとMain_Game_Scene_Alpha_PageRewardsのScene資産を編集せず、Scenes/PagePickupDemo.unityを追加。ミニお化けAへの練習弾と門を通過するトロッコを別々に操作できる。撃破報酬ID 3と道中ID 1を取得すると画面に表示。
+- RoutePageRewardsの共通飛行を使用。デモ専用設定で紙を拡大し、固定カメラに向け、敵の位置から落下して一拍置く。PageArrivedでローカル表示する。本編のDropの即時飛行とBookNetworkServerへの送信は既定値で維持。
+- 作業手順、落下と近接判定、検証用設定、本編のInspector参照とID登録をPAGE_PICKUP_INTEGRATION.mdに記載。Git fetch後のブランチと追跡先は0/0。前回分の未コミット資産と既存のhatake差分を保持。
+- Unity Play Modeで練習弾から敵の死亡、モデルの関節変化、ID 3の到着、門通過後のID 1の到着を確認。敵を生存させた別試行でもID 1を取得。Gameビューの紙面と2つの取得表示を画像で確認。
+
+## Alpha複製へのページ報酬統合（2026-11-26）
+
+- MS-166/Feature/GetPageのd28539aを基点に、Assets/Main/Main_Game_Scene_Alpha.unityを担当Scenes/Main_Game_Scene_Alpha_PageRewards.unityに複製。複製側で旧形式の敵出現設定を現行のBattleData／EnemySpawnManagerへ移し、開始地点を寝室レールの21.7mに設定。各戦の停止と開始を同じイベントにまとめ、ボス戦後は廊下の停止点から再開する。
+- 初期ページはBookSceneのID 2（落とす）と5（ボールを投げる）。複製シーンでは寝室レールから廊下へ移った直後にID 1（閉める）、ミニお化け1戦目の1体撃破でID 3（火をつける）、2戦目の3体全滅でID 6（枕を投げる）、マエストロ撃破でID 4（バリアを張る）。最後に撃破された敵の位置から1枚だけ出す。
+- Assets/pageのモデル・テクスチャ・Take 001を使用。道中は1.4m以内への接近で開始。1.3秒の開きながらの直進と0.5秒の上下1周期の後にトロッコへ到着し、既存の獲得通信と本のID順挿入・自動めくり・金色演出につなぐ。
+- MiniGhostB/Cの専用Prefab Variantで、元Prefabの死亡パーティクル位置参照漏れを修正。原本はAssets/WatanabeKaito/Prefabs/Enemy/MiniGhost/MiniGhostB.prefabとMiniGhostC.prefab。両 Variant はParticleOffsetTransformの追加・割り当てのみ。コピー元Scene、共有設定、他担当資産への変更なし。
+- Unity 6000.3.23f1のPlay Modeで寝室から走行し、撃破処理を検証コードから起動。2戦目の1体だけでは報酬なし、全滅後に報酬あり、道中取得とマエストロ後の走行再開、両プレイヤー枠への実ローカルUDP送信（3→6→1→4、全て演出あり）を確認。別試行で1戦目が時間切れでも報酬が出ず、2戦目へ進むことを確認。タブレット実機2台は未検証。
+
+- BookSceneに残っていたPageDatabaseの参照GUIDでBookPageDatabaseを復旧し、既存ID 1〜7を登録。BookSceneのローカルUDP検証で初期一覧2・5、ID 3の一度だけの挿入、一覧2・3・5とID 3への自動めくりを確認。既存の獲得演出を使用。
+
+## Pageモデルによるページ取得の事前調査（2026-11-25）
+
+- 既存BattlePageDropsは敵ID→PageId、仮の泡の着地／回収、到着時のAcquirePageForBothを実装。保存済みScene／Prefabや実戦からの接続は見つからず、検証メニューからの呼び出しを確認。敵／群れの撃破確定と道中の近接取得に共通の飛行演出が必要。
+- Assets/pageにpage_mdl.fbx、page_anim.fbx、page_base.pngあり。Prefab等からのGUID参照は見つからず。Unity上のクリップ再生とトロッコへの飛行は未検証。
+- 既存の獲得通信とBookInventoryのID順挿入、対象見開きへの移動・獲得演出を再利用できる見込み。対象Sceneとページ割当、群れの全滅判定、追加演出の詳細は確認待ち。
+- Git fetch後、MS-166/Feature/GetPageと追跡先の差分は0/0。Assets/page一式は未追跡、hatakeのnumber.png.metaに既存差分あり。今回は静的調査と本記録のみ更新。
+
 ## フォルダ整理：未使用12資産を復元可能な状態で隔離（2026-11-25）
 
 - ユーザー指定：現状をほぼ完成とし、ジェットコースター以外も含め担当フォルダ内の未使用物を整理。対象はAssets/YasudaHarutoのみ。他担当・共有設定・既存差分は維持。
