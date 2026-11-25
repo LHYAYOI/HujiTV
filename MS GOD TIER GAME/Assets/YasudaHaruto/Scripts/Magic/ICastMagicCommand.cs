@@ -6,5 +6,6 @@
 //-----------------------------------------------
 public interface ICastMagicCommand
 {
+
     void Execute(MAGIC_CAST_DIRECTION direction);
 }

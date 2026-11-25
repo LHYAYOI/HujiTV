@@ -1,34 +1,41 @@
-
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "MagicData", menuName = "Book/Magic Data")]
 public class MagicData : ScriptableObject
 {
-    [SerializeField] private byte m_magicId;
-
-    [SerializeField] private string m_displayName;
-
-    [SerializeField] private MAGIC_TYPE m_magicType;
-
-    [SerializeField] private EVENT_MAGIC_TYPE m_eventMagicType = EVENT_MAGIC_TYPE.NONE;
-
-    [SerializeField] private MAGIC_AIM_TYPE m_aimType = MAGIC_AIM_TYPE.THREE_DIRECTIONS;
-
+    [SerializeField]
+    private byte m_magicId;
+    [SerializeField]
+    private string m_displayName;
+    [SerializeField]
+    private MAGIC_TYPE m_magicType;
+    [SerializeField]
+    private EVENT_MAGIC_TYPE m_eventMagicType = EVENT_MAGIC_TYPE.NONE;
+    [SerializeField]
+    private MAGIC_AIM_TYPE m_aimType = MAGIC_AIM_TYPE.THREE_DIRECTIONS;
     [Tooltip("Projectile flies from the book; Instant activates the rune in place.")]
-    [SerializeField] private MAGIC_CAST_TYPE m_castType = MAGIC_CAST_TYPE.PROJECTILE;
-
+    [SerializeField]
+    private MAGIC_CAST_TYPE m_castType = MAGIC_CAST_TYPE.PROJECTILE;
     [Tooltip("INSTANTで生成・実行する魔法のPrefab。InstantMagicBaseを継承したコンポーネントを設定します。")]
-    [SerializeField] private InstantMagicBase m_instantMagicPrefab;
-
+    [SerializeField]
+    private InstantMagicBase m_instantMagicPrefab;
     [Tooltip("着弾時に表示する固定ルーン画像。未設定の場合はルーン画像の演出を省略します。")]
-    [SerializeField] private Sprite m_impactRuneTexture;
+    [SerializeField]
+    private Sprite m_impactRuneTexture;
 
     public byte MagicId => m_magicId;
+
     public string DisplayName => m_displayName;
+
     public MAGIC_TYPE MagicType => m_magicType;
+
     public EVENT_MAGIC_TYPE EventMagicType => m_eventMagicType;
+
     public MAGIC_AIM_TYPE AimType => m_aimType;
+
     public MAGIC_CAST_TYPE CastType => m_castType;
+
     public InstantMagicBase InstantMagicPrefab => m_instantMagicPrefab;
+
     public Sprite ImpactRuneTexture => m_impactRuneTexture;
 }

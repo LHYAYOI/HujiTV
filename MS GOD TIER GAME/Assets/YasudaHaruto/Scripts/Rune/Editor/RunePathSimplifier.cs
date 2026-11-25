@@ -9,6 +9,7 @@ using UnityEngine;
 
 public static class RunePathSimplifier
 {
+
     // RDP法を使用してパスを簡略化するメソッド
     public static List<Vector2> Simplify(
         IReadOnlyList<Vector2> points,
@@ -39,6 +40,7 @@ public static class RunePathSimplifier
 
         return result;
     }
+
 
     private static void SimplifyRecursive(
         IReadOnlyList<Vector2> points,
@@ -98,6 +100,7 @@ public static class RunePathSimplifier
             result.Add(start);
         }
     }
+
 
     // 点と線分の最短距離を求めるメソッド
     private static float DistanceToSegment(

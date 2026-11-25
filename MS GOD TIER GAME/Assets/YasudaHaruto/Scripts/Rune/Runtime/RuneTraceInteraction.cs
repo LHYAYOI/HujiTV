@@ -15,7 +15,9 @@ public class RuneTraceInteraction : IPageInteraction
     private readonly ICastMagicCommand m_successCommand;
     private float m_cooldownUntil;
 
+
     public bool IsActive => m_runeTraceController.IsTracing;
+
 
     public RuneTraceInteraction(RuneData runeData, RuneTraceController runeTraceController, BookInputController inputController, ICastMagicCommand successCommand, MAGIC_AIM_TYPE aimType)
     {
@@ -26,6 +28,7 @@ public class RuneTraceInteraction : IPageInteraction
         m_aimType = aimType;
     }
 
+
     public void Begin()
     {
         m_runeTraceController.CastConfirmed += OnCastConfirmed;
@@ -33,6 +36,7 @@ public class RuneTraceInteraction : IPageInteraction
         m_runeTraceController.BeginTrace(m_runeData, m_aimType);
         m_runeTraceController.ResumeCooldown(m_cooldownUntil - Time.time);
     }
+
 
     public void End()
     {
@@ -47,10 +51,12 @@ public class RuneTraceInteraction : IPageInteraction
             m_inputController.EndRuneTrace();
     }
 
+
     private void OnCastConfirmed(MAGIC_CAST_DIRECTION direction)
     {
         m_successCommand?.Execute(direction);
     }
+
 
     private void OnTraceFailed(RuneTraceResult result)
     {

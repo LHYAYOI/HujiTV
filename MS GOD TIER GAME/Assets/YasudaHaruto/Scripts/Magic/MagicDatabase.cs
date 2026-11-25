@@ -13,6 +13,7 @@ public class MagicDatabase : ScriptableObject
 {
     [SerializeField] private List<MagicData> m_magicList = new();
 
+
     public MagicData Find(byte magicId)
     {
         return m_magicList.Find(magic => magic.MagicId == magicId);

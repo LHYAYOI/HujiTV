@@ -8,6 +8,7 @@ using UnityEngine;
 
 public static class RuneImagePreprocessor
 {
+
     /// <summary>
     /// Texture2D‚ğ“ñ’l‰æ‘œ‚É•ÏŠ·‚·‚é
     /// true  = ƒ‹[ƒ“•”•ª

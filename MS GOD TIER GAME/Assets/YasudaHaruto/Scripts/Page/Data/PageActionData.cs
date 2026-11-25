@@ -23,6 +23,8 @@ public class PageActionData
     [SerializeField]
     private MagicData m_magicData;
 
+
     public PAGE_ACTION_TYPE Type => m_type;
+
     public MagicData MagicData => m_magicData;
 }

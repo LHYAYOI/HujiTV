@@ -7,5 +7,6 @@
 
 public interface IPageCommand
 {
+
     void Execute();
 }

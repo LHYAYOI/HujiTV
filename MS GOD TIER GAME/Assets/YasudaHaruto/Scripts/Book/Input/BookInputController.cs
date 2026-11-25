@@ -9,16 +9,21 @@ public class BookInputController
 {
     private BOOK_INPUT_STATE m_state = BOOK_INPUT_STATE.NORMAL;
 
+
     public BOOK_INPUT_STATE State => m_state;
+
 
     public bool CanNavigatePage => m_state == BOOK_INPUT_STATE.NORMAL;
 
+
     public bool CanTraceRune => m_state == BOOK_INPUT_STATE.RUNE_TRACING;
+
 
     public void BeginRuneTrace()
     {
         m_state = BOOK_INPUT_STATE.RUNE_TRACING;
     }
+
 
     public void EndRuneTrace()
     {
@@ -30,10 +35,12 @@ public class BookInputController
         m_state = BOOK_INPUT_STATE.NORMAL;
     }
 
+
     public void BeginPageTransition()
     {
         m_state = BOOK_INPUT_STATE.PAGE_TRANSITION;
     }
+
 
     public void EndPageTransition()
     {
@@ -45,10 +52,12 @@ public class BookInputController
         m_state = BOOK_INPUT_STATE.NORMAL;
     }
 
+
     public void Disable()
     {
         m_state = BOOK_INPUT_STATE.DISABLED;
     }
+
 
     public void Enable()
     {

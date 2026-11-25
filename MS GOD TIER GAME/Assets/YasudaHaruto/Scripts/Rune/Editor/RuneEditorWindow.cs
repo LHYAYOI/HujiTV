@@ -15,20 +15,27 @@ public partial class RuneEditorWindow : EditorWindow
     private readonly List<Vector2> m_currentStroke = new();
 
     private bool m_isDrawing;
-    private enum CANVAS_TOOL { DRAW, SELECT, POINTS }
+    private enum CANVAS_TOOL
+    {
+        DRAW, SELECT, POINTS
+    }
     private CANVAS_TOOL m_canvasTool;
     private bool m_showSourceImage = true;
     private float m_sourceImageOpacity = 0.3f;
     private bool m_showImportedPreview = true;
     private int m_canvasControlId;
 
+
     private void OnEnable() => Undo.undoRedoPerformed += OnUndoRedo;
+
     private void OnDisable()
     {
         Undo.undoRedoPerformed -= OnUndoRedo;
         CancelCanvasInput();
     }
+
     private void OnLostFocus() => CancelCanvasInput();
+
     private void OnUndoRedo()
     {
         CancelCanvasInput();
@@ -37,6 +44,7 @@ public partial class RuneEditorWindow : EditorWindow
         ResetTest();
         Repaint();
     }
+
     private void CancelCanvasInput()
     {
         if (m_canvasControlId != 0 && GUIUtility.hotControl == m_canvasControlId)
@@ -125,11 +133,13 @@ public partial class RuneEditorWindow : EditorWindow
 
     private const float TEST_SAMPLE_INTERVAL = 0.005f;
 
+
     [MenuItem("Tools/Rune Editor")]
     public static void Open()
     {
         GetWindow<RuneEditorWindow>("Rune Editor");
     }
+
 
 
     private void OnGUI()
@@ -190,6 +200,7 @@ public partial class RuneEditorWindow : EditorWindow
     }
 
 
+
     private void DrawRuneSelector()
     {
         // RuneDataの選択フィールドを描画し、変更があった場合にm_runeDataを更新する
@@ -210,6 +221,7 @@ public partial class RuneEditorWindow : EditorWindow
             ResetTest();
         }
     }
+
 
 
     private void DrawToolbar()
@@ -239,6 +251,7 @@ public partial class RuneEditorWindow : EditorWindow
         EditorGUILayout.EndHorizontal();
     }
 
+
     private void DrawDisplaySettings()
     {
         EditorGUILayout.Space(5);
@@ -247,6 +260,7 @@ public partial class RuneEditorWindow : EditorWindow
         m_lineWidth = EditorGUILayout.Slider("Line Width", m_lineWidth, MIN_LINE_WIDTH, MAX_LINE_WIDTH);
         m_showStrokeGuide = EditorGUILayout.Toggle("Show Stroke Guide", m_showStrokeGuide);
     }
+
 
 
     private void DrawCanvas()
@@ -278,7 +292,8 @@ public partial class RuneEditorWindow : EditorWindow
             DrawSkeletonPreview();
         }
 
-        if (m_showImportedPreview) DrawImportedStrokes();
+        if (m_showImportedPreview)
+            DrawImportedStrokes();
 
         DrawPointGrid();
         DrawSavedStrokes();
@@ -290,6 +305,7 @@ public partial class RuneEditorWindow : EditorWindow
         DrawStrokeGuides(m_runeData.AuthoringData.Strokes);
         DrawPointHandles();
     }
+
 
 
     private void DrawSavedStrokes()
@@ -305,6 +321,7 @@ public partial class RuneEditorWindow : EditorWindow
         for (int i = 0; i < strokes.Count; i++)
             DrawStroke(strokes[i].Points, i == m_selectedStrokeIndex ? Color.cyan : Color.white);
     }
+
 
     private void DrawBakedPoints()
     {
@@ -340,10 +357,12 @@ public partial class RuneEditorWindow : EditorWindow
         Handles.EndGUI();
     }
 
+
     private void DrawCurrentStroke()
     {
         DrawStroke(m_currentStroke, Color.yellow);
     }
+
 
 
     private void DrawStroke(
@@ -374,21 +393,31 @@ public partial class RuneEditorWindow : EditorWindow
         Handles.EndGUI();
     }
 
+
     private void DrawCanvasTools()
     {
         EditorGUILayout.LabelField("Canvas Editing", EditorStyles.boldLabel);
         var tool = (CANVAS_TOOL)GUILayout.Toolbar((int)m_canvasTool, new[] { "Draw", "Select / Delete", "Points" });
-        if (tool != m_canvasTool) { CancelCanvasInput(); m_canvasTool = tool; m_placingPoints = false; }
-        if (m_canvasTool == CANVAS_TOOL.POINTS) DrawPointToolbar();
+        if (tool != m_canvasTool)
+        {
+            CancelCanvasInput();
+            m_canvasTool = tool;
+            m_placingPoints = false;
+        }
+        if (m_canvasTool == CANVAS_TOOL.POINTS)
+            DrawPointToolbar();
         m_showSourceImage = EditorGUILayout.Toggle("Show Source Image", m_showSourceImage);
         m_sourceImageOpacity = EditorGUILayout.Slider("Source Opacity", m_sourceImageOpacity, 0f, 1f);
         m_showImportedPreview = EditorGUILayout.Toggle("Show Import Preview", m_showImportedPreview);
-        if (m_canvasTool != CANVAS_TOOL.POINTS) EditorGUILayout.HelpBox(m_canvasTool == CANVAS_TOOL.DRAW
+        if (m_canvasTool != CANVAS_TOOL.POINTS)
+            EditorGUILayout.HelpBox(m_canvasTool == CANVAS_TOOL.DRAW
             ? "Draw over the source image. Each drag adds one stroke. Bake after editing."
             : "Click a saved stroke to select it (cyan). Delete removes it; Ctrl+Z restores it. Apply an import before editing its strokes.", MessageType.Info);
         using (new EditorGUI.DisabledScope(m_selectedStrokeIndex < 0 || m_selectedStrokeIndex >= m_runeData.AuthoringData.Strokes.Count))
-            if (GUILayout.Button("Delete Selected Stroke")) DeleteSelectedStroke();
+            if (GUILayout.Button("Delete Selected Stroke"))
+                DeleteSelectedStroke();
     }
+
 
     private void DeleteSelectedStroke()
     {
@@ -396,7 +425,8 @@ public partial class RuneEditorWindow : EditorWindow
         EditStroke(() =>
         {
             var strokes = new List<RuneStrokeData>(m_runeData.AuthoringData.Strokes);
-            if (index < 0 || index >= strokes.Count) return false;
+            if (index < 0 || index >= strokes.Count)
+                return false;
             strokes.RemoveAt(index);
             m_runeData.AuthoringData.SetStrokes(strokes);
             return true;
@@ -404,6 +434,7 @@ public partial class RuneEditorWindow : EditorWindow
         m_selectedStrokeIndex = -1;
         m_mergeTargetIndex = -1;
     }
+
 
     private int FindStroke(Vector2 position)
     {
@@ -420,7 +451,8 @@ public partial class RuneEditorWindow : EditorWindow
                 Vector2 segment = b - a;
                 float t = segment.sqrMagnitude > 0f ? Mathf.Clamp01(Vector2.Dot(position - a, segment) / segment.sqrMagnitude) : 0f;
                 float distance = Vector2.Distance(position, a + t * segment);
-                if (distance >= nearest) continue;
+                if (distance >= nearest)
+                    continue;
                 nearest = distance;
                 selected = i;
             }
@@ -428,15 +460,29 @@ public partial class RuneEditorWindow : EditorWindow
         return selected;
     }
 
+
     private void HandleDrawingInput()
     {
         Event e = Event.current;
-        if (m_canvasTool == CANVAS_TOOL.POINTS) { HandlePointInput(e); return; }
+        if (m_canvasTool == CANVAS_TOOL.POINTS)
+        {
+            HandlePointInput(e);
+            return;
+        }
         if (e.type == EventType.KeyDown && GUIUtility.keyboardControl == m_canvasControlId)
         {
-            if (e.keyCode == KeyCode.Escape) { CancelCanvasInput(); e.Use(); return; }
+            if (e.keyCode == KeyCode.Escape)
+            {
+                CancelCanvasInput();
+                e.Use();
+                return;
+            }
             if (m_canvasTool == CANVAS_TOOL.SELECT && (e.keyCode == KeyCode.Delete || e.keyCode == KeyCode.Backspace))
-            { DeleteSelectedStroke(); e.Use(); return; }
+            {
+                DeleteSelectedStroke();
+                e.Use();
+                return;
+            }
         }
         if (e.type == EventType.MouseDown && e.button == 0 && m_drawingRect.Contains(e.mousePosition))
         {
@@ -461,7 +507,10 @@ public partial class RuneEditorWindow : EditorWindow
                 // End at the boundary instead of connecting across an excursion outside the canvas.
                 AddPoint(e.mousePosition);
                 if (!m_drawingRect.Contains(e.mousePosition))
-                { FinishStroke(); GUIUtility.hotControl = 0; }
+                {
+                    FinishStroke();
+                    GUIUtility.hotControl = 0;
+                }
                 e.Use();
             }
             else if (e.type == EventType.MouseUp && e.button == 0)
@@ -473,6 +522,7 @@ public partial class RuneEditorWindow : EditorWindow
             }
         }
     }
+
 
 
     private void StartStroke(Vector2 mousePosition)
@@ -488,12 +538,13 @@ public partial class RuneEditorWindow : EditorWindow
     }
 
 
+
     private void AddPoint(Vector2 mousePosition)
     {
         // マウス位置を正規化座標に変換する
         Vector2 normalizedPoint = CanvasToNormalized(mousePosition);
 
-        
+
         if (m_currentStroke.Count > 0)
         {// すでにストロークにポイントがある場合、最後のポイントとの距離を計算する
 
@@ -513,6 +564,7 @@ public partial class RuneEditorWindow : EditorWindow
         // エディタウィンドウを再描画する
         Repaint();
     }
+
 
 
     private void FinishStroke()
@@ -553,6 +605,7 @@ public partial class RuneEditorWindow : EditorWindow
     }
 
 
+
     private Vector2 CanvasToNormalized(Vector2 canvasPosition)
     {
         // 描画エリアの左上を原点とした正規化座標に変換する
@@ -564,6 +617,7 @@ public partial class RuneEditorWindow : EditorWindow
     }
 
 
+
     private Vector2 NormalizedToCanvas(Vector2 normalizedPosition)
     {
         // 正規化座標を描画エリアの左上を原点としたキャンバス座標に変換する
@@ -572,6 +626,7 @@ public partial class RuneEditorWindow : EditorWindow
 
         return new Vector2(x, y);
     }
+
 
 
     private void UndoLastStroke()
@@ -603,6 +658,7 @@ public partial class RuneEditorWindow : EditorWindow
     }
 
 
+
     private void ClearRune()
     {
         if (m_runeData == null)
@@ -631,9 +687,11 @@ public partial class RuneEditorWindow : EditorWindow
         Repaint();
     }
 
+
     private void BakeRune()
     {
-        if (m_canvasTool == CANVAS_TOOL.POINTS && m_currentStroke.Count >= 2) FinishPointStroke();
+        if (m_canvasTool == CANVAS_TOOL.POINTS && m_currentStroke.Count >= 2)
+            FinishPointStroke();
         if (m_runeData == null)
         {// RuneDataがnullの場合は処理を終了する
             return;
@@ -660,6 +718,7 @@ public partial class RuneEditorWindow : EditorWindow
         Debug.Log($"Rune Bake Complete : {m_runeData.name}");
     }
 
+
     private void DrawInfo()
     {
         EditorGUILayout.Space(5);
@@ -685,6 +744,7 @@ public partial class RuneEditorWindow : EditorWindow
         EditorGUILayout.LabelField($"Baked Points : {bakedPointCount}");
     }
 
+
     private void DrawModeSelector()
     {
         EDITOR_MODE newMode = (EDITOR_MODE)GUILayout.Toolbar((int)m_mode, new string[] { "Edit", "Test" });
@@ -701,10 +761,13 @@ public partial class RuneEditorWindow : EditorWindow
     }
 
 
+
     private void DrawTestToolbar()
     {
-        if (GUILayout.Button("Reset Test")) ResetTest();
+        if (GUILayout.Button("Reset Test"))
+            ResetTest();
     }
+
 
     private void DrawTestCanvas()
     {
@@ -723,6 +786,7 @@ public partial class RuneEditorWindow : EditorWindow
         DrawStrokeGuides(m_runeData.TraceData.Strokes);
     }
 
+
     private void DrawTestResult()
     {
         EditorGUILayout.Space(5);
@@ -737,6 +801,7 @@ public partial class RuneEditorWindow : EditorWindow
         else if (m_testState == TEST_TRACE_STATE.WAITING_RELEASE)
             EditorGUILayout.HelpBox("Stroke completed. Release to continue.", MessageType.Info);
     }
+
 
 
     private void DrawReferenceRune()
@@ -758,6 +823,7 @@ public partial class RuneEditorWindow : EditorWindow
 
         DrawCoverageDebug();
     }
+
 
     private void DrawCoverageDebug()
     {
@@ -785,6 +851,7 @@ public partial class RuneEditorWindow : EditorWindow
         }
     }
 
+
     private void DrawSegment(Vector2 start, Vector2 end, Color color)
     {
         Handles.BeginGUI();
@@ -792,7 +859,7 @@ public partial class RuneEditorWindow : EditorWindow
         Color previousColor = Handles.color;
         Handles.color = color;
 
-        Vector3[] points = {NormalizedToCanvas(start), NormalizedToCanvas(end) };
+        Vector3[] points = { NormalizedToCanvas(start), NormalizedToCanvas(end) };
 
         Handles.DrawAAPolyLine(m_lineWidth, points);
 
@@ -800,6 +867,7 @@ public partial class RuneEditorWindow : EditorWindow
 
         Handles.EndGUI();
     }
+
 
     private void DrawTestStrokes()
     {
@@ -815,6 +883,7 @@ public partial class RuneEditorWindow : EditorWindow
 
         DrawAccuracyDebug();
     }
+
 
     private void DrawAccuracyDebug()
     {
@@ -843,6 +912,7 @@ public partial class RuneEditorWindow : EditorWindow
     }
 
 
+
     private void HandleTestInput()
     {
         Event e = Event.current;
@@ -850,19 +920,22 @@ public partial class RuneEditorWindow : EditorWindow
         switch (e.type)
         {
             case EventType.MouseDown:
-                if (e.button != 0 || !m_drawingRect.Contains(e.mousePosition)) return;
+                if (e.button != 0 || !m_drawingRect.Contains(e.mousePosition))
+                    return;
                 StartTestStroke(e.mousePosition);
                 e.Use();
                 break;
 
             case EventType.MouseDrag:
-                if (e.button != 0 || !m_isTestDrawing) return;
+                if (e.button != 0 || !m_isTestDrawing)
+                    return;
                 AddTestPoint(e.mousePosition);
                 e.Use();
                 break;
 
             case EventType.MouseUp:
-                if (e.button != 0 || !m_isTestDrawing) return;
+                if (e.button != 0 || !m_isTestDrawing)
+                    return;
                 if (m_testState == TEST_TRACE_STATE.DRAWING)
                     AddTestPoint(e.mousePosition);
                 FinishTestStroke();
@@ -871,11 +944,15 @@ public partial class RuneEditorWindow : EditorWindow
         }
     }
 
+
     private void StartTestStroke(Vector2 mousePosition)
     {
-        if (m_testState == TEST_TRACE_STATE.SUCCESS) return;
-        if (m_testState == TEST_TRACE_STATE.FAILED) ResetTest();
-        if (m_testState != TEST_TRACE_STATE.WAITING_STROKE) return;
+        if (m_testState == TEST_TRACE_STATE.SUCCESS)
+            return;
+        if (m_testState == TEST_TRACE_STATE.FAILED)
+            ResetTest();
+        if (m_testState != TEST_TRACE_STATE.WAITING_STROKE)
+            return;
 
         IReadOnlyList<Vector2> points = m_runeData.TraceData.Strokes[m_testStrokeIndex].Points;
         RuneTraceRule rule = m_runeData.Rule;
@@ -901,14 +978,17 @@ public partial class RuneEditorWindow : EditorWindow
         Repaint();
     }
 
+
     private void AddTestPoint(Vector2 mousePosition)
     {
-        if (m_testState != TEST_TRACE_STATE.DRAWING) return;
+        if (m_testState != TEST_TRACE_STATE.DRAWING)
+            return;
 
         Vector2 position = CanvasToNormalized(mousePosition);
         Vector2 previous = m_testCurrentStroke[m_testCurrentStroke.Count - 1];
 
-        if (Vector2.Distance(previous, position) < MIN_POINT_DISTANCE) return;
+        if (Vector2.Distance(previous, position) < MIN_POINT_DISTANCE)
+            return;
 
         RUNE_REALTIME_RESULT result = m_testEvaluator.EvaluateSegment(previous, position);
 
@@ -931,6 +1011,7 @@ public partial class RuneEditorWindow : EditorWindow
 
         Repaint();
     }
+
 
     private void FinishTestStroke()
     {
@@ -958,6 +1039,7 @@ public partial class RuneEditorWindow : EditorWindow
     }
 
 
+
     private void EvaluateTest()
     {
         if (m_runeData == null)
@@ -969,6 +1051,7 @@ public partial class RuneEditorWindow : EditorWindow
 
         Repaint();
     }
+
     private void ResetTest()
     {
         m_testSession.Clear();
@@ -982,6 +1065,7 @@ public partial class RuneEditorWindow : EditorWindow
         Repaint();
     }
 
+
     private void ResetCurrentDrawing()
     {
         m_currentStroke.Clear();
@@ -990,6 +1074,7 @@ public partial class RuneEditorWindow : EditorWindow
         m_isDrawing = false;
         m_isTestDrawing = false;
     }
+
 
 
     private void DrawImageImportSettings()
@@ -1103,6 +1188,7 @@ public partial class RuneEditorWindow : EditorWindow
     }
 
 
+
     private void DrawStrokeEditor()
     {
         EditorGUILayout.Space(5);
@@ -1154,6 +1240,7 @@ public partial class RuneEditorWindow : EditorWindow
     }
 
 
+
     private void DrawStrokeOperations()
     {
         EditorGUILayout.Space(5);
@@ -1177,7 +1264,8 @@ public partial class RuneEditorWindow : EditorWindow
         m_selectedStrokeIndex = EditorGUILayout.Popup(
             "Selected Stroke", Mathf.Clamp(m_selectedStrokeIndex + 1, 0, count), options) - 1;
 
-        if (m_selectedStrokeIndex < 0) return;
+        if (m_selectedStrokeIndex < 0)
+            return;
 
         int pointCount = strokes[m_selectedStrokeIndex].Points.Count;
 
@@ -1239,18 +1327,21 @@ public partial class RuneEditorWindow : EditorWindow
         }
     }
 
+
     private bool CanMergeStrokes(int firstIndex, int secondIndex, float tolerance)
     {
         var strokes = m_runeData.AuthoringData.Strokes;
 
         if (firstIndex < 0 || firstIndex >= strokes.Count ||
             secondIndex < 0 || secondIndex >= strokes.Count ||
-            firstIndex == secondIndex) return false;
+            firstIndex == secondIndex)
+            return false;
 
         var a = strokes[firstIndex].Points;
         var b = strokes[secondIndex].Points;
 
-        if (a.Count < 2 || b.Count < 2) return false;
+        if (a.Count < 2 || b.Count < 2)
+            return false;
 
         float minDistance = Mathf.Min(
             Vector2.Distance(a[0], b[0]),
@@ -1260,6 +1351,7 @@ public partial class RuneEditorWindow : EditorWindow
 
         return minDistance <= tolerance;
     }
+
 
 
     private void DrawTraceRuleSettings()
@@ -1275,23 +1367,27 @@ public partial class RuneEditorWindow : EditorWindow
         float start = EditorGUILayout.FloatField("Start Tolerance", rule.StartTolerance);
         float end = EditorGUILayout.FloatField("End Tolerance", rule.EndTolerance);
 
-        if (!EditorGUI.EndChangeCheck()) return;
+        if (!EditorGUI.EndChangeCheck())
+            return;
 
         Undo.RecordObject(m_runeData, "Change Rune Trace Settings");
         rule.SetTolerances(distance, start, end);
         EditorUtility.SetDirty(m_runeData);
     }
 
+
     private void EditStroke(System.Func<bool> editAction)
     {
         Undo.RecordObject(m_runeData, "Edit Rune Stroke");
 
-        if (!editAction()) return;
+        if (!editAction())
+            return;
 
         m_runeData.TraceData.Clear();
         EditorUtility.SetDirty(m_runeData);
         Repaint();
     }
+
 
     private void AnalyzeRuneImage()
     {
@@ -1325,7 +1421,8 @@ public partial class RuneEditorWindow : EditorWindow
             float length = 0f;
             for (int i = 1; i < stroke.Points.Count; i++)
                 length += Vector2.Distance(stroke.Points[i - 1], stroke.Points[i]);
-            if (length < m_minImportedStrokeLength) continue;
+            if (length < m_minImportedStrokeLength)
+                continue;
 
             m_extractedPointCount += stroke.Points.Count;
 
@@ -1347,6 +1444,7 @@ public partial class RuneEditorWindow : EditorWindow
         m_showImportedPreview = true;
         Repaint();
     }
+
 
     private void DrawBinaryImagePreview()
     {
@@ -1383,6 +1481,7 @@ public partial class RuneEditorWindow : EditorWindow
         }
     }
 
+
     private void DrawSkeletonPreview()
     {
         if (m_skeletonRuneImage == null)
@@ -1416,6 +1515,7 @@ public partial class RuneEditorWindow : EditorWindow
         }
     }
 
+
     private void DrawImportedStrokes()
     {
         if (m_importedRuneStrokes == null)
@@ -1431,6 +1531,7 @@ public partial class RuneEditorWindow : EditorWindow
                 Color.magenta);
         }
     }
+
 
     private void ApplyImportedRune()
     {
@@ -1469,9 +1570,11 @@ public partial class RuneEditorWindow : EditorWindow
     }
 
 
+
     private void DrawStrokeGuides(IReadOnlyList<RuneStrokeData> strokes)
     {
-        if (!m_showStrokeGuide || strokes == null) return;
+        if (!m_showStrokeGuide || strokes == null)
+            return;
 
         Handles.BeginGUI();
         Color previousColor = Handles.color;
@@ -1479,7 +1582,8 @@ public partial class RuneEditorWindow : EditorWindow
         for (int i = 0; i < strokes.Count; i++)
         {
             IReadOnlyList<Vector2> points = strokes[i].Points;
-            if (points == null || points.Count < 2) continue;
+            if (points == null || points.Count < 2)
+                continue;
 
             Vector2 start = NormalizedToCanvas(points[0]);
             Vector2 end = NormalizedToCanvas(points[points.Count - 1]);
@@ -1500,16 +1604,19 @@ public partial class RuneEditorWindow : EditorWindow
         Handles.EndGUI();
     }
 
+
     private void DrawStrokeDirection(IReadOnlyList<Vector2> points)
     {
-        if (points.Count < 2) return;
+        if (points.Count < 2)
+            return;
 
         int index = Mathf.Max(0, (points.Count - 1) / 2);
         Vector2 start = NormalizedToCanvas(points[index]);
         Vector2 end = NormalizedToCanvas(points[index + 1]);
 
         Vector2 direction = (end - start).normalized;
-        if (direction.sqrMagnitude < 0.0001f) return;
+        if (direction.sqrMagnitude < 0.0001f)
+            return;
 
         Vector2 center = (start + end) * 0.5f;
         Vector2 tip = center + direction * 10f;

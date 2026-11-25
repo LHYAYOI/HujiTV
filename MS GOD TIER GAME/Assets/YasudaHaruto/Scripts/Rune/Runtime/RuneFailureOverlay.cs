@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // Lives outside the book capture Canvas so the shade covers the entire screen.
+/// <summary>入力失敗時のフィードバック表示を制御する。</summary>
 public sealed class RuneFailureOverlay : MonoBehaviour
 {
     private CanvasGroup m_group;
@@ -12,7 +13,9 @@ public sealed class RuneFailureOverlay : MonoBehaviour
     private float m_duration;
     private float m_scale;
 
+
     public bool IsVisible => m_remaining > 0f;
+
 
     public void Show(Func<Rect?> screenRect, float duration, float scale, Color shade,
         Color crossColor, Sprite crossSprite)
@@ -21,11 +24,13 @@ public sealed class RuneFailureOverlay : MonoBehaviour
         m_duration = Mathf.Max(0.05f, duration);
         m_remaining = m_duration;
         m_scale = Mathf.Max(0.1f, scale);
-        if (m_group == null) Build(shade, crossColor, crossSprite);
+        if (m_group == null)
+            Build(shade, crossColor, crossSprite);
         gameObject.SetActive(true);
         m_group.alpha = 1f;
         UpdatePosition();
     }
+
 
     private void Build(Color shade, Color crossColor, Sprite sprite)
     {
@@ -68,6 +73,7 @@ public sealed class RuneFailureOverlay : MonoBehaviour
         }
     }
 
+
     private static Image CreateImage(string name, Transform parent, Color color)
     {
         Image image = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image)).GetComponent<Image>();
@@ -76,11 +82,13 @@ public sealed class RuneFailureOverlay : MonoBehaviour
         return image;
     }
 
+
     private void UpdatePosition()
     {
         Rect? screenRect = m_screenRect?.Invoke();
         m_cross.gameObject.SetActive(screenRect.HasValue);
-        if (!screenRect.HasValue) return;
+        if (!screenRect.HasValue)
+            return;
         Rect rect = screenRect.Value;
         RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)transform,
             rect.center, null, out Vector2 local);
@@ -89,13 +97,19 @@ public sealed class RuneFailureOverlay : MonoBehaviour
         m_cross.sizeDelta = new Vector2(size, size);
     }
 
+
     private void LateUpdate()
     {
         m_remaining = Mathf.Max(0f, m_remaining - Time.unscaledDeltaTime);
-        if (m_remaining <= 0f) { Hide(); return; }
+        if (m_remaining <= 0f)
+        {
+            Hide();
+            return;
+        }
         m_group.alpha = Mathf.Clamp01(m_remaining / Mathf.Min(0.15f, m_duration));
         UpdatePosition();
     }
+
 
     public void Hide()
     {

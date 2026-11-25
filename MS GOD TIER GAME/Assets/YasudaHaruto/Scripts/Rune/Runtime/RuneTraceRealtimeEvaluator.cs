@@ -33,12 +33,21 @@ public class RuneTraceRealtimeEvaluator
     private bool m_isCompleted;
     private bool m_hasFailed;
 
-    public float NormalizedDeviation { get; private set; }
+
+    public float NormalizedDeviation
+    {
+        get; private set;
+    }
+
 
     public float Progress => m_pathLength > 0f ? Mathf.Clamp01(m_maxDistance / m_pathLength) : 0f;
+
     public float CurrentProgress => m_pathLength > 0f ? Mathf.Clamp01(m_currentDistance / m_pathLength) : 0f;
+
     public bool IsCompleted => m_isCompleted;
+
     public bool HasFailed => m_hasFailed;
+
 
     public RuneTraceRealtimeEvaluator(IReadOnlyList<Vector2> referencePoints, float distanceTolerance, float startTolerance, float endTolerance, float sampleInterval)
     {
@@ -52,6 +61,7 @@ public class RuneTraceRealtimeEvaluator
         m_endTolerance = Mathf.Max(0f, endTolerance);
         m_sampleInterval = Mathf.Max(0.0001f, sampleInterval);
     }
+
 
     // 開始位置を設定し、評価を開始する
     public bool Begin(Vector2 position)
@@ -77,6 +87,7 @@ public class RuneTraceRealtimeEvaluator
         m_hasStarted = true;
         return true;
     }
+
 
     // ルーンのトレースを評価する
     public RUNE_REALTIME_RESULT EvaluateSegment(Vector2 previous, Vector2 current)
@@ -146,6 +157,7 @@ public class RuneTraceRealtimeEvaluator
         return RUNE_REALTIME_RESULT.IN_PROGRESS;
     }
 
+
     // 評価をリセットする
     public void Reset()
     {
@@ -160,6 +172,7 @@ public class RuneTraceRealtimeEvaluator
         m_hasFailed = false;
     }
 
+
     // Advance only a contiguous route prefix inside the swept input capsule.
     // A capsule is convex, so a straight reference segment with both ends inside is covered.
     private void AdvanceCoverage(Vector2 previous, Vector2 current, float tolerance)
@@ -170,7 +183,8 @@ public class RuneTraceRealtimeEvaluator
             Vector2 start = m_referencePoints[m_coverageSegment];
             Vector2 end = m_referencePoints[m_coverageSegment + 1];
             Vector2 frontier = Vector2.Lerp(start, end, m_coverageFraction);
-            if (SquaredDistanceToSegment(frontier, previous, current) > radiusSquared) return;
+            if (SquaredDistanceToSegment(frontier, previous, current) > radiusSquared)
+                return;
             if (SquaredDistanceToSegment(end, previous, current) <= radiusSquared)
             {
                 m_coverageSegment++;
@@ -185,8 +199,10 @@ public class RuneTraceRealtimeEvaluator
             {
                 float middle = (low + high) * 0.5f;
                 Vector2 point = Vector2.Lerp(start, end, middle);
-                if (SquaredDistanceToSegment(point, previous, current) <= radiusSquared) low = middle;
-                else high = middle;
+                if (SquaredDistanceToSegment(point, previous, current) <= radiusSquared)
+                    low = middle;
+                else
+                    high = middle;
             }
             m_coverageFraction = low;
             m_coveredDistance = Mathf.Lerp(m_pathDistances[m_coverageSegment],
@@ -195,6 +211,7 @@ public class RuneTraceRealtimeEvaluator
         }
     }
 
+
     private static float SquaredDistanceToSegment(Vector2 point, Vector2 start, Vector2 end)
     {
         Vector2 direction = end - start;
@@ -202,6 +219,7 @@ public class RuneTraceRealtimeEvaluator
         float t = lengthSquared > 0f ? Mathf.Clamp01(Vector2.Dot(point - start, direction) / lengthSquared) : 0f;
         return (point - (start + t * direction)).sqrMagnitude;
     }
+
 
     // 評価が失敗した場合の処理
     private RUNE_REALTIME_RESULT Fail()

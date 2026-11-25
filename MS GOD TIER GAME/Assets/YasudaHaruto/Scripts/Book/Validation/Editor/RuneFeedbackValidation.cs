@@ -15,22 +15,44 @@ namespace YasudaHaruto.BookValidation.Editor
             public int Completions;
             public float Deviation;
             public float Cooldown;
+
             public void ShowCooldown(float remaining) => Cooldown = remaining;
-            public void BeginTrace(RuneData rune) { }
-            public void UpdateCurrentStroke(IReadOnlyList<Vector2> points) { }
-            public void EndStroke() { }
-            public void PlaySuccess(RuneTraceResult result) { }
+
+            public void BeginTrace(RuneData rune)
+            {
+            }
+
+            public void UpdateCurrentStroke(IReadOnlyList<Vector2> points)
+            {
+            }
+
+            public void EndStroke()
+            {
+            }
+
+            public void PlaySuccess(RuneTraceResult result)
+            {
+            }
+
             public void PlayFailure(RuneTraceResult result) => Failures++;
-            public void Clear() { }
+
+            public void Clear()
+            {
+            }
+
             public void SetTraceDeviation(float value) => Deviation = value;
+
             public void PlayCompletion() => Completions++;
         }
 
+
         private static void Require(bool condition, string message)
         {
-            if (!condition) throw new InvalidOperationException(message);
+            if (!condition)
+                throw new InvalidOperationException(message);
             Debug.Log("RuneFeedback PASS: " + message);
         }
+
 
         public static void Run()
         {
@@ -101,6 +123,7 @@ namespace YasudaHaruto.BookValidation.Editor
             Debug.Log("RuneFeedback COMPLETE");
         }
 
+
         private static void CheckCompletionTiming(Vector2 start, Vector2 end)
         {
             RuneData rune = ScriptableObject.CreateInstance<RuneData>();
@@ -130,6 +153,7 @@ namespace YasudaHaruto.BookValidation.Editor
             }
             finally { UnityEngine.Object.DestroyImmediate(rune); }
         }
+
 
         private static void CheckCastGuide(RuneData rune, Vector2 start, Vector2 end)
         {
@@ -213,6 +237,7 @@ namespace YasudaHaruto.BookValidation.Editor
                 UnityEngine.Object.DestroyImmediate(events);
             }
         }
+
 
         private static void CheckGraphics(RuneData rune)
         {
@@ -323,11 +348,14 @@ namespace YasudaHaruto.BookValidation.Editor
             }
             finally
             {
-                if (overlay != null) UnityEngine.Object.DestroyImmediate(overlay.gameObject);
-                if (completion != null) UnityEngine.Object.DestroyImmediate(completion.gameObject);
+                if (overlay != null)
+                    UnityEngine.Object.DestroyImmediate(overlay.gameObject);
+                if (completion != null)
+                    UnityEngine.Object.DestroyImmediate(completion.gameObject);
                 UnityEngine.Object.DestroyImmediate(root);
             }
         }
+
 
         private static void CheckPageImageBinding()
         {
@@ -360,6 +388,7 @@ namespace YasudaHaruto.BookValidation.Editor
             }
         }
 
+
         private static void CheckCanvasCooldown()
         {
             var scene = UnityEditor.SceneManagement.EditorSceneManager.NewPreviewScene();
@@ -376,11 +405,15 @@ namespace YasudaHaruto.BookValidation.Editor
                 camera.enabled = false;
                 camera.scene = scene;
                 camera.transform.position = new Vector3(0f, 0f, -10f);
-                camera.orthographic = true; camera.orthographicSize = 128f;
-                camera.clearFlags = CameraClearFlags.SolidColor; camera.backgroundColor = Color.black;
-                camera.targetTexture = texture; texture.Create();
+                camera.orthographic = true;
+                camera.orthographicSize = 128f;
+                camera.clearFlags = CameraClearFlags.SolidColor;
+                camera.backgroundColor = Color.black;
+                camera.targetTexture = texture;
+                texture.Create();
                 Canvas canvas = root.GetComponent<Canvas>();
-                canvas.renderMode = RenderMode.WorldSpace; canvas.worldCamera = camera;
+                canvas.renderMode = RenderMode.WorldSpace;
+                canvas.worldCamera = camera;
                 root.GetComponent<RectTransform>().sizeDelta = new Vector2(256f, 256f);
                 var image = new GameObject("Translated Scaled Rune", typeof(RectTransform), typeof(Image)).GetComponent<Image>();
                 image.transform.SetParent(root.transform, false);
@@ -390,19 +423,24 @@ namespace YasudaHaruto.BookValidation.Editor
                 image.rectTransform.localScale = new Vector3(1.2f, 0.8f, 1f);
                 var feedback = root.AddComponent<RuneCooldownImageFeedback>();
                 feedback.Show(image, false, 0.1f, 0.28f, 0.12f);
-                var corners = new Vector3[4]; image.rectTransform.GetWorldCorners(corners);
+                var corners = new Vector3[4];
+                image.rectTransform.GetWorldCorners(corners);
                 Vector3 bottom = camera.WorldToScreenPoint(corners[0]);
                 Vector3 top = camera.WorldToScreenPoint(corners[2]);
                 for (int step = 1; step <= 3; step++)
                 {
                     feedback.SetRemaining(1f - step * 0.25f);
-                    Canvas.ForceUpdateCanvases(); camera.Render();
+                    Canvas.ForceUpdateCanvases();
+                    camera.Render();
                     RenderTexture.active = texture;
-                    pixels.ReadPixels(new Rect(0, 0, 256, 256), 0, 0); pixels.Apply();
+                    pixels.ReadPixels(new Rect(0, 0, 256, 256), 0, 0);
+                    pixels.Apply();
                     int bright = 0;
                     int x = Mathf.RoundToInt((bottom.x + top.x) * 0.5f);
                     int first = Mathf.CeilToInt(bottom.y), last = Mathf.FloorToInt(top.y) - 1;
-                    for (int y = first; y <= last; y++) if (pixels.GetPixel(x, y).r > 0.8f) bright++;
+                    for (int y = first; y <= last; y++)
+                        if (pixels.GetPixel(x, y).r > 0.8f)
+                            bright++;
                     float actual = (float)bright / (last - first + 1);
                     Require(Mathf.Abs(actual - step * 0.25f) < 0.04f,
                         "Batched Canvas restores translated, scaled, top-pivot image at " + step + "/4; actual=" + actual);
@@ -413,10 +451,13 @@ namespace YasudaHaruto.BookValidation.Editor
             {
                 RenderTexture.active = previous;
                 camera.targetTexture = null;
-                texture.Release(); UnityEngine.Object.DestroyImmediate(texture); UnityEngine.Object.DestroyImmediate(pixels);
+                texture.Release();
+                UnityEngine.Object.DestroyImmediate(texture);
+                UnityEngine.Object.DestroyImmediate(pixels);
                 UnityEditor.SceneManagement.EditorSceneManager.ClosePreviewScene(scene);
             }
         }
+
 
         private static void CheckCooldownShader()
         {
@@ -436,36 +477,56 @@ namespace YasudaHaruto.BookValidation.Editor
                 material.SetFloat("_Darkness", 0.28f);
                 material.SetFloat("_Drain", 1f);
                 material.SetFloat("_Recovery", 0.5f);
-                GL.PushMatrix(); pushed = true;
+                GL.PushMatrix();
+                pushed = true;
                 GL.LoadOrtho();
                 material.SetPass(0);
-                GL.Begin(GL.QUADS); GL.Color(Color.white);
-                GL.MultiTexCoord2(0, 0f, 0f); GL.MultiTexCoord2(1, 0f, 0f); GL.Vertex3(0f, 0f, 0f);
-                GL.MultiTexCoord2(0, 0f, 1f); GL.MultiTexCoord2(1, 1f, 0f); GL.Vertex3(0f, 1f, 0f);
-                GL.MultiTexCoord2(0, 1f, 1f); GL.MultiTexCoord2(1, 1f, 0f); GL.Vertex3(1f, 1f, 0f);
-                GL.MultiTexCoord2(0, 1f, 0f); GL.MultiTexCoord2(1, 0f, 0f); GL.Vertex3(1f, 0f, 0f);
-                GL.End(); GL.PopMatrix(); pushed = false;
-                readback.ReadPixels(new Rect(0, 0, 32, 32), 0, 0); readback.Apply();
+                GL.Begin(GL.QUADS);
+                GL.Color(Color.white);
+                GL.MultiTexCoord2(0, 0f, 0f);
+                GL.MultiTexCoord2(1, 0f, 0f);
+                GL.Vertex3(0f, 0f, 0f);
+                GL.MultiTexCoord2(0, 0f, 1f);
+                GL.MultiTexCoord2(1, 1f, 0f);
+                GL.Vertex3(0f, 1f, 0f);
+                GL.MultiTexCoord2(0, 1f, 1f);
+                GL.MultiTexCoord2(1, 1f, 0f);
+                GL.Vertex3(1f, 1f, 0f);
+                GL.MultiTexCoord2(0, 1f, 0f);
+                GL.MultiTexCoord2(1, 0f, 0f);
+                GL.Vertex3(1f, 0f, 0f);
+                GL.End();
+                GL.PopMatrix();
+                pushed = false;
+                readback.ReadPixels(new Rect(0, 0, 32, 32), 0, 0);
+                readback.Apply();
                 Require(readback.GetPixel(16, 8).r > 0.9f && readback.GetPixel(16, 24).r < 0.65f,
                     "GPU output restores brightness from bottom while the top stays dark");
                 for (int step = 1; step <= 3; step++)
                 {
                     material.SetFloat("_Recovery", step * 0.25f);
                     DrawCooldownQuad(material);
-                    readback.ReadPixels(new Rect(0, 0, 32, 32), 0, 0); readback.Apply();
+                    readback.ReadPixels(new Rect(0, 0, 32, 32), 0, 0);
+                    readback.Apply();
                     int brightRows = 0;
-                    for (int row = 0; row < 32; row++) if (readback.GetPixel(16, row).r > 0.8f) brightRows++;
+                    for (int row = 0; row < 32; row++)
+                        if (readback.GetPixel(16, row).r > 0.8f)
+                            brightRows++;
                     Require(Mathf.Abs(brightRows - step * 8) <= 1,
                         "Equal time steps restore equal height: " + step + "/4");
                 }
                 var green = new Texture2D(1, 1);
                 try
                 {
-                    green.SetPixel(0, 0, new Color(0.2f, 0.6f, 0.1f, 1f)); green.Apply();
+                    green.SetPixel(0, 0, new Color(0.2f, 0.6f, 0.1f, 1f));
+                    green.Apply();
                     material.SetTexture("_MainTex", green);
-                    material.SetFloat("_Recovery", 0.5f); material.SetFloat("_Drain", 0.5f); material.SetFloat("_Flash", 0.65f);
+                    material.SetFloat("_Recovery", 0.5f);
+                    material.SetFloat("_Drain", 0.5f);
+                    material.SetFloat("_Flash", 0.65f);
                     DrawCooldownQuad(material);
-                    readback.ReadPixels(new Rect(0, 0, 32, 32), 0, 0); readback.Apply();
+                    readback.ReadPixels(new Rect(0, 0, 32, 32), 0, 0);
+                    readback.Apply();
                     Require(readback.GetPixel(16, 8).r < readback.GetPixel(16, 24).r - 0.1f,
                         "Release light no longer overlays the already recovered area: bottom=" + readback.GetPixel(16, 8) + ", top=" + readback.GetPixel(16, 24));
                 }
@@ -475,7 +536,8 @@ namespace YasudaHaruto.BookValidation.Editor
             }
             finally
             {
-                if (pushed) GL.PopMatrix();
+                if (pushed)
+                    GL.PopMatrix();
                 RenderTexture.active = previous;
                 texture.Release();
                 UnityEngine.Object.DestroyImmediate(texture);
@@ -484,18 +546,31 @@ namespace YasudaHaruto.BookValidation.Editor
             }
         }
 
+
         private static void DrawCooldownQuad(Material material)
         {
             GL.Clear(true, true, Color.black);
             GL.PushMatrix();
-            GL.LoadOrtho(); material.SetPass(0);
-            GL.Begin(GL.QUADS); GL.Color(Color.white);
-            GL.MultiTexCoord2(0, 0f, 0f); GL.MultiTexCoord2(1, 0f, 0f); GL.Vertex3(0f, 0f, 0f);
-            GL.MultiTexCoord2(0, 0f, 1f); GL.MultiTexCoord2(1, 1f, 0f); GL.Vertex3(0f, 1f, 0f);
-            GL.MultiTexCoord2(0, 1f, 1f); GL.MultiTexCoord2(1, 1f, 0f); GL.Vertex3(1f, 1f, 0f);
-            GL.MultiTexCoord2(0, 1f, 0f); GL.MultiTexCoord2(1, 0f, 0f); GL.Vertex3(1f, 0f, 0f);
-            GL.End(); GL.PopMatrix();
+            GL.LoadOrtho();
+            material.SetPass(0);
+            GL.Begin(GL.QUADS);
+            GL.Color(Color.white);
+            GL.MultiTexCoord2(0, 0f, 0f);
+            GL.MultiTexCoord2(1, 0f, 0f);
+            GL.Vertex3(0f, 0f, 0f);
+            GL.MultiTexCoord2(0, 0f, 1f);
+            GL.MultiTexCoord2(1, 1f, 0f);
+            GL.Vertex3(0f, 1f, 0f);
+            GL.MultiTexCoord2(0, 1f, 1f);
+            GL.MultiTexCoord2(1, 1f, 0f);
+            GL.Vertex3(1f, 1f, 0f);
+            GL.MultiTexCoord2(0, 1f, 0f);
+            GL.MultiTexCoord2(1, 0f, 0f);
+            GL.Vertex3(1f, 0f, 0f);
+            GL.End();
+            GL.PopMatrix();
         }
+
 
         private static void RenderCooldownPreview(Material material)
         {
@@ -504,7 +579,8 @@ namespace YasudaHaruto.BookValidation.Editor
             RenderTexture previous = RenderTexture.active;
             try
             {
-                target.Create(); RenderTexture.active = target;
+                target.Create();
+                RenderTexture.active = target;
                 GL.Clear(true, true, new Color(0.94f, 0.91f, 0.8f, 1f));
                 material.SetTexture("_MainTex", AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/YasudaHaruto/Data/Runes/Images/Runa_Clean.png"));
                 for (int i = 0; i < 5; i++)
@@ -513,25 +589,40 @@ namespace YasudaHaruto.BookValidation.Editor
                     material.SetFloat("_Recovery", i == 0 || i == 4 ? 1f : i == 3 ? 0.5f : 0f);
                     material.SetFloat("_Flash", i == 1 ? 0.65f : 0f);
                     GL.PushMatrix();
-                    GL.LoadOrtho(); material.SetPass(0);
-                    GL.Begin(GL.QUADS); GL.Color(Color.white);
+                    GL.LoadOrtho();
+                    material.SetPass(0);
+                    GL.Begin(GL.QUADS);
+                    GL.Color(Color.white);
                     float left = i / 5f, right = (i + 1) / 5f;
-                    GL.MultiTexCoord2(0, 0f, 0f); GL.MultiTexCoord2(1, 0f, 0f); GL.Vertex3(left, 0f, 0f);
-                    GL.MultiTexCoord2(0, 0f, 1f); GL.MultiTexCoord2(1, 1f, 0f); GL.Vertex3(left, 1f, 0f);
-                    GL.MultiTexCoord2(0, 1f, 1f); GL.MultiTexCoord2(1, 1f, 0f); GL.Vertex3(right, 1f, 0f);
-                    GL.MultiTexCoord2(0, 1f, 0f); GL.MultiTexCoord2(1, 0f, 0f); GL.Vertex3(right, 0f, 0f);
-                    GL.End(); GL.PopMatrix();
+                    GL.MultiTexCoord2(0, 0f, 0f);
+                    GL.MultiTexCoord2(1, 0f, 0f);
+                    GL.Vertex3(left, 0f, 0f);
+                    GL.MultiTexCoord2(0, 0f, 1f);
+                    GL.MultiTexCoord2(1, 1f, 0f);
+                    GL.Vertex3(left, 1f, 0f);
+                    GL.MultiTexCoord2(0, 1f, 1f);
+                    GL.MultiTexCoord2(1, 1f, 0f);
+                    GL.Vertex3(right, 1f, 0f);
+                    GL.MultiTexCoord2(0, 1f, 0f);
+                    GL.MultiTexCoord2(1, 0f, 0f);
+                    GL.Vertex3(right, 0f, 0f);
+                    GL.End();
+                    GL.PopMatrix();
                 }
-                pixels.ReadPixels(new Rect(0, 0, 1280, 256), 0, 0); pixels.Apply();
+                pixels.ReadPixels(new Rect(0, 0, 1280, 256), 0, 0);
+                pixels.Apply();
                 System.IO.Directory.CreateDirectory("Temp");
                 System.IO.File.WriteAllBytes("Temp/RuneCooldownPreview.png", pixels.EncodeToPNG());
             }
             finally
             {
                 RenderTexture.active = previous;
-                target.Release(); UnityEngine.Object.DestroyImmediate(target); UnityEngine.Object.DestroyImmediate(pixels);
+                target.Release();
+                UnityEngine.Object.DestroyImmediate(target);
+                UnityEngine.Object.DestroyImmediate(pixels);
             }
         }
+
 
         private static void CheckThickLineGeometry()
         {
@@ -554,6 +645,7 @@ namespace YasudaHaruto.BookValidation.Editor
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
         }
+
 
         private static void CheckMesh(RuneLineGraphic graphic, bool green)
         {

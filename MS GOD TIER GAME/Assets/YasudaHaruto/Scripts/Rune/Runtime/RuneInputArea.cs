@@ -11,6 +11,7 @@ public class RuneInputArea : MonoBehaviour
     [SerializeField] private RectTransform m_runeArea;
     [SerializeField] private BookRuneCoordinateMapper m_coordinateMapper;
 
+
     public bool ContainsScreenPosition(Vector2 screenPosition)
     {
         if (m_coordinateMapper != null)
@@ -20,6 +21,7 @@ public class RuneInputArea : MonoBehaviour
 
         return TryConvertToNormalized(screenPosition, out _);
     }
+
 
     public bool TryConvertToNormalized(Vector2 screenPosition, out Vector2 normalizedPosition, bool allowOutside = false)
     {

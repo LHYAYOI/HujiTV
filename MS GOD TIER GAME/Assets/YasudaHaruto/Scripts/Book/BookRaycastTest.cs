@@ -8,9 +8,11 @@ using UnityEngine;
 
 public class BookRaycastTest : MonoBehaviour
 {
+
     [Header("Display")]
     [SerializeField] private RectTransform m_displayImage;
     [SerializeField] private Camera m_modelCamera;
+
 
     [Header("Book Mesh")]
     [SerializeField] private MeshCollider m_bookCollider;
@@ -19,13 +21,17 @@ public class BookRaycastTest : MonoBehaviour
     private static readonly int LEFT_UV_ID = Shader.PropertyToID("_LeftUv");
     private static readonly int RIGHT_UV_ID = Shader.PropertyToID("_RightUv");
 
+
     private void Update()
     {
-        if (!Input.GetMouseButtonDown(0)) return;
+        if (!Input.GetMouseButtonDown(0))
+            return;
         if (m_displayImage == null || m_modelCamera == null ||
-            m_bookCollider == null || m_bookRenderer == null) return;
+            m_bookCollider == null || m_bookRenderer == null)
+            return;
 
-        if (!TryGetDisplayUV(Input.mousePosition, out Vector2 displayUV)) return;
+        if (!TryGetDisplayUV(Input.mousePosition, out Vector2 displayUV))
+            return;
 
         Ray ray = m_modelCamera.ViewportPointToRay(displayUV);
 
@@ -36,7 +42,8 @@ public class BookRaycastTest : MonoBehaviour
         }
 
         Material material = m_bookRenderer.sharedMaterial;
-        if (material == null) return;
+        if (material == null)
+            return;
 
         Vector2 meshUV = hit.textureCoord;
         Vector4 leftRegion = material.GetVector(LEFT_UV_ID);
@@ -66,6 +73,7 @@ public class BookRaycastTest : MonoBehaviour
     $"Triangle={hit.triangleIndex}");
     }
 
+
     private bool TryGetDisplayUV(Vector2 screenPosition, out Vector2 uv)
     {
         uv = default;
@@ -75,13 +83,16 @@ public class BookRaycastTest : MonoBehaviour
             ? canvas.worldCamera : null;
 
         if (!RectTransformUtility.RectangleContainsScreenPoint(
-            m_displayImage, screenPosition, uiCamera)) return false;
+            m_displayImage, screenPosition, uiCamera))
+            return false;
 
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            m_displayImage, screenPosition, uiCamera, out Vector2 local)) return false;
+            m_displayImage, screenPosition, uiCamera, out Vector2 local))
+            return false;
 
         Rect rect = m_displayImage.rect;
-        if (rect.width <= 0f || rect.height <= 0f) return false;
+        if (rect.width <= 0f || rect.height <= 0f)
+            return false;
 
         uv = new Vector2(
             (local.x - rect.xMin) / rect.width,
@@ -90,11 +101,13 @@ public class BookRaycastTest : MonoBehaviour
         return true;
     }
 
+
     private static bool IsInsideRegion(Vector2 uv, Vector4 region)
     {
         return uv.x >= region.x && uv.x <= region.x + region.z &&
                uv.y >= region.y && uv.y <= region.y + region.w;
     }
+
 
     private static Vector2 ConvertToPageUV(Vector2 uv, Vector4 region, bool flip)
     {

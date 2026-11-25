@@ -5,6 +5,7 @@ using UnityEngine.UI;
 namespace YasudaHaruto.BookValidation
 {
     // Presentation only. Inventory decisions belong to BookGameController.
+    /// <summary>ページ選択一覧の一行を表示し、選択操作を通知する。</summary>
     public sealed class BookPageChoiceRow : MonoBehaviour
     {
         [SerializeField] private Text m_label;
@@ -12,7 +13,12 @@ namespace YasudaHaruto.BookValidation
         [SerializeField] private Image m_background;
         [SerializeField] private Color m_normalColor = new Color(0.94f, 0.95f, 0.97f);
         [SerializeField] private Color m_selectedColor = new Color(0.72f, 0.85f, 1f);
-        public PageInstance Page { get; private set; }
+
+        public PageInstance Page
+        {
+            get; private set;
+        }
+
 
         public void Bind(PageInstance page, int index, Font font, Action<PageInstance> selected)
         {
@@ -23,6 +29,7 @@ namespace YasudaHaruto.BookValidation
             m_button.onClick.AddListener(() => selected(Page));
             SetState(false, true);
         }
+
 
         public void SetState(bool selected, bool interactable)
         {

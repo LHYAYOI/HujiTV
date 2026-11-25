@@ -14,7 +14,9 @@ public class RuneAuthoringData
 {
     [SerializeField] private List<RuneStrokeData> m_strokes = new();
 
+
     public IReadOnlyList<RuneStrokeData> Strokes => m_strokes;
+
 
     // ルーンのストロークデータを追加するメソッド
     public void AddStroke(RuneStrokeData stroke)
@@ -26,6 +28,7 @@ public class RuneAuthoringData
 
         m_strokes.Add(stroke);
     }
+
 
     // ルーンのストロークデータを設定するメソッド
     public void SetStrokes(IEnumerable<RuneStrokeData> strokes)
@@ -40,6 +43,7 @@ public class RuneAuthoringData
         m_strokes.AddRange(strokes);
     }
 
+
     // ルーンの最後のストロークデータを削除するメソッド
     public void RemoveLastStroke()
     {
@@ -50,6 +54,7 @@ public class RuneAuthoringData
 
         m_strokes.RemoveAt(m_strokes.Count - 1);
     }
+
 
     // ルーンのストロークデータを指定したインデックスに移動するメソッド
     public bool MoveStroke(int index, int newIndex)
@@ -65,6 +70,7 @@ public class RuneAuthoringData
         return true;
     }
 
+
     // ルーンのストロークデータを逆順にするメソッド
     public bool ReverseStroke(int index)
     {
@@ -78,18 +84,23 @@ public class RuneAuthoringData
     }
 
 
+
     public bool SplitStroke(int strokeIndex, int pointIndex)
     {
-        if (strokeIndex < 0 || strokeIndex >= m_strokes.Count) return false;
+        if (strokeIndex < 0 || strokeIndex >= m_strokes.Count)
+            return false;
 
         IReadOnlyList<Vector2> points = m_strokes[strokeIndex].Points;
-        if (pointIndex <= 0 || pointIndex >= points.Count - 1) return false;
+        if (pointIndex <= 0 || pointIndex >= points.Count - 1)
+            return false;
 
         List<Vector2> first = new();
         List<Vector2> second = new();
 
-        for (int i = 0; i <= pointIndex; i++) first.Add(points[i]);
-        for (int i = pointIndex; i < points.Count; i++) second.Add(points[i]);
+        for (int i = 0; i <= pointIndex; i++)
+            first.Add(points[i]);
+        for (int i = pointIndex; i < points.Count; i++)
+            second.Add(points[i]);
 
         bool preserveCorners = m_strokes[strokeIndex].PreserveCorners;
         m_strokes[strokeIndex] = new RuneStrokeData(first, preserveCorners);
@@ -97,15 +108,18 @@ public class RuneAuthoringData
         return true;
     }
 
+
     public bool MergeStrokes(int firstIndex, int secondIndex, float maxEndpointDistance)
     {
         if (firstIndex < 0 || firstIndex >= m_strokes.Count ||
             secondIndex < 0 || secondIndex >= m_strokes.Count ||
-            firstIndex == secondIndex) return false;
+            firstIndex == secondIndex)
+            return false;
 
         IReadOnlyList<Vector2> first = m_strokes[firstIndex].Points;
         IReadOnlyList<Vector2> second = m_strokes[secondIndex].Points;
-        if (first.Count < 2 || second.Count < 2) return false;
+        if (first.Count < 2 || second.Count < 2)
+            return false;
 
         float bestDistance = float.PositiveInfinity;
         bool reverseFirst = false;
@@ -119,7 +133,8 @@ public class RuneAuthoringData
                 Vector2 startB = b == 0 ? second[0] : second[second.Count - 1];
                 float distance = Vector2.Distance(endA, startB);
 
-                if (distance >= bestDistance) continue;
+                if (distance >= bestDistance)
+                    continue;
 
                 bestDistance = distance;
                 reverseFirst = a == 1;
@@ -127,25 +142,30 @@ public class RuneAuthoringData
             }
         }
 
-        if (bestDistance > Mathf.Max(0f, maxEndpointDistance)) return false;
+        if (bestDistance > Mathf.Max(0f, maxEndpointDistance))
+            return false;
 
         List<Vector2> merged = new(first);
         List<Vector2> next = new(second);
 
-        if (reverseFirst) merged.Reverse();
-        if (reverseSecond) next.Reverse();
+        if (reverseFirst)
+            merged.Reverse();
+        if (reverseSecond)
+            next.Reverse();
 
         // 接続点の微小なずれを吸収する
         Vector2 joint = (merged[merged.Count - 1] + next[0]) * 0.5f;
         merged[merged.Count - 1] = joint;
 
-        for (int i = 1; i < next.Count; i++) merged.Add(next[i]);
+        for (int i = 1; i < next.Count; i++)
+            merged.Add(next[i]);
 
         bool preserveCorners = m_strokes[firstIndex].PreserveCorners || m_strokes[secondIndex].PreserveCorners;
         m_strokes[firstIndex] = new RuneStrokeData(merged, preserveCorners);
         m_strokes.RemoveAt(secondIndex);
         return true;
     }
+
 
 
     // ルーンのストロークデータをクリアするメソッド

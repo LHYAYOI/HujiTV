@@ -12,6 +12,7 @@ public class PageDatabase : ScriptableObject
 {
     [SerializeField] private List<PageData> m_pages = new();
 
+
     public PageData GetPage(byte pageId)
     {
         if (pageId == 0)
@@ -45,6 +46,7 @@ public class PageDatabase : ScriptableObject
 
         return foundPage;
     }
+
 
 #if UNITY_EDITOR
     private void OnValidate()

@@ -6,8 +6,9 @@ using UnityEngine.UI;
 namespace YasudaHaruto.BookValidation
 {
     // Captures all pointer input while aiming; only a press inside the circle may start a cast.
+    /// <summary>ルーンの発動操作を画面上で案内し、ドラッグから発動表示へつなぐ。</summary>
     public sealed class RuneCastOverlay : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
-        IBeginDragHandler, IDragHandler, IEndDragHandler
+            IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         private const float ReleaseFadeDuration = 0.18f;
         private RuneTraceController m_controller;
@@ -35,9 +36,16 @@ namespace YasudaHaruto.BookValidation
 
         private float m_releaseFadeStart;
 
-        public bool IsFadingOut { get; private set; }
+
+        public bool IsFadingOut
+        {
+            get; private set;
+        }
+
         public Vector2 Center => m_center;
+
         public float Radius => m_radius;
+
 
         public void Configure(RuneTraceController controller, CastSwipeDetector detector, Func<Rect?> bookRect,
             Vector2 origin, float radiusRatio, float shade, float pulseSpeed, float pulseAmount, float arrowWidth = 0.1f,
@@ -99,6 +107,7 @@ namespace YasudaHaruto.BookValidation
             RefreshGeometry();
         }
 
+
         private RawImage CreateArtwork(string name)
         {
             var image = new GameObject(name, typeof(RectTransform)).AddComponent<RawImage>();
@@ -109,19 +118,23 @@ namespace YasudaHaruto.BookValidation
             return image;
         }
 
+
         private static void PlaceArtwork(RawImage image, Vector2 point, float height, float opacity)
         {
-            if (image.texture == null) return;
+            if (image.texture == null)
+                return;
             float aspect = image.texture.width / (float)image.texture.height;
             image.rectTransform.anchoredPosition = point;
             image.rectTransform.sizeDelta = new Vector2(height * aspect, height);
             image.color = new Color(1f, 1f, 1f, opacity);
         }
 
+
         private bool RefreshGeometry(float visibility = 1f)
         {
             Rect? book = m_bookRect?.Invoke();
-            if (!book.HasValue || book.Value.height <= 0f) return false;
+            if (!book.HasValue || book.Value.height <= 0f)
+                return false;
             Rect rect = book.Value;
             m_center = new Vector2(Mathf.Lerp(rect.xMin, rect.xMax, Mathf.Clamp01(m_origin.x)),
                 Mathf.Lerp(rect.yMin, rect.yMax, Mathf.Clamp01(m_origin.y)));
@@ -141,35 +154,43 @@ namespace YasudaHaruto.BookValidation
             return true;
         }
 
+
         private void UpdateShade(Rect book, float fade)
         {
             // Stack the configured shade twice to match the darker paper in the reference.
             float transmission = 1f - m_shade;
             m_graphic.SetShade((1f - transmission * transmission) * fade);
-            if (m_shadeMaterial == null) return;
+            if (m_shadeMaterial == null)
+                return;
 
             RectTransform graphic = m_graphic.rectTransform;
             Rect bounds = graphic.rect;
-            if (bounds.width <= 0f || bounds.height <= 0f) return;
+            if (bounds.width <= 0f || bounds.height <= 0f)
+                return;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(graphic, book.center, null, out Vector2 center);
             m_shadeMaterial.SetVector("_Vignette", new Vector4(
                 (center.x - bounds.xMin) / bounds.width, (center.y - bounds.yMin) / bounds.height,
                 book.width * 0.53f / bounds.width, book.height * 0.60f / bounds.height));
         }
 
+
         private void UpdateGlowComposite(float height)
         {
-            if (m_glowMaterial == null || m_glow.texture == null) return;
+            if (m_glowMaterial == null || m_glow.texture == null)
+                return;
             Texture book = m_bookTexture?.Invoke();
-            if (m_bookDisplay == null || book == null) return;
+            if (m_bookDisplay == null || book == null)
+                return;
 
             Canvas canvas = m_bookDisplay.GetComponentInParent<Canvas>();
             Camera camera = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
             Vector2 halfSize = new Vector2(height * m_glow.texture.width / m_glow.texture.height, height) * 0.5f;
             if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(m_bookDisplay, m_center - halfSize, camera, out Vector2 lower) ||
-                !RectTransformUtility.ScreenPointToLocalPointInRectangle(m_bookDisplay, m_center + halfSize, camera, out Vector2 upper)) return;
+                !RectTransformUtility.ScreenPointToLocalPointInRectangle(m_bookDisplay, m_center + halfSize, camera, out Vector2 upper))
+                return;
             Rect display = m_bookDisplay.rect;
-            if (display.width <= 0f || display.height <= 0f) return;
+            if (display.width <= 0f || display.height <= 0f)
+                return;
 
             Vector2 origin = new Vector2((lower.x - display.xMin) / display.width, (lower.y - display.yMin) / display.height);
             Vector2 size = new Vector2((upper.x - lower.x) / display.width, (upper.y - lower.y) / display.height);
@@ -178,13 +199,15 @@ namespace YasudaHaruto.BookValidation
             m_glowMaterial.SetVector("_BookUV", new Vector4(origin.x, origin.y, size.x, size.y));
         }
 
+
         private void RefreshArrows(Vector2 bookSize)
         {
             float bookHeight = bookSize.y;
             bool ready = m_controller != null && m_spellView != null && m_spellView.IsCastReady &&
                 (m_controller.State == RUNE_TRACE_STATE.WAITING_CAST_START || m_controller.State == RUNE_TRACE_STATE.CHARGING);
             bool show = ready || m_pressed;
-            if (show && !m_arrowsVisible) m_arrowStart = Time.unscaledTime;
+            if (show && !m_arrowsVisible)
+                m_arrowStart = Time.unscaledTime;
             m_arrowsVisible = show;
             Sprite frame = null;
             if (show && m_frames != null && m_frames.Length > 0)
@@ -197,8 +220,10 @@ namespace YasudaHaruto.BookValidation
             for (int i = 0; i < m_arrows.Length; i++)
             {
                 var arrow = m_arrows[i];
-                if (arrow == null) continue;
-                if (frame != null) arrow.sprite = frame;
+                if (arrow == null)
+                    continue;
+                if (frame != null)
+                    arrow.sprite = frame;
                 bool visible = show && arrow.sprite != null &&
                     (m_controller.UsesThreeDirections || i == (int)MAGIC_CAST_DIRECTION.CENTER);
                 arrow.gameObject.SetActive(visible);
@@ -212,7 +237,8 @@ namespace YasudaHaruto.BookValidation
                     point += new Vector2((i - 1) * bookSize.x * 0.042f, -bookHeight * 0.045f);
                 Vector2 axis = (point - m_center).normalized;
                 m_arrowAxes[i] = axis;
-                if (!visible) continue;
+                if (!visible)
+                    continue;
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(m_graphic.rectTransform, point, null, out Vector2 local);
                 arrow.rectTransform.anchoredPosition = local;
                 arrow.rectTransform.sizeDelta = Vector2.one * length;
@@ -224,18 +250,24 @@ namespace YasudaHaruto.BookValidation
             }
         }
 
+
         private void LateUpdate()
         {
             if (IsFadingOut)
             {
                 float elapsed = Time.unscaledTime - m_releaseFadeStart;
                 float visibility = 1f - Mathf.SmoothStep(0f, 1f, elapsed / ReleaseFadeDuration);
-                if (visibility <= 0f || !RefreshGeometry(visibility)) Hide();
+                if (visibility <= 0f || !RefreshGeometry(visibility))
+                    Hide();
                 return;
             }
             if (m_controller == null || (m_controller.State != RUNE_TRACE_STATE.WAITING_CAST_RELEASE &&
                 m_controller.State != RUNE_TRACE_STATE.WAITING_CAST_START &&
-                m_controller.State != RUNE_TRACE_STATE.CHARGING)) { Hide(); return; }
+                m_controller.State != RUNE_TRACE_STATE.CHARGING))
+            {
+                Hide();
+                return;
+            }
             if (!RefreshGeometry())
             {
                 m_controller.CancelCastGesture();
@@ -243,14 +275,17 @@ namespace YasudaHaruto.BookValidation
                 m_spellView?.CancelSpellDrag();
                 m_graphic.gameObject.SetActive(false);
             }
-            else m_graphic.gameObject.SetActive(true);
+            else
+                m_graphic.gameObject.SetActive(true);
         }
+
 
         public void OnPointerDown(PointerEventData data)
         {
             if (m_pressed || data.button != PointerEventData.InputButton.Left || !RefreshGeometry() ||
                 Vector2.Distance(data.position, m_center) > m_radius || m_detector == null ||
-                m_controller == null || !m_controller.TryBeginCast()) return;
+                m_controller == null || !m_controller.TryBeginCast())
+                return;
             IsFadingOut = false;
             m_graphic.raycastTarget = true;
             m_pressed = true;
@@ -263,13 +298,19 @@ namespace YasudaHaruto.BookValidation
             RefreshGeometry();
         }
 
-        public void OnBeginDrag(PointerEventData data) { }
+
+        public void OnBeginDrag(PointerEventData data)
+        {
+        }
+
 
         public void OnDrag(PointerEventData data)
         {
-            if (!m_pressed || data.pointerId != m_pointerId) return;
+            if (!m_pressed || data.pointerId != m_pointerId)
+                return;
             m_spellView?.SetSpellDrag(GetAimOffset(data.position));
         }
+
 
         private Vector2 GetAimOffset(Vector2 pointer)
         {
@@ -289,15 +330,18 @@ namespace YasudaHaruto.BookValidation
                 m_detector.TryPreviewDirection(m_start, pointer, out MAGIC_CAST_DIRECTION direction) &&
                 (m_controller.UsesThreeDirections || direction == MAGIC_CAST_DIRECTION.CENTER))
                 m_graphic.SelectedDirection = (int)direction;
-            if (m_graphic.SelectedDirection < 0) return Vector2.zero;
+            if (m_graphic.SelectedDirection < 0)
+                return Vector2.zero;
 
             Vector2 axis = m_arrowAxes[m_graphic.SelectedDirection];
             return axis * Mathf.Max(0f, Vector2.Dot(delta, axis));
         }
 
+
         public void OnPointerUp(PointerEventData data)
         {
-            if (!m_pressed || data.pointerId != m_pointerId) return;
+            if (!m_pressed || data.pointerId != m_pointerId)
+                return;
             m_pressed = false;
             Vector2 offset = GetAimOffset(data.position);
             if (m_graphic.SelectedDirection >= 0 &&
@@ -310,26 +354,35 @@ namespace YasudaHaruto.BookValidation
                 IsFadingOut = true;
                 return;
             }
-            else m_controller.EndStroke(); // Preserve the existing invalid-swipe failure rules.
+            else
+                m_controller.EndStroke(); // Preserve the existing invalid-swipe failure rules.
             Hide();
         }
 
+
         public void OnEndDrag(PointerEventData data) => OnPointerUp(data);
+
 
         private void OnApplicationFocus(bool focus)
         {
-            if (focus) return;
+            if (focus)
+                return;
             m_pressed = false;
             m_controller?.CancelCastGesture();
             m_spellView?.CancelSpellDrag();
-            if (m_graphic != null) m_graphic.SelectedDirection = -1;
+            if (m_graphic != null)
+                m_graphic.SelectedDirection = -1;
         }
+
 
         private void OnDestroy()
         {
-            if (m_glowMaterial != null) Destroy(m_glowMaterial);
-            if (m_shadeMaterial != null) Destroy(m_shadeMaterial);
+            if (m_glowMaterial != null)
+                Destroy(m_glowMaterial);
+            if (m_shadeMaterial != null)
+                Destroy(m_shadeMaterial);
         }
+
 
         public void Hide()
         {
@@ -342,7 +395,9 @@ namespace YasudaHaruto.BookValidation
                 m_graphic.raycastTarget = true;
             }
             m_arrowsVisible = false;
-            foreach (var arrow in m_arrows) if (arrow != null) arrow.gameObject.SetActive(false);
+            foreach (var arrow in m_arrows)
+                if (arrow != null)
+                    arrow.gameObject.SetActive(false);
             gameObject.SetActive(false);
         }
     }

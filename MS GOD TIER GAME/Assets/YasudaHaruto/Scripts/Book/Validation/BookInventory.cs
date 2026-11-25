@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace YasudaHaruto.BookValidation
 {
     // Owns game spreads. The renderer receives only a projection of this inventory.
+    /// <summary>所持ページから変更候補と表示ページを組み立て、承認後に確定する。</summary>
     public sealed class BookInventory
     {
         private readonly BookPageData m_firstFixedPage;
@@ -11,8 +12,17 @@ namespace YasudaHaruto.BookValidation
         private readonly PageFactory m_factory;
         private List<PageInstance> m_pages;
 
-        public IReadOnlyList<PageInstance> Pages { get; private set; }
-        public int MaxPageCount { get; }
+
+        public IReadOnlyList<PageInstance> Pages
+        {
+            get; private set;
+        }
+
+        public int MaxPageCount
+        {
+            get;
+        }
+
 
         public BookInventory(PageFactory factory, IReadOnlyList<PageData> initialPages,
             BookPageData firstFixedPage, BookPageData lastFixedPage, int maxPageCount)
@@ -28,7 +38,8 @@ namespace YasudaHaruto.BookValidation
             var pages = new List<PageInstance>(initialPages.Count);
             foreach (PageData data in initialPages)
             {
-                if (!HasVisuals(data)) throw new ArgumentException("Initial page has no left/right visual.");
+                if (!HasVisuals(data))
+                    throw new ArgumentException("Initial page has no left/right visual.");
                 if (!pages.Exists(page => page.Data.PageId == data.PageId))
                     pages.Add(m_factory.Create(data));
             }
@@ -36,15 +47,20 @@ namespace YasudaHaruto.BookValidation
             Commit(pages);
         }
 
+
         public static bool HasVisuals(PageData data) => data != null &&
             data.LeftVisualData != null && data.RightVisualData != null;
 
+
         public static bool CanAdd(PageData data) => HasVisuals(data) && data.PageId != 0;
+
 
         public PageInstance GetPageAtSpread(int spread) =>
             spread > 0 && spread <= m_pages.Count ? m_pages[spread - 1] : null;
 
+
         public bool Contains(byte pageId) => m_pages.Exists(page => page.Data.PageId == pageId);
+
 
         public List<PageInstance> Add(PageData data, out PageInstance added)
         {
@@ -55,12 +71,14 @@ namespace YasudaHaruto.BookValidation
             return candidate;
         }
 
+
         public List<BookPageData> BuildVisualPages(IReadOnlyList<PageInstance> pages)
         {
             var visuals = new List<BookPageData> { null, m_firstFixedPage };
             foreach (var page in pages)
             {
-                if (page == null || !HasVisuals(page.Data)) throw new ArgumentException("Invalid game spread.");
+                if (page == null || !HasVisuals(page.Data))
+                    throw new ArgumentException("Invalid game spread.");
                 visuals.Add(page.Data.LeftVisualData);
                 visuals.Add(page.Data.RightVisualData);
             }
@@ -68,10 +86,12 @@ namespace YasudaHaruto.BookValidation
             return visuals;
         }
 
+
         // Commit only after the view has accepted and captured the complete candidate.
         public void Commit(List<PageInstance> candidate)
         {
-            if (candidate == null) throw new ArgumentException("Invalid inventory candidate.");
+            if (candidate == null)
+                throw new ArgumentException("Invalid inventory candidate.");
             m_pages = new List<PageInstance>(candidate);
             Pages = m_pages.AsReadOnly();
         }
