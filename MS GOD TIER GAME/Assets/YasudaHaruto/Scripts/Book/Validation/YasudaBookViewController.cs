@@ -222,8 +222,17 @@ namespace YasudaHaruto.BookValidation
             m_captureFlag = true;
             RenderTexture target = m_currentTexture == m_textureA ? m_textureB : m_textureA;
             int left = targetSpread * 2;
-            m_leftPageView.ShowPage(candidate[left]);
-            m_rightPageView.ShowPage(left + 1 < candidate.Count ? candidate[left + 1] : null);
+            var leftPage = candidate[left];
+            var rightPage = left + 1 < candidate.Count ? candidate[left + 1] : null;
+            if (present)
+            {
+                m_acquiringLeft = leftPage;
+                m_acquiringRight = rightPage;
+                BookPageState.SetAcquired(leftPage, false);
+                BookPageState.SetAcquired(rightPage, false);
+            }
+            m_leftPageView.ShowPage(leftPage);
+            m_rightPageView.ShowPage(rightPage);
             PreparePageDecoration(targetSpread, m_leftPageView, m_rightPageView, m_captureCamera, candidate.Count);
             m_captureCamera.targetTexture = target;
             m_captureCamera.enabled = true;
@@ -235,6 +244,8 @@ namespace YasudaHaruto.BookValidation
             {
                 PrepareFlipDisplay();
                 yield return m_flipView.PlayTurn(m_currentTexture, target, targetSpread > m_spreadIndex);
+                m_flipView.ShowSpread(target);
+                yield return RevealAcquiredSpread(leftPage, rightPage);
             }
 
             // Commit both display inventory and logical inventory without a yield between them.
@@ -257,41 +268,38 @@ namespace YasudaHaruto.BookValidation
             SpreadShown?.Invoke(targetSpread);
             ResumePendingSpread();
         }
-        private Coroutine m_acquisitionGlow;
-        private Color m_displayColorBeforeGlow;
+        private BookPageData m_acquiringLeft;
+        private BookPageData m_acquiringRight;
 
 
-        internal void PlayAcquisitionEffect()
+        private IEnumerator RevealAcquiredSpread(BookPageData left, BookPageData right)
         {
-            StopAcquisitionGlow();
-            m_displayColorBeforeGlow = m_displayImage.color;
-            m_acquisitionGlow = StartCoroutine(AcquisitionGlow());
-        }
+            var origin = new Vector2(0.5f, 0.5f);
+            var settings = BookPageState.AcquireSettings.Default;
+            // A game reward adds both sides of the spread. Reveal each using the same origin.
+            BookPageState.PlayAcquire(left, null, false, origin, settings);
+            if (right != left)
+                BookPageState.PlayAcquire(right, null, true, origin, settings);
 
-
-        private void StopAcquisitionGlow()
-        {
-            if (m_acquisitionGlow == null)
-                return;
-            StopCoroutine(m_acquisitionGlow);
-            m_acquisitionGlow = null;
-            m_displayImage.color = m_displayColorBeforeGlow;
-        }
-
-
-        private IEnumerator AcquisitionGlow()
-        {
-            const float duration = 0.65f;
-            Color original = m_displayColorBeforeGlow;
-            Color gold = new Color(1f, 0.76f, 0.34f, original.a);
-            for (float elapsed = 0; elapsed < duration; elapsed += Time.unscaledDeltaTime)
+            while (BookPageState.IsAcquiring(left) || BookPageState.IsAcquiring(right))
             {
-                float strength = Mathf.Sin(elapsed / duration * Mathf.PI) * 0.65f;
-                m_displayImage.color = Color.Lerp(original, gold, strength);
+                yield return WaitForCameraFrame(m_captureCamera);
+                m_flipView.MarkDirty();
                 yield return null;
             }
-            m_displayImage.color = original;
-            m_acquisitionGlow = null;
+            FinishAcquisition();
+            yield return WaitForCameraFrame(m_captureCamera);
+            m_flipView.MarkDirty();
+        }
+
+
+        private void FinishAcquisition()
+        {
+            BookPageState.SetAcquired(m_acquiringLeft, true);
+            if (m_acquiringRight != m_acquiringLeft)
+                BookPageState.SetAcquired(m_acquiringRight, true);
+            m_acquiringLeft = null;
+            m_acquiringRight = null;
         }
 
         private BookCoverState m_coverState;
@@ -870,7 +878,7 @@ namespace YasudaHaruto.BookValidation
 
         private void OnDisable()
         {
-            StopAcquisitionGlow();
+            FinishAcquisition();
             StopAllCoroutines();
             var completion = m_inventoryCompletion;
             m_inventoryCompletion = null;

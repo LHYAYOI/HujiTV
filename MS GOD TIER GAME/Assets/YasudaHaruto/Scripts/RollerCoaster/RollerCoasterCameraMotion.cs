@@ -8,6 +8,20 @@ namespace YasudaHaruto.RollerCoaster
     [DefaultExecutionOrder(1100)]
     public sealed class RollerCoasterCameraMotion : MonoBehaviour
     {
+        public enum CURVE_CAMERA_MODE { FOLLOW_CART, FIXED_ROLL, DELAYED_ROLL }
+
+        [Header("連続カーブのカメラ")]
+        [SerializeField] private CURVE_CAMERA_MODE m_curveCameraMode = CURVE_CAMERA_MODE.DELAYED_ROLL;
+        [SerializeField, Range(.05f, 1.5f)] private float m_bankDelaySeconds = .55f;
+        [SerializeField, Range(10f, 120f)] private float m_bankMaxDegreesPerSecond = 45f;
+        private float m_cameraBank;
+        private float m_bankVelocity;
+        private Quaternion m_baseCameraRotation;
+
+        public CURVE_CAMERA_MODE CurveCameraMode { get => m_curveCameraMode; set => m_curveCameraMode = value; }
+        public float CameraBankDegrees => m_cameraBank;
+        public float CameraBankAngularSpeed { get; private set; }
+
         [SerializeField] private RollerCoasterCourse m_course;
         [SerializeField] private CartController m_cart;
         [SerializeField] private CameraShake m_shake;
@@ -20,9 +34,13 @@ namespace YasudaHaruto.RollerCoaster
         [SerializeField, Range(0f, 1f)] private float m_uphillBoost = 0.1f;
         [SerializeField, Range(0f, 1f)] private float m_downhillBoost = 0.3f;
         [SerializeField, Range(0f, 1f)] private float m_gradeChangeBoost = 0.12f;
-        [SerializeField, Range(0f, 0.5f)] private float m_airborneStrength = 0.3f;
+        [SerializeField, Range(0f, 0.5f)] private float m_airborneStrength = 0.5f;
         [SerializeField, Range(1f, 3f)] private float m_downhillVerticalScale = 1.5f;
-        [SerializeField, Range(1f, 3f)] private float m_fallVerticalScale = 1.25f;
+        [SerializeField, Range(1f, 3f)] private float m_fallVerticalScale = 1.8f;
+        [SerializeField, Range(0f, 5f)] private float m_fallShakeDegrees = 1.8f;
+        private float m_fallShakeElapsed;
+        public Vector3 FallShakeRotation { get; private set; }
+        public Vector3 LandingShakeRotation { get; private set; }
         private RollerCoasterVerticalNoiseExtension m_verticalNoise;
         [SerializeField, Range(0f, 25f)] private float m_encounterLookDegrees = 15f;
         private RollerCoasterEncounter[] m_encounters;
@@ -30,10 +48,11 @@ namespace YasudaHaruto.RollerCoaster
         private float m_lookYaw;
 
         [Header("着地の衝撃（回転の強さ、度）")]
-        [SerializeField, Range(0.1f, 1f)] private float m_landingDuration = 0.5f;
-        [SerializeField, Range(0f, 6f)] private float m_landingPitch = 2.5f;
-        [SerializeField, Range(0f, 3f)] private float m_landingYaw = 0.45f;
-        [SerializeField, Range(0f, 3f)] private float m_landingRoll = 0.45f;
+        [SerializeField, Range(0.1f, 1f)] private float m_landingDuration = 0.7f;
+        [SerializeField, Range(0f, 12f)] private float m_landingPitch = 8f;
+        [SerializeField, Range(0f, 5f)] private float m_landingYaw = 1.4f;
+        [SerializeField, Range(0f, 5f)] private float m_landingRoll = 2.2f;
+        [SerializeField, Range(0f, .6f)] private float m_landingSinkMeters = .3f;
 
         [Header("試走構成のカメラ管理")]
         [SerializeField] private bool m_manageCameraActivation = true;
@@ -93,14 +112,22 @@ namespace YasudaHaruto.RollerCoaster
             if (!m_cameraBaselineSaved)
             {
                 m_baseCameraPosition = m_virtualCamera.transform.localPosition;
+                m_baseCameraRotation = m_virtualCamera.transform.localRotation;
                 m_baseFov = m_virtualCamera.Lens.FieldOfView;
                 m_cameraBaselineSaved = true;
             }
             m_virtualCamera.transform.localPosition = m_baseCameraPosition;
+            m_virtualCamera.transform.localRotation = m_baseCameraRotation;
+            var story = GetComponent<RollerCoasterStoryboard>();
+            m_cameraBank = story != null ? story.RideBankDegreesAt(startProgress) : 0f;
+            m_bankVelocity = 0f;
+            CameraBankAngularSpeed = 0f;
             var resetLens = m_virtualCamera.Lens;
             resetLens.FieldOfView = m_baseFov;
             m_virtualCamera.Lens = resetLens;
             m_landingElapsed = 10f;
+            m_fallShakeElapsed = 0;
+            FallShakeRotation = LandingShakeRotation = Vector3.zero;
             BrakeRattleRotation = Vector3.zero;
             BrakeLeanWeight = 0f;
             m_speedProfile = GetComponent<RollerCoasterSpeedProfile>();
@@ -139,12 +166,15 @@ namespace YasudaHaruto.RollerCoaster
         public void EndRide()
         {
             m_driving = false;
+            m_fallShakeElapsed = 0;
+            FallShakeRotation = LandingShakeRotation = Vector3.zero;
             m_currentRate = 0f;
             BrakeRattleRotation = Vector3.zero;
             BrakeLeanWeight = 0f;
             if (m_cameraBaselineSaved && m_virtualCamera != null)
             {
                 m_virtualCamera.transform.localPosition = m_baseCameraPosition;
+                m_virtualCamera.transform.localRotation = m_baseCameraRotation;
                 var lens = m_virtualCamera.Lens;
                 lens.FieldOfView = m_baseFov;
                 m_virtualCamera.Lens = lens;
@@ -235,7 +265,9 @@ namespace YasudaHaruto.RollerCoaster
                 rattle = Mathf.Sin(Mathf.PI * m_speedProfile.DropBrakeProgress);
             }
             var storyboard = GetComponent<RollerCoasterStoryboard>();
-            if (storyboard != null && storyboard.BrakeFailing)
+            var breakthrough = GetComponent<RollerCoasterBreakthroughSequence>();
+            ApplyCurveCameraBank(storyboard, progress, ride != null && ride.Paused);
+            if (storyboard != null && storyboard.BrakeFailing && breakthrough == null)
             {
                 rattleTime = storyboard.BrakePhase * 2f;
                 rattle = 1f;
@@ -243,14 +275,25 @@ namespace YasudaHaruto.RollerCoaster
             // 制動・着地とは別の復帰振動。強さはStoryboard側で調整し、ここで重ね合わせる。
             Vector3 bankJolt = storyboard != null ? storyboard.BankReturnShakeAt(progress) : Vector3.zero;
             float bankDip = storyboard != null ? storyboard.BankReturnDipAt(progress) : 0;
+            // 比較用の2案では復帰衝撃を載せず、車体とカメラの傾きの差を見やすくする。
+            if (m_curveCameraMode != CURVE_CAMERA_MODE.FOLLOW_CART)
+            {
+                bankJolt = Vector3.zero;
+                bankDip = 0;
+            }
             BrakeRattleRotation = new Vector3(Mathf.Sin(rattleTime * 2f * Mathf.PI * 23f), .3f * Mathf.Sin(rattleTime * 2f * Mathf.PI * 29f),
                 .5f * Mathf.Sin(rattleTime * 2f * Mathf.PI * 18f)) * m_brakeRattleDegrees * rattle;
-            if (m_lookExtension != null)
-                m_lookExtension.SetShakeRotationOffset(new Vector3(
+            if (airborne && (ride == null || !ride.Paused)) m_fallShakeElapsed += Time.deltaTime;
+            if (!airborne) m_fallShakeElapsed = 0;
+            float fallEnvelope = airborne ? Mathf.SmoothStep(0, 1, Mathf.Clamp01(air / .12f)) * (1f - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(.85f, 1f, air))) : 0;
+            FallShakeRotation = new Vector3(Mathf.Sin(m_fallShakeElapsed * 47f), .45f * Mathf.Sin(m_fallShakeElapsed * 37f), .65f * Mathf.Sin(m_fallShakeElapsed * 53f)) * m_fallShakeDegrees * fallEnvelope;
+            LandingShakeRotation = new Vector3(
                 Mathf.Sin(m_landingElapsed * 45f) * m_landingPitch,
                 Mathf.Sin(m_landingElapsed * 37f) * m_landingYaw,
-                Mathf.Sin(m_landingElapsed * 41f) * m_landingRoll) * impact * impact + BrakeRattleRotation + bankJolt);
-            float sink = m_landingElapsed < .65f ? -.18f * Mathf.Sin(Mathf.PI * m_landingElapsed / .65f) : 0f;
+                Mathf.Sin(m_landingElapsed * 41f) * m_landingRoll) * impact * impact;
+            if (m_lookExtension != null)
+                m_lookExtension.SetShakeRotationOffset(LandingShakeRotation + FallShakeRotation + BrakeRattleRotation + bankJolt + (breakthrough != null ? breakthrough.ImpactRotation : Vector3.zero));
+            float sink = m_landingElapsed < .8f ? -m_landingSinkMeters * Mathf.Sin(Mathf.PI * m_landingElapsed / .8f) : 0f;
             float brake = 0f;
             if (m_speedProfile != null && m_speedProfile.DropBrakeStarted)
             {
@@ -260,6 +303,7 @@ namespace YasudaHaruto.RollerCoaster
             }
             BrakeLeanWeight = brake;
             m_virtualCamera.transform.localPosition = m_baseCameraPosition + new Vector3(0, m_floatHeight * airWeight + sink + bankDip - .06f * brake + .009f * rattle * Mathf.Sin(rattleTime * 2f * Mathf.PI * 27f), m_brakeForward * brake);
+            if (breakthrough != null) m_virtualCamera.transform.localPosition += breakthrough.ImpactPosition;
             var lens = m_virtualCamera.Lens;
             lens.FieldOfView = m_baseFov + Mathf.Clamp01(m_cart.Speed / 36f) * 5f + m_fallFovBoost * airWeight;
             m_virtualCamera.Lens = lens;
@@ -274,6 +318,43 @@ namespace YasudaHaruto.RollerCoaster
         private void OnDisable()
         {
             EndRide();
+        }
+
+        // 車体のピッチ・進行方向は維持し、カメラのロールだけを車体から分離する。
+        private void ApplyCurveCameraBank(RollerCoasterStoryboard story, float progress, bool paused)
+        {
+            if (story == null || !story.enabled)
+                return;
+            float cartBank = story.RideBankDegreesAt(progress);
+            float distanceIn = (progress - story.Markers[1]) * m_length;
+            float distanceOut = (story.Markers[3] - progress) * m_length;
+            float weight = Mathf.SmoothStep(0, 1, Mathf.Clamp01(Mathf.Min(distanceIn, distanceOut) / 6f));
+            float target = m_curveCameraMode == CURVE_CAMERA_MODE.FIXED_ROLL ? Mathf.LerpAngle(cartBank, 0, weight) : cartBank;
+            float previousBank = m_cameraBank;
+            if (m_curveCameraMode == CURVE_CAMERA_MODE.DELAYED_ROLL)
+            {
+                if (!paused)
+                    // 車体の素早いバンク復帰も、カメラ側では角速度を制限して連続的につなぐ。
+                    m_cameraBank = Mathf.SmoothDampAngle(m_cameraBank, target, ref m_bankVelocity, m_bankDelaySeconds,
+                        m_bankMaxDegreesPerSecond, Mathf.Min(Time.deltaTime, .05f));
+            }
+            else
+            {
+                m_cameraBank = target;
+                m_bankVelocity = 0;
+            }
+            CameraBankAngularSpeed = !paused && m_curveCameraMode == CURVE_CAMERA_MODE.DELAYED_ROLL && Time.deltaTime > 0 ?
+                Mathf.DeltaAngle(previousBank, m_cameraBank) / Time.deltaTime : 0;
+            m_virtualCamera.transform.localRotation = Quaternion.AngleAxis(Mathf.DeltaAngle(cartBank, m_cameraBank), Vector3.forward) * m_baseCameraRotation;
+        }
+
+        private void OnGUI()
+        {
+            if (!m_driving || GetComponent<RollerCoasterStoryboard>() == null)
+                return;
+            string label = m_curveCameraMode == CURVE_CAMERA_MODE.FIXED_ROLL ? "水平を保つ" : m_curveCameraMode == CURVE_CAMERA_MODE.DELAYED_ROLL ? "遅れて傾く" : "車体と同時";
+            if (GUI.Button(new Rect(12, 130, 340, 28), "カーブ視点：" + label))
+                m_curveCameraMode = m_curveCameraMode == CURVE_CAMERA_MODE.FIXED_ROLL ? CURVE_CAMERA_MODE.DELAYED_ROLL : CURVE_CAMERA_MODE.FIXED_ROLL;
         }
 
 

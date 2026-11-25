@@ -26,7 +26,7 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 Object.DestroyImmediate(old.gameObject);
             var root = new GameObject("Ride Wagon Foreground");
             root.transform.SetParent(ride.Cart.transform, false);
-            root.transform.localPosition = new Vector3(0, .75f, .5f);
+            root.transform.localPosition = new Vector3(0, .65f, .25f);
             root.transform.localScale = Vector3.one * 1.15f;
             var model = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(Source), root.transform);
             model.transform.localPosition = Vector3.zero;

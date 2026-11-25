@@ -24,6 +24,20 @@ namespace YasudaHaruto.RollerCoaster.Editor
         private static bool s_held, s_pauseDone, s_recovered, s_bankJoltSeen, s_foregroundVisible;
         private static double s_pauseAt;
         private static float s_pauseProgress;
+        private static int s_cameraModeTest;
+        private static readonly bool[] s_earlyCrossing = new bool[2];
+        private static double s_sparksPreviewStart;
+        private static bool s_sparksPreviewJumped;
+        private static int s_sparksPreviewFrame;
+        private static readonly bool[] s_barrierCaptured = new bool[3];
+        private static readonly bool[] s_debrisCaptured = new bool[3];
+        private static bool s_boardImpactSeen;
+        private static bool s_boardApproachCaptured, s_boardPauseDone;
+        private static double s_boardPauseAt;
+        private static Vector3 s_boardPausePosition, s_boardPauseImpact;
+        private static float s_maxCameraBankSpeed;
+        private static float s_maxBoardImpact, s_maxBoardDisplacement;
+        private static float s_maxFallShake, s_maxLandingShake;
 
         static RollerCoasterStoryboardValidation()
         {
@@ -129,11 +143,111 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 var wrongDistance = new RailDistanceTable(wrong);
                 Vector3 edge = (Vector3)wrong.EvaluatePosition(0, wrongDistance.Parameter(10)) + Vector3.up * .15f;
                 Vector3 sight = edge - eye;
-                Require(!collider.Raycast(new Ray(eye, sight.normalized), out _, sight.magnitude - .25f), "Broken forward rail is visible before the right turn");
+                Require(!collider.Raycast(new Ray(eye, sight.normalized), out _, sight.magnitude - .25f), "Continuous forward rail is visible before the right turn");
+                var forwardRail = wrong.GetComponent<RailSplineMesh>();
+                Require(forwardRail.StartDistance == 0 && forwardRail.EndDistance == 0 &&
+                    ride.Course.transform.Find("Image Course 1-11/08 Broken Rail Far Side") == null,
+                    "Apparent straight rail is continuous with no overlapping far-side duplicate");
+                foreach (var actor in story.Actors.Where(a => a.Kind == RollerCoasterStoryboard.ACTOR_KIND.CROSSING))
+                {
+                    float meeting = distanceTable.DistanceAtParameter(actor.Meeting);
+                    distanceTable.Frame(meeting - 20f, out var ahead, out var heading);
+                    Vector3 from = ahead + Vector3.up * 1.1f;
+                    Vector3 target = (Vector3)actor.Route.EvaluatePosition(0, story.CrossingParameterAt(actor, -20f)) + Vector3.up * .8f;
+                    Vector3 direction = target - from;
+                    Require(!collider.Raycast(new Ray(from, direction.normalized), out _, direction.magnitude - .3f),
+                        $"Crossing {actor.Section} is unobstructed from 20m before the meeting");
+                    Require(story.CrossingParameterAt(actor, -20f) > 0 &&
+                        (actor.ReverseCrossing ? story.CrossingParameterAt(actor, -19f) < story.CrossingParameterAt(actor, -20f) : story.CrossingParameterAt(actor, -19f) > story.CrossingParameterAt(actor, -20f)),
+                        $"Crossing {actor.Section} is already moving during the early reveal");
+                    var playerBounds = RollerCoasterCartClearance.Measure(ride.Cart.transform);
+                    playerBounds.center = Vector3.Scale(playerBounds.center, ride.Cart.transform.lossyScale);
+                    playerBounds.size = Vector3.Scale(playerBounds.size, ride.Cart.transform.lossyScale);
+                    var actorBounds = RollerCoasterCartClearance.Measure(actor.Cart);
+                    actorBounds.center = Vector3.Scale(actorBounds.center, actor.Cart.lossyScale);
+                    actorBounds.size = Vector3.Scale(actorBounds.size, actor.Cart.lossyScale);
+                    float minimum = float.PositiveInfinity;
+                    for (float delta = -28f; delta <= 12f; delta += .05f)
+                    {
+                        float progress = actor.Meeting + delta / story.Length;
+                        Vector3 playerPosition = ride.Course.Spline.EvaluatePosition(0, progress);
+                        actor.Route.Evaluate(0, story.CrossingParameterAt(actor, delta), out var actorPosition, out var tangent, out var up);
+                        if (actor.ReverseCrossing) tangent = -tangent;
+                        float gap = RollerCoasterCartClearance.Gap(playerBounds, playerPosition, story.RotationAt(progress), actorBounds,
+                            actorPosition, Quaternion.LookRotation(tangent, up));
+                        minimum = Mathf.Min(minimum, gap);
+                    }
+                    Require(minimum > .02f, $"Crossing {actor.Section} keeps the entire wagons apart ({minimum:F3}m minimum separating-axis gap)");
+                    Require(minimum < .09f && actor.ReverseCrossing == (actor.Section == 10), $"Crossing {actor.Section} uses the requested direction and a close non-contact pass");
+                    float minimumSpeed = float.PositiveInfinity, maximumSpeed = 0;
+                    for (float delta = -22f; delta <= 8f; delta += .5f)
+                    {
+                        Vector3 a = actor.Route.EvaluatePosition(0, story.CrossingParameterAt(actor, delta - .05f));
+                        Vector3 b = actor.Route.EvaluatePosition(0, story.CrossingParameterAt(actor, delta + .05f));
+                        float speed = Vector3.Distance(a, b) / .1f * story.SpeedAt(actor.Meeting + delta / story.Length);
+                        minimumSpeed = Mathf.Min(minimumSpeed, speed);
+                        maximumSpeed = Mathf.Max(maximumSpeed, speed);
+                    }
+                    Require(minimumSpeed > 0 && maximumSpeed / minimumSpeed < 1.1f,
+                        $"Crossing {actor.Section} remains approximately uniform from early reveal through passage ({minimumSpeed:F2}-{maximumSpeed:F2}m/s)");
+                }
             }
             finally { Physics.queriesHitBackfaces = backfaces; UnityEngine.Object.DestroyImmediate(probe); }
             Require(story.SpeedAt(0) > 0 && story.SpeedAt(story.Markers[0]) > 0 && story.SpeedAt(story.FallEnd + .001f) < 4, "No crest stop; low landing target speed");
-            Require(story.SpeedAt(story.Markers[10] - .001f) > 20 && story.SpeedAt(Mathf.Lerp(story.Markers[10], story.FallEnd, .6f)) > 27, "Final brake does not stop the cart and the fall accelerates");
+            Require(story.SpeedAt(story.Markers[10] - .001f) > 0 && story.SpeedAt(story.Markers[10] - .001f) < 10 &&
+                story.SpeedAt(Mathf.Lerp(story.Markers[10], story.FallEnd, .6f)) > 20, "Barrier brake slows without stopping, then the fall accelerates");
+            var sequence = ride.GetComponent<RollerCoasterBreakthroughSequence>();
+            Require(sequence != null && sequence.Barriers.Length == 3 && sequence.StraightExtension >= 30f &&
+                !ride.GetComponent<RollerCoasterBrakeSparks>().enabled, "Three breakable boards replace sparks on the extended straight");
+            Require(!ShaderUtil.ShaderHasError(Shader.Find("YasudaHaruto/RollerCoaster/Warning Board")), "Yellow and black board shader compiles");
+            Require(!ShaderUtil.ShaderHasError(Shader.Find("YasudaHaruto/RollerCoaster/Board Text")), "Board lettering uses a depth-tested shader");
+            foreach (var barrier in sequence.Barriers)
+            {
+                Require(barrier.IntactVisual != null && barrier.IntactVisual.activeSelf && barrier.Fragments.All(p => !p.gameObject.activeSelf),
+                    "Unbroken board uses one seamless surface and hides all fragments");
+                var mesh = barrier.IntactVisual.GetComponent<MeshFilter>().sharedMesh;
+                Require(mesh.bounds.size.x > 5.3f && mesh.bounds.size.y > 5.3f, "Board nearly fills the six-metre duct cross section");
+                var boardProbe = new GameObject("Temporary seamless board probe");
+                boardProbe.transform.SetPositionAndRotation(barrier.Root.position, barrier.Root.rotation);
+                try
+                {
+                    var collider = boardProbe.AddComponent<MeshCollider>();
+                    collider.sharedMesh = mesh;
+                    for (float sampleY = -2.4f; sampleY <= 2.4f; sampleY += .2f)
+                        for (float sampleX = -2.4f; sampleX <= 2.4f; sampleX += .2f)
+                            if (sampleX * sampleX + sampleY * sampleY < 2.4f * 2.4f && !collider.Raycast(new Ray(boardProbe.transform.TransformPoint(new Vector3(sampleX, sampleY + 1.4f, -.2f)), boardProbe.transform.forward), out _, .4f))
+                                throw new InvalidOperationException("Hole in intact board");
+                }
+                finally { UnityEngine.Object.DestroyImmediate(boardProbe); }
+            }
+            float previousBrakeSpeed = float.PositiveInfinity;
+            bool progressiveBraking = true;
+            for (float remaining = sequence.BrakeDistance; remaining >= 0; remaining -= .25f)
+            {
+                float speed = story.SpeedAt(story.Markers[10] - remaining / story.Length);
+                progressiveBraking &= speed > 0 && speed <= previousBrakeSpeed + .05f;
+                previousBrakeSpeed = speed;
+            }
+            Require(progressiveBraking, "Brake profile remains positive and decelerates through the barriers");
+            float entryParameter = RollerCoasterCourseBuilder.KnotParameter(ride.Course.Spline.Spline, ride.Course.FallStartKnot - 1);
+            Vector3 entryBefore = ride.Course.Spline.EvaluateTangent(0, entryParameter - .000001f);
+            Vector3 entryAfter = ride.Course.Spline.EvaluateTangent(0, entryParameter + .000001f);
+            float entryAngle = Vector3.Angle(entryBefore, entryAfter);
+            Require(entryAngle < .1f, $"Curve enters the barrier straight with a continuous tangent ({entryAngle:F4}deg jump)");
+            float approach = story.Markers[10] - 35f / story.Length;
+            Require(Mathf.Abs(sequence.ModifySpeed(approach, 23f) - 23f) < .001f && sequence.ContactLeanAt(approach) == 0,
+                "There is no voluntary slowdown or forward lean before the first contact");
+            for (int i = 0; i < sequence.Barriers.Length; i++)
+            {
+                float distance = sequence.Barriers[i].MetersBeforeEdge;
+                float before = story.SpeedAt(story.Markers[10] - (distance + 1.2f) / story.Length);
+                float after = story.SpeedAt(story.Markers[10] - (distance - .5f) / story.Length);
+                float expected = i == 0 ? 18f : i == 1 ? 13f : 8f;
+                Require(before - after > 3f && Mathf.Abs(after - expected) < .01f,
+                    $"Board {i + 1} causes its own speed loss ({before:F2} -> {after:F2}m/s)");
+                float middle = story.SpeedAt(story.Markers[10] - (distance - 4f) / story.Length);
+                Require(Mathf.Abs(middle - after) < .01f, "Speed holds between board collisions");
+            }
             SessionState.SetBool(Active, true);
             s_errors = 0;
             EditorApplication.isPlaying = true;
@@ -160,6 +274,44 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 catch (IOException) { return; } // 外部の書き込み完了を次のEditor更新まで待つ。
                 if (command == "build")
                     RollerCoasterStoryboardBuilder.BuildAndValidate();
+                else if (command == "presentation")
+                {
+                    try { RollerCoasterStoryboardBuilder.ApplyPresentationRefinement(); Begin(); }
+                    catch (Exception error) { File.WriteAllText(Folder + "/result.txt", "FAIL " + error); Debug.LogException(error); }
+                }
+                else if (command == "entry-fall")
+                {
+                    try { RollerCoasterBreakthroughSetup.SmoothEntranceAndStrengthenFall(); Begin(); }
+                    catch (Exception error) { File.WriteAllText(Folder + "/result.txt", "FAIL " + error); Debug.LogException(error); }
+                }
+                else if (command == "impact-timing")
+                {
+                    try { RollerCoasterBreakthroughSetup.RefineImpactAndCrossings(); Begin(); }
+                    catch (Exception error) { File.WriteAllText(Folder + "/result.txt", "FAIL " + error); Debug.LogException(error); }
+                }
+                else if (command == "smooth-boards")
+                {
+                    try { RollerCoasterBreakthroughSetup.RefineCameraAndBoards(); Begin(); }
+                    catch (Exception error) { File.WriteAllText(Folder + "/result.txt", "FAIL " + error); Debug.LogException(error); }
+                }
+                else if (command == "breakthrough")
+                {
+                    try { RollerCoasterBreakthroughSetup.Apply(); Begin(); }
+                    catch (Exception error) { File.WriteAllText(Folder + "/result.txt", "FAIL " + error); Debug.LogException(error); }
+                }
+                else if (command == "sparks-preview" || command == "entry-preview")
+                {
+                    bool entryPreview = command == "entry-preview";
+                    File.WriteAllText(Folder + (entryPreview ? "/entry-preview.txt" : "/sparks-preview.txt"), entryPreview ? "Curve to straight preview\n" : "Brake contact preview\n");
+                    SessionState.SetBool("Yasuda.EntryPreview", entryPreview);
+                    SessionState.SetBool("Yasuda.SparksPreview", true);
+                    EditorApplication.isPlaying = true;
+                }
+                else if (command == "presentation-effects")
+                {
+                    try { RollerCoasterStoryboardBuilder.ApplyPresentationEffects(); Begin(); }
+                    catch (Exception error) { File.WriteAllText(Folder + "/result.txt", "FAIL " + error); Debug.LogException(error); }
+                }
                 else if (command == "wagon-inspect")
                     RollerCoasterWagonSetup.Inspect();
                 else if (command == "wagon")
@@ -195,6 +347,11 @@ namespace YasudaHaruto.RollerCoaster.Editor
                     RollerCoasterStoryboardBuilder.FinalizeOutput();
                 return;
             }
+            if (SessionState.GetBool("Yasuda.SparksPreview", false) && EditorApplication.isPlaying && !EditorApplication.isCompiling)
+            {
+                TickSparksPreview();
+                return;
+            }
             if (!SessionState.GetBool(Active, false) || !EditorApplication.isPlaying || EditorApplication.isCompiling)
                 return;
             if (s_start == 0)
@@ -226,6 +383,7 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 }
                 if (story.BankReturnShakeAt(ride.Progress).magnitude > 1)
                     s_bankJoltSeen = true;
+                ValidatePresentation(ride, story);
                 if (story.HoldingAfterLanding)
                 {
                     if (!s_held)
@@ -292,7 +450,7 @@ namespace YasudaHaruto.RollerCoaster.Editor
                     if (viewport.z > 0 && viewport.x > .03f && viewport.x < .97f && viewport.y > .03f && viewport.y < .97f)
                         s_visible[index] = true;
                     float before = (ride.Progress - actor.Meeting) * story.Length;
-                    if (!s_actorCaptured[index] && actor.Kind == RollerCoasterStoryboard.ACTOR_KIND.CROSSING && Mathf.Abs(before + story.CrossingLead) < .7f)
+                    if (!s_actorCaptured[index] && actor.Kind == RollerCoasterStoryboard.ACTOR_KIND.CROSSING && Mathf.Abs(before + story.CrossingLeadFor(actor)) < .7f)
                     {
                         s_actorCaptured[index] = true;
                         Capture(ride.RideCamera, Folder + $"/crossing-{actor.Section:00}.png");
@@ -315,14 +473,196 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 if (ride.ForegroundVisual != null)
                     Require(s_foregroundVisible, "Wagon foreground is visible in the lower ride view");
                 Require(s_bankJoltSeen, "The curve return impact occurred during the actual ride");
+                Require(s_cameraModeTest == 3, "Level and delayed camera bank modes were exercised during the curve");
+                Require(s_maxCameraBankSpeed > 1 && s_maxCameraBankSpeed <= 45.1f, $"Camera bank stays within the smooth angular speed limit ({s_maxCameraBankSpeed:F2}deg/s peak)");
+                Require(s_earlyCrossing.All(x => x), "Both crossing carts are visible at least 16m before the meeting");
+                var finalSequence = ride.GetComponent<RollerCoasterBreakthroughSequence>();
+                Require(finalSequence.BrokenCount == 3 && s_barrierCaptured.All(x => x) && s_boardImpactSeen,
+                    "All three boards break into visible fragments and produce camera impacts");
+                Require(s_debrisCaptured.All(x => x), "Debris spread was captured after each impact");
+                Require(s_boardPauseDone, "Pause freezes flying wood and impact state, then resumes");
+                Require(s_maxBoardImpact > 7.5f && s_maxBoardDisplacement > .1f,
+                    $"Collision shake is pronounced ({s_maxBoardImpact:F2}deg and {s_maxBoardDisplacement:F3}m peak)");
+                Require(s_maxFallShake > 1.5f && s_maxLandingShake > 5f,
+                    $"Falling and landing shakes are stronger ({s_maxFallShake:F2}deg airborne, {s_maxLandingShake:F2}deg landing)");
                 Require(s_held && s_pauseDone && s_recovered, "Landing recovers the view, waits, and launches after pause/resume");
                 Require(ride.Cart.Speed < .01f, "Automatic goal stop");
                 File.AppendAllText(Folder + "/result.txt", $"Camera clearance {s_minEye:F3}m, frames={s_frame}\n");
                 ride.Restart();
                 Require(ride.Progress < .001f && story.Actors.All(x => !x.Passed), "Restart resets course events");
+                Require(finalSequence.BrokenCount == 0 && finalSequence.FlyingFragmentCount == 0 && finalSequence.ImpactRotation == Vector3.zero &&
+                    finalSequence.Barriers.All(b => b.Lettering.activeSelf && b.IntactVisual.activeSelf && b.Fragments.All(p => !p.gameObject.activeSelf)), "Restart restores intact boards, hides fragments and resets impact clocks");
                 Finish("COMPLETE", 0);
             }
             catch (Exception error) { Finish("FAIL " + error, 1); }
+        }
+
+        // Sceneの開始位置を編集せず、接続部または旧火花の区間だけをPlay中に短く確認する。
+        private static void TickSparksPreview()
+        {
+            var ride = UnityEngine.Object.FindFirstObjectByType<RollerCoasterTrialRide>();
+            if (ride == null || Time.frameCount < 5)
+                return;
+            bool entryPreview = SessionState.GetBool("Yasuda.EntryPreview", false);
+            if (!s_sparksPreviewJumped)
+            {
+                var story = ride.GetComponent<RollerCoasterStoryboard>();
+                float progress = entryPreview ? RollerCoasterCourseBuilder.KnotParameter(ride.Course.Spline.Spline, ride.Course.FallStartKnot - 1) - 10f / story.Length : story.Markers[10] - 16f / story.Length;
+                ride.Restart();
+                ride.Cart.SetSpline(ride.Course.Spline, progress * story.Length, false, true);
+                story.RestartSequence();
+                ride.ApplyPose(progress);
+                ride.GetComponent<RollerCoasterCameraMotion>().BeginRide(progress);
+                s_sparksPreviewJumped = true;
+                s_sparksPreviewStart = EditorApplication.timeSinceStartup;
+            }
+            if (entryPreview && s_sparksPreviewFrame++ % 10 == 0)
+            {
+                Capture(ride.RideCamera, Folder + $"/straight-entry-{s_sparksPreviewFrame:000}.png");
+                File.AppendAllText(Folder + "/entry-preview.txt", $"frame {s_sparksPreviewFrame}: progress={ride.Progress:F6}\n");
+            }
+            if (!entryPreview && ride.GetComponent<RollerCoasterStoryboard>().BrakeFailing && s_sparksPreviewFrame++ % 10 == 0)
+            {
+                int[] pixels = VisibleSparkPixels(ride);
+                File.AppendAllText(Folder + "/sparks-preview.txt", $"{s_sparksPreviewFrame}: left={pixels[0]}, right={pixels[1]}\n");
+                Capture(ride.RideCamera, Folder + $"/sparks-contact-{s_sparksPreviewFrame:000}.png");
+            }
+            if (EditorApplication.timeSinceStartup - s_sparksPreviewStart > (entryPreview ? 1.1f : 2f))
+            {
+                SessionState.SetBool("Yasuda.SparksPreview", false);
+                SessionState.SetBool("Yasuda.EntryPreview", false);
+                EditorApplication.isPlaying = false;
+            }
+        }
+
+        private static void ValidatePresentation(RollerCoasterTrialRide ride, RollerCoasterStoryboard story)
+        {
+            var motion = ride.GetComponent<RollerCoasterCameraMotion>();
+            s_maxFallShake = Mathf.Max(s_maxFallShake, motion.FallShakeRotation.magnitude);
+            s_maxLandingShake = Mathf.Max(s_maxLandingShake, motion.LandingShakeRotation.magnitude);
+            float bank = story.RideBankDegreesAt(ride.Progress);
+            if (motion.CurveCameraMode == RollerCoasterCameraMotion.CURVE_CAMERA_MODE.DELAYED_ROLL)
+                s_maxCameraBankSpeed = Mathf.Max(s_maxCameraBankSpeed, Mathf.Abs(motion.CameraBankAngularSpeed));
+            if (ride.Progress > story.Markers[1] + 8f / story.Length && ride.Progress < story.Markers[3] - 8f / story.Length && Mathf.Abs(bank) > 30)
+            {
+                if (s_cameraModeTest == 0)
+                {
+                    motion.CurveCameraMode = RollerCoasterCameraMotion.CURVE_CAMERA_MODE.FIXED_ROLL;
+                    s_cameraModeTest = 1;
+                }
+                else if (s_cameraModeTest == 1)
+                {
+                    Require(Mathf.Abs(motion.CameraBankDegrees) < .01f, "Camera stays level while the cart is banked");
+                    Capture(ride.RideCamera, Folder + "/curve-camera-level.png");
+                    motion.CurveCameraMode = RollerCoasterCameraMotion.CURVE_CAMERA_MODE.DELAYED_ROLL;
+                    s_cameraModeTest = 2;
+                }
+                else if (s_cameraModeTest == 2)
+                {
+                    Require(Mathf.Abs(Mathf.DeltaAngle(motion.CameraBankDegrees, bank)) > 5 && Mathf.Abs(motion.CameraBankDegrees) > 0,
+                        "Delayed camera follows after the cart rather than sharing its immediate bank");
+                    Capture(ride.RideCamera, Folder + "/curve-camera-delayed.png");
+                    s_cameraModeTest = 3;
+                }
+            }
+            foreach (var actor in story.Actors.Where(a => a.Kind == RollerCoasterStoryboard.ACTOR_KIND.CROSSING))
+            {
+                int index = actor.Section - 9;
+                float delta = (ride.Progress - actor.Meeting) * story.Length;
+                Vector3 viewport = ride.RideCamera.WorldToViewportPoint(actor.Cart.position + Vector3.up);
+                if (!s_earlyCrossing[index] && delta >= -22f && delta <= -16f && actor.Cart.gameObject.activeSelf &&
+                    viewport.z > 0 && viewport.x > .02f && viewport.x < .98f && viewport.y > .02f && viewport.y < .98f)
+                {
+                    s_earlyCrossing[index] = true;
+                    Require(true, $"Crossing {actor.Section} is in the early peripheral view at {delta:F2}m, viewport={viewport}");
+                    Capture(ride.RideCamera, Folder + $"/crossing-early-{actor.Section:00}.png");
+                }
+            }
+            var sequence = ride.GetComponent<RollerCoasterBreakthroughSequence>();
+            if (sequence == null) return;
+            s_maxBoardImpact = Mathf.Max(s_maxBoardImpact, sequence.ImpactRotation.magnitude);
+            s_maxBoardDisplacement = Mathf.Max(s_maxBoardDisplacement, sequence.ImpactPosition.magnitude);
+            if (story.BrakeFailing && !s_boardApproachCaptured)
+            {
+                s_boardApproachCaptured = true;
+                Capture(ride.RideCamera, Folder + "/no-entry-approach.png");
+            }
+            for (int i = 0; i < 3; i++)
+                if (!s_barrierCaptured[i] && sequence.BrokenCount > i && sequence.ImpactRotation.magnitude > .5f)
+                {
+                    int visible = sequence.Barriers[i].Fragments.Count(piece =>
+                    {
+                        Vector3 p = ride.RideCamera.WorldToViewportPoint(piece.position);
+                        return piece.gameObject.activeSelf && p.z > .1f && p.x > 0 && p.x < 1 && p.y > 0 && p.y < 1;
+                    });
+                    Require(visible >= 3 && sequence.FlyingFragmentCount >= 18, $"Board {i + 1} breaks with visible wood ({visible} pieces), speed={ride.Cart.Speed:F2}m/s");
+                    s_barrierCaptured[i] = true;
+                    s_boardImpactSeen = true;
+                    Capture(ride.RideCamera, Folder + $"/board-break-{i + 1}.png");
+                }
+            if (!s_boardPauseDone && s_boardPauseAt == 0 && sequence.BrokenCount == 1 && s_barrierCaptured[0])
+            {
+                ride.TogglePause();
+                s_boardPauseAt = EditorApplication.timeSinceStartup;
+                s_boardPausePosition = sequence.Barriers[0].Fragments[0].position;
+                s_boardPauseImpact = sequence.ImpactRotation;
+            }
+            int lastBoard = sequence.BrokenCount - 1;
+            if (lastBoard >= 0 && !s_debrisCaptured[lastBoard] && sequence.ImpactElapsed > .18f)
+            {
+                s_debrisCaptured[lastBoard] = true;
+                Capture(ride.RideCamera, Folder + $"/board-debris-{lastBoard + 1}.png");
+            }
+            if (!s_boardPauseDone && s_boardPauseAt > 0 && EditorApplication.timeSinceStartup - s_boardPauseAt > .15)
+            {
+                Require(Vector3.Distance(sequence.Barriers[0].Fragments[0].position, s_boardPausePosition) < .0001f &&
+                    Vector3.Distance(sequence.ImpactRotation, s_boardPauseImpact) < .0001f, "Wood fragments and impact do not advance while paused");
+                ride.TogglePause();
+                s_boardPauseDone = true;
+            }
+        }
+
+        // 同一フレームで粒子を非表示/片側表示して差分を取る。車体に隠れている粒子は数えない。
+        private static int[] VisibleSparkPixels(RollerCoasterTrialRide ride)
+        {
+            var renderers = new[] { "Left Brake Sparks", "Right Brake Sparks" }
+                .Select(n => ride.Cart.transform.Find(n).GetComponent<ParticleSystemRenderer>()).ToArray();
+            var enabled = renderers.Select(r => r.enabled).ToArray();
+            var target = RenderTexture.GetTemporary(320, 180, 24);
+            var previous = ride.RideCamera.targetTexture;
+            var active = RenderTexture.active;
+            var texture = new Texture2D(320, 180, TextureFormat.RGB24, false);
+            Color32[] Read()
+            {
+                ride.RideCamera.Render();
+                RenderTexture.active = target;
+                texture.ReadPixels(new Rect(0, 0, 320, 180), 0, 0);
+                texture.Apply();
+                return texture.GetPixels32();
+            }
+            try
+            {
+                ride.RideCamera.targetTexture = target;
+                foreach (var renderer in renderers) renderer.enabled = false;
+                var baseline = Read();
+                var result = new int[2];
+                for (int side = 0; side < 2; side++)
+                {
+                    renderers[side].enabled = true;
+                    var visible = Read();
+                    result[side] = Enumerable.Range(0, visible.Length).Count(i => visible[i].r - baseline[i].r > 20 && visible[i].g - baseline[i].g > 10);
+                    renderers[side].enabled = false;
+                }
+                return result;
+            }
+            finally
+            {
+                for (int i = 0; i < renderers.Length; i++) renderers[i].enabled = enabled[i];
+                ride.RideCamera.targetTexture = previous;
+                RenderTexture.active = active;
+                RenderTexture.ReleaseTemporary(target);
+                UnityEngine.Object.DestroyImmediate(texture);
+            }
         }
 
         private static void Capture(Camera camera, string path)

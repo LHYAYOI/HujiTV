@@ -211,11 +211,7 @@ namespace YasudaHaruto.BookValidation
             bool accepted = m_bookController.TryApplyInventory(visuals, spread, present, success =>
             {
                 if (success)
-                {
                     m_inventory.Commit(candidate);
-                    if (present)
-                        m_bookController.PlayAcquisitionEffect();
-                }
                 m_captureCandidate = null;
                 m_editing = false;
                 if (isActiveAndEnabled && m_initialized && m_bookController.IsReady && !m_bookController.IsClosed)

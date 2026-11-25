@@ -18,6 +18,9 @@ namespace YasudaHaruto.BookValidation
         [Header("Rune")]
         [SerializeField] private RunePageView m_runeTraceView;
         [SerializeField, Min(0f)] private float m_runeCooldownSeconds = 1f;
+        [SerializeField, Range(0f, 1f)] private float m_cooldownBookDim = 0.6f;
+        private bool m_bookDimmedForCooldown;
+        private float m_bookDimBeforeCooldown;
 
 
         [Header("Input")]
@@ -99,10 +102,44 @@ namespace YasudaHaruto.BookValidation
         private void Update()
         {
             m_runeTraceController?.Tick(Time.deltaTime);
+            UpdateBookCooldownDim();
             m_pageRequests?.Tick();
             if (m_pendingCastSelection.HasValue && m_networkClient != null &&
                 m_networkClient.SendCastSelection(m_pendingCastSelection.Value))
                 m_pendingCastSelection = null;
+        }
+
+
+        private void UpdateBookCooldownDim()
+        {
+            var book = m_gameController != null ? m_gameController.BookView : null;
+            var flipView = book != null ? book.FlipView : null;
+            if (flipView == null || !flipView.isActiveAndEnabled)
+                return;
+
+            bool coolingDown = m_cooldownBookDim > 0f &&
+                m_runeTraceController?.State == RUNE_TRACE_STATE.COOLDOWN &&
+                book.isActiveAndEnabled && !book.IsClosed;
+            if (coolingDown == m_bookDimmedForCooldown)
+                return;
+
+            m_bookDimmedForCooldown = coolingDown;
+            if (coolingDown)
+                m_bookDimBeforeCooldown = flipView.Dim;
+            flipView.FadeDim(coolingDown ? Mathf.Max(m_bookDimBeforeCooldown, m_cooldownBookDim) :
+                m_bookDimBeforeCooldown, 0.15f);
+        }
+
+
+        private void OnDisable()
+        {
+            if (!m_bookDimmedForCooldown)
+                return;
+
+            m_bookDimmedForCooldown = false;
+            var book = m_gameController != null ? m_gameController.BookView : null;
+            if (book != null && book.FlipView != null)
+                book.FlipView.SetDim(m_bookDimBeforeCooldown);
         }
 
 

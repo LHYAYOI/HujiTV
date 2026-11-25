@@ -7,6 +7,8 @@ namespace YasudaHaruto.RollerCoaster
     public sealed class RollerCoasterBrakeSparks : MonoBehaviour
     {
         [SerializeField] private Material m_material;
+        [Tooltip("前輪とレールの接地点付近。見せるために発生位置を車体上へ移動しない。Xは左右へ反転する。")]
+        [SerializeField] private Vector3 m_storyboardEmissionOffset = new Vector3(.88f, .04f, .65f);
         private RollerCoasterTrialRide m_ride;
         private RollerCoasterSpeedProfile m_profile;
         private RollerCoasterStoryboard m_storyboard;
@@ -34,15 +36,15 @@ namespace YasudaHaruto.RollerCoaster
                 var go = new GameObject(side == 0 ? "Left Brake Sparks" : "Right Brake Sparks");
                 go.transform.SetParent(m_ride.Cart.transform, false);
                 go.transform.localPosition = m_storyboard != null ?
-                    new Vector3(side == 0 ? -.7f : .7f, .25f, 1.2f) : new Vector3(side == 0 ? -.88f : .88f, .2f, .7f);
+                    new Vector3((side == 0 ? -1 : 1) * m_storyboardEmissionOffset.x, m_storyboardEmissionOffset.y, m_storyboardEmissionOffset.z) : new Vector3(side == 0 ? -.88f : .88f, .2f, .7f);
                 var system = go.AddComponent<ParticleSystem>();
                 system.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
                 var main = system.main;
                 main.loop = true;
                 main.playOnAwake = false;
                 main.simulationSpace = ParticleSystemSimulationSpace.World;
-                main.startLifetime = new ParticleSystem.MinMaxCurve(.18f, .32f);
-                main.startSize = new ParticleSystem.MinMaxCurve(.025f, .055f);
+                main.startLifetime = m_storyboard != null ? new ParticleSystem.MinMaxCurve(.2f, .3f) : new ParticleSystem.MinMaxCurve(.18f, .32f);
+                main.startSize = m_storyboard != null ? new ParticleSystem.MinMaxCurve(.018f, .035f) : new ParticleSystem.MinMaxCurve(.025f, .055f);
                 main.startSpeed = 0f;
                 main.gravityModifier = 1f;
                 main.maxParticles = 180;
@@ -105,7 +107,7 @@ namespace YasudaHaruto.RollerCoaster
                     var velocity = new Vector3((side == 0 ? -1 : 1) * Random.Range(.3f, .9f), Random.Range(2.8f, 4.5f), -Random.Range(3f, 5f));
                     Vector3 worldVelocity = source.TransformDirection(velocity) + m_ride.Cart.transform.forward * m_ride.Cart.Speed * .6f;
                     if (m_storyboard != null)
-                        worldVelocity = source.TransformDirection(new Vector3((side == 0 ? -1 : 1) * Random.Range(.15f, .5f), Random.Range(4f, 6f), -Random.Range(7f, 11f))) +
+                        worldVelocity = source.TransformDirection(new Vector3((side == 0 ? -1 : 1) * Random.Range(.1f, .4f), Random.Range(8f, 11f), -Random.Range(.1f, .5f))) +
                             m_ride.Cart.transform.forward * m_ride.Cart.Speed;
                     LastRelativeForwardSpeed = Vector3.Dot(worldVelocity - m_ride.Cart.transform.forward * m_ride.Cart.Speed, m_ride.Cart.transform.forward);
                     var particle = new ParticleSystem.EmitParams { position = source.position, velocity = worldVelocity };

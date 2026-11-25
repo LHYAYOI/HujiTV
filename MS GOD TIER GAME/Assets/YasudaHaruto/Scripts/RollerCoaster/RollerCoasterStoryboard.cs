@@ -22,6 +22,8 @@ namespace YasudaHaruto.RollerCoaster
             public Transform Cart;
             public float Meeting;
             public float Span = 30f;
+            public bool ReverseCrossing;
+            public float CrossingLeadMeters;
             [NonSerialized] public bool Seen;
             [NonSerialized] public bool Passed;
         }
@@ -52,7 +54,7 @@ namespace YasudaHaruto.RollerCoaster
         [SerializeField, Range(.1f, .5f)] private float m_oncomingRate = .405f;
         [SerializeField, Range(0, 40)] private float m_parallelLookDegrees = 26f;
         [SerializeField, Range(3, 12)] private float m_oncomingApproach = 6.3f;
-        [SerializeField, Range(.5f, 6)] private float m_crossingLead = 2.1f;
+        [SerializeField, Range(.5f, 10)] private float m_crossingLead = 6f;
         [SerializeField, Range(0, 35)] private float m_brakePitch = 22f;
         [SerializeField, Min(0)] private float m_landingStopSeconds = .65f;
         [SerializeField, Min(.1f)] private float m_landingRecoverySeconds = .55f;
@@ -70,9 +72,10 @@ namespace YasudaHaruto.RollerCoaster
 
         public float CrossingLead => m_crossingLead;
 
-        public bool BrakeFailing => isActiveAndEnabled && m_ride.Progress > m_markers[10] - 18f / Length && m_ride.Progress < m_markers[10];
+        private float BrakeDistance => GetComponent<RollerCoasterBreakthroughSequence>() is RollerCoasterBreakthroughSequence sequence && sequence.enabled ? sequence.BrakeDistance : 18f;
+        public bool BrakeFailing => isActiveAndEnabled && m_ride.Progress > m_markers[10] - BrakeDistance / Length && m_ride.Progress < m_markers[10];
 
-        public float BrakePhase => Mathf.InverseLerp(m_markers[10] - 18f / Length, m_markers[10], m_ride.Progress);
+        public float BrakePhase => Mathf.InverseLerp(m_markers[10] - BrakeDistance / Length, m_markers[10], m_ride.Progress);
 
         public float[] Markers => m_markers;
 
@@ -100,6 +103,9 @@ namespace YasudaHaruto.RollerCoaster
         {
             m_length = m_ride.Course.Spline.CalculateLength();
             m_bankReturns = null;
+            var breakthrough = GetComponent<RollerCoasterBreakthroughSequence>();
+            if (breakthrough != null)
+                breakthrough.RestartSequence();
             m_landingReached = m_ride.Progress >= m_fallEnd;
             m_landingElapsed = m_landingReached ? 100f : 0f;
             foreach (var actor in m_actors)
@@ -157,7 +163,7 @@ namespace YasudaHaruto.RollerCoaster
                 float drop = Mathf.Clamp01((top - height) / (top - bottom));
                 return Mathf.Sqrt(9f + (36f * 36f - 9f) * drop);
             }
-            // ⑪はブレーキを踏む演出でも実速度を落とさず、そのまま落下する。
+            // 基本の最終落下速度。突破演出がある場合は末尾で減速と重力加速へ置き換える。
             if (progress > m_markers[10] && progress < m_fallEnd)
             {
                 float drop = Mathf.Max(0, ((Vector3)m_ride.Course.Spline.EvaluatePosition(0, m_markers[10])).y -
@@ -168,7 +174,8 @@ namespace YasudaHaruto.RollerCoaster
             float revealWeight = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(-22, -12, reveal)) * (1 - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(8, 20, reveal)));
             speed = Mathf.Lerp(speed, 16f, revealWeight);
             speed *= Mathf.Lerp(1, m_cruiseScale, Mathf.SmoothStep(0, 1, Mathf.InverseLerp(m_markers[1], m_markers[1] + 16f / Length, progress)));
-            return Mathf.Max(.5f, speed);
+            var breakthrough = GetComponent<RollerCoasterBreakthroughSequence>();
+            return breakthrough != null && breakthrough.enabled ? breakthrough.ModifySpeed(progress, Mathf.Max(.5f, speed)) : Mathf.Max(.5f, speed);
         }
 
         public Quaternion RotationAt(float progress)
@@ -192,7 +199,11 @@ namespace YasudaHaruto.RollerCoaster
             if (progress > m_markers[1] && progress < m_markers[10])
                 rotation = Quaternion.LookRotation(tangent, Vector3.up) * Quaternion.Euler(0, 0, RideBankDegreesAt(progress));
             if (progress <= m_markers[10] && BrakeFailing)
-                rotation *= Quaternion.Euler(m_brakePitch * Mathf.SmoothStep(0, 1, BrakePhase), 0, 0);
+            {
+                var breakthrough = GetComponent<RollerCoasterBreakthroughSequence>();
+                float lean = breakthrough != null && breakthrough.enabled ? breakthrough.ContactLeanAt(progress) : Mathf.SmoothStep(0, 1, BrakePhase);
+                rotation *= Quaternion.Euler(m_brakePitch * lean, 0, 0);
+            }
             return rotation;
         }
 
@@ -322,8 +333,10 @@ namespace YasudaHaruto.RollerCoaster
                 else if (actor.Kind == ACTOR_KIND.PARALLEL)
                     t = Mathf.InverseLerp(-actor.Span, actor.Span, delta + 7f);
                 else
-                    t = Mathf.Clamp01(.5f + (delta + m_crossingLead) * .1f);
+                    t = CrossingParameterAt(actor, delta);
                 actor.Route.Evaluate(0, t, out var p, out var tangent, out var up);
+                if (actor.Kind == ACTOR_KIND.CROSSING && actor.ReverseCrossing)
+                    tangent = -tangent;
                 actor.Cart.SetPositionAndRotation(p, Quaternion.LookRotation(reverse ? -(Vector3)tangent : (Vector3)tangent, up));
                 if (delta > 5f)
                     actor.Passed = true;
@@ -348,6 +361,21 @@ namespace YasudaHaruto.RollerCoaster
             GUI.Box(new Rect(12, 94, 340, 30), $"Course sequence {Section} / 11");
         }
 
+        // 接近から交差まで同じ割合で進む。現行の交差区間の自車速度は一定なので相手もほぼ等速になる。
+        // 交差直前だけ加速させず、中央通過の先行距離で車体の抜ける余裕を確保する。
+        public float CrossingParameterAt(float distanceToMeeting)
+        {
+            return Mathf.Clamp01(.5f + (distanceToMeeting + m_crossingLead) / 40f);
+        }
+
+        public float CrossingLeadFor(ACTOR actor) => actor.CrossingLeadMeters > 0 ? actor.CrossingLeadMeters : m_crossingLead;
+
+        public float CrossingParameterAt(ACTOR actor, float distanceToMeeting)
+        {
+            float t = Mathf.Clamp01(.5f + (distanceToMeeting + CrossingLeadFor(actor)) / 40f);
+            return actor.ReverseCrossing ? 1f - t : t;
+        }
+
 #if UNITY_EDITOR
         public void ApplyRideRefinement()
         {
@@ -363,6 +391,8 @@ namespace YasudaHaruto.RollerCoaster
 
         public void Configure(RollerCoasterTrialRide ride, float[] markers, float fallEnd, AnimationCurve speeds, ACTOR[] actors, CEILING[] ceilings)
         {
+            m_length = 0;
+            m_bankReturns = null;
             m_ride = ride;
             m_markers = markers;
             m_fallEnd = fallEnd;

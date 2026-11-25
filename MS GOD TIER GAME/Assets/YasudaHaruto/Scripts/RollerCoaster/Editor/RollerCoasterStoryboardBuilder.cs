@@ -84,6 +84,8 @@ namespace YasudaHaruto.RollerCoaster.Editor
             if (oldProfile != null)
                 oldProfile.enabled = false;
             var oldStory = ride.GetComponent<RollerCoasterStoryboard>();
+            var oldBreakthrough = ride.GetComponent<RollerCoasterBreakthroughSequence>();
+            if (oldBreakthrough != null) oldBreakthrough.Configure(Array.Empty<RollerCoasterBreakthroughSequence.Barrier>(), 0);
             if (oldStory != null)
                 UnityEngine.Object.DestroyImmediate(oldStory);
             var root = new GameObject("Image Course 1-11");
@@ -250,13 +252,12 @@ namespace YasudaHaruto.RollerCoaster.Editor
                     route.Spline.SetKnot(0, knot);
                     RailSplineMeshGenerator.Generate(route.GetComponent<RailSplineMesh>());
                 }
-                // 全レールは実在する。⑧だけ正面の見せ線路を短くし、その奥に切れた続きの線路を置く。
+                // ⑧は直進できそうに見える連続レールを残し、自車だけが右の経路へ進む。
                 if (section == 8)
                 {
                     var rail = route.GetComponent<RailSplineMesh>();
-                    RollerCoasterCourseBuilder.SetRange(rail, 3.5f, 10);
+                    RollerCoasterCourseBuilder.SetRange(rail, 0, 0);
                     RailSplineMeshGenerator.Generate(rail);
-                    Route("08 Broken Rail Far Side", new[] { p + heading * 20, p + heading * 33 });
                     var reveal = new GameObject("08 Broken Rail Reveal Light");
                     reveal.transform.SetParent(root.transform, false);
                     reveal.transform.position = p + heading * 23f + Vector3.up * 2.5f;
@@ -295,10 +296,10 @@ namespace YasudaHaruto.RollerCoaster.Editor
                 table.Frame(d, out var p, out var r);
                 Vector3 right = Vector3.ProjectOnPlane(r * Vector3.right, Vector3.up).normalized;
                 var route = Route($"{section:00} Crossing Right To Left", new[] { p + right * 16, p + right * 8, p, p - right * 8, p - right * 16 });
-                Actor(section, RollerCoasterStoryboard.ACTOR_KIND.CROSSING, route, 20);
-                var room = new ROOM { Entry = d - 8, Exit = d + 8 };
-                room.Branches.Add((route, 3));
-                room.Branches.Add((route, 29));
+                Actor(section, RollerCoasterStoryboard.ACTOR_KIND.CROSSING, route, 30);
+                var room = new ROOM { Entry = d - 26, Exit = d + 10 };
+                room.Branches.Add((route, 1));
+                room.Branches.Add((route, 31));
                 rooms.Add(room);
             }
             // 着地地点の手前まで受け側の線路を伸ばし、車体全体が線路へ乗る。
@@ -328,6 +329,7 @@ namespace YasudaHaruto.RollerCoaster.Editor
             File.WriteAllText("Temp/RollerCoasterStoryboard/build.txt", $"11 sections, {spline.Count} knots, {table.Length:F3}m; actors={actors.Count}, moving ceilings={ceilings.Count}\n" +
                 string.Join("\n", markers.Select((x, i) => $"{i + 1}: t={x:F6} d={table.DistanceAtParameter(x):F3} p={course.Spline.EvaluatePosition(0, x)}")));
             Selection.activeGameObject = story.gameObject;
+            RollerCoasterBreakthroughSetup.Apply();
         }
 
 
@@ -364,25 +366,77 @@ namespace YasudaHaruto.RollerCoaster.Editor
             foreach (int section in new[] { 9, 10 })
             {
                 float d = main.DistanceAtParameter(story.Markers[section - 1]);
-                var room = new ROOM { Entry = d - 8, Exit = d + 8 };
-                var route = root.Find($"{section:00} Crossing Right To Left").GetComponent<SplineContainer>();
-                room.Branches.Add((route, 3));
-                room.Branches.Add((route, 29));
+                var room = new ROOM { Entry = d - 26, Exit = d + 10 };
+                var route = story.Actors.Single(a => a.Section == section && a.Kind == RollerCoasterStoryboard.ACTOR_KIND.CROSSING).Route;
+                room.Branches.Add((route, 1));
+                room.Branches.Add((route, 31));
                 rooms.Add(room);
             }
-            foreach (string name in new[] { "Continuous Course Enclosure", "07 Rising Ceiling", "08 Rising Ceiling Before Broken Track", "08 Dark Gap Under Broken Track" })
-            {
-                var old = root.Find(name);
-                if (old != null)
-                    UnityEngine.Object.DestroyImmediate(old.gameObject);
-            }
             var ceilings = new List<RollerCoasterStoryboard.CEILING>();
-            GenerateEnclosure(root, course, settings, main, rooms, story.Markers, story.FallEnd, ceilings);
+            // 成功した囲いだけを入れ替える。生成失敗時に現在の背景を失わない。
+            var staging = new GameObject("Enclosure Refinement Staging");
+            staging.transform.SetParent(root, false);
+            try
+            {
+                GenerateEnclosure(staging.transform, course, settings, main, rooms, story.Markers, story.FallEnd, ceilings);
+                foreach (string name in new[] { "Continuous Course Enclosure", "07 Rising Ceiling", "08 Rising Ceiling Before Broken Track", "08 Dark Gap Under Broken Track" })
+                {
+                    var old = root.Find(name);
+                    if (old != null)
+                        UnityEngine.Object.DestroyImmediate(old.gameObject);
+                }
+                while (staging.transform.childCount > 0)
+                    staging.transform.GetChild(0).SetParent(root, false);
+            }
+            finally { UnityEngine.Object.DestroyImmediate(staging); }
             story.ConfigureCeilings(ceilings.ToArray());
             EditorUtility.SetDirty(story);
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             AssetDatabase.SaveAssets();
+        }
+
+        [MenuItem("Tools/Roller Coaster/Apply Camera And Crossing Refinement")]
+        internal static void ApplyPresentationRefinement()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new InvalidOperationException("編集モードで実行してください。");
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            if (scene.path != RollerCoasterCourseBuilder.ScenePath)
+                throw new InvalidOperationException("RollerCoaster Sceneを開いてください。");
+            EditorSceneManager.SaveScene(scene, "Assets/YasudaHaruto/Backups~/Before-presentation-scene-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".unity", true);
+            var story = UnityEngine.Object.FindFirstObjectByType<RollerCoasterStoryboard>();
+            var ride = story.GetComponent<RollerCoasterTrialRide>();
+            var root = ride.Course.transform.Find("Image Course 1-11");
+            var rail = root.Find("08 Apparent Forward Route").GetComponent<RailSplineMesh>();
+            RollerCoasterCourseBuilder.SetRange(rail, 0, 0);
+            RailSplineMeshGenerator.Generate(rail);
+            var oldFarSide = root.Find("08 Broken Rail Far Side");
+            if (oldFarSide != null)
+                UnityEngine.Object.DestroyImmediate(oldFarSide.gameObject);
+            foreach (var actor in story.Actors.Where(a => a.Kind == RollerCoasterStoryboard.ACTOR_KIND.CROSSING))
+                actor.Span = 30f;
+            ride.GetComponent<RollerCoasterCameraMotion>().CurveCameraMode = RollerCoasterCameraMotion.CURVE_CAMERA_MODE.DELAYED_ROLL;
+            EditorUtility.SetDirty(story);
+            EditorUtility.SetDirty(ride.GetComponent<RollerCoasterCameraMotion>());
+            ApplyPresentationEffects();
+            RebuildDuctEnclosure();
+        }
+
+        internal static void ApplyPresentationEffects()
+        {
+            var story = UnityEngine.Object.FindFirstObjectByType<RollerCoasterStoryboard>();
+            if (story == null || story.gameObject.scene.path != RollerCoasterCourseBuilder.ScenePath || EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new InvalidOperationException("RollerCoasterの編集モードで実行してください。");
+            // 早い段階の見せ場を長くしても、交差直前には相手の車体全体が抜ける余裕を残す。
+            var storyData = new SerializedObject(story);
+            storyData.FindProperty("m_crossingLead").floatValue = 6f;
+            storyData.ApplyModifiedPropertiesWithoutUndo();
+            var sparksData = new SerializedObject(story.GetComponent<RollerCoasterBrakeSparks>());
+            sparksData.FindProperty("m_storyboardEmissionOffset").vector3Value = new Vector3(.88f, .04f, .65f);
+            sparksData.ApplyModifiedPropertiesWithoutUndo();
+            EditorSceneManager.MarkSceneDirty(story.gameObject.scene);
+            EditorSceneManager.SaveScene(story.gameObject.scene);
         }
 
 
@@ -615,6 +669,12 @@ namespace YasudaHaruto.RollerCoaster.Editor
                         Pipe(table, Mathf.Max(0, distances[0] - 1f), table.Length, true);
                 }
                 var all = ports.SelectMany(x => new[] { x[0], x[1] }).ToArray();
+                var topByFloor = new Dictionary<Vector3, Vector3>();
+                foreach (var port in ports)
+                {
+                    topByFloor[port[0]] = port[3];
+                    topByFloor[port[1]] = port[2];
+                }
                 Vector3 center = all.Aggregate(Vector3.zero, (a, b) => a + b) / all.Length;
                 var hull = new List<Vector3>();
                 foreach (var port in ports.OrderBy(p => Mathf.Atan2((p[0].z + p[1].z) * .5f - center.z, (p[0].x + p[1].x) * .5f - center.x)))
@@ -641,7 +701,8 @@ namespace YasudaHaruto.RollerCoaster.Editor
                     var a = hull[i];
                     var b = hull[(i + 1) % hull.Count];
                     bool opening = ports.Any(p => (Vector3.Distance(a, p[0]) < .01f && Vector3.Distance(b, p[1]) < .01f) || (Vector3.Distance(a, p[1]) < .01f && Vector3.Distance(b, p[0]) < .01f));
-                    Vector3 aa = a + Vector3.up * (roof - floor), bb = b + Vector3.up * (roof - floor);
+                    // 傾斜した入口は上端が真上ではない。実際の開口を使って天井との隙間を防ぐ。
+                    Vector3 aa = topByFloor[a], bb = topByFloor[b];
                     if (opening)
                         openings++;
                     else
