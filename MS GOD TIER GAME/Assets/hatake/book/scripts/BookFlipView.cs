@@ -89,8 +89,11 @@ namespace hatake
         [SerializeField, Min(0)] private float m_ambientRefreshRateMobile = 30f;
         [Tooltip("出力（合成）の高さの上限（画素）。0 で上限なし。表示先より小さいと拡大して表示する（ちらつきは出ない）")]
         [SerializeField, Min(0)] private int m_maxOutputHeight;
-        [Tooltip("モバイル（Android / iOS）での出力の高さの上限（画素）。合成シェーダーの負荷は画素数に比例する")]
-        [SerializeField, Min(0)] private int m_maxOutputHeightMobile = 720;
+        [Tooltip("モバイル（Android / iOS）での出力の高さの上限（画素）。0 で上限なし（表示先の画素数のまま描く）。" +
+                 "合成シェーダーの負荷は画素数に比例する")]
+        [SerializeField, Min(0)] private int m_maxOutputHeightMobile;
+        [Tooltip("オンのときだけ Max Output Height Mobile で合成の高さを抑える。オフなら表示先の画素数そのまま（文字がぼけない）。既存シーンに残っている古い上限値を無視するための切り替え")]
+        [SerializeField] private bool m_limitOutputHeightMobile;
         [Tooltip("モバイルでの Bloom の段数の上限。段ごとに描画の切り替えが1回増える")]
         [SerializeField, Range(1, 8)] private int m_bloomIterationsMobile = 3;
         [Tooltip("モバイルで、Bloom を2フレームに分けて求める（1フレーム目に縮小、2フレーム目に拡大。その間は前の結果を重ねる）。" +
@@ -124,6 +127,10 @@ namespace hatake
         [Tooltip("Hidden/Book/Page Flip Post。未設定なら Bloom・ぼかし無しでそのまま出力")]
         [SerializeField] private Shader m_postShader;
         [SerializeField, Min(0)] private float m_bloomIntensity = 0.9f;
+        [Tooltip("本の上の暗い所（文字・線）に Bloom の光を足さない割合。1 で紙だけが光り、文字は元の濃さのまま")]
+        [SerializeField, Range(0, 1)] private float m_bloomKeepDark = 0.9f;
+        [Tooltip("撮影したページを本に写すときの輪郭の強調。補間で細い文字・線が薄くなる分を戻す（0 で無し）")]
+        [SerializeField, Range(0, 2)] private float m_pageSharpen = 0.6f;
         [Tooltip("これより明るい部分が光る（1 = 白）")]
         [SerializeField, Min(0)] private float m_bloomThreshold = 0.95f;
         [SerializeField, Range(0, 1)] private float m_bloomKnee = 0.5f;
@@ -224,6 +231,8 @@ namespace hatake
         private static readonly int s_paperFinish = Shader.PropertyToID("_PaperFinish");
         private static readonly int s_bookPoseInv = Shader.PropertyToID("_BookPoseInv");
         private static readonly int s_pageLod = Shader.PropertyToID("_PageLod");
+        private static readonly int s_pageSharpen = Shader.PropertyToID("_PageSharpen");
+        private static readonly int s_bloomKeepDark = Shader.PropertyToID("_BloomKeepDark");
         private static readonly int s_prefilterSpread = Shader.PropertyToID("_PrefilterSpread");
         private static readonly int s_downSpread = Shader.PropertyToID("_DownSpread");
         private static readonly int s_coverLod = Shader.PropertyToID("_CoverLod");
@@ -379,22 +388,56 @@ namespace hatake
             }
         }
 
+        private static readonly Vector3[] s_displayCorners = new Vector3[4];
+
         private void MatchDisplayAspect()
         {
             float aspect = DisplayAspect;
             if (aspect <= 0f || !m_ownsOutput || m_outputTexture == null) return;
             int height = Mathf.Max(16, m_outputSize.y);
+            int width = 0;
+            Rect uvRect = new Rect(0f, 0f, 1f, 1f);
             // 表示先の実際の画素数に合わせる（縮小して表示しない）
             if (m_fitDisplayResolution)
             {
+                // 画面上で実際に占める範囲（親の拡大縮小も含める）。Canvas の倍率だけで求めると、
+                // 親が拡大していると出力を引き伸ばして表示することになり、ぼける
                 Canvas canvas = m_display.canvas;
                 float scale = canvas != null ? canvas.scaleFactor : 1f;
-                height = Mathf.Clamp(Mathf.RoundToInt(m_display.rectTransform.rect.height * scale), 16, 4096);
+                float pixels = m_display.rectTransform.rect.height * scale;
+                if (canvas != null)
+                {
+                    Canvas root = canvas.rootCanvas;
+                    Camera eventCamera = root.renderMode == RenderMode.ScreenSpaceOverlay ? null : root.worldCamera;
+                    m_display.rectTransform.GetWorldCorners(s_displayCorners);
+                    Vector2 min = RectTransformUtility.WorldToScreenPoint(eventCamera, s_displayCorners[0]);
+                    Vector2 max = RectTransformUtility.WorldToScreenPoint(eventCamera, s_displayCorners[2]);
+                    Vector2 size = max - min;
+                    if (size.x > 1f && size.y > 1f && Mathf.Abs(s_displayCorners[1].x - s_displayCorners[0].x) < 1e-3f)
+                    {
+                        pixels = size.y;
+                        // 出力の画素を画面の画素にぴったり重ねる。表示先の位置が画素の途中（小数）だと、
+                        // 表示するときの補間で全体が半画素ほどぼける（細い文字が薄くなる）。
+                        // 出力の画素の格子を画面の画素の格子に合わせ、そのずれを表示の UV で打ち消す
+                        width = Mathf.Clamp(Mathf.RoundToInt(size.x), 16, 8192);
+                        int h = Mathf.Clamp(Mathf.RoundToInt(size.y), 16, 4096);
+                        float originX = Mathf.Round(min.x), originY = Mathf.Round(min.y);
+                        uvRect = new Rect((min.x - originX) / width, (min.y - originY) / h, size.x / width, size.y / h);
+                    }
+                    if (Time.frameCount % 60 == 0) DebugDisplayInfo = "screen=" + Screen.width + "x" + Screen.height + " min=" + min + " size=" + size + " sf=" + scale.ToString("0.000");
+                }
+                height = Mathf.Clamp(Mathf.RoundToInt(pixels), 16, 4096);
             }
-            // 合成の画素数を抑える（モバイルは既定 720）。表示では拡大されるだけなので、ちらつきは出ない
-            int maxHeight = UsesMobileSettings ? m_maxOutputHeightMobile : m_maxOutputHeight;
-            if (maxHeight > 0) height = Mathf.Min(height, Mathf.Max(16, maxHeight));
-            int width = Mathf.Clamp(Mathf.RoundToInt(height * aspect), 16, 8192);
+            // 合成の画素数を抑える（既定は上限なし）。表示では拡大されるだけなので、ちらつきは出ない
+            int maxHeight = UsesMobileSettings ? (m_limitOutputHeightMobile ? m_maxOutputHeightMobile : 0) : m_maxOutputHeight;
+            if (maxHeight > 0 && height > maxHeight)
+            {
+                height = Mathf.Max(16, maxHeight);
+                width = 0;
+                uvRect = new Rect(0f, 0f, 1f, 1f);
+            }
+            if (width <= 0) width = Mathf.Clamp(Mathf.RoundToInt(height * aspect), 16, 8192);
+            if (m_display.uvRect != uvRect) m_display.uvRect = uvRect;
             if (m_outputTexture.width == width && m_outputTexture.height == height) return;
             RenderTexture old = m_outputTexture;
             m_outputTexture = CreateOutput(width, height);
@@ -1118,6 +1161,7 @@ namespace hatake
             }
             m_progressActive = false;
             m_progressPending = false;
+            m_lastAnimFrameExact = true;
             DrawComposite(m_compositeTexture);
             m_postSource = null;
             RenderPost();
@@ -1203,8 +1247,9 @@ namespace hatake
             Note(" warmUp");
         }
 
-        [Tooltip("モバイルで、めくり・演出の間に描く解像度の倍率（出力の大きさに対して）。止まると元の解像度で描き直す")]
-        [SerializeField, Range(0.5f, 1f)] private float m_animationScaleMobile = 0.8f;
+        [Tooltip("モバイルで、めくり・演出の間に描く解像度の倍率（出力の大きさに対して）。1 で下げない。" +
+                 "1 未満なら止まった後に元の解像度で描き直す")]
+        [SerializeField, Range(0.5f, 1f)] private float m_animationScaleMobile = 1f;
         private RenderTexture m_animTexture;
         private RenderTexture m_postSource;   // 後処理が読む合成（null で m_compositeTexture）
         private RenderTexture m_lastDrawTarget;
@@ -1457,7 +1502,7 @@ namespace hatake
         {
             if (!m_prerenderCoverMobile || !m_turnCacheMobile || !m_rigidCovers || m_postMaterial == null || m_runtimeMaterial == null) return;
             if (!UsesSplitPasses || m_turning || m_progressActive) return;
-            if (m_compositeTexture == null || !m_compositeTexture.IsCreated() || m_animationScaleMobile >= 0.999f) return;
+            if (m_compositeTexture == null || !m_compositeTexture.IsCreated()) return;
             if (m_runtimeMaterial.passCount <= PassCoverTurn) return;
             // 暗転・魔法の縁取りが動いている間は描き直しが続くので、先に描いてもすぐ無効になる
             if (m_dim > 0f || m_dimRoutine != null || (m_hasMagicStyle ? m_magicStrength : m_baseMagicStrength) > 0f) return;
@@ -1469,9 +1514,15 @@ namespace hatake
                 m_coverPreSpread = m_current;
                 m_coverPreSignature = ComputeSignature(true);
             }
-            EnsureAnimTexture();
+            // めくりを描く先と同じ大きさ（解像度を下げて動かすときは m_animTexture、下げないときは合成そのもの）
+            RenderTexture size = m_compositeTexture;
+            if (m_animationScaleMobile < 0.999f)
+            {
+                EnsureAnimTexture();
+                size = m_animTexture;
+            }
             RenderTexture previous = m_coverPre;
-            m_coverPre = EnsureMipCache(m_coverPre, m_animTexture, "BookCoverPre");
+            m_coverPre = EnsureMipCache(m_coverPre, size, "BookCoverPre");
             // 途中で作り直した（大きさが変わった）：前に描いた帯は消えているので始めから
             if (previous != m_coverPre && m_coverPreStep > 0) m_coverPreStep = 0;
             // 移動先の状態として描く（表紙の開け閉めは、めくる前と後で同じ見開きを使う）
@@ -2019,6 +2070,10 @@ namespace hatake
         // 計測用（BookPerfProbe のベンチマーク）：今の状態のまま、合成・後処理だけを描く
         // ------------------------------------------------------------------
         internal Material BenchMaterial => m_runtimeMaterial;
+        internal Texture DebugCurrent => m_current;
+        internal RenderTexture DebugComposite => m_compositeTexture;
+        internal RenderTexture DebugOutput => m_outputTexture;
+        internal static string DebugDisplayInfo = "";
         // 計測用：このフレームで行った重い処理の名前（BookPerfProbe が遅いフレームの記録に使う）
         internal string FrameNote = "";
         // 計測（BookPerfProbe）がいるときだけ、そのフレームの処理の名前を残す（いなければ文字列を作らない）
@@ -2705,6 +2760,7 @@ namespace hatake
             post.SetColor(s_bloomTint, new Color(m_bloomTint.r, m_bloomTint.g, m_bloomTint.b, bloom != null ? m_bloomIntensity : 0f));
             post.SetFloat(s_dimBlur, blurFlag ? m_dimBlur : 0f);
             post.SetFloat(s_tonemap, m_tonemap && !m_hdrOutput ? 1f : 0f);
+            post.SetFloat(s_bloomKeepDark, m_bloomKeepDark);
             post.SetFloat(s_exposure, m_exposure);
             if (m_postRect is Rect postRect)
             {
@@ -2860,13 +2916,21 @@ namespace hatake
 
         // 縮小表示でのちらつき対策：出力でのページの画素数から、撮影テクスチャ・表紙の絵を読むミップの段と、
         // 紙の細かな模様をどこまで描くかを決める（シェーダーは分岐内で読むので、微分の代わりにこの値を使う）
+        /// <summary>撮影テクスチャをこの幅にすると、撮影したページの画素が本の出力でのページの画素と同じ数になる（0 は未定）</summary>
+        public static float DesiredCaptureWidth { get; private set; }
+
         private void ApplyResolution(Material material)
         {
             float outWidth = m_outputTexture != null ? m_outputTexture.width : m_outputSize.x;
             float pagePixels = Mathf.Max(1f, (m_bookRect.z - m_bookRect.x) * 0.5f * outWidth);
             material.SetFloat(s_pagePixels, pagePixels);
             float pageTexels = m_current != null ? m_rightCrop.z * m_current.width : pagePixels;
+            // 撮影テクスチャの幅を、撮影したページの画素が出力でのページの画素と同じ数になるようにしたいときの幅（BookPageView が使う）
+            if (m_current != null && m_rightCrop.z > 0.05f && m_outputTexture != null) DesiredCaptureWidth = pagePixels / m_rightCrop.z;
+            // 縮小の割合に合ったミップで読む（ミップの無い撮影テクスチャでは使われない）。
+            // 粗いミップを避けると、縮小で細い線・小さな文字が途切れる
             material.SetFloat(s_pageLod, Mathf.Max(0f, Mathf.Log(pageTexels / pagePixels, 2f)));
+            material.SetFloat(s_pageSharpen, m_pageSharpen);
             Texture cover = m_frontCover != null ? m_frontCover : m_backCover;
             // 閉じた表紙の板の幅はページ幅の約 1.1 倍
             float coverLod = cover != null ? Mathf.Log(cover.width / (pagePixels * 1.1f), 2f) : 0f;

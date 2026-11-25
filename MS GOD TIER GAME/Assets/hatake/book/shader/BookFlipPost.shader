@@ -17,6 +17,7 @@ Shader "Hidden/Book/Page Flip Post"
     float4 _BloomThreshold;   // x 閾値, y ニー, z 上限, w 散乱（上位レベルへの足し込み）
     float4 _BloomTint;        // rgb 色, a 強さ
     float _DimBlur, _Tonemap, _Exposure;
+    float _BloomKeepDark; // 本の上の暗い所（文字・線）には Bloom の光を足さない割合。紙一面のにじみで文字が薄くなるのを防ぐ
     float _DownSpread;
     float _PrefilterSpread; // 最初の縮小で読む範囲（元の画素の何個分ずらすか）。1/2 へ縮めるなら 0.5、1/4 なら 1
 
@@ -108,6 +109,9 @@ Shader "Hidden/Book/Page Flip Post"
             c = lerp(c, b, blur);
         }
         float3 bloom = Tap(_BloomTex, i.uv).rgb * _BloomTint.rgb * _BloomTint.a;
+        // 紙（明るい）にはそのまま、文字や線（暗い）にはほとんど足さない。本の外（不透明度 0）はにじみをそのまま残す
+        float luma = dot(c.rgb, float3(0.2126, 0.7152, 0.0722));
+        bloom *= lerp(1, saturate(luma * 1.25), _BloomKeepDark * saturate(c.a));
         c.rgb += bloom;
         // 光が本の外へにじむ分は不透明度に足す
         c.a = saturate(max(c.a, max(bloom.r, max(bloom.g, bloom.b))));
