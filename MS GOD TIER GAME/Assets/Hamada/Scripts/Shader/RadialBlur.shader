@@ -21,6 +21,9 @@
 
             float _BlurStrength;
             float2 _BlurCenter;
+            float _maskStart;
+            float _maskEnd;
+
 
             struct Attributes
             {
@@ -54,6 +57,12 @@
 
                 float2 toCenter = _BlurCenter - uv;
 
+                float distance = length(toCenter);
+
+                float mask = smoothstep(_maskStart,_maskEnd,distance);
+
+                float strength = _BlurStrength * mask;
+
                 const int SAMPLE_COUNT = 10;
 
                 half4 result = 0;
@@ -63,7 +72,7 @@
                 {
                     float t = (float)i / (SAMPLE_COUNT - 1);
 
-                    float2 sampleUV = uv + toCenter * (_BlurStrength * t);
+                    float2 sampleUV = uv + toCenter * (strength * t);
 
                     result += SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_LinearClamp, sampleUV);
                 }

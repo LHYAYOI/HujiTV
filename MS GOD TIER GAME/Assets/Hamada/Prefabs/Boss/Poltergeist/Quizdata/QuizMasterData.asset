@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cbd506c6d64da246b5b9e92d430f38e, type: 3}
+  m_Name: QuizMasterData
+  m_EditorClassIdentifier: Assembly-CSharp::QuizMasterData
+  m_quizList:
+  - {fileID: 11400000, guid: 9d1ca64a510d80549b70e3450ece2b51, type: 2}
+  - {fileID: 11400000, guid: 35bc3d5688b47fa4d812af8eaca014dc, type: 2}
+  - {fileID: 11400000, guid: a48a5c9dbda9b024d80fd751404e0811, type: 2}

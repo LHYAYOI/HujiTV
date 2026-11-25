@@ -6,6 +6,9 @@ public class RadialBlurController : MonoBehaviour
 {
     [Header("Blur Settings")]
 
+    public float m_startMask;
+    public float m_endMask;
+
     [SerializeField]
     private Vector2 m_center = new Vector2(0.5f, 0.5f);
 

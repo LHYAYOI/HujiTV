@@ -553,34 +553,10 @@ MonoBehaviour:
   m_onHit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 445313436}
-        m_TargetAssemblyTypeName: TargetableObject, Assembly-CSharp
-        m_MethodName: SetTargetable
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 956464054}
-        m_TargetAssemblyTypeName: PoltergeistController, Assembly-CSharp
-        m_MethodName: CheckIfIsAllPictureFrameAttacked
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 445313434}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 818427791}
+        m_TargetAssemblyTypeName: QuizController, Assembly-CSharp
+        m_MethodName: HitProcess
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -740,6 +716,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3014a08ce7905db49998159aa4681027, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RadialBlurController
+  m_startMask: 0.05
+  m_endMask: 0.5
   m_center: {x: 0.5, y: 0.5}
   m_intensityCurve:
     serializedVersion: 2
@@ -1338,6 +1316,7 @@ GameObject:
   - component: {fileID: 818427789}
   - component: {fileID: 818427788}
   - component: {fileID: 818427790}
+  - component: {fileID: 818427791}
   m_Layer: 0
   m_Name: Head
   m_TagString: Untagged
@@ -1436,6 +1415,21 @@ MonoBehaviour:
   m_amplitudeX: 0.5
   m_amplitudeY: 0.5
   m_frequency: 0.5
+--- !u!114 &818427791
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 818427785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f145b2a033c41b44ae9b1a26c6767e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  m_quizData: {fileID: 11400000, guid: 35bc3d5688b47fa4d812af8eaca014dc, type: 2}
+  m_poltergeistController: {fileID: 956464054}
+  m_target: {fileID: 445313436}
 --- !u!1 &851144263
 GameObject:
   m_ObjectHideFlags: 0
@@ -1639,6 +1633,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   m_enemyData: {fileID: 0}
   m_stateMachine: {fileID: 956464053}
+  m_masterData: {fileID: 11400000, guid: e55cbaedf50cfdb498bb5f10fd35d024, type: 2}
+  m_quizControllers:
+  - {fileID: 818427791}
+  - {fileID: 1298178214}
+  - {fileID: 1729466392}
   m_selectStateColliders:
   - {fileID: 445313436}
   - {fileID: 1445288166}
@@ -2510,6 +2509,7 @@ GameObject:
   - component: {fileID: 1298178212}
   - component: {fileID: 1298178211}
   - component: {fileID: 1298178213}
+  - component: {fileID: 1298178214}
   m_Layer: 0
   m_Name: R_Hand
   m_TagString: Untagged
@@ -2608,6 +2608,21 @@ MonoBehaviour:
   m_amplitudeX: 0.5
   m_amplitudeY: 0.5
   m_frequency: 0.5
+--- !u!114 &1298178214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1298178208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f145b2a033c41b44ae9b1a26c6767e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QuizController
+  m_quizData: {fileID: 11400000, guid: a48a5c9dbda9b024d80fd751404e0811, type: 2}
+  m_poltergeistController: {fileID: 956464054}
+  m_target: {fileID: 1445288166}
 --- !u!1001 &1358071902
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2903,34 +2918,10 @@ MonoBehaviour:
   m_onHit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1445288166}
-        m_TargetAssemblyTypeName: TargetableObject, Assembly-CSharp
-        m_MethodName: SetTargetable
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 956464054}
-        m_TargetAssemblyTypeName: PoltergeistController, Assembly-CSharp
-        m_MethodName: CheckIfIsAllPictureFrameAttacked
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1445288162}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 1298178214}
+        m_TargetAssemblyTypeName: QuizController, Assembly-CSharp
+        m_MethodName: HitProcess
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3231,6 +3222,7 @@ GameObject:
   - component: {fileID: 1729466390}
   - component: {fileID: 1729466389}
   - component: {fileID: 1729466391}
+  - component: {fileID: 1729466392}
   m_Layer: 0
   m_Name: L_Hand
   m_TagString: Untagged
@@ -3329,6 +3321,21 @@ MonoBehaviour:
   m_amplitudeX: 0.5
   m_amplitudeY: 0.5
   m_frequency: 0.5
+--- !u!114 &1729466392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1729466386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f145b2a033c41b44ae9b1a26c6767e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QuizController
+  m_quizData: {fileID: 11400000, guid: 9d1ca64a510d80549b70e3450ece2b51, type: 2}
+  m_poltergeistController: {fileID: 956464054}
+  m_target: {fileID: 2061329894}
 --- !u!114 &1768438944 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
@@ -3708,34 +3715,10 @@ MonoBehaviour:
   m_onHit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2061329894}
-        m_TargetAssemblyTypeName: TargetableObject, Assembly-CSharp
-        m_MethodName: SetTargetable
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 956464054}
-        m_TargetAssemblyTypeName: PoltergeistController, Assembly-CSharp
-        m_MethodName: CheckIfIsAllPictureFrameAttacked
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 2061329890}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 1729466392}
+        m_TargetAssemblyTypeName: QuizController, Assembly-CSharp
+        m_MethodName: HitProcess
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3912,7 +3895,7 @@ PrefabInstance:
     - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
       propertyPath: magicData
       value: 
-      objectReference: {fileID: 11400000, guid: 17ef150f604effd4e91c6dfb9950d6c0, type: 2}
+      objectReference: {fileID: 11400000, guid: fd84468c9ad10ad489611b6288bb8c24, type: 2}
     - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
       propertyPath: m_bulletManager
       value: 
@@ -4406,10 +4389,6 @@ PrefabInstance:
     - target: {fileID: 2891612462245475655, guid: 05af61a048cab92428b26362eafbfb76, type: 3}
       propertyPath: m_Name
       value: SpiderBoss
-      objectReference: {fileID: 0}
-    - target: {fileID: 2891612462245475655, guid: 05af61a048cab92428b26362eafbfb76, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4631033087239045963, guid: 05af61a048cab92428b26362eafbfb76, type: 3}
       propertyPath: m_LocalPosition.x

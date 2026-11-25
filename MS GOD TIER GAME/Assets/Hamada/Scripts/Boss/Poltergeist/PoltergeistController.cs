@@ -8,6 +8,9 @@ public class PoltergeistController : EnemyBase
 {
     [SerializeField] StateMachine m_stateMachine;
 
+    [SerializeField] QuizMasterData m_masterData;
+
+    [SerializeField] List<QuizController> m_quizControllers;
     [SerializeField] List<TargetableObject> m_selectStateColliders;
     [SerializeField] List<TargetableObject> m_stunStateColliders;
     [SerializeField] List<BodyPartMover> m_upperBody;
@@ -41,6 +44,11 @@ public class PoltergeistController : EnemyBase
         StunStateCollidersActivateFlag(false);
         SetBodyPartsPosition(new Vector3(0, -5, 0));
         ChangeState("Encounter");
+    }
+
+    private void Update()
+    {
+        
     }
 
     public void ChangeState(string stateName) 
@@ -260,5 +268,27 @@ public class PoltergeistController : EnemyBase
         }
     }
 
-    //上の３つだけ移動
+    public void RegisterRandomQuizProcess() 
+    {
+        List<QuizData> m_registeredQuizData = new List<QuizData>();
+
+        foreach (QuizController controller in m_quizControllers) 
+        {
+            QuizData quizData = m_masterData.GetRandomQuizData();
+
+            if (quizData == null) 
+            {
+                continue;
+            }
+
+            while (m_registeredQuizData.Contains(quizData)) 
+            {
+                quizData = m_masterData.GetRandomQuizData();
+            }
+
+            controller.SetQuizData(quizData);
+
+            m_registeredQuizData.Add(quizData);
+        }
+    }
 }

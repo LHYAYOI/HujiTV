@@ -46,7 +46,9 @@ public class RadialBlurRendererFeature : ScriptableRendererFeature
             return;
         }
 
-        m_pass.Setup(controller.Intensity, controller.Center);
+        //m_pass.renderPassEvent = RenderPassEvent.AfterRendering;
+
+        m_pass.Setup(controller.Intensity, controller.Center, controller.m_startMask, controller.m_endMask);
 
         renderer.EnqueuePass(m_pass);
     }
@@ -61,6 +63,9 @@ public class RadialBlurRendererFeature : ScriptableRendererFeature
     private class RadialBlurPass : ScriptableRenderPass
     {
         private readonly Material m_material;
+
+        private float m_startMask;
+        private float m_endMask;
 
         private float m_intensity;
         private Vector2 m_center;
@@ -81,10 +86,12 @@ public class RadialBlurRendererFeature : ScriptableRendererFeature
             requiresIntermediateTexture = true;
         }
 
-        public void Setup(float intensity, Vector2 center)
+        public void Setup(float intensity, Vector2 center, float startMask, float endMask)
         {
             m_intensity = intensity;
             m_center = center;
+            m_startMask = startMask;
+            m_endMask = endMask;
         }
 
         public override void RecordRenderGraph(
@@ -123,15 +130,13 @@ public class RadialBlurRendererFeature : ScriptableRendererFeature
             // シェーダーにパラメータを渡す
             m_material.SetFloat("_BlurStrength", m_intensity);
 
-            m_material.SetVector(
-                "_BlurCenter",
-                new Vector4(m_center.x, m_center.y, 0, 0)
-            );
+            m_material.SetVector("_BlurCenter", new Vector4(m_center.x, m_center.y, 0, 0));
 
-            using (var builder =
-                renderGraph.AddRasterRenderPass<PassData>(
-                    "Radial Blur Pass",
-                    out var passData))
+            m_material.SetFloat("_maskStart", m_startMask);
+
+            m_material.SetFloat("_maskEnd", m_endMask);
+
+            using (var builder = renderGraph.AddRasterRenderPass<PassData>("Radial Blur Pass", out var passData))
             {
                 passData.source = source;
                 passData.material = m_material;
