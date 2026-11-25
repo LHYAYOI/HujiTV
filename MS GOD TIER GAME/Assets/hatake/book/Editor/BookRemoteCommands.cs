@@ -140,6 +140,8 @@ namespace hatake.EditorTools
                     return "ok";
                 case "build":
                     return Build();
+                case "astctest":
+                    return BookAstcTest.Run();
                 default:
                     return "unknown";
             }
