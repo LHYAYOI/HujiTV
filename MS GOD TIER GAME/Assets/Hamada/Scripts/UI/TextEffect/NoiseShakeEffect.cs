@@ -21,8 +21,8 @@ public class NoiseShakeEffect : TextEffect
         int materialIndex = charInfo.materialReferenceIndex;
         int vertexIndex = charInfo.vertexIndex;
 
-        Vector3[] vertices =
-            textInfo.meshInfo[materialIndex].vertices;
+        //頂点取得
+        Vector3[] vertices = textInfo.meshInfo[materialIndex].vertices;
 
         // 文字ごとに異なるNoiseの座標を作る
         float seed = characterIndex * 17.17f + m_seed;
@@ -30,22 +30,12 @@ public class NoiseShakeEffect : TextEffect
         float time = elapsedTime * m_frequency;
 
         // X方向のNoise
-        float noiseX = Mathf.PerlinNoise(
-            seed,
-            time
-        ) * 2f - 1f;
+        float noiseX = Mathf.PerlinNoise(seed, time) * 2f - 1f;
 
         // Y方向のNoise
-        float noiseY = Mathf.PerlinNoise(
-            seed + 53.71f,
-            time + 31.29f
-        ) * 2f - 1f;
+        float noiseY = Mathf.PerlinNoise(seed + 53.71f, time + 31.29f) * 2f - 1f;
 
-        Vector3 offset = new Vector3(
-            noiseX * m_amplitude.x,
-            noiseY * m_amplitude.y,
-            0f
-        );
+        Vector3 offset = new Vector3(noiseX * m_amplitude.x, noiseY * m_amplitude.y, 0f);
 
         // 文字の4頂点を同じ方向に移動
         for (int i = 0; i < 4; i++)

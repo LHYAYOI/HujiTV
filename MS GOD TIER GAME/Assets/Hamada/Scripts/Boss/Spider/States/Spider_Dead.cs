@@ -1,6 +1,6 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "Spider_Dead", menuName = "Scriptable Objects/Spider_Dead")]
+[CreateAssetMenu(fileName = "Spider_Dead", menuName = "Scriptable Objects/Spider/Spider_Dead")]
 public class Spider_Dead : StateBase
 {
     public override void Awake()

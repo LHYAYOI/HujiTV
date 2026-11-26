@@ -10,7 +10,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private BookNetworkServer m_bookNetworkServer;
     [SerializeField] private ScreenEffectManager m_screenEffectManager;
 
-    [SerializeField] private MagicData magicData;
+    [SerializeField] private MagicData magicDataLeft;
+    [SerializeField] private MagicData magicDataCenter;
+    [SerializeField] private MagicData magicDataRight;
 
     private void OnEnable()
     {
@@ -32,25 +34,23 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            FireBullet(magicData, MAGIC_CAST_DIRECTION.LEFT);
+            FireBullet(magicDataLeft, MAGIC_CAST_DIRECTION.LEFT);
         }
 
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            FireBullet(magicData, MAGIC_CAST_DIRECTION.CENTER);
+            FireBullet(magicDataCenter, MAGIC_CAST_DIRECTION.CENTER);
         }
 
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            FireBullet(magicData, MAGIC_CAST_DIRECTION.RIGHT);
+            FireBullet(magicDataRight, MAGIC_CAST_DIRECTION.RIGHT);
         }
     }
 
     //ダメージ処理
     public void TakeDamage(byte dirtAmount) 
     {
-
-
         //汚れの付着
         BookNetworkServer server = BookNetworkServer.Instance;
 
@@ -79,7 +79,7 @@ public class PlayerController : MonoBehaviour
     //弾の発射
     public void FireBullet(MagicData magicData, MAGIC_CAST_DIRECTION direction)
     {
-        GameObject target = m_targetSelector.GetSelectedTarget(direction);
+        TargetableObject target = m_targetSelector.GetSelectedTarget(direction);
 
         if (target == null) 
         {

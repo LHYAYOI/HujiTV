@@ -109,16 +109,11 @@ public class TargetLockOnUIManager : MonoBehaviour
         // TargetSelector が持つ方向別配列（m_targetArrayなど）から有効なものを集める
         foreach (MAGIC_CAST_DIRECTION dir in System.Enum.GetValues(typeof(MAGIC_CAST_DIRECTION)))
         {
-            GameObject obj = m_targetSelector.GetSelectedTarget(dir);
+            TargetableObject targetable = m_targetSelector.GetSelectedTarget(dir);
 
-            if (obj != null)
+            if (targetable != null && !targets.Contains(targetable))
             {
-                TargetableObject targetable = obj.GetComponent<TargetableObject>();
-
-                if (targetable != null && !targets.Contains(targetable))
-                {
-                    targets.Add(targetable);
-                }
+                targets.Add(targetable);
             }
         }
 
@@ -127,14 +122,7 @@ public class TargetLockOnUIManager : MonoBehaviour
 
     public void PlaySelectedEffect(MAGIC_CAST_DIRECTION direction, MagicBulletController bullet)
     {
-        GameObject target = m_targetSelector.GetSelectedTarget(direction);
-
-        if (target == null) 
-        {
-            return;
-        }
-
-        TargetableObject targetable = target.GetComponent<TargetableObject>();
+        TargetableObject targetable = m_targetSelector.GetSelectedTarget(direction);
 
         if (targetable == null) 
         {

@@ -38,6 +38,8 @@ public class TargetableObject : MonoBehaviour
     public void SetTargetable(bool value)
     {
         m_IsTargetableFlag = value;
+
+        Debug.Log("eeeeeeeeeeeeeeeeeeee" + m_IsTargetableFlag);
     }
 
     public bool IsTargetable()

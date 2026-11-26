@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class testHitSender : HitSenderBase
+public class SimpleHitSender : HitSenderBase
 {
     protected override HitData CreateHitData()
     {

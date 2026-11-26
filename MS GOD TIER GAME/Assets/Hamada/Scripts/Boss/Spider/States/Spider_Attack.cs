@@ -1,6 +1,6 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
-[CreateAssetMenu(fileName = "Spider_Attack", menuName = "Scriptable Objects/Spider_Attack")]
+[CreateAssetMenu(fileName = "Spider_Attack", menuName = "Scriptable Objects/Spider/Spider_Attack")]
 public class Spider_Attack : StateBase
 {
     SpiderController m_controller;
@@ -22,10 +22,10 @@ public class Spider_Attack : StateBase
 
     public override void UpdateState()
     {
-        //ƒAƒjƒ[ƒVƒ‡ƒ“I‚í‚Á‚½‚çƒAƒCƒhƒ‹‚É–ß‚é
+        //ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³çµ‚ã‚ã£ãŸã‚‰ã‚¢ã‚¤ãƒ‰ãƒ«ã«æˆ»ã‚‹
         if (m_controller.IsAnimationFinished("Attack")) 
         {
-            Debug.Log("UŒ‚I‚í‚è");
+            Debug.Log("æ”»æ’ƒçµ‚ã‚ã‚Š");
 
             m_controller.ChangeState("Idle_State");
         }

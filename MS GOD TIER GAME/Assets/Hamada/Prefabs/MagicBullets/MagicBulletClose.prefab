@@ -47,7 +47,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   m_magicData: {fileID: 11400000, guid: 1fc6fe6d07825934aa2aa07117f42783, type: 2}
-  m_trail: {fileID: 7623963093128985812}
+  m_particles:
+  - {fileID: 3973448965644951302}
+  - {fileID: 4409116746748284942}
   m_hitEffect: {fileID: 888282901553999714, guid: 882b6b7814cef2c4bac976fcf0fc630c, type: 3}
   m_kiranEffect: {fileID: 5259950150523390421, guid: 680257c5521f1964783602489b7926c1, type: 3}
   m_moveSpeed: 3
@@ -276,11 +278,57 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5990460929640765348, guid: d607b12e8c1638746882fbaa53c80f10, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3973448965644951302}
   m_SourcePrefab: {fileID: 100100000, guid: d607b12e8c1638746882fbaa53c80f10, type: 3}
+--- !u!198 &637256527826810824 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 2099054121617892375, guid: d607b12e8c1638746882fbaa53c80f10, type: 3}
+  m_PrefabInstance: {fileID: 1582641390921241567}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2319580235746610326 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3874896795331026761, guid: d607b12e8c1638746882fbaa53c80f10, type: 3}
+  m_PrefabInstance: {fileID: 1582641390921241567}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5103932493768737915 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5990460929640765348, guid: d607b12e8c1638746882fbaa53c80f10, type: 3}
+  m_PrefabInstance: {fileID: 1582641390921241567}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3973448965644951302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5103932493768737915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 390d00209dd18f343a7867906c34e014, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ParticleController
+  m_particleList:
+  - {fileID: 637256527826810824}
+  - {fileID: 8218374811691025768}
+  - {fileID: 7118348265861994659}
+  - {fileID: 9023286455289299293}
+  m_type: 0
+--- !u!198 &7118348265861994659 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 8592832895096720252, guid: d607b12e8c1638746882fbaa53c80f10, type: 3}
+  m_PrefabInstance: {fileID: 1582641390921241567}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &8218374811691025768 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 7492621629007877815, guid: d607b12e8c1638746882fbaa53c80f10, type: 3}
+  m_PrefabInstance: {fileID: 1582641390921241567}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &9023286455289299293 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 7552409912130409090, guid: d607b12e8c1638746882fbaa53c80f10, type: 3}
   m_PrefabInstance: {fileID: 1582641390921241567}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7870726408513371750
@@ -338,11 +386,19 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 357946000173531826, guid: 53d462324fc82334d81bc13e1bba3a0d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4409116746748284942}
   m_SourcePrefab: {fileID: 100100000, guid: 53d462324fc82334d81bc13e1bba3a0d, type: 3}
 --- !u!4 &4719787607845601888 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3222996394714610694, guid: 53d462324fc82334d81bc13e1bba3a0d, type: 3}
+  m_PrefabInstance: {fileID: 7870726408513371750}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &6204285711739369628 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 4260514151135708922, guid: 53d462324fc82334d81bc13e1bba3a0d, type: 3}
   m_PrefabInstance: {fileID: 7870726408513371750}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &7623963093128985812 stripped
@@ -350,3 +406,18 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 357946000173531826, guid: 53d462324fc82334d81bc13e1bba3a0d, type: 3}
   m_PrefabInstance: {fileID: 7870726408513371750}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4409116746748284942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7623963093128985812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 390d00209dd18f343a7867906c34e014, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ParticleController
+  m_particleList:
+  - {fileID: 6204285711739369628}
+  m_type: 1

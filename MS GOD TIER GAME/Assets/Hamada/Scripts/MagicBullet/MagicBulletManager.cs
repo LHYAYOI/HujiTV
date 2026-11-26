@@ -12,12 +12,12 @@ public class MagicBulletManager : MonoBehaviour
     [SerializeField] Transform m_bulletSpawnPoint;
 
     //弾の発射
-    public void FireBullet(MagicData magicData, MAGIC_CAST_DIRECTION direction, GameObject target)
+    public void FireBullet(MagicData magicData, MAGIC_CAST_DIRECTION direction, TargetableObject target)
     {
         Fire(magicData, direction, target);
     }
 
-    private void Fire(MagicData magicData, MAGIC_CAST_DIRECTION direction, GameObject target) 
+    private void Fire(MagicData magicData, MAGIC_CAST_DIRECTION direction, TargetableObject target) 
     {
         foreach (MagicBulletController prefab in m_magicBulletPrefabList)
         {
