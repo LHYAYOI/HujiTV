@@ -50,9 +50,12 @@ public class TargetSelector : MonoBehaviour
 
     TargetInfo[] m_targetArray = new TargetInfo[3];
 
+    float m_defaultTargetRange;
+
     private void Awake()
     {
         Instance = this;
+        m_defaultTargetRange = m_targetRange;
     }
 
     private void Update()
@@ -291,6 +294,16 @@ public class TargetSelector : MonoBehaviour
 
             DrawTargetRange(area.m_positionX, area.m_maxTargetDistance, area.m_areaColor, area.m_AreaName, area.m_labelHeight);
         }
+    }
+
+    public void SetTargetRange(float range) 
+    {
+        m_targetRange = range;
+    }
+
+    public void Resetrange() 
+    {
+        m_targetRange = m_defaultTargetRange;
     }
 
     private void DrawTargetRange(float centerViewportX, float range, Color color, string label, float labelHeight = 0)
