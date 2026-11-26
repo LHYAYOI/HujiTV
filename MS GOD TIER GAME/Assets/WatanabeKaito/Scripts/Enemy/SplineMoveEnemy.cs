@@ -37,7 +37,7 @@ public class SplineMoveEnemy : EnemyBase
     // 戦闘終了時の処理
     public override void BattleEnd()
     {
-        m_moveSpeed = 0f;
+   
     }
 
     public virtual void SetupSpline(SplineContainer spline)
@@ -119,5 +119,29 @@ public class SplineMoveEnemy : EnemyBase
         }
     }
 
-    
+    // スプライン上の指定した割合の位置に移動する
+    public void SetSplinePosition(float progress)
+    {
+        if (m_targetSpline == null || m_splineLength <= 0f)
+        {
+            return;
+        }
+
+        // 割合を0～1の範囲に制限
+        progress = Mathf.Clamp01(progress);
+
+        // 割合を移動距離に変換して更新
+        m_distanceTraveled = progress * m_splineLength;
+
+        // 指定した位置と向きを反映
+        Vector3 position = m_targetSpline.EvaluatePosition(progress);
+        Vector3 tangent = m_targetSpline.EvaluateTangent(progress);
+
+        transform.position = position;
+
+        if (m_rotateWithSplineFlag)
+        {
+            UpdateRotation(tangent);
+        }
+    }
 }

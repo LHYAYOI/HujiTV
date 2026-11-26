@@ -84,29 +84,19 @@ public class ActiveEnemyManager : MonoBehaviour
         }
     }
 
-    // アクティブな壁エネミーを一回目の停止位置に移動させる
-    //public void MoveAllActiveCrushingWallsToFirstStopPosition(float )
-    //{
-    //    foreach (var enemy in m_activeEnemies)
-    //    {
-    //        if (enemy != null && enemy is CrushingWallEnemy crushingWall)
-    //        {
-    //            crushingWall.MoveToFirstStopPoint();
-    //        }
-    //    }
-    //}
+    //アクティブな壁エネミーを一回目の停止位置に移動させる
+    public void MoveAllActiveCrushingWallsToStopPosition(float ratio)
+    {
+        foreach (var enemy in m_activeEnemies)
+        {
+            if (enemy != null && enemy is CrushingWallEnemy crushingWall)
+            {
+                crushingWall.SetSplinePosition(ratio);
+            }
+        }
+    }
 
-    //// アクティブな壁エネミーを二回目の停止位置に移動させる
-    //public void MoveAllActiveCrushingWallsToSecondStopPosition()
-    //{
-    //    foreach (var enemy in m_activeEnemies)
-    //    {
-    //        if (enemy != null && enemy is CrushingWallEnemy crushingWall)
-    //        {
-    //            crushingWall.MoveToSecondStopPoint();
-    //        }
-    //    }
-    //}
+  
 }
 
 

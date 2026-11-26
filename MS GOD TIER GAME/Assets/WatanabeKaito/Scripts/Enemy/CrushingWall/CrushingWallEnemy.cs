@@ -53,6 +53,9 @@ public class CrushingWallEnemy : SplineMoveEnemy
     [Header("一回目の停止地点の割合")]
     [SerializeField] private float m_firstStopPointT = 0.5f;
 
+    [Header("角を曲がる時のアニメーションのディレイ")]
+    [SerializeField] private float m_turnAnimationDelay = 3.0f;
+
     [Header("二回目の停止地点の割合")]
     [SerializeField] private float m_secondStopPointT = 0.8f;
 
@@ -103,11 +106,10 @@ public class CrushingWallEnemy : SplineMoveEnemy
         m_isAttackingFlag = false;
         m_battleEndFlag = false;
 
-        m_animator.SetFloat("fSpeed", 1f);
+        m_animator.SetFloat("fSpeed", 1.5f);
+        m_animator.SetBool("bMove", true);
 
         m_lookTarget.SetActive(true);
-
-        ActivateAllTargetableObjects();
 
         ResetMoveSpeed();
 
@@ -116,10 +118,20 @@ public class CrushingWallEnemy : SplineMoveEnemy
         if(m_startCount == 1)
         {
             m_speedRampDuration = m_restartSpeedRampDuration;
+
+            StartCoroutine(ResumeMovementCoroutine());
         }
         else if(m_startCount > 1)
         {
+            m_animator.SetBool("bMove", false);
+
             m_speedRampDuration = m_lastSpeedRampDuration;
+
+            DeactivateAllTargetableObjects();
+        }
+        else
+        {
+            ActivateAllTargetableObjects();
         }
 
         m_startCount++;
@@ -128,6 +140,9 @@ public class CrushingWallEnemy : SplineMoveEnemy
     public override void BattleEnd()
     {
         base.BattleEnd();
+
+        m_animator.SetBool("bMove", false);
+        m_animator.SetFloat("fSpeed", 1.0f);
 
         DeactivateAllTargetableObjects();
 
@@ -198,6 +213,19 @@ public class CrushingWallEnemy : SplineMoveEnemy
         m_moveSpeed =  EvaluateSpeed(normalizedTime) * m_damageSpeedMultiplier;
     }
 
+    // 移動再開コルーチン
+    private IEnumerator ResumeMovementCoroutine()
+    {
+        m_animator.SetBool("bMove", false);
+
+        yield return new WaitForSeconds(m_turnAnimationDelay);
+
+        ActivateAllTargetableObjects();
+
+        m_animator.SetBool("bMove", true);
+    }
+
+
     // 移動速度を初期状態に戻す
     private void ResetMoveSpeed()
     {
@@ -257,12 +285,6 @@ public class CrushingWallEnemy : SplineMoveEnemy
 
         // TargetableObject全てをアクティブにする
         ActivateAllTargetableObjects();
-    }
-
-    // スプラインの指定した割合に応じた位置に移動する
-    public void MoveToPosition(float t)
-    {
-        transform.position = m_targetSpline.EvaluatePosition(t);
     }
 
 
