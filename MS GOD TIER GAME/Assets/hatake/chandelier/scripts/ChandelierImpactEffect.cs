@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using Unity.Cinemachine;
 
@@ -81,9 +81,9 @@ namespace hatake
 
             //=========================================================================================================
 
-            //CameraManager.Instance.ShakeCameraInVHF(2.0f, 3.0f, 0.0f, 3.0f);
+            CameraManager.Instance.ShakeCameraInVHF(2.0f, 3.0f, 0.0f, 3.0f);
 
-           // CameraManager.Instance.ChangeCameraFOV010(3.0f, 70);
+            CameraManager.Instance.ChangeCameraFOV010(3.0f, 70);
 
             if (m_audio != null && m_impactClip != null) m_audio.PlayOneShot(m_impactClip, Mathf.Clamp01(0.5f + 0.25f * amount));
         }

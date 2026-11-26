@@ -6202,6 +6202,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2019704238}
     m_Modifications:
+    - target: {fileID: 1546905772465068212, guid: dcbf5efd48117f642b74527a3130d69d, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 4096
+      objectReference: {fileID: 0}
     - target: {fileID: 3870920922602734928, guid: dcbf5efd48117f642b74527a3130d69d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.3863783
@@ -12578,6 +12582,10 @@ PrefabInstance:
       propertyPath: m_gimmickPoint
       value: 54.7
       objectReference: {fileID: 0}
+    - target: {fileID: 5124618987693928829, guid: fd1be8b25ab300c44a4dff87535198d3, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 4096
+      objectReference: {fileID: 0}
     - target: {fileID: 7833273642438991014, guid: fd1be8b25ab300c44a4dff87535198d3, type: 3}
       propertyPath: m_Name
       value: LookTarget (3)
@@ -12945,7 +12953,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1023269525
 Transform:
   m_ObjectHideFlags: 0
@@ -12956,7 +12964,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -3.3760383, y: -2.775, z: -58.89}
-  m_LocalScale: {x: 1.6, y: 0.29125, z: 1.6}
+  m_LocalScale: {x: 10, y: 0.29125, z: 30}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 911699045}
@@ -13851,6 +13859,10 @@ PrefabInstance:
     - target: {fileID: 5064549368580362379, guid: 678548b3d50bffb41aa03eae839b749a, type: 3}
       propertyPath: m_LocalRotation.z
       value: 0.011704504
+      objectReference: {fileID: 0}
+    - target: {fileID: 6429317884751047427, guid: 678548b3d50bffb41aa03eae839b749a, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 4096
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -14809,13 +14821,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4598669251846744852, guid: a63cac2fd8edca14d947b464a2abaaa6, type: 3}
-      propertyPath: m_IsTargetableFlag
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8751071775191009411, guid: a63cac2fd8edca14d947b464a2abaaa6, type: 3}
-      propertyPath: m_IsTargetableFlag
-      value: 0
+    - target: {fileID: 8242140068870044940, guid: a63cac2fd8edca14d947b464a2abaaa6, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

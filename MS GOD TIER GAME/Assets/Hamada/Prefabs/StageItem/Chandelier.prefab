@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6490804277197924036}
   - component: {fileID: 8751071775191009411}
   - component: {fileID: 8242140068870044940}
-  - component: {fileID: 469710250383451119}
+  - component: {fileID: 6878645996282192152}
   m_Layer: 12
   m_Name: Chandelier
   m_TagString: Chandelier
@@ -50,7 +50,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9b81b05cff9928428e236be0ac6b564, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  m_IsTargetableFlag: 1
+  m_targetable: {fileID: 8751071775191009411}
   m_effect: {fileID: 3137520877146992824}
   m_chandelierBreakable: {fileID: 4292404463730864530}
   m_shakeObject: {fileID: 8897524785975194896}
@@ -143,8 +143,8 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!135 &469710250383451119
-SphereCollider:
+--- !u!65 &6878645996282192152
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -162,7 +162,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 3
+  m_Size: {x: 6, y: 3, z: 6}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7345995622997197558
 GameObject:

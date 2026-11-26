@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ChandelierController : MonoBehaviour
 {
+    [SerializeField] TargetableObject m_targetable;
     [SerializeField] ChandelierImpactEffect m_effect;
     [SerializeField] ChandelierBreakable m_chandelierBreakable;
     [SerializeField] ShakeObject m_shakeObject;
@@ -32,6 +33,8 @@ public class ChandelierController : MonoBehaviour
 
     private IEnumerator FallRoutine() 
     {
+        m_targetable.SetTargetable(false);
+
         yield return m_shakeObject.ShakeCoroutine(m_shakeDuration, m_shakeIntensity);
 
         m_rigidbody.isKinematic = false;
