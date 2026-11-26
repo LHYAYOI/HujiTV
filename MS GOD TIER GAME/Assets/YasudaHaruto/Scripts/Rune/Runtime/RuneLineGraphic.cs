@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>ルーンの軌跡をUIの線メッシュとして描画する。</summary>
 [RequireComponent(typeof(CanvasRenderer))]
 public class RuneLineGraphic : Graphic
 {
@@ -14,11 +15,17 @@ public class RuneLineGraphic : Graphic
     [SerializeField] private float m_lineWidth = 4f;
     [SerializeField, Range(0.25f, 3f)] private float m_edgeSoftness = 1f;
 
+
     public float LineWidth
     {
         get => m_lineWidth;
-        set { m_lineWidth = Mathf.Max(0.1f, value); SetVerticesDirty(); }
+        set
+        {
+            m_lineWidth = Mathf.Max(0.1f, value);
+            SetVerticesDirty();
+        }
     }
+
 
     public void SetStrokes(IReadOnlyList<RuneStrokeData> strokes,
         IReadOnlyList<IReadOnlyList<Color>> strokeColors = null)
@@ -29,6 +36,7 @@ public class RuneLineGraphic : Graphic
         SetVerticesDirty();
     }
 
+
     public void SetCurrentStroke(IReadOnlyList<Vector2> points)
     {
         m_strokes = null;
@@ -37,6 +45,7 @@ public class RuneLineGraphic : Graphic
         SetVerticesDirty();
     }
 
+
     public void Clear()
     {
         m_strokeColors = null;
@@ -44,6 +53,7 @@ public class RuneLineGraphic : Graphic
         m_currentStroke = null;
         SetVerticesDirty();
     }
+
 
     protected override void OnPopulateMesh(VertexHelper vh)
     {
@@ -57,22 +67,27 @@ public class RuneLineGraphic : Graphic
             DrawStroke(vh, m_currentStroke, rect);
     }
 
+
     private void DrawStroke(VertexHelper vh, IReadOnlyList<Vector2> points, Rect rect,
         IReadOnlyList<Color> pointColors = null)
     {
-        if (points == null || points.Count < 2) return;
+        if (points == null || points.Count < 2)
+            return;
         m_positions.Clear();
         m_colors.Clear();
         for (int i = 0; i < points.Count; i++)
         {
             Vector2 p = new Vector2(Mathf.Lerp(rect.xMin, rect.xMax, points[i].x),
                 Mathf.Lerp(rect.yMin, rect.yMax, points[i].y));
-            if (float.IsNaN(p.x) || float.IsNaN(p.y) || float.IsInfinity(p.x) || float.IsInfinity(p.y)) continue;
-            if (m_positions.Count > 0 && (p - m_positions[m_positions.Count - 1]).sqrMagnitude < 0.000001f) continue;
+            if (float.IsNaN(p.x) || float.IsNaN(p.y) || float.IsInfinity(p.x) || float.IsInfinity(p.y))
+                continue;
+            if (m_positions.Count > 0 && (p - m_positions[m_positions.Count - 1]).sqrMagnitude < 0.000001f)
+                continue;
             m_positions.Add(p);
             m_colors.Add(pointColors != null && i < pointColors.Count ? pointColors[i] : color);
         }
-        if (m_positions.Count < 2) return;
+        if (m_positions.Count < 2)
+            return;
         float half = Mathf.Max(0.1f, m_lineWidth) * 0.5f;
         // One output pixel of transparent fringe works on both screen and book capture canvases.
         Camera camera = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
@@ -96,18 +111,23 @@ public class RuneLineGraphic : Graphic
         DrawRun(vh, first, m_positions.Count - 1, half, edge);
     }
 
+
     private void DrawRun(VertexHelper vh, int first, int last, float half, float edge)
     {
-        if (last <= first) return;
+        if (last <= first)
+            return;
         // Stay below uGUI's 16-bit mesh limit, even with unexpectedly long input.
-        if (vh.currentVertCount + (last - first + 1) * 4 + 160 >= 64000) return;
+        if (vh.currentVertCount + (last - first + 1) * 4 + 160 >= 64000)
+            return;
         int start = vh.currentVertCount;
         for (int i = first; i <= last; i++)
         {
             Vector2 previous = (m_positions[i] - m_positions[i == first ? i : i - 1]).normalized;
             Vector2 next = (m_positions[i == last ? i : i + 1] - m_positions[i]).normalized;
-            if (i == first) previous = next;
-            if (i == last) next = previous;
+            if (i == first)
+                previous = next;
+            if (i == last)
+                next = previous;
             Vector2 nextNormal = new Vector2(-next.y, next.x);
             Vector2 normal = (new Vector2(-previous.y, previous.x) + nextNormal).normalized;
             normal /= Mathf.Max(0.5f, Vector2.Dot(normal, nextNormal));
@@ -119,7 +139,8 @@ public class RuneLineGraphic : Graphic
             AddVertex(vh, p + normal * half, c);
             AddVertex(vh, p - normal * half, c);
             AddVertex(vh, p - normal * (half + edge), transparent);
-            if (i == first) continue;
+            if (i == first)
+                continue;
             int index = start + (i - first - 1) * 4;
             for (int band = 0; band < 3; band++)
             {
@@ -132,6 +153,7 @@ public class RuneLineGraphic : Graphic
         DrawCap(vh, m_positions[last], (m_positions[last] - m_positions[last - 1]).normalized,
             half, edge, m_colors[last]);
     }
+
 
     private static void DrawCap(VertexHelper vh, Vector2 center, Vector2 outward, float half, float edge, Color c)
     {
@@ -147,13 +169,15 @@ public class RuneLineGraphic : Graphic
             Vector2 direction = normal * Mathf.Cos(angle) + outward * Mathf.Sin(angle);
             AddVertex(vh, center + direction * half, c);
             AddVertex(vh, center + direction * (half + edge), transparent);
-            if (i == 0) continue;
+            if (i == 0)
+                continue;
             int index = origin + 1 + (i - 1) * 2;
             vh.AddTriangle(origin, index, index + 2);
             vh.AddTriangle(index, index + 1, index + 3);
             vh.AddTriangle(index, index + 3, index + 2);
         }
     }
+
 
     private static void AddVertex(VertexHelper vh, Vector2 position, Color color)
     {

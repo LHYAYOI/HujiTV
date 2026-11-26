@@ -11,9 +11,12 @@ public class RuneTraceSession
 {
     private readonly List<RuneStrokeData> m_strokes = new();
 
+
     public IReadOnlyList<RuneStrokeData> Strokes => m_strokes;
 
+
     public int StrokeCount => m_strokes.Count;
+
 
 
     public void AddStroke(IEnumerable<Vector2> points)
@@ -32,6 +35,7 @@ public class RuneTraceSession
 
         m_strokes.Add(stroke);
     }
+
 
 
     public void Clear()

@@ -15,12 +15,16 @@ public class RuneStrokeData
 
     // Only point-authored strokes retain every corner when baked.
     [SerializeField] private bool m_preserveCorners;
+
     public bool PreserveCorners => m_preserveCorners;
+
     public IReadOnlyList<Vector2> Points => m_points;
+
 
     public RuneStrokeData()
     {
     }
+
 
     public RuneStrokeData(IEnumerable<Vector2> points, bool preserveCorners = false)
     {
@@ -28,17 +32,20 @@ public class RuneStrokeData
         m_preserveCorners = preserveCorners;
     }
 
+
     // ルーンのストロークデータを追加するメソッド
     public void AddPoint(Vector2 point)
     {
         m_points.Add(point);
     }
 
+
     // ルーンのストロークデータを逆順にするメソッド
     public void Reverse()
     {
         m_points.Reverse();
     }
+
 
     // ルーンのストロークデータをクリアするメソッド
     public void Clear()

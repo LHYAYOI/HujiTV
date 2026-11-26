@@ -27,17 +27,20 @@ namespace YasudaHaruto.BookValidation.Editor
         private static Sprite s_readyFrame;
         private static MAGIC_CAST_DIRECTION s_lastDirection;
 
+
         static RuneSpellValidation()
         {
             const string request = "Temp/RuneSpellValidation/runtime-request";
-            if (File.Exists(request)) EditorApplication.delayCall += () =>
+            if (File.Exists(request))
+                EditorApplication.delayCall += () =>
             {
                 File.Delete(request);
                 Run();
             };
             EditorApplication.playModeStateChanged += state =>
             {
-                if (!SessionState.GetBool(Running, false)) return;
+                if (!SessionState.GetBool(Running, false))
+                    return;
                 if (state == PlayModeStateChange.EnteredPlayMode)
                 {
                     s_step = s_castCount = 0;
@@ -50,42 +53,59 @@ namespace YasudaHaruto.BookValidation.Editor
                 {
                     EditorApplication.update -= Tick;
                     SessionState.SetBool(Running, false);
-                    s_game = null; s_view = null; s_effect = null; s_overlay = null;
+                    s_game = null;
+                    s_view = null;
+                    s_effect = null;
+                    s_overlay = null;
                 }
             };
         }
 
+
         public static void Run()
         {
-            if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Exit Play Mode first.");
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new InvalidOperationException("Exit Play Mode first.");
             Directory.CreateDirectory("Temp/RuneSpellValidation");
             File.WriteAllText(Report, "Current scene; input handlers exercised with synthetic pointer events.\n");
             SessionState.SetBool(Running, true);
             EditorApplication.EnterPlaymode();
         }
 
+
         private static object Get(object target, string name) => target.GetType()
             .GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+
         private static void Require(bool value, string message)
         {
-            if (!value) throw new InvalidOperationException(message);
+            if (!value)
+                throw new InvalidOperationException(message);
             File.AppendAllText(Report, "PASS: " + message + "\n");
         }
+
         private static void Capture(string name) => ScreenCapture.CaptureScreenshot("Temp/RuneSpellValidation/" + name + ".png");
-        private static void OnCast(MAGIC_CAST_DIRECTION direction) { s_castCount++; s_lastDirection = direction; }
+
+        private static void OnCast(MAGIC_CAST_DIRECTION direction)
+        {
+            s_castCount++;
+            s_lastDirection = direction;
+        }
+
 
         private static void CheckPalette()
         {
             var texture = new Texture2D(8, 8, TextureFormat.RGBA32, false);
             var colors = new Color[64];
-            for (int i = 0; i < colors.Length; i++) colors[i] = i < 32 ? Color.white : new Color(0.05f, 0.4f, 1f, 1f);
+            for (int i = 0; i < colors.Length; i++)
+                colors[i] = i < 32 ? Color.white : new Color(0.05f, 0.4f, 1f, 1f);
             texture.SetPixels(colors);
             texture.Apply(false, true);
             var sprite = Sprite.Create(texture, new Rect(0, 0, 8, 8), Vector2.one * 0.5f);
             var go = new GameObject("Rune Palette Test", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             try
             {
-                var image = go.GetComponent<Image>(); image.sprite = sprite;
+                var image = go.GetComponent<Image>();
+                image.sprite = sprite;
                 Color color = RuneSpellPalette.Sample(image, Color.magenta);
                 Require(color.b > 0.8f && color.r < 0.2f && color.g > 0.2f,
                     "Color is sampled from non-readable rune pixels while ignoring white paper");
@@ -93,14 +113,17 @@ namespace YasudaHaruto.BookValidation.Editor
             finally { UnityEngine.Object.Destroy(go); UnityEngine.Object.Destroy(sprite); UnityEngine.Object.Destroy(texture); }
         }
 
+
         private static void Complete(MAGIC_AIM_TYPE type = MAGIC_AIM_TYPE.THREE_DIRECTIONS)
         {
             s_controller.BeginTrace(s_rune, type);
             foreach (var stroke in s_rune.TraceData.Strokes)
             {
                 s_controller.BeginStroke(stroke.Points[0]);
-                for (int i = 1; i < stroke.Points.Count; i++) s_controller.AddPoint(stroke.Points[i]);
-                if (s_controller.State == RUNE_TRACE_STATE.WAITING_RELEASE) s_controller.EndStroke();
+                for (int i = 1; i < stroke.Points.Count; i++)
+                    s_controller.AddPoint(stroke.Points[i]);
+                if (s_controller.State == RUNE_TRACE_STATE.WAITING_RELEASE)
+                    s_controller.EndStroke();
             }
             Require(s_controller.State == RUNE_TRACE_STATE.WAITING_CAST_RELEASE, "Completed trace waits for original finger release");
             s_effect = s_view.SpellEffect;
@@ -108,16 +131,25 @@ namespace YasudaHaruto.BookValidation.Editor
             s_effect.enabled = false; // Deterministic phase advancement, actual uGUI rendering remains active.
         }
 
+
         private static PointerEventData Pointer(Vector2 point) => new PointerEventData(EventSystem.current)
-        { pointerId = 17, button = PointerEventData.InputButton.Left, position = point };
+        {
+            pointerId = 17,
+            button = PointerEventData.InputButton.Left,
+            position = point
+        };
+
 
         private static void Tick()
         {
-            if (!EditorApplication.isPlaying || EditorApplication.timeSinceStartup < s_next) return;
+            if (!EditorApplication.isPlaying || EditorApplication.timeSinceStartup < s_next)
+                return;
             try
             {
-                if (EditorApplication.timeSinceStartup > s_deadline) throw new TimeoutException("Rune spell validation timed out.");
-                if (s_game != null && !s_game.BookView.IsReady) return;
+                if (EditorApplication.timeSinceStartup > s_deadline)
+                    throw new TimeoutException("Rune spell validation timed out.");
+                if (s_game != null && !s_game.BookView.IsReady)
+                    return;
                 s_next = EditorApplication.timeSinceStartup + 0.35;
                 switch (s_step++)
                 {
@@ -137,7 +169,8 @@ namespace YasudaHaruto.BookValidation.Editor
                                     s_spread = i + 1;
                                     s_rune = page.Interaction.RuneData;
                                 }
-                                if (page.Action.MagicData.MagicType == MAGIC_TYPE.FIRE) break;
+                                if (page.Action.MagicData.MagicType == MAGIC_TYPE.FIRE)
+                                    break;
                             }
                         }
                         Require(s_spread > 0, "Found a directional rune in the current inventory");
@@ -372,6 +405,7 @@ namespace YasudaHaruto.BookValidation.Editor
             }
         }
 
+
         private static void CheckInstantCast()
         {
             var magic = ScriptableObject.CreateInstance<MagicData>();
@@ -400,6 +434,7 @@ namespace YasudaHaruto.BookValidation.Editor
             }
             finally { UnityEngine.Object.Destroy(magic); }
         }
+
         private static void CheckSide(MAGIC_CAST_DIRECTION direction)
         {
             Complete();
@@ -428,10 +463,12 @@ namespace YasudaHaruto.BookValidation.Editor
                 direction + " gesture fires exactly once along the same visible axis");
         }
 
+
         private static void Finish()
         {
             EditorApplication.update -= Tick;
-            if (s_controller != null) s_controller.CastConfirmed -= OnCast;
+            if (s_controller != null)
+                s_controller.CastConfirmed -= OnCast;
             EditorApplication.ExitPlaymode();
         }
     }

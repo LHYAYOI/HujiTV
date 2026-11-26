@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>ルーン入力の判定結果と進行を検証用に表示する。</summary>
 public class DebugRuneTraceView : MonoBehaviour, IRuneTraceView
 {
     [SerializeField] private RuneLineGraphic m_referenceGraphic;
 
     [SerializeField] private RuneLineGraphic m_playerGraphic;
+
 
     public void BeginTrace(RuneData runeData)
     {
@@ -16,15 +18,18 @@ public class DebugRuneTraceView : MonoBehaviour, IRuneTraceView
         m_playerGraphic.Clear();
     }
 
+
     public void UpdateCurrentStroke(IReadOnlyList<Vector2> points)
     {
         m_playerGraphic.SetCurrentStroke(points);
     }
 
+
     public void EndStroke()
     {
         Debug.Log("Stroke End");
     }
+
 
     public void PlaySuccess(
         RuneTraceResult result)
@@ -35,6 +40,7 @@ public class DebugRuneTraceView : MonoBehaviour, IRuneTraceView
             $"Accuracy:{result.Accuracy:P1}");
     }
 
+
     public void PlayFailure(
         RuneTraceResult result)
     {
@@ -43,6 +49,7 @@ public class DebugRuneTraceView : MonoBehaviour, IRuneTraceView
             $"Coverage:{result.Coverage:P1} " +
             $"Accuracy:{result.Accuracy:P1}");
     }
+
 
     public void Clear()
     {

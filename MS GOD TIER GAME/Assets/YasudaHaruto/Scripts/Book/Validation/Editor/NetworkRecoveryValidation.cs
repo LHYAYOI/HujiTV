@@ -31,19 +31,39 @@ namespace YasudaHaruto.BookValidation.Editor
 
         private sealed class View : IRuneTraceView
         {
-            public void BeginTrace(RuneData data) { }
-            public void UpdateCurrentStroke(IReadOnlyList<Vector2> points) { }
-            public void EndStroke() { }
-            public void PlaySuccess(RuneTraceResult result) { }
-            public void PlayFailure(RuneTraceResult result) { }
-            public void Clear() { }
+
+            public void BeginTrace(RuneData data)
+            {
+            }
+
+            public void UpdateCurrentStroke(IReadOnlyList<Vector2> points)
+            {
+            }
+
+            public void EndStroke()
+            {
+            }
+
+            public void PlaySuccess(RuneTraceResult result)
+            {
+            }
+
+            public void PlayFailure(RuneTraceResult result)
+            {
+            }
+
+            public void Clear()
+            {
+            }
         }
+
 
         static NetworkRecoveryValidation()
         {
             EditorApplication.playModeStateChanged += state =>
             {
-                if (state != PlayModeStateChange.EnteredPlayMode || !SessionState.GetBool(Running, false)) return;
+                if (state != PlayModeStateChange.EnteredPlayMode || !SessionState.GetBool(Running, false))
+                    return;
                 s_step = 0;
                 s_registrations = 0;
                 s_deadline = EditorApplication.timeSinceStartup + 45;
@@ -51,15 +71,18 @@ namespace YasudaHaruto.BookValidation.Editor
             };
         }
 
+
         // Run only in a dedicated batch editor. Does not save or modify source scenes.
         public static void RunBatch()
         {
-            if (!Application.isBatchMode) throw new InvalidOperationException("Use a dedicated batch editor with the main editor closed.");
+            if (!Application.isBatchMode)
+                throw new InvalidOperationException("Use a dedicated batch editor with the main editor closed.");
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             SessionState.SetBool(Batch, true);
             SessionState.SetBool(Running, true);
             EditorApplication.EnterPlaymode();
         }
+
 
         public static void Run()
         {
@@ -74,20 +97,27 @@ namespace YasudaHaruto.BookValidation.Editor
             EditorApplication.EnterPlaymode();
         }
 
+
         private static object Get(object target, string name) => target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+
         private static void Set(object target, string name, object value) => target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).SetValue(target, value);
+
         private static void Require(bool condition, string message)
         {
-            if (!condition) throw new InvalidOperationException(message);
+            if (!condition)
+                throw new InvalidOperationException(message);
             Debug.Log("NetworkRecovery PASS: " + message);
         }
+
 
         private static void Tick()
         {
             try
             {
-                if (EditorApplication.timeSinceStartup > s_deadline) throw new TimeoutException("Network recovery validation timed out at step " + s_step);
-                if (s_server.IsCreated) PumpServer();
+                if (EditorApplication.timeSinceStartup > s_deadline)
+                    throw new TimeoutException("Network recovery validation timed out at step " + s_step);
+                if (s_server.IsCreated)
+                    PumpServer();
                 switch (s_step)
                 {
                     case 0:
@@ -107,7 +137,8 @@ namespace YasudaHaruto.BookValidation.Editor
                         s_step++;
                         break;
                     case 1:
-                        if (s_client.ConnectionState != BOOK_CONNECTION_STATE.DISCONNECTED) break;
+                        if (s_client.ConnectionState != BOOK_CONNECTION_STATE.DISCONNECTED)
+                            break;
                         Require(s_client.IsReconnecting && (float)Get(s_client, "m_reconnectDelay") == 2f,
                             "Initial failure schedules retry with timeScale zero");
                         Require(s_input.GetComponentInChildren<Text>().text.Contains("再接続中"),
@@ -120,7 +151,8 @@ namespace YasudaHaruto.BookValidation.Editor
                         s_step++;
                         break;
                     case 2:
-                        if (s_client.ConnectionState != BOOK_CONNECTION_STATE.CONNECTING) break;
+                        if (s_client.ConnectionState != BOOK_CONNECTION_STATE.CONNECTING)
+                            break;
                         Require(Time.unscaledTime - s_mark >= 0.9f, "Retry waits its one second interval using unscaled time");
                         s_server = NetworkDriver.Create();
                         s_pipeline = s_server.CreatePipeline(typeof(ReliableSequencedPipelineStage));
@@ -129,7 +161,8 @@ namespace YasudaHaruto.BookValidation.Editor
                         s_step++;
                         break;
                     case 3:
-                        if (s_registrations < 1 || s_client.ConnectionState != BOOK_CONNECTION_STATE.CONNECTED) break;
+                        if (s_registrations < 1 || s_client.ConnectionState != BOOK_CONNECTION_STATE.CONNECTED)
+                            break;
                         Require(s_rune.CanBeginStroke && !s_client.IsReconnecting, "Connection restores rune input");
                         Require(s_input.GetComponentInChildren<Text>(true).gameObject.activeInHierarchy == false,
                             "Connection banner disappears after successful connection");
@@ -142,13 +175,15 @@ namespace YasudaHaruto.BookValidation.Editor
                         s_step++;
                         break;
                     case 4:
-                        if (s_client.ConnectionState == BOOK_CONNECTION_STATE.CONNECTED) break;
+                        if (s_client.ConnectionState == BOOK_CONNECTION_STATE.CONNECTED)
+                            break;
                         Require(!s_rune.CanBeginStroke && !s_rune.IsAwaitingCast && !s_input.IsGestureActive,
                             "Real transport disconnect cancels pending cast and blocks rune input");
                         s_step++;
                         break;
                     case 5:
-                        if (s_registrations < 2 || s_client.ConnectionState != BOOK_CONNECTION_STATE.CONNECTED) break;
+                        if (s_registrations < 2 || s_client.ConnectionState != BOOK_CONNECTION_STATE.CONNECTED)
+                            break;
                         Require(s_rune.CanBeginStroke && SceneManager.GetActiveScene().handle == s_scene,
                             "Reconnect registers the same slot and retains the current scene");
                         Require((float)Get(s_client, "m_reconnectDelay") == 1f, "Successful connection resets retry delay");
@@ -157,7 +192,8 @@ namespace YasudaHaruto.BookValidation.Editor
                         s_step++;
                         break;
                     case 6:
-                        if (Time.unscaledTime - s_mark < 1.2f) break;
+                        if (Time.unscaledTime - s_mark < 1.2f)
+                            break;
                         Require(!s_client.IsReconnecting && s_client.ConnectionState == BOOK_CONNECTION_STATE.DISCONNECTED,
                             "Explicit disconnect stops automatic retries");
                         var disconnected = typeof(BookNetworkClient).GetMethod("OnDisconnected", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -180,17 +216,25 @@ namespace YasudaHaruto.BookValidation.Editor
             }
         }
 
+
         private static void PumpServer()
         {
             s_server.ScheduleUpdate().Complete();
             NetworkConnection accepted;
-            while ((accepted = s_server.Accept()) != default) s_connection = accepted;
-            if (!s_connection.IsCreated) return;
+            while ((accepted = s_server.Accept()) != default)
+                s_connection = accepted;
+            if (!s_connection.IsCreated)
+                return;
             NetworkEvent.Type type;
             while ((type = s_server.PopEventForConnection(s_connection, out var reader)) != NetworkEvent.Type.Empty)
             {
-                if (type == NetworkEvent.Type.Disconnect) { s_connection = default; break; }
-                if (type != NetworkEvent.Type.Data) continue;
+                if (type == NetworkEvent.Type.Disconnect)
+                {
+                    s_connection = default;
+                    break;
+                }
+                if (type != NetworkEvent.Type.Data)
+                    continue;
                 Require(reader.Length == 2 && reader.ReadByte() == (byte)BOOK_MESSAGE_TYPE.REGISTER_CONTROLLER &&
                     reader.ReadByte() == (byte)PLAYER_SLOT.PLAYER2, "Each connection sends the original player registration");
                 s_registrations++;
@@ -200,6 +244,7 @@ namespace YasudaHaruto.BookValidation.Editor
                 s_server.EndSend(writer);
             }
         }
+
 
         private static void CheckRuneRecovery()
         {
@@ -239,18 +284,26 @@ namespace YasudaHaruto.BookValidation.Editor
             s_rune.BeginTrace(s_data);
         }
 
+
         private static void Finish(int code)
         {
             EditorApplication.update -= Tick;
             SessionState.SetBool(Running, false);
             Time.timeScale = 1f;
-            if (s_client != null) UnityEngine.Object.DestroyImmediate(s_client.gameObject);
-            if (s_input != null) UnityEngine.Object.DestroyImmediate(s_input.gameObject);
-            if (s_data != null) UnityEngine.Object.DestroyImmediate(s_data);
-            if (s_server.IsCreated) s_server.Dispose();
-            if (code == 0) Debug.Log("NetworkRecovery COMPLETE");
-            if (SessionState.GetBool(Batch, false)) EditorApplication.Exit(code);
-            else EditorApplication.ExitPlaymode();
+            if (s_client != null)
+                UnityEngine.Object.DestroyImmediate(s_client.gameObject);
+            if (s_input != null)
+                UnityEngine.Object.DestroyImmediate(s_input.gameObject);
+            if (s_data != null)
+                UnityEngine.Object.DestroyImmediate(s_data);
+            if (s_server.IsCreated)
+                s_server.Dispose();
+            if (code == 0)
+                Debug.Log("NetworkRecovery COMPLETE");
+            if (SessionState.GetBool(Batch, false))
+                EditorApplication.Exit(code);
+            else
+                EditorApplication.ExitPlaymode();
         }
     }
 }

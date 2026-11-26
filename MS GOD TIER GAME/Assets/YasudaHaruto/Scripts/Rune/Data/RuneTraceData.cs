@@ -13,7 +13,9 @@ public class RuneTraceData
 {
     [SerializeField] private List<RuneStrokeData> m_strokes = new();
 
+
     public IReadOnlyList<RuneStrokeData> Strokes => m_strokes;
+
 
     // ルーンのストロークデータを設定するメソッド
     public void SetStrokes(IEnumerable<RuneStrokeData> strokes)
@@ -26,6 +28,7 @@ public class RuneTraceData
 
         m_strokes.AddRange(strokes);
     }
+
 
     // ルーンのストロークデータをクリアするメソッド
     public void Clear()

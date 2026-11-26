@@ -8,6 +8,7 @@ using UnityEngine.UI;
 
 namespace YasudaHaruto.BookValidation.Editor
 {
+    /// <summary>ページ報酬の落下と取得表示をEditor上でプレビューする。</summary>
     [InitializeOnLoad]
     public static class PageDropPreview
     {
@@ -24,19 +25,26 @@ namespace YasudaHaruto.BookValidation.Editor
         private static double s_next;
         private static int s_step;
 
+
         static PageDropPreview()
         {
             EditorApplication.playModeStateChanged += state =>
             {
-                if (!SessionState.GetBool(Running, false)) return;
+                if (!SessionState.GetBool(Running, false))
+                    return;
                 if (state == PlayModeStateChange.EnteredPlayMode)
                 {
-                    try { Setup(); }
+                    try
+                    {
+                        Setup();
+                    }
                     catch (Exception error) { Debug.LogException(error); Finish(); }
                 }
-                if (state == PlayModeStateChange.ExitingPlayMode) Finish();
+                if (state == PlayModeStateChange.ExitingPlayMode)
+                    Finish();
             };
         }
+
 
         [MenuItem("Tools/YasudaHaruto/Preview Page Drop and Acquisition")]
         public static void Run()
@@ -51,6 +59,7 @@ namespace YasudaHaruto.BookValidation.Editor
             EditorApplication.EnterPlaymode();
         }
 
+
         private static void Setup()
         {
             var network = new GameObject("Page Drop Loopback");
@@ -61,9 +70,11 @@ namespace YasudaHaruto.BookValidation.Editor
             EditorSceneManager.LoadSceneInPlayMode(BookScene, new LoadSceneParameters(LoadSceneMode.Single));
         }
 
+
         private static void SetupStage(Scene scene, LoadSceneMode mode)
         {
-            if (scene.path != BookScene) return;
+            if (scene.path != BookScene)
+                return;
             SceneManager.sceneLoaded -= SetupStage;
             var stage = new GameObject("Page Drop Preview Stage");
             stage.transform.position = new Vector3(0f, 150f, 0f);
@@ -126,12 +137,14 @@ namespace YasudaHaruto.BookValidation.Editor
             EditorApplication.update += Tick;
         }
 
+
         private static void Tick()
         {
             try
             {
                 double now = EditorApplication.timeSinceStartup;
-                if (now > s_deadline) throw new TimeoutException("Page drop preview did not complete.");
+                if (now > s_deadline)
+                    throw new TimeoutException("Page drop preview did not complete.");
                 var book = UnityEngine.Object.FindFirstObjectByType<BookGameController>();
                 switch (s_step)
                 {
@@ -167,18 +180,20 @@ namespace YasudaHaruto.BookValidation.Editor
             catch (Exception error)
             {
                 Debug.LogException(error);
-                if (s_caption != null) s_caption.text = "FAIL: see Console";
+                if (s_caption != null)
+                    s_caption.text = "FAIL: see Console";
                 EditorApplication.update -= Tick;
             }
         }
+
 
         private static void Finish()
         {
             EditorApplication.update -= Tick;
             SceneManager.sceneLoaded -= SetupStage;
             SessionState.EraseBool(Running);
-            if (s_preview != null) UnityEngine.Object.DestroyImmediate(s_preview);
+            if (s_preview != null)
+                UnityEngine.Object.DestroyImmediate(s_preview);
         }
     }
 }
-

@@ -20,12 +20,17 @@ public class RuneData : ScriptableObject
     [SerializeField] private RuneTraceRule m_rule = new();
 
 
+
     public string RuneId => m_runeId;
+
 
     public string DisplayName => m_displayName;
 
+
     public RuneAuthoringData AuthoringData => m_authoringData;
+
     public RuneTraceData TraceData => m_traceData;
+
 
     public RuneTraceRule Rule => m_rule;
 }

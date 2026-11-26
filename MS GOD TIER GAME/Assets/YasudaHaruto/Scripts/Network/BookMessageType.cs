@@ -17,4 +17,5 @@ public enum BOOK_MESSAGE_TYPE : byte
     REGISTRATION_REJECTED = 8,
     GAME_STARTED = 9,
     APPLY_DIRT = 10,
+    CAST_SELECTION = 11,
 }

@@ -10,6 +10,7 @@ using UnityEngine;
 public static class RunePathUtility
 {
 
+
     // 指定したPointが、いずれかのStrokeの近くに存在するか
     public static bool IsPointNearStrokes(Vector2 point, IReadOnlyList<RuneStrokeData> strokes, float tolerance)
     {
@@ -38,7 +39,8 @@ public static class RunePathUtility
     }
 
 
-    
+
+
     // Pointと線分との最短距離を求める
     public static float DistancePointToSegment(Vector2 point, Vector2 segmentStart, Vector2 segmentEnd)
     {
@@ -51,7 +53,7 @@ public static class RunePathUtility
         // 線分の長さがほぼゼロの場合、線分の始点との距離を返す
         if (segmentLengthSquared <= Mathf.Epsilon)
         {
-            return Vector2.Distance(point,segmentStart);
+            return Vector2.Distance(point, segmentStart);
         }
 
         // 点から線分への射影を計算
@@ -66,6 +68,7 @@ public static class RunePathUtility
         // 射影点と点との距離を返す
         return Vector2.Distance(point, closestPoint);
     }
+
 
 
     // Polylineを一定距離ごとのPointへ再サンプリングする
@@ -148,6 +151,7 @@ public static class RunePathUtility
         return result;
     }
 
+
     public static List<RuneStrokeData> ResampleStrokes(IReadOnlyList<RuneStrokeData> strokes, float interval)
     {
         List<RuneStrokeData> result = new();
@@ -178,9 +182,11 @@ public static class RunePathUtility
     }
 
 
+
     public static float CalculatePathLength(IReadOnlyList<Vector2> points)
     {
-        if (points == null || points.Count < 2) return 0f;
+        if (points == null || points.Count < 2)
+            return 0f;
 
         float length = 0f;
         for (int i = 1; i < points.Count; i++)
@@ -188,6 +194,7 @@ public static class RunePathUtility
 
         return length;
     }
+
 
     // 指定した位置をパス上に射影し、パス上の距離とパスからの距離を返す
     public static bool TryProjectOnPath(IReadOnlyList<Vector2> points, Vector2 position, float currentDistance, float backwardAllowance, float forwardAllowance, out float projectedDistance, out float distanceFromPath)

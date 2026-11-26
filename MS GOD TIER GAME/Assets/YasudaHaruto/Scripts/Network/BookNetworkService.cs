@@ -8,10 +8,12 @@ public class BookNetworkService
 {
     private readonly BookNetworkClient m_client;
 
+
     public BookNetworkService(BookNetworkClient client)
     {
         m_client = client;
     }
+
 
     public bool CastSkill(byte skillId, MAGIC_CAST_DIRECTION direction)
     {

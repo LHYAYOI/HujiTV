@@ -9,6 +9,7 @@ using UnityEngine;
 
 public static class RuneTraceEvaluator
 {
+
     public static RuneTraceResult Evaluate(RuneData runeData, RuneTraceSession session)
     {
         if (runeData == null || session == null)
@@ -30,6 +31,7 @@ public static class RuneTraceEvaluator
 
         return new RuneTraceResult(coverage, accuracy, session.StrokeCount, success);
     }
+
 
 
     private static float CalculateCoverage(IReadOnlyList<RuneStrokeData> referenceStrokes, IReadOnlyList<RuneStrokeData> inputStrokes, float tolerance)
@@ -57,6 +59,7 @@ public static class RuneTraceEvaluator
 
         return (float)coveredPointCount / totalPointCount;
     }
+
 
 
     private static float CalculateAccuracy(IReadOnlyList<RuneStrokeData> referenceStrokes, IReadOnlyList<RuneStrokeData> inputStrokes, float tolerance)

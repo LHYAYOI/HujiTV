@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>発動前後のルーン弾プレビューを生成・表示する。</summary>
 public sealed class RuneBulletPreview : MonoBehaviour
 {
     private const int PreviewLayer = 31;
@@ -8,6 +9,7 @@ public sealed class RuneBulletPreview : MonoBehaviour
     private RenderTexture m_target;
     private RawImage m_image;
     private Material m_material;
+
 
     public bool Show(MagicBulletController prefab, RectTransform canvas)
     {
@@ -58,6 +60,7 @@ public sealed class RuneBulletPreview : MonoBehaviour
         return true;
     }
 
+
     public void Draw(Vector2 localPoint, float size, float opacity)
     {
         gameObject.SetActive(true);
@@ -67,19 +70,25 @@ public sealed class RuneBulletPreview : MonoBehaviour
         m_image.color = new Color(1f, 1f, 1f, opacity);
     }
 
+
     public void Hide()
     {
         gameObject.SetActive(false);
-        if (m_image != null) m_image.gameObject.SetActive(false);
+        if (m_image != null)
+            m_image.gameObject.SetActive(false);
     }
+
 
     private void OnDestroy()
     {
-        if (m_image != null) Destroy(m_image.gameObject);
-        if (m_material != null) Destroy(m_material);
+        if (m_image != null)
+            Destroy(m_image.gameObject);
+        if (m_material != null)
+            Destroy(m_material);
         if (m_target != null)
         {
-            if (m_camera != null) m_camera.targetTexture = null;
+            if (m_camera != null)
+                m_camera.targetTexture = null;
             m_target.Release();
             Destroy(m_target);
         }

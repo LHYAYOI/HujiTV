@@ -6,9 +6,15 @@
 //-----------------------------------------------
 public interface IPageInteraction
 {
-    bool IsActive { get; }
+
+    bool IsActive
+    {
+        get;
+    }
+
 
     void Begin();
+
 
     void End();
 }

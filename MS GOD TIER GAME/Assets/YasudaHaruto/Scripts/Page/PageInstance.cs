@@ -9,9 +9,13 @@ public class PageInstance
     private readonly PageData m_data;
     private readonly IPageInteraction m_interaction;
 
+
     public PageObstacleState Obstacles { get; } = new PageObstacleState();
+
     public PageData Data => m_data;
+
     public IPageInteraction Interaction => m_interaction;
+
 
     public PageInstance(PageData data, IPageInteraction interaction)
     {
@@ -19,10 +23,12 @@ public class PageInstance
         m_interaction = interaction;
     }
 
+
     public void BeginInteraction()
     {
         m_interaction?.Begin();
     }
+
 
     public void EndInteraction()
     {

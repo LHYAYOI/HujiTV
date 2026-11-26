@@ -13,6 +13,7 @@ public class MagicManager : MonoBehaviour
 
     public event Action<MagicData> OnMagicCastRequested;
 
+
     public void RequestCast(byte magicId)
     {
         MagicData magicData = m_magicDatabase.Find(magicId);

@@ -30,11 +30,13 @@ namespace YasudaHaruto.BookValidation.Editor
         private static bool s_done;
         private static int s_connectedCount;
 
+
         static ServerLobbyValidation()
         {
             EditorApplication.playModeStateChanged += state =>
             {
-                if (state != PlayModeStateChange.EnteredPlayMode || !SessionState.GetBool(Running, false)) return;
+                if (state != PlayModeStateChange.EnteredPlayMode || !SessionState.GetBool(Running, false))
+                    return;
                 s_step = 0;
                 s_done = false;
                 s_connectedCount = 0;
@@ -44,14 +46,17 @@ namespace YasudaHaruto.BookValidation.Editor
             };
         }
 
+
         public static void RunBatch()
         {
-            if (!Application.isBatchMode) throw new InvalidOperationException("Dedicated batch editor only; close the main Unity editor first.");
+            if (!Application.isBatchMode)
+                throw new InvalidOperationException("Dedicated batch editor only; close the main Unity editor first.");
             EditorSceneManager.OpenScene("Assets/YasudaHaruto/Scenes/BookServerLobby.unity");
             SessionState.SetBool(Batch, true);
             SessionState.SetBool(Running, true);
             EditorApplication.EnterPlaymode();
         }
+
 
         public static void Run()
         {
@@ -63,15 +68,19 @@ namespace YasudaHaruto.BookValidation.Editor
             EditorApplication.EnterPlaymode();
         }
 
+
         private static void Require(bool condition, string description)
         {
-            if (!condition) throw new InvalidOperationException(description);
+            if (!condition)
+                throw new InvalidOperationException(description);
             Debug.Log("ServerLobby PASS: " + description);
         }
 
+
         private static void CreatePeer(PLAYER_SLOT slot)
         {
-            if (s_peer.IsCreated) s_peer.Dispose();
+            if (s_peer.IsCreated)
+                s_peer.Dispose();
             s_peerAccepted = s_peerRejected = s_peerStarted = false;
             s_peer = NetworkDriver.Create();
             s_pipeline = s_peer.CreatePipeline(typeof(ReliableSequencedPipelineStage));
@@ -80,9 +89,11 @@ namespace YasudaHaruto.BookValidation.Editor
         }
         private static PLAYER_SLOT s_peerSlot;
 
+
         private static void PumpPeer()
         {
-            if (!s_peer.IsCreated) return;
+            if (!s_peer.IsCreated)
+                return;
             s_peer.ScheduleUpdate().Complete();
             NetworkEvent.Type type;
             while ((type = s_connection.PopEvent(s_peer, out DataStreamReader reader)) != NetworkEvent.Type.Empty)
@@ -94,26 +105,34 @@ namespace YasudaHaruto.BookValidation.Editor
                     writer.WriteByte((byte)s_peerSlot);
                     s_peer.EndSend(writer);
                 }
-                if (type != NetworkEvent.Type.Data) continue;
+                if (type != NetworkEvent.Type.Data)
+                    continue;
                 BOOK_MESSAGE_TYPE message = (BOOK_MESSAGE_TYPE)reader.ReadByte();
-                if (message == BOOK_MESSAGE_TYPE.REGISTRATION_ACCEPTED) s_peerAccepted = true;
-                if (message == BOOK_MESSAGE_TYPE.REGISTRATION_REJECTED) s_peerRejected = true;
-                if (message == BOOK_MESSAGE_TYPE.GAME_STARTED) s_peerStarted = true;
+                if (message == BOOK_MESSAGE_TYPE.REGISTRATION_ACCEPTED)
+                    s_peerAccepted = true;
+                if (message == BOOK_MESSAGE_TYPE.REGISTRATION_REJECTED)
+                    s_peerRejected = true;
+                if (message == BOOK_MESSAGE_TYPE.GAME_STARTED)
+                    s_peerStarted = true;
             }
         }
 
+
         private static void Tick()
         {
-            if (s_done) return;
+            if (s_done)
+                return;
             try
             {
-                if (EditorApplication.timeSinceStartup > s_deadline) throw new TimeoutException("Step " + s_step);
+                if (EditorApplication.timeSinceStartup > s_deadline)
+                    throw new TimeoutException("Step " + s_step);
                 PumpPeer();
                 switch (s_step)
                 {
                     case 0:
                         s_server = BookNetworkServer.Instance;
-                        if (s_server == null || !s_server.IsListening) return;
+                        if (s_server == null || !s_server.IsListening)
+                            return;
                         var flow = s_server.GetComponent<BookServerGameFlow>();
                         Require(!flow.CanStart, "zero players cannot start");
                         flow.StartGame();
@@ -125,7 +144,8 @@ namespace YasudaHaruto.BookValidation.Editor
                         s_step++;
                         break;
                     case 1:
-                        if (s_client.ConnectionState != BOOK_CONNECTION_STATE.CONNECTED) return;
+                        if (s_client.ConnectionState != BOOK_CONNECTION_STATE.CONNECTED)
+                            return;
                         Require(s_server.IsPlayerConnected(PLAYER_SLOT.PLAYER1) && !s_server.IsPlayerConnected(PLAYER_SLOT.PLAYER2), "registered Player1 only");
                         Require(!s_client.HasGameStarted && SceneManager.GetActiveScene().name == "BookServerLobby", "tablet waits before host start");
                         Require(s_server.GetComponent<BookServerGameFlow>().CanStart, "one player can start");
@@ -133,22 +153,26 @@ namespace YasudaHaruto.BookValidation.Editor
                         s_step++;
                         break;
                     case 2:
-                        if (!s_peerRejected) return;
+                        if (!s_peerRejected)
+                            return;
                         Require(!s_peerAccepted && !s_peerStarted, "duplicate slot rejected without game access");
                         s_peer.Dispose();
                         s_server.GetComponent<BookServerGameFlow>().StartGame();
                         s_step++;
                         break;
                     case 3:
-                        if (!s_client.HasGameStarted || SceneManager.GetActiveScene().name != "BookServerGame") return;
+                        if (!s_client.HasGameStarted || SceneManager.GetActiveScene().name != "BookServerGame")
+                            return;
                         Require(BookNetworkServer.Instance == s_server && s_connectedCount == 1, "same server and connection survive real game scene load");
                         int drivers = 0;
                         BookNetworkServer adapter = null;
                         foreach (var server in UnityEngine.Object.FindObjectsByType<BookNetworkServer>(FindObjectsSortMode.None))
                         {
                             var driver = (NetworkDriver)typeof(BookNetworkServer).GetField("m_driver", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(server);
-                            if (driver.IsCreated) drivers++;
-                            if (server != s_server) adapter = server;
+                            if (driver.IsCreated)
+                                drivers++;
+                            if (server != s_server)
+                                adapter = server;
                         }
                         Require(drivers == 1 && adapter != null, "game scene server adapter does not bind a second driver");
                         Require(adapter.IsPlayerConnected(PLAYER_SLOT.PLAYER1), "scene-local reference forwards player status");
@@ -157,20 +181,23 @@ namespace YasudaHaruto.BookValidation.Editor
                         s_step++;
                         break;
                     case 4:
-                        if (!s_peerAccepted || !s_peerStarted || !s_castReceived) return;
+                        if (!s_peerAccepted || !s_peerStarted || !s_castReceived)
+                            return;
                         Require(s_server.IsPlayerConnected(PLAYER_SLOT.PLAYER2), "late Player2 receives registration and game start");
                         Require(s_castReceived, "CastMagic arrives after scene transition");
                         s_client.Disconnect();
                         s_step++;
                         break;
                     case 5:
-                        if (s_server.IsPlayerConnected(PLAYER_SLOT.PLAYER1)) return;
+                        if (s_server.IsPlayerConnected(PLAYER_SLOT.PLAYER1))
+                            return;
                         Require(!s_client.HasGameStarted, "disconnect clears tablet start state");
                         s_client.Connect("127.0.0.1", PLAYER_SLOT.PLAYER1);
                         s_step++;
                         break;
                     case 6:
-                        if (!s_client.HasGameStarted) return;
+                        if (!s_client.HasGameStarted)
+                            return;
                         Require(s_client.ConnectionState == BOOK_CONNECTION_STATE.CONNECTED && s_connectedCount == 2, "rejoining tablet receives running game state");
                         Finish(0, "ServerLobby COMPLETE");
                         break;
@@ -179,17 +206,21 @@ namespace YasudaHaruto.BookValidation.Editor
             catch (Exception e) { Finish(1, "ServerLobby FAILED: " + e); }
         }
 
+
         private static void Finish(int exitCode, string message)
         {
             s_done = true;
             SessionState.SetBool(Running, false);
             EditorApplication.update -= Tick;
-            if (s_peer.IsCreated) s_peer.Dispose();
+            if (s_peer.IsCreated)
+                s_peer.Dispose();
             System.IO.Directory.CreateDirectory("Temp/ServerLobbyValidation");
             System.IO.File.WriteAllText("Temp/ServerLobbyValidation/results.txt", message);
             Debug.Log(message);
-            if (SessionState.GetBool(Batch, false)) EditorApplication.Exit(exitCode);
-            else EditorApplication.ExitPlaymode();
+            if (SessionState.GetBool(Batch, false))
+                EditorApplication.Exit(exitCode);
+            else
+                EditorApplication.ExitPlaymode();
         }
     }
 }

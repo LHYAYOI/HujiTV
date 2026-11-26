@@ -9,6 +9,7 @@ using UnityEngine;
 
 public static class RuneBaker
 {
+
     // AuthoringData‚©‚ç”»’è—p‚ÌStroke‚ğ¶¬‚·‚é
     public static List<RuneStrokeData> Bake(RuneAuthoringData authoringData, float sampleInterval)
     {
@@ -40,18 +41,22 @@ public static class RuneBaker
     }
 
 
+
     // Retain authored corners; subdivide each straight segment to at most the sample interval.
     private static List<Vector2> ResampleWithCorners(IReadOnlyList<Vector2> points, float interval)
     {
         var result = new List<Vector2>();
-        if (points == null || points.Count == 0) return result;
+        if (points == null || points.Count == 0)
+            return result;
         result.Add(points[0]);
-        if (interval <= 0f) return result;
+        if (interval <= 0f)
+            return result;
         for (int i = 1; i < points.Count; i++)
         {
             Vector2 start = points[i - 1], end = points[i];
             float distance = Vector2.Distance(start, end);
-            if (distance <= Mathf.Epsilon) continue;
+            if (distance <= Mathf.Epsilon)
+                continue;
             int steps = Mathf.Max(1, Mathf.CeilToInt(distance / interval));
             for (int step = 1; step <= steps; step++)
                 result.Add(Vector2.Lerp(start, end, (float)step / steps));

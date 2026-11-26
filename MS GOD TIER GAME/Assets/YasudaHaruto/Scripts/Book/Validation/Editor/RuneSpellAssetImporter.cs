@@ -2,8 +2,10 @@ using UnityEditor;
 
 namespace YasudaHaruto.BookValidation.Editor
 {
+    /// <summary>ルーン発動表示に必要な素材と設定を取り込む。</summary>
     public sealed class RuneSpellAssetImporter : AssetPostprocessor
     {
+
         [InitializeOnLoadMethod]
         private static void EnsureSpriteImport()
         {
@@ -19,6 +21,7 @@ namespace YasudaHaruto.BookValidation.Editor
             };
         }
 
+
         private void OnPreprocessTexture()
         {
             const string root = "Assets/YasudaHaruto/Resources/RuneSpell/";
@@ -32,7 +35,8 @@ namespace YasudaHaruto.BookValidation.Editor
                 return;
             }
             if (assetPath != root + "MagicAimArrow.png" &&
-                !assetPath.StartsWith(root + "DirectionFrames/", System.StringComparison.Ordinal)) return;
+                !assetPath.StartsWith(root + "DirectionFrames/", System.StringComparison.Ordinal))
+                return;
             var importer = (TextureImporter)assetImporter;
             importer.textureType = TextureImporterType.Sprite;
             importer.spriteImportMode = SpriteImportMode.Single;

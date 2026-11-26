@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // A snapshot of the player's completed strokes. It never takes pointer input.
+/// <summary>ルーン入力成功時の完了表示を制御する。</summary>
 public sealed class RuneCompletionOverlay : MonoBehaviour
 {
     private RuneLineGraphic m_graphic;
@@ -11,7 +12,9 @@ public sealed class RuneCompletionOverlay : MonoBehaviour
     private Color m_color;
     private Vector2 m_pivot;
 
+
     public bool IsVisible => gameObject.activeSelf && m_graphic != null;
+
 
     public void Play(IReadOnlyList<RuneStrokeData> strokes, Func<Rect?> screenRect, Color color,
         float lineWidth, float duration, float endScale)
@@ -50,10 +53,15 @@ public sealed class RuneCompletionOverlay : MonoBehaviour
         ApplyProgress(0f);
     }
 
+
     private void ApplyProgress(float progress)
     {
         Rect? area = m_screenRect?.Invoke();
-        if (!area.HasValue) { Hide(); return; }
+        if (!area.HasValue)
+        {
+            Hide();
+            return;
+        }
         Rect rect = area.Value;
         RectTransform target = m_graphic.rectTransform;
         target.pivot = m_pivot;
@@ -68,16 +76,23 @@ public sealed class RuneCompletionOverlay : MonoBehaviour
         m_graphic.color = tint;
     }
 
+
     private void LateUpdate()
     {
         m_elapsed += Time.unscaledDeltaTime;
-        if (m_elapsed >= m_duration) { Hide(); return; }
+        if (m_elapsed >= m_duration)
+        {
+            Hide();
+            return;
+        }
         ApplyProgress(m_elapsed / m_duration);
     }
 
+
     public void Hide()
     {
-        if (m_graphic != null) m_graphic.Clear();
+        if (m_graphic != null)
+            m_graphic.Clear();
         gameObject.SetActive(false);
     }
 }

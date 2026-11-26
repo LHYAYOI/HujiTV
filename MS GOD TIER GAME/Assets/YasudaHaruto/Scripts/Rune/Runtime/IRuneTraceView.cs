@@ -9,6 +9,7 @@ using UnityEngine;
 
 public interface IRuneTraceView
 {
+
     void BeginTrace(RuneData runeData);
 
     void UpdateCurrentStroke(IReadOnlyList<Vector2> points);

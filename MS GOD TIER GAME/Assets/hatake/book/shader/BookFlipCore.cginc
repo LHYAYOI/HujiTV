@@ -45,6 +45,7 @@ float _BoardThickness; // 表紙の板の厚み（ページ幅比）
 float _CoverRadius; // 表紙の板の角丸
 float _DropShadowWidth; // めくれた紙・立った板の落ち影の幅
 // 縮小表示でのちらつき対策（BookFlipView が毎フレーム設定）
+float _PageSharpen; // 撮影したページを出力の画素へ写すときの輪郭の強調（0 で無し）。双線形の補間で細い文字が薄くなる分を戻す
 float _PageLod; // ページの撮影テクスチャを読むミップの段（出力の画素に対するテクセルの数から）
 float _CoverLod; // 表紙の絵を読むミップの段
 float _PagePixels; // 出力でのページ幅の画素数（細かな模様を画素より細かくしない）
@@ -340,6 +341,21 @@ float2 BookCropUV(float2 uv, float4 rect)
 }
 
 // 分岐内でも微分に依存しないよう、ミップの段は BookFlipView が計算した値（_PageLod）で読む
+// ページの撮影テクスチャを読む。_PageSharpen > 0 なら、1段粗いミップとの差で輪郭を締める（ガンマに近い平方根の空間で）。
+// ミップの無い撮影テクスチャでは粗いミップも同じ色なので何も変わらない
+#define BOOK_PAGE_TAP(c, tex, rect) \
+    { \
+        float2 puv_ = BookCropUV(uv, rect); \
+        c = BOOK_TEX_LOD(tex, float4(puv_, 0, _PageLod)); \
+        [branch] if (_PageSharpen > 0) \
+        { \
+            float3 b_ = BOOK_TEX_LOD(tex, float4(puv_, 0, _PageLod + 1)).rgb; \
+            float3 s_ = sqrt(max(c.rgb, 0)); \
+            s_ += (s_ - sqrt(max(b_, 0))) * _PageSharpen; \
+            c.rgb = s_ * max(s_, 0); \
+        } \
+    }
+
 float4 BookSamplePage(float dest, float right, float2 uv)
 {
     float4 c = 0;
@@ -357,18 +373,18 @@ float4 BookSamplePage(float dest, float right, float2 uv)
     if (dest < 0.5)
     {
         if (right > 0.5)
-            c = BOOK_TEX_LOD(_CurRightTex, float4(BookCropUV(uv, _CurRightRect), 0, _PageLod));
+            { BOOK_PAGE_TAP(c, _CurRightTex, _CurRightRect) }
         else
-            c = BOOK_TEX_LOD(_CurLeftTex, float4(BookCropUV(uv, _CurLeftRect), 0, _PageLod));
+            { BOOK_PAGE_TAP(c, _CurLeftTex, _CurLeftRect) }
     }
 #if !defined(BOOK_STILL)
     // めくっていない見開き（演出なし）は今の見開きしか読まない
     else
     {
         if (right > 0.5)
-            c = BOOK_TEX_LOD(_DstRightTex, float4(BookCropUV(uv, _DstRightRect), 0, _PageLod));
+            { BOOK_PAGE_TAP(c, _DstRightTex, _DstRightRect) }
         else
-            c = BOOK_TEX_LOD(_DstLeftTex, float4(BookCropUV(uv, _DstLeftRect), 0, _PageLod));
+            { BOOK_PAGE_TAP(c, _DstLeftTex, _DstLeftRect) }
     }
 #endif
     return c;

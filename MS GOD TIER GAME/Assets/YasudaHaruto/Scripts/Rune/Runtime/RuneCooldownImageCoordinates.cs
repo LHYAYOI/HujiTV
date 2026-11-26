@@ -2,18 +2,23 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // Encode image-local height before uGUI moves vertices into the Canvas batching space.
+/// <summary>クールダウン画像の描画領域に合わせて座標を変換する。</summary>
 public sealed class RuneCooldownImageCoordinates : BaseMeshEffect
 {
+
     protected override void OnEnable()
     {
         base.OnEnable();
         Canvas owner = graphic != null ? graphic.canvas : null;
-        if (owner != null) owner.additionalShaderChannels |= AdditionalCanvasShaderChannels.TexCoord1;
+        if (owner != null)
+            owner.additionalShaderChannels |= AdditionalCanvasShaderChannels.TexCoord1;
     }
+
 
     public override void ModifyMesh(VertexHelper mesh)
     {
-        if (!IsActive()) return;
+        if (!IsActive())
+            return;
         Rect rect = graphic.rectTransform.rect;
         UIVertex vertex = default;
         for (int i = 0; i < mesh.currentVertCount; i++)

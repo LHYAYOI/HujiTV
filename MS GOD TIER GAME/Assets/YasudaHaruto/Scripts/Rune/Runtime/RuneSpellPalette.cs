@@ -1,12 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>ルーン発動演出に使う色や素材を選ぶ。</summary>
 public static class RuneSpellPalette
 {
+
     // GPU readback supports imported sprites without changing Read/Write or the source asset.
     public static Color Sample(Image image, Color fallback)
     {
-        if (image == null || image.sprite == null) return fallback;
+        if (image == null || image.sprite == null)
+            return fallback;
         Sprite sprite = image.sprite;
         var target = RenderTexture.GetTemporary(32, 32, 0, RenderTextureFormat.ARGB32);
         var pixels = new Texture2D(32, 32, TextureFormat.RGBA32, false);
@@ -26,11 +29,13 @@ public static class RuneSpellPalette
             {
                 Color.RGBToHSV(pixel, out _, out float saturation, out float value);
                 float weight = pixel.a * saturation * saturation * value;
-                if (pixel.a < 0.1f || saturation < 0.15f || value < 0.15f) continue;
+                if (pixel.a < 0.1f || saturation < 0.15f || value < 0.15f)
+                    continue;
                 sum += pixel * weight;
                 total += weight;
             }
-            if (total < 0.001f) return fallback;
+            if (total < 0.001f)
+                return fallback;
             Color result = sum / total;
             Color.RGBToHSV(result, out float hue, out float sat, out float brightness);
             result = Color.HSVToRGB(hue, Mathf.Max(0.45f, sat), Mathf.Max(0.85f, brightness));
@@ -42,7 +47,10 @@ public static class RuneSpellPalette
         {
             RenderTexture.active = previous;
             RenderTexture.ReleaseTemporary(target);
-            if (Application.isPlaying) Object.Destroy(pixels); else Object.DestroyImmediate(pixels);
+            if (Application.isPlaying)
+                Object.Destroy(pixels);
+            else
+                Object.DestroyImmediate(pixels);
         }
     }
 }

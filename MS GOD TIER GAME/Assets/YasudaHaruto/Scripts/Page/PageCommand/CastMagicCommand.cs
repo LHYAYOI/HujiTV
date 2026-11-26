@@ -4,7 +4,6 @@
 // 制作者：安田晴人
 // 概要： 魔法を発動するコマンドクラス
 //-----------------------------------------------
-
 public class CastMagicCommand : IPageCommand, ICastMagicCommand
 {
     private readonly byte m_skillId;
@@ -16,10 +15,12 @@ public class CastMagicCommand : IPageCommand, ICastMagicCommand
         m_networkService = networkService;
     }
 
+
     public void Execute()
     {
         Execute(MAGIC_CAST_DIRECTION.NONE);
     }
+
 
     public void Execute(MAGIC_CAST_DIRECTION direction)
     {

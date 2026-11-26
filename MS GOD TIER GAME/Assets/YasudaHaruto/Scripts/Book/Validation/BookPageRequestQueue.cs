@@ -4,6 +4,7 @@ using UnityEngine;
 namespace YasudaHaruto.BookValidation
 {
     // Network IDs are resolved here; inventory rules remain in BookGameController.
+    /// <summary>ページ取得要求を待機させ、本が編集可能になった時点で順に処理する。</summary>
     public sealed class BookPageRequestQueue
     {
         private readonly Queue<(PageData Data, bool Present)> m_requests = new();
@@ -11,25 +12,39 @@ namespace YasudaHaruto.BookValidation
         private readonly PageDatabase m_database;
         private readonly BookGameController m_game;
 
+
         public BookPageRequestQueue(PageDatabase database, BookGameController game)
         {
             m_database = database;
             m_game = game;
         }
 
+
         public void Receive(byte id) => ReceiveAcquired(id, true);
+
 
         public void ReceiveAcquired(byte id, bool present)
         {
-            if (m_database == null) { Debug.LogWarning("Page database is not configured."); return; }
+            if (m_database == null)
+            {
+                Debug.LogWarning("Page database is not configured.");
+                return;
+            }
             PageData data = m_database.GetPage(id);
-            if (!BookInventory.CanAdd(data)) { Debug.LogWarning("Unsupported page request: " + id); return; }
-            if (m_pendingIds.Add(id)) m_requests.Enqueue((data, present));
+            if (!BookInventory.CanAdd(data))
+            {
+                Debug.LogWarning("Unsupported page request: " + id);
+                return;
+            }
+            if (m_pendingIds.Add(id))
+                m_requests.Enqueue((data, present));
         }
+
 
         public void Tick()
         {
-            if (m_requests.Count == 0 || m_game == null || m_game.IsInputBlocked) return;
+            if (m_requests.Count == 0 || m_game == null || m_game.IsInputBlocked)
+                return;
             var request = m_requests.Peek();
             // Keep the request until the captured inventory has committed.
             if (m_game.RequestAdd(request.Data, request.Present) == PAGE_ADD_RESULT.INVALID)
@@ -38,6 +53,7 @@ namespace YasudaHaruto.BookValidation
                 m_pendingIds.Remove(request.Data.PageId);
             }
         }
+
 
         public void Clear()
         {

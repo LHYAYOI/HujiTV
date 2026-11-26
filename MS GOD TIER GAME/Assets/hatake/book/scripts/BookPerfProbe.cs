@@ -162,8 +162,44 @@ namespace hatake
 
         private float m_fxPollAt;
 
+        // 見た目の確認用：端末に dumppage を置くと、今の見開きの撮影テクスチャと合成・出力を PNG に保存する（dump_*.png）
+        private float m_dumpPollAt;
+        private void DumpIfRequested()
+        {
+            if (Time.unscaledTime < m_dumpPollAt || m_flipView == null) return;
+            m_dumpPollAt = Time.unscaledTime + 1f;
+            string flag = System.IO.Path.Combine(Application.persistentDataPath, "dumppage");
+            if (!System.IO.File.Exists(flag)) return;
+            System.IO.File.Delete(flag);
+            Save(m_flipView.DebugCurrent, "dump_page.png");
+            Save(m_flipView.DebugComposite, "dump_composite.png");
+            Save(m_flipView.DebugOutput, "dump_output.png");
+            Material m = m_flipView.BenchMaterial;
+            if (m != null)
+                Debug.Log("[BookDump] pageLod=" + m.GetFloat("_PageLod") + " pagePixels=" + m.GetFloat("_PagePixels") +
+                          " curLeft=" + m.GetVector("_CurLeftRect") + " curRight=" + m.GetVector("_CurRightRect") + " bookRect=" + m.GetVector("_BookRect"));
+        }
+
+        private static void Save(Texture texture, string name)
+        {
+            if (texture == null) return;
+            RenderTexture rt = RenderTexture.GetTemporary(texture.width, texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+            Graphics.Blit(texture, rt);
+            RenderTexture previous = RenderTexture.active;
+            RenderTexture.active = rt;
+            var tex = new Texture2D(texture.width, texture.height, TextureFormat.RGB24, false);
+            tex.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0, false);
+            tex.Apply(false);
+            RenderTexture.active = previous;
+            RenderTexture.ReleaseTemporary(rt);
+            System.IO.File.WriteAllBytes(System.IO.Path.Combine(Application.persistentDataPath, name), tex.EncodeToPNG());
+            Destroy(tex);
+            Debug.Log("[BookDump] " + name + " " + texture.width + "x" + texture.height + " " + (texture is RenderTexture r ? r.format + " mips=" + r.useMipMap : texture.GetType().Name));
+        }
+
         private void Update()
         {
+            DumpIfRequested();
             // 起動後に fxtest（中身 now）が置かれたら、すぐ燃やす（見た目の確認で途中の画面を撮るため）
             if (m_fxTestAt < 0f && Time.unscaledTime >= m_fxPollAt)
             {
@@ -250,7 +286,7 @@ namespace hatake
                      " cpu=" + cpu.ToString("0.0") + "ms (worst " + m_cpuWorst.ToString("0.0") + ")" +
                      " gpu=" + gpu +
                      " main=" + (m_workSum / Mathf.Max(1, m_workFrames)).ToString("0.0") + "ms (worst " + m_workWorst.ToString("0.0") + ")" +
-                     " output=" + output + " " + state +
+                     " output=" + output + " [" + BookFlipView.DebugDisplayInfo + "] " + state +
                      " mono=" + (Profiler.GetMonoUsedSizeLong() >> 20) + "MB" +
                      " gfx=" + (Profiler.GetAllocatedMemoryForGraphicsDriver() >> 20) + "MB" +
                      " total=" + (Profiler.GetTotalAllocatedMemoryLong() >> 20) + "MB";

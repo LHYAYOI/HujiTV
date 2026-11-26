@@ -25,11 +25,21 @@ public sealed class BookPageView : MonoBehaviour
     private Camera m_lightenedCamera;
 
     [Tooltip("ON：モバイルで、このページを撮影するレンダーテクスチャを軽い設定に変える（実行中だけ。アセットは書き換えない）。" +
-             "HDR のまま半分の容量の形式（R11G11B10。不透明度は合成で使っていない）・ミップマップ無し・下の高さまで縮小。" +
+             "HDR のまま半分の容量の形式（R11G11B10。不透明度は合成で使っていない）・ミップマップ無し。" +
+             "大きさは変えない（下の高さの上限を 0 より大きくしたときだけ縮小）。" +
              "撮影が毎フレーム動くコントローラーでは、撮影の時間が半分以下になる")]
     [SerializeField] private bool m_lightweightCaptureTextureMobile = true;
-    [Tooltip("モバイルでの撮影テクスチャの高さの上限（本の出力の高さに合わせる）")]
-    [SerializeField, Min(180)] private int m_captureHeightMobile = 720;
+    [Tooltip("モバイルでの撮影テクスチャの高さの上限。0 で元の大きさのまま（解像度を落とさない）")]
+    [SerializeField, Min(0)] private int m_captureHeightMobile;
+    [Tooltip("モバイルで撮影テクスチャにミップマップを付ける。本に貼るとき縮小されるので、" +
+             "ミップが無いと細い線・小さな文字が途切れる（ちらつく）")]
+    [SerializeField] private bool m_captureMipsMobile = true;
+    [Tooltip("モバイルで、撮影テクスチャの大きさを本の表示に合わせる：撮影したページの画素が、画面でのページの画素と同じ数になる大きさにする" +
+             "（下の倍率を掛ける）。撮影の絵を本に貼るときに拡大・縮小しないので、文字がいちばんくっきりする。" +
+             "OFF ならアセットの大きさに下の倍率を掛ける")]
+    [SerializeField] private bool m_matchCaptureToDisplayMobile = true;
+    [Tooltip("モバイルで撮影テクスチャの大きさに掛ける倍率。1 で画面と同じ画素数。撮影の負荷は倍率の2乗に比例する")]
+    [SerializeField, Range(0.5f, 2.5f)] private float m_captureScaleMobile = 1f;
     private RenderTexture m_checkedTexture;
     private static readonly HashSet<RenderTexture> s_lightTextures = new HashSet<RenderTexture>();
 
@@ -43,16 +53,44 @@ public sealed class BookPageView : MonoBehaviour
         m_checkedTexture = texture;
         if (texture == null || !s_lightTextures.Add(texture)) return;
         if (!SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.RGB111110Float)) return;
-        int height = Mathf.Min(texture.height, m_captureHeightMobile);
-        int width = Mathf.Max(1, Mathf.RoundToInt(texture.width * (height / (float)texture.height)));
+        s_assetSizes[texture] = new Vector2Int(texture.width, texture.height);
+        GetCaptureSize(texture, out int width, out int height);
+        ResizeCapture(texture, width, height);
+    }
+
+    private static readonly Dictionary<RenderTexture, Vector2Int> s_assetSizes = new Dictionary<RenderTexture, Vector2Int>();
+
+    // 撮影テクスチャの大きさ：本の表示に合わせる（わかっていれば）か、アセットの大きさに倍率を掛ける
+    private void GetCaptureSize(RenderTexture texture, out int width, out int height)
+    {
+        Vector2Int asset = s_assetSizes.TryGetValue(texture, out Vector2Int size) ? size : new Vector2Int(texture.width, texture.height);
+        float scale = m_captureScaleMobile;
+        // 計測用：端末の persistentDataPath の capscale に倍率を書くと、それを使う
+        string scaleFile = System.IO.Path.Combine(Application.persistentDataPath, "capscale");
+        if (System.IO.File.Exists(scaleFile) && float.TryParse(System.IO.File.ReadAllText(scaleFile).Trim(),
+                System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float fileScale))
+            scale = Mathf.Clamp(fileScale, 0.5f, 3f);
+        float desired = m_matchCaptureToDisplayMobile ? BookFlipView.DesiredCaptureWidth : 0f;
+        width = desired > 0f ? Mathf.RoundToInt(desired * scale) : Mathf.RoundToInt(asset.x * scale);
+        width = Mathf.Clamp(width, 64, 4096);
+        height = Mathf.Clamp(Mathf.RoundToInt(width * asset.y / (float)asset.x), 64, 4096);
+        if (m_captureHeightMobile > 0 && height > m_captureHeightMobile)
+        {
+            height = m_captureHeightMobile;
+            width = Mathf.Max(64, Mathf.RoundToInt(height * asset.x / (float)asset.y));
+        }
+    }
+
+    private void ResizeCapture(RenderTexture texture, int width, int height)
+    {
         // もう描かれている（表示に使われているかもしれない）：変えた後、撮影し直して伝える
         bool used = texture.IsCreated();
         texture.Release();
         texture.width = width;
         texture.height = height;
         texture.format = RenderTextureFormat.RGB111110Float;
-        texture.useMipMap = false;
-        texture.autoGenerateMips = false;
+        texture.useMipMap = m_captureMipsMobile;
+        texture.autoGenerateMips = m_captureMipsMobile;
         texture.Create();
         if (used)
         {
@@ -60,6 +98,17 @@ public sealed class BookPageView : MonoBehaviour
             NotifyContentChanged();
             StateOverlayChanged?.Invoke(this);
         }
+    }
+
+    // 本の表示の大きさが分かった・変わったら、撮影テクスチャをそれに合わせ直す（モバイル）
+    private void FollowDisplaySize()
+    {
+        if (!m_lightweightCaptureTextureMobile || !m_matchCaptureToDisplayMobile || !Application.isPlaying || !Application.isMobilePlatform) return;
+        RenderTexture texture = m_checkedTexture;
+        if (texture == null || !s_assetSizes.ContainsKey(texture) || BookFlipView.DesiredCaptureWidth <= 0f) return;
+        GetCaptureSize(texture, out int width, out int height);
+        if (Mathf.Abs(width - texture.width) <= Mathf.Max(8, texture.width * 0.03f)) return;
+        ResizeCapture(texture, width, height);
     }
 
     // ------------------------------------------------------------------
@@ -213,6 +262,7 @@ public sealed class BookPageView : MonoBehaviour
         }
         UpdateOverlay(false);
         LightenCaptureTexture();
+        FollowDisplaySize();
         AlternateCaptures();
         if (m_lightweightCaptureCamera && m_rootCanvas != null && m_rootCanvas.worldCamera != m_lightenedCamera)
         {
@@ -425,6 +475,58 @@ public sealed class BookPageView : MonoBehaviour
         ContentChanged?.Invoke(this);
     }
 
+    // ------------------------------------------------------------------
+    // ページの画像を縮小して撮影するときの読み方。元の画像にミップマップが無いと、縮小したときに画素を飛ばして読むので
+    // 細い線・小さな文字が途切れる（解像度が落ちたように見える）。標準の UI マテリアルの画像だけ、
+    // 画素の範囲を数点で平均して読むマテリアル（Resources/BookPageImageFiltered）に替える。画像のアセットは変えない
+    // ------------------------------------------------------------------
+    [Tooltip("ON：ミップマップの無いページの画像を、縮小しても線が途切れない読み方で描く（標準の UI マテリアルの画像だけ）")]
+    [SerializeField] private bool m_filterPageImages = true;
+    private static Material s_filteredImageMaterial, s_filteredSpriteMaterial;
+
+    private static int s_filterLogCount = -1;
+    private Material FilteredMaterial(Sprite sprite, Material material)
+    {
+        Material result = FilteredMaterialCore(sprite, material);
+        // 計測用：端末の persistentDataPath に pagelog があると、どの画像に付けたかを書く
+        if (s_filterLogCount < 0)
+            s_filterLogCount = System.IO.File.Exists(System.IO.Path.Combine(Application.persistentDataPath, "pagelog")) ? 0 : 1000;
+        if (s_filterLogCount < 60 && sprite != null)
+        {
+            s_filterLogCount++;
+            Debug.Log("[BookPageImage] " + sprite.name + " tex=" + (sprite.texture != null ? sprite.texture.width + "x" + sprite.texture.height + " mips=" + sprite.texture.mipmapCount + " " + sprite.texture.graphicsFormat : "null") +
+                      " mat=" + (material != null ? material.name + "/" + (material.shader != null ? material.shader.name : "null") : "null") + " -> " + (result != null ? result.name : "null"));
+        }
+        return result;
+    }
+
+    private Material FilteredMaterialCore(Sprite sprite, Material material)
+    {
+        if (!m_filterPageImages || sprite == null || sprite.texture == null) return material;
+        // ミップマップがあれば標準の読み方でよい
+        if (sprite.texture.mipmapCount > 1) return material;
+        // 標準の UI マテリアル・標準のスプライトのマテリアルだけ置き換える。独自のマテリアル（効果付き）はそのまま
+        string shaderName = material != null && material.shader != null ? material.shader.name : null;
+        bool ui = material == null || material == Graphic.defaultGraphicMaterial || shaderName == "UI/Default";
+        bool spriteShader = shaderName == "Sprites/Default";
+        if (!ui && !spriteShader) return material;
+        Shader shader = Resources.Load<Shader>("BookPageImageFiltered");
+        if (shader == null || !shader.isSupported) return material;
+        if (ui)
+        {
+            if (s_filteredImageMaterial == null)
+                s_filteredImageMaterial = new Material(shader) { name = "BookPageImageFiltered", hideFlags = HideFlags.HideAndDontSave };
+            return s_filteredImageMaterial;
+        }
+        // Sprites/Default は RectMask2D で切り抜かれないので、置き換えても切り抜かない（見た目を変えない）
+        if (s_filteredSpriteMaterial == null)
+        {
+            s_filteredSpriteMaterial = new Material(shader) { name = "BookPageImageFilteredSprite", hideFlags = HideFlags.HideAndDontSave };
+            s_filteredSpriteMaterial.SetFloat("_IgnoreClipRect", 1f);
+        }
+        return s_filteredSpriteMaterial;
+    }
+
     public void ShowPage(BookPageData pageData)
     {
         // Page Content が未設定なら、ページ自身に画像を置く（ページは RectMask2D で切り抜かれる）
@@ -502,7 +604,7 @@ public sealed class BookPageView : MonoBehaviour
             Image image = imageObject.GetComponent<Image>();
 
             image.sprite = imageData.Sprite;
-            image.material = imageData.Material;
+            image.material = FilteredMaterial(imageData.Sprite, imageData.Material);
             image.type = Image.Type.Simple;
             image.preserveAspect = false;
             image.raycastTarget = false;

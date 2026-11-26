@@ -21,11 +21,13 @@ namespace YasudaHaruto.BookValidation.Editor
         private static int s_count;
         private static PageData s_endPage;
 
+
         static BookManagementValidation()
         {
             EditorApplication.playModeStateChanged += state =>
             {
-                if (!SessionState.GetBool(Running, false)) return;
+                if (!SessionState.GetBool(Running, false))
+                    return;
                 if (state == PlayModeStateChange.EnteredPlayMode)
                 {
                     s_step = 0;
@@ -44,20 +46,25 @@ namespace YasudaHaruto.BookValidation.Editor
             };
         }
 
+
         public static void Run()
         {
-            if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Exit Play Mode first.");
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new InvalidOperationException("Exit Play Mode first.");
             Directory.CreateDirectory("Temp/BookRefactorValidation");
             File.WriteAllText(Report, "Current scene; no scene save or replacement.\n");
             SessionState.SetBool(Running, true);
             EditorApplication.EnterPlaymode();
         }
 
+
         private static void Require(bool value, string message)
         {
-            if (!value) throw new InvalidOperationException(message);
+            if (!value)
+                throw new InvalidOperationException(message);
             File.AppendAllText(Report, "PASS: " + message + "\n");
         }
+
 
         private static void CheckProjection()
         {
@@ -68,13 +75,17 @@ namespace YasudaHaruto.BookValidation.Editor
                     "Visual pair matches owned spread " + i);
         }
 
+
         private static void Tick()
         {
-            if (!EditorApplication.isPlaying) return;
+            if (!EditorApplication.isPlaying)
+                return;
             try
             {
-                if (EditorApplication.timeSinceStartup > s_deadline) throw new TimeoutException("Book management timed out.");
-                if (s_view != null && !s_view.IsReady) return;
+                if (EditorApplication.timeSinceStartup > s_deadline)
+                    throw new TimeoutException("Book management timed out.");
+                if (s_view != null && !s_view.IsReady)
+                    return;
                 switch (s_step++)
                 {
                     case 0:
@@ -174,10 +185,12 @@ namespace YasudaHaruto.BookValidation.Editor
             }
         }
 
+
         private static void Finish()
         {
             EditorApplication.update -= Tick;
-            if (s_endPage != null) UnityEngine.Object.Destroy(s_endPage);
+            if (s_endPage != null)
+                UnityEngine.Object.Destroy(s_endPage);
             EditorApplication.ExitPlaymode();
         }
     }
