@@ -165,6 +165,8 @@ public class MiniGhostAttackState : MiniGhostState
             Vector3 correctedTargetPosition = GetCorrectedTargetPosition(targetPosition, spawnPosition);
 
             bullet.SetTarget(correctedTargetPosition, m_bulletSpeed, m_bulletAngle);
+
+            bullet.SetAttackValue(m_owner.GetEnemyData().m_attack);
         }
 
         yield return new WaitForSeconds(m_postShootDelay);

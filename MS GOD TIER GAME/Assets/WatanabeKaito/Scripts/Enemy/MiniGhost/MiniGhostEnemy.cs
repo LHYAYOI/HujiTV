@@ -374,7 +374,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
             MagicData magicData = hitData.GetMagicData;
             if (magicData != null)
             {
-                //if (magicData.EventMagicType == EVENT_MAGIC_TYPE.CLOSE)
+                if (magicData.MagicType == MAGIC_TYPE.ATTACK)
                 {
                     BeginDying();
                 }

@@ -22,5 +22,5 @@ public class EnemyData : ScriptableObject
     public int m_maxHealth;
 
     [Header("エネミーの攻撃力")]
-    public int m_attack;
+    public byte m_attack;
 }

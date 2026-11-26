@@ -228,6 +228,166 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &4415652653511334883
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8180386629794858189}
+  - component: {fileID: 6621462641718076268}
+  - component: {fileID: 644538622849241289}
+  - component: {fileID: 6669723123807058891}
+  - component: {fileID: 8033101454439669846}
+  - component: {fileID: 8319306378756691172}
+  m_Layer: 0
+  m_Name: Collider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8180386629794858189
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4415652653511334883}
+  serializedVersion: 2
+  m_LocalRotation: {x: -8.881784e-16, y: -1, z: -0, w: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 3657512928046305364}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &6621462641718076268
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4415652653511334883}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &644538622849241289
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4415652653511334883}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!135 &6669723123807058891
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4415652653511334883}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8033101454439669846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4415652653511334883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cbaad71236fc3847a357071779833c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TargetableObject
+  m_IsTargetableFlag: 1
+--- !u!114 &8319306378756691172
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4415652653511334883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ced5332850543c24ca276d1983454a1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitReceiverController
+  m_onHit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 15567977242755660}
+        m_TargetAssemblyTypeName: SwarmGhostManager, Assembly-CSharp
+        m_MethodName: OnSwarmGhostHit
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_onStay:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onExit:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &4563933557310973050
 GameObject:
   m_ObjectHideFlags: 0
@@ -1245,6 +1405,14 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2375542825176977384, guid: 54d6bca8b4c5a414a96df808e9d0a10e, type: 3}
+      propertyPath: m_enemyData
+      value: 
+      objectReference: {fileID: 11400000, guid: 166ad5e01487ed14c84cd256f0392837, type: 2}
+    - target: {fileID: 2375542825176977384, guid: 54d6bca8b4c5a414a96df808e9d0a10e, type: 3}
+      propertyPath: m_targetableObject
+      value: 
+      objectReference: {fileID: 8033101454439669846}
     - target: {fileID: 2477396145599959823, guid: 54d6bca8b4c5a414a96df808e9d0a10e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.74
@@ -1997,9 +2165,13 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2742938954884847963, guid: 54d6bca8b4c5a414a96df808e9d0a10e, type: 3}
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 1297821478226664944, guid: 54d6bca8b4c5a414a96df808e9d0a10e, type: 3}
+      insertIndex: 0
+      addedObject: {fileID: 8180386629794858189}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 54d6bca8b4c5a414a96df808e9d0a10e, type: 3}
 --- !u!114 &15567977242755660 stripped
@@ -2212,9 +2384,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbc6c325c4322364ab0154f7455f7f8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChestDrawer
-  m_onHit:
-    m_PersistentCalls:
-      m_Calls: []
   m_targetPosition: {x: 0.713, y: 1.916158, z: -0.014}
   m_moveDuration: 1
 --- !u!1 &5396550138705306354 stripped
@@ -2234,21 +2403,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbc6c325c4322364ab0154f7455f7f8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChestDrawer
-  m_onHit:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1805963002013783076}
-        m_TargetAssemblyTypeName: ConductorGhostManager, Assembly-CSharp
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   m_targetPosition: {x: 0.633, y: 0.974894, z: 0}
   m_moveDuration: 1
 --- !u!4 &5789577673204294222 stripped
@@ -2473,21 +2627,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbc6c325c4322364ab0154f7455f7f8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChestDrawer
-  m_onHit:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1805963002013783076}
-        m_TargetAssemblyTypeName: ConductorGhostManager, Assembly-CSharp
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 8455753040948527871}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Collider, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   m_targetPosition: {x: 0.713, y: 1.916158, z: -0.014}
   m_moveDuration: 1
 --- !u!4 &7459556982104756307 stripped
@@ -2535,8 +2674,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbc6c325c4322364ab0154f7455f7f8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChestDrawer
-  m_onHit:
-    m_PersistentCalls:
-      m_Calls: []
   m_targetPosition: {x: 0.633, y: 0.974894, z: 0}
   m_moveDuration: 1

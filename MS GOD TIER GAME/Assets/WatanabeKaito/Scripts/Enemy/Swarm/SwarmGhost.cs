@@ -70,6 +70,10 @@ public class SwarmGhost : MonoBehaviour
 
     private bool m_turnToPlayerFlag = true; // プレイヤーの方向を向くフラグ
 
+    private SwarmGhostManager m_swarmGhostManager;  // 群れお化けマネージャーの参照
+
+    private bool m_hasNotifiedTargetArrivalFlag = false;// ターゲット到達を通知したか
+
     private void Awake()
     {
         m_initialPosition = transform.position;
@@ -177,6 +181,9 @@ public class SwarmGhost : MonoBehaviour
     {
         m_isChargingFlag = true;
 
+        // ターゲット到達通知フラグをリセット
+        m_hasNotifiedTargetArrivalFlag = false;
+
         // 待ち時間とアニメーションをランダムに選ぶ
         float delay = Random.Range(m_minDelay, m_maxDelay);
         int index = Random.Range(0, m_chargeStates.Length);
@@ -233,7 +240,27 @@ public class SwarmGhost : MonoBehaviour
                 yield break;
             }
 
-            transform.position = Vector3.MoveTowards(transform.position, passPosition, m_moveSpeed * Time.deltaTime);
+            Vector3 currentPosition = transform.position;
+
+            Vector3 nextPosition = Vector3.MoveTowards(
+                currentPosition,
+                passPosition,
+                m_moveSpeed * Time.deltaTime
+            );
+
+            transform.position = nextPosition;
+
+            // ターゲットを通過したか判定
+            if (!m_hasNotifiedTargetArrivalFlag &&
+                HasCrossedTarget(currentPosition, nextPosition, targetPosition, direction))
+            {
+                m_hasNotifiedTargetArrivalFlag = true;
+
+                if (m_swarmGhostManager != null)
+                {
+                    m_swarmGhostManager.OnSwarmGhostReachedTarget();
+                }
+            }
 
             yield return null;
         }
@@ -445,6 +472,23 @@ public class SwarmGhost : MonoBehaviour
         rotationAxis.Normalize();
     }
 
+    // ターゲットの位置を通過したか判定
+    private bool HasCrossedTarget(Vector3 currentPosition, Vector3 nextPosition, Vector3 targetPosition, Vector3 direction)
+    {
+        float currentDistance = Vector3.Dot(
+            currentPosition - targetPosition,
+            direction
+        );
+
+        float nextDistance = Vector3.Dot(
+            nextPosition - targetPosition,
+            direction
+        );
+
+        // ターゲットの手前から奥に移動した場合
+        return currentDistance <= 0f && nextDistance >= 0f;
+    }
+
     public void StartMaterialBlend()
     {
         // 透明から元のマテリアルに戻す
@@ -584,5 +628,10 @@ public class SwarmGhost : MonoBehaviour
     public void SetTurnToPlayerFlag(bool flag)
     {
         m_turnToPlayerFlag = flag;
+    }
+
+    public void SetSwarmGhostManager(SwarmGhostManager manager)
+    {
+        m_swarmGhostManager = manager;
     }
 }

@@ -8893,6 +8893,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TrokkoController
       objectReference: {fileID: 0}
+    - target: {fileID: 781320102260947649, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 1431370856330892349, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
       propertyPath: m_speed
       value: 1
@@ -10850,12 +10854,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6811702407854686011, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_startOffset
-      value: 0
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 6811702407854686011, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_startSplineController
       value: 
-      objectReference: {fileID: 1846558912}
+      objectReference: {fileID: 2019704239}
     - target: {fileID: 8778732444337950149, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_Name
       value: Sp_BedRoom
