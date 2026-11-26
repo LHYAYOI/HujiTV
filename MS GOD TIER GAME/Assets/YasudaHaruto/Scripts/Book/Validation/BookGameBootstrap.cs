@@ -56,7 +56,7 @@ namespace YasudaHaruto.BookValidation
             m_runeTraceController.CastSelectionChanged += OnCastSelectionChanged;
             m_runeTraceController.CastConfirmed += OnCastConfirmed;
 
-            m_runeTraceView.ConfigureCooldownImage(() => m_gameController != null ? m_gameController.GetCurrentRuneImage() : null);
+            // Cooldown dimming is handled for the whole book by UpdateBookCooldownDim.
             m_runeTraceView.ConfigureScreenProjection(m_gameDragInput.GetRuneScreenRect, m_gameDragInput.GetGraphicScreenRect);
             m_runeTraceView.ConfigureTraceOverlay(() => m_gameController.BookView != null &&
                 m_gameController.BookView.IsReady && !m_gameController.BookView.IsClosed);

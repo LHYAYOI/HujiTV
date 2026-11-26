@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0348284d6c830c745b43a7bc4bbddec7, type: 3}
+  m_Name: PD_Jumon_Smell
+  m_EditorClassIdentifier: Assembly-CSharp::PageData
+  m_pageId: 9
+  m_insertType: 0
+  m_displayName: Smell
+  m_pageType: 0
+  m_interaction:
+    m_type: 1
+    m_runeData: {fileID: 11400000, guid: 56365d135f711d844bfe48df572532e0, type: 2}
+    m_runeImageIndex: -1
+  m_action:
+    m_type: 1
+    m_magicData: {fileID: 11400000, guid: aaedada4a2713374eb8206497a01423b, type: 2}
+  m_leftVisualData: {fileID: 11400000, guid: f14d8a4cb0232a84f96e280d438bd231, type: 2}
+  m_rightVisualData: {fileID: 11400000, guid: 0162f330a7a75a5449b5fd5cc1b9892e, type: 2}

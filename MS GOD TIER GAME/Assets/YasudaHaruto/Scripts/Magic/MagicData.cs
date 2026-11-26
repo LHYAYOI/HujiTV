@@ -9,8 +9,8 @@ public class MagicData : ScriptableObject
     private string m_displayName;
     [SerializeField]
     private MAGIC_TYPE m_magicType;
-    [SerializeField]
-    private EVENT_MAGIC_TYPE m_eventMagicType = EVENT_MAGIC_TYPE.NONE;
+    [SerializeField] 
+    private bool m_isAttackMagic; // 攻撃魔法かどうかを示すフラグ
     [SerializeField]
     private MAGIC_AIM_TYPE m_aimType = MAGIC_AIM_TYPE.THREE_DIRECTIONS;
     [Tooltip("Projectile flies from the book; Instant activates the rune in place.")]
@@ -29,7 +29,7 @@ public class MagicData : ScriptableObject
 
     public MAGIC_TYPE MagicType => m_magicType;
 
-    public EVENT_MAGIC_TYPE EventMagicType => m_eventMagicType;
+    public bool IsAttackMagic => m_isAttackMagic;
 
     public MAGIC_AIM_TYPE AimType => m_aimType;
 

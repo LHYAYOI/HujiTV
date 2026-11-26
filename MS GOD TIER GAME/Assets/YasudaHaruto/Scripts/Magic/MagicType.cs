@@ -7,14 +7,15 @@
 
 public enum MAGIC_TYPE
 {
-    ATTACK,
-    EVENT
-}
-
-public enum EVENT_MAGIC_TYPE
-{
-    NONE,
-    OPEN,
+    NONE = 0,
     CLOSE,
+    DROP,
+    FIRE,
+    LIGHT,
+    OPEN,
     SET_BARRIER,
+    SMELL,
+    THROW_BALL,
+    THROW_MAKURA,
+    WATER,
 }

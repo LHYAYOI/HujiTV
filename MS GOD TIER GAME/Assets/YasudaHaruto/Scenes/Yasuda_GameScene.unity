@@ -1410,6 +1410,22 @@ PrefabInstance:
       propertyPath: m_targetHitUIManager
       value: 
       objectReference: {fileID: 114954664}
+    - target: {fileID: 2723047527836766935, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
+      propertyPath: m_magicBulletPrefabList.Array.size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2723047527836766935, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
+      propertyPath: 'm_magicBulletPrefabList.Array.data[7]'
+      value: 
+      objectReference: {fileID: 7678089287139935553, guid: 98afe36dd451c5e4f9ff3bc50381a8cb, type: 3}
+    - target: {fileID: 2723047527836766935, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
+      propertyPath: 'm_magicBulletPrefabList.Array.data[8]'
+      value: 
+      objectReference: {fileID: 7678089287139935553, guid: f4f64cbd514a1b348b20f9c5a60ca37c, type: 3}
+    - target: {fileID: 2723047527836766935, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
+      propertyPath: 'm_magicBulletPrefabList.Array.data[9]'
+      value: 
+      objectReference: {fileID: 7678089287139935553, guid: abae4dc58b06a2c4784eff48f20ee3c7, type: 3}
     - target: {fileID: 7078241854969815186, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
       propertyPath: m_Name
       value: MagicBulletManager
@@ -12857,6 +12873,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1317936738344727098, guid: 22911ea3aeeb1874387779c0444519f7, type: 3}
+      propertyPath: m_magicDatabase
+      value: 
+      objectReference: {fileID: 11400000, guid: 8ab0e86e510f7be4ea46c0342f735645, type: 2}
     - target: {fileID: 8975471745667720204, guid: 22911ea3aeeb1874387779c0444519f7, type: 3}
       propertyPath: m_Name
       value: MagicManager
@@ -31502,6 +31522,10 @@ PrefabInstance:
       propertyPath: m_bulletManager
       value: 
       objectReference: {fileID: 231831548}
+    - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
+      propertyPath: m_magicDatabase
+      value: 
+      objectReference: {fileID: 11400000, guid: 8ab0e86e510f7be4ea46c0342f735645, type: 2}
     - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
       propertyPath: m_lockOnUIManager
       value: 

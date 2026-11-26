@@ -1,7 +1,7 @@
 
 using UnityEngine;
 
-public class KeyGhostManager : EnemyBase, IEventMagicReceiver
+public class KeyGhostManager : EnemyBase, IMagicReceiver
 {
     [Header("TargetableObject")]
     [SerializeField] private TargetableObject m_targetableObject;
@@ -453,13 +453,13 @@ public class KeyGhostManager : EnemyBase, IEventMagicReceiver
 
             if (magicData != null)
             {
-                TryReceiveEventMagic(EVENT_MAGIC_TYPE.NONE);
+                TryReceiveEventMagic(MAGIC_TYPE.NONE);
             }
         }
     }
 
 
-    public bool TryReceiveEventMagic(EVENT_MAGIC_TYPE eventMagicType)
+    public bool TryReceiveEventMagic(MAGIC_TYPE eventMagicType)
     {
         //if (eventMagicType == EVENT_MAGIC_TYPE.CLOSE)
         {

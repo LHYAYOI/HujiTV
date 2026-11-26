@@ -164,12 +164,12 @@ namespace YasudaHaruto.BookValidation.Editor
                             if (page.Interaction != null && page.Interaction.RuneData != null && page.Action != null &&
                                 page.Action.MagicData != null && page.Action.MagicData.AimType == MAGIC_AIM_TYPE.THREE_DIRECTIONS)
                             {
-                                if (s_spread < 0 || page.Action.MagicData.MagicType == MAGIC_TYPE.ATTACK)
+                                if (s_spread < 0 || page.Action.MagicData.MagicType != MAGIC_TYPE.NONE)
                                 {
                                     s_spread = i + 1;
                                     s_rune = page.Interaction.RuneData;
                                 }
-                                if (page.Action.MagicData.MagicType == MAGIC_TYPE.ATTACK)
+                                if (page.Action.MagicData.MagicType != MAGIC_TYPE.NONE)
                                     break;
                             }
                         }

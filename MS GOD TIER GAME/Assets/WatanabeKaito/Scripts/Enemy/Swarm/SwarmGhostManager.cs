@@ -365,20 +365,17 @@ public class SwarmGhostManager : EnemyBase
             MagicData magicData = hitData.GetMagicData;
             if (magicData != null)
             {
-                if (magicData.MagicType == MAGIC_TYPE.ATTACK)
-                {
-                    m_currentHealth--;
+                m_currentHealth--;
 
-                    if (m_currentHealth == 1)
-                    {
-                        // ‘Ì—Í‚ª1‚É‚È‚Á‚½‚çƒ‰ƒ“ƒ_ƒ€‚É”¼•ª‚ÌŒQ‚ê‚¨‰»‚¯‚ğíœ
-                        RemoveRandomHalfSwarmGhosts();
-                    }
-                    else if (m_currentHealth <= 0)
-                    {
-                        // ‘Ì—Í‚ª0‚É‚È‚Á‚½‚ç‚·‚×‚Ä‚ÌŒQ‚ê‚¨‰»‚¯‚ğíœ
-                        RemoveAllSwarmGhosts();
-                    }
+                if (m_currentHealth == 1)
+                {
+                    // ‘Ì—Í‚ª1‚É‚È‚Á‚½‚çƒ‰ƒ“ƒ_ƒ€‚É”¼•ª‚ÌŒQ‚ê‚¨‰»‚¯‚ğíœ
+                    RemoveRandomHalfSwarmGhosts();
+                }
+                else if (m_currentHealth <= 0)
+                {
+                    // ‘Ì—Í‚ª0‚É‚È‚Á‚½‚ç‚·‚×‚Ä‚ÌŒQ‚ê‚¨‰»‚¯‚ğíœ
+                    RemoveAllSwarmGhosts();
                 }
             }
         }
