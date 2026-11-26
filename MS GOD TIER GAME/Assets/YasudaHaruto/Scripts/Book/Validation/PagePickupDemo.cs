@@ -67,7 +67,7 @@ namespace YasudaHaruto
                 return;
 
             m_nextShot = Time.time + 0.7f;
-            m_bullets.FireBullet(m_practiceMagic, MAGIC_CAST_DIRECTION.CENTER, target.gameObject);
+            m_bullets.FireBullet(m_practiceMagic, MAGIC_CAST_DIRECTION.CENTER, target);
         }
 
         private void GoToBedroomExit()
