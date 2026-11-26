@@ -241,21 +241,21 @@ Shader "custom/hatake/ToonMaster"
             #include "TeamToonPasses.hlsl"
             ENDHLSL
         }
-        Pass
-        {
-            Name "TeamToonHairMask"
-            Tags { "LightMode"="TeamToonHairMask" }
-            ZWrite Off ZTest Equal
-            HLSLPROGRAM
-            #pragma target 3.5
-            #pragma vertex ToonPassVertex
-            #pragma fragment ToonHairMaskFragment
-            #pragma shader_feature_local_fragment _ _TOON_ALPHA_CLIP
-            #pragma shader_feature_local_vertex _ _TOON_DEFORM
-            #pragma multi_compile_instancing
-            #include "TeamToonPasses.hlsl"
-            ENDHLSL
-        }
+        // Pass
+        // {
+        //     Name "TeamToonHairMask"
+        //     Tags { "LightMode"="TeamToonHairMask" }
+        //     ZWrite Off ZTest Equal
+        //     HLSLPROGRAM
+        //     #pragma target 3.5
+        //     #pragma vertex ToonPassVertex
+        //     #pragma fragment ToonHairMaskFragment
+        //     #pragma shader_feature_local_fragment _ _TOON_ALPHA_CLIP
+        //     #pragma shader_feature_local_vertex _ _TOON_DEFORM
+        //     #pragma multi_compile_instancing
+        //     #include "TeamToonPasses.hlsl"
+        //     ENDHLSL
+        // }
         Pass
         {
             Name "TeamToonReveal"
