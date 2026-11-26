@@ -50,6 +50,8 @@ MonoBehaviour:
   - {fileID: 7678089287139935553, guid: a5df6f03bb979484c968d72addf627a9, type: 3}
   - {fileID: 7678089287139935553, guid: 5a46e82ce7e5d4d4b8af7a9b988802ef, type: 3}
   - {fileID: 7678089287139935553, guid: 600acb82cefbb8d4191079e592197590, type: 3}
-  m_chargeEffect: {fileID: 3976731442623253172, guid: 5fb943052830f694292568c95bdbfc94, type: 3}
-  m_kiranEffect: {fileID: 5259950150523390421, guid: 418cfb6fec5d0d14cbc5ddde7323509b, type: 3}
+  - {fileID: 7678089287139935553, guid: 039876a4ad9c49e4a935ca77f7486b82, type: 3}
+  - {fileID: 7678089287139935553, guid: e81c27e8e353d714aa2e3c2c4c4416f4, type: 3}
+  - {fileID: 7678089287139935553, guid: abae4dc58b06a2c4784eff48f20ee3c7, type: 3}
+  - {fileID: 7678089287139935553, guid: 74b1562116b4f17488f748bc2cb28cd2, type: 3}
   m_bulletSpawnPoint: {fileID: 0}

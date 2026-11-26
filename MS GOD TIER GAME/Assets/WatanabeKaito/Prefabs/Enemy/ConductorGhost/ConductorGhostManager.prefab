@@ -242,6 +242,7 @@ GameObject:
   - component: {fileID: 6669723123807058891}
   - component: {fileID: 8033101454439669846}
   - component: {fileID: 8319306378756691172}
+  - component: {fileID: 586992024951015417}
   m_Layer: 0
   m_Name: Collider
   m_TagString: Untagged
@@ -388,6 +389,18 @@ MonoBehaviour:
   m_onExit:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &586992024951015417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4415652653511334883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4abef53da95ebe74e93f06fc42790a2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::testHitSender
 --- !u!1 &4563933557310973050
 GameObject:
   m_ObjectHideFlags: 0
