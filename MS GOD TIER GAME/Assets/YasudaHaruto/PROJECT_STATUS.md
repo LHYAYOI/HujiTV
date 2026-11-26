@@ -1,4 +1,10 @@
 # Project Status
+## BookSceneの旧左ページ暗転を停止（2026-11-26）
+
+- ユーザー報告の発射後に左ページだけ暗くなる表示を調査。BookGameBootstrapがRunePageViewへ左側ルーンImageを渡す旧クールダウン表示と、UpdateBookCooldownDimによる本全体の暗転が併存していた。
+- BootstrapのConfigureCooldownImage接続を撤去。本全体の暗転とクールダウンの時間・入力制限は維持。RunePageViewは画像取得コールバックが未設定なら旧演出コンポーネントを生成しない。既存の旧演出クラス・検証用APIは保持し、Scene・Prefabは変更していない。
+- 現行RuntimeソースをUnity同梱Roslyn・Bee参照で別出力コンパイル成功（既存警告5件）。Play Mode・実機の表示確認は未実施。Git状態確認は親リポジトリのパス解決エラーで未確認。
+
 
 ## ルーン成功後の魔法プレビュー設定場所を調査（2026-11-26）
 

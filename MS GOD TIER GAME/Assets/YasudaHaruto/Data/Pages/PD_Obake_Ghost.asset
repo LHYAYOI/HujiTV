@@ -14,14 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PageData
   m_pageId: 20
   m_insertType: 0
-  m_displayName: ThrowMakura
+  m_displayName: Obake
   m_pageType: 1
   m_interaction:
     m_type: 0
-    m_runeData: {fileID: 11400000, guid: e33db08a3b7fe344fb95766fdc64fc56, type: 2}
+    m_runeData: {fileID: 0}
     m_runeImageIndex: -1
   m_action:
-    m_type: 1
-    m_magicData: {fileID: 11400000, guid: fd84468c9ad10ad489611b6288bb8c24, type: 2}
-  m_leftVisualData: {fileID: 11400000, guid: ef7b2bbcbf5bde347b429b245d3b30ca, type: 2}
-  m_rightVisualData: {fileID: 11400000, guid: 7250186cfcdd9e14fa89bcbbe8be233b, type: 2}
+    m_type: 0
+    m_magicData: {fileID: 0}
+  m_leftVisualData: {fileID: 11400000, guid: b14232ea932403543b99a0f41934bd75, type: 2}
+  m_rightVisualData: {fileID: 11400000, guid: 058ae813cad4da4479ac3e7354a6575f, type: 2}

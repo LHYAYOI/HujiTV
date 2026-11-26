@@ -7,7 +7,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private MagicBulletManager m_bulletManager;
     [SerializeField] private MagicDatabase m_magicDatabase;
     [SerializeField] private TargetSelector m_targetSelector;
-    [SerializeField] private BookNetworkServer m_bookNetworkServer;
     [SerializeField] private ScreenEffectManager m_screenEffectManager;
 
     [SerializeField] private MagicData magicDataLeft;
@@ -16,12 +15,12 @@ public class PlayerController : MonoBehaviour
 
     private void OnEnable()
     {
-        m_bookNetworkServer.CastMagicReceived += OnReceiveCastMagic;
+        BookNetworkServer.Instance.CastMagicReceived += OnReceiveCastMagic;
     }
 
     private void OnDisable()
     {
-        m_bookNetworkServer.CastMagicReceived -= OnReceiveCastMagic;
+        BookNetworkServer.Instance.CastMagicReceived -= OnReceiveCastMagic;
     }
 
     private void Awake()

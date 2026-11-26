@@ -309,7 +309,7 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
     {
         HideCompletion();
         ClearGraphics();
-        if (!isActiveAndEnabled || remainingFraction <= 0f)
+        if (!isActiveAndEnabled || remainingFraction <= 0f || m_cooldownImage == null)
         {
             HideCooldown();
             return;
