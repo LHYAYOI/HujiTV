@@ -2,6 +2,8 @@
 
 public class PlayerController : MonoBehaviour
 {
+    public static PlayerController Instance { get; private set; }
+
     [SerializeField] private MagicBulletManager m_bulletManager;
     [SerializeField] private MagicDatabase m_magicDatabase;
     [SerializeField] private TargetSelector m_targetSelector;
@@ -18,6 +20,11 @@ public class PlayerController : MonoBehaviour
     private void OnDisable()
     {
         m_bookNetworkServer.CastMagicReceived -= OnReceiveCastMagic;
+    }
+
+    private void Awake()
+    {
+        Instance = this;
     }
 
     // Update is called once per frame

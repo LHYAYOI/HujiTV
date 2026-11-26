@@ -102,21 +102,6 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
             if (magicData != null)
             {
                 TryReceiveEventMagic(magicData.EventMagicType);
-
-                //if (magicData.EventMagicType == EVENT_MAGIC_TYPE.CLOSE)
-                {
-
-                    if (m_isUpperFlag)
-                    {
-                        // 上の引き出しの処理
-                        StartCoroutine(m_conductorGhost.LockUpperChest());
-                    }
-                    else
-                    {
-                        // 下の引き出しの処理
-                        StartCoroutine(m_conductorGhost.LockLowerChest());
-                    }
-                }
             }
         }
 
@@ -127,7 +112,16 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
     {
         if (eventMagicType == EVENT_MAGIC_TYPE.CLOSE)
         {
-            
+            if (m_isUpperFlag)
+            {
+                // 上の引き出しの処理
+                StartCoroutine(m_conductorGhost.LockUpperChest());
+            }
+            else
+            {
+                // 下の引き出しの処理
+                StartCoroutine(m_conductorGhost.LockLowerChest());
+            }
         }
 
         return false;
