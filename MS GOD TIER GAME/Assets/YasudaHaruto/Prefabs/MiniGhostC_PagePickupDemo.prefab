@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &2143487005080396196
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2184403017090781541, guid: a974bec26e4b1a641bfe7bb2693ddcaf, type: 3}
+      propertyPath: m_Name
+      value: MiniGhostC_PagePickupDemo
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957984509549962943, guid: a974bec26e4b1a641bfe7bb2693ddcaf, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957984509549962943, guid: a974bec26e4b1a641bfe7bb2693ddcaf, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957984509549962943, guid: a974bec26e4b1a641bfe7bb2693ddcaf, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -4.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957984509549962943, guid: a974bec26e4b1a641bfe7bb2693ddcaf, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957984509549962943, guid: a974bec26e4b1a641bfe7bb2693ddcaf, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957984509549962943, guid: a974bec26e4b1a641bfe7bb2693ddcaf, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957984509549962943, guid: a974bec26e4b1a641bfe7bb2693ddcaf, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957984509549962943, guid: a974bec26e4b1a641bfe7bb2693ddcaf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957984509549962943, guid: a974bec26e4b1a641bfe7bb2693ddcaf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957984509549962943, guid: a974bec26e4b1a641bfe7bb2693ddcaf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2184403017090781541, guid: a974bec26e4b1a641bfe7bb2693ddcaf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1510419720062830117}
+  m_SourcePrefab: {fileID: 100100000, guid: a974bec26e4b1a641bfe7bb2693ddcaf, type: 3}
+--- !u!1 &283653021089886401 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2184403017090781541, guid: a974bec26e4b1a641bfe7bb2693ddcaf, type: 3}
+  m_PrefabInstance: {fileID: 2143487005080396196}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1510419720062830117
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 283653021089886401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ced5332850543c24ca276d1983454a1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitReceiverController
+  m_onHit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4345095161552323334}
+        m_TargetAssemblyTypeName: MiniGhostEnemy, Assembly-CSharp
+        m_MethodName: OnMiniGhostHit
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_onStay:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onExit:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &4345095161552323334 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2446531106483462818, guid: a974bec26e4b1a641bfe7bb2693ddcaf, type: 3}
+  m_PrefabInstance: {fileID: 2143487005080396196}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 283653021089886401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bee90095721f7a42b0c5cf2490ad8a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniGhostEnemy

@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MagicData
   m_magicId: 3
   m_displayName: CloseMagic
-  m_magicType: 4
+  m_magicType: 1
   m_eventMagicType: 2
   m_aimType: 0
-  m_impactRuneTexture: {fileID: 21300000, guid: c099415b619312845a44222516f9136c, type: 3}
+  m_castType: 0
+  m_instantMagicPrefab: {fileID: 0}
+  m_impactRuneTexture: {fileID: 21300000, guid: 43473659c839ef64b899ce2ce3260981, type: 3}

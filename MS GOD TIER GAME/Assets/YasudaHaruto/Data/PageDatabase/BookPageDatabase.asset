@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41aee5e5b2470164ab6b4fa782c71eda, type: 3}
+  m_Name: BookPageDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::PageDatabase
+  m_pages:
+  - {fileID: 11400000, guid: 03ed73127d4e75940b17b1584cd3e987, type: 2}
+  - {fileID: 11400000, guid: 3babb39473d1e2443b4baa760cc7c483, type: 2}
+  - {fileID: 11400000, guid: 6e5bef54a04283343acb5b42a7f83e76, type: 2}
+  - {fileID: 11400000, guid: a219df46311649149879ca448298955a, type: 2}
+  - {fileID: 11400000, guid: bc1d710beea17de4b8f658d3e4d39fa1, type: 2}
+  - {fileID: 11400000, guid: b23dbdb84500ba44aacc34ae0e64448f, type: 2}
+  - {fileID: 11400000, guid: b26585c5026a53b4ca6d99881ede2a2d, type: 2}

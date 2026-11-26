@@ -15,11 +15,13 @@ namespace YasudaHaruto.BookValidation.Editor
         private const string Running = "Yasuda.PageDropPreview";
         private const string PrefabPath = "Assets/YasudaHaruto/Prefabs/PreviewPageBubble.prefab";
         private const string BookScene = "Assets/YasudaHaruto/Scenes/BookScene.unity";
+        private const byte PreviewPageId = 3;
         private static BookNetworkServer s_server;
         private static BookNetworkClient s_client;
         private static BattlePageDrops s_drops;
         private static Transform s_cart;
         private static RenderTexture s_preview;
+        private static Camera s_previewCamera;
         private static Text s_caption;
         private static double s_deadline;
         private static double s_next;
@@ -82,6 +84,9 @@ namespace YasudaHaruto.BookValidation.Editor
             var serialized = new SerializedObject(s_drops);
             serialized.FindProperty("m_bubblePrefab").objectReferenceValue =
                 AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
+            var assignments = serialized.FindProperty("m_assignments");
+            for (int i = 0; i < assignments.arraySize; i++)
+                assignments.GetArrayElementAtIndex(i).FindPropertyRelative("PageId").intValue = PreviewPageId;
             serialized.ApplyModifiedPropertiesWithoutUndo();
 
             s_cart = GameObject.CreatePrimitive(PrimitiveType.Cube).transform;
@@ -99,6 +104,7 @@ namespace YasudaHaruto.BookValidation.Editor
             camera.backgroundColor = new Color(0.08f, 0.13f, 0.2f);
             s_preview = new RenderTexture(640, 360, 24);
             camera.targetTexture = s_preview;
+            s_previewCamera = camera;
 
             var lamp = new GameObject("Page Drop Preview Light").AddComponent<Light>();
             lamp.transform.SetParent(stage.transform, false);
@@ -155,11 +161,11 @@ namespace YasudaHaruto.BookValidation.Editor
                     case 1 when s_client.ConnectionState == BOOK_CONNECTION_STATE.CONNECTED &&
                         book != null && book.IsInitialized:
                         s_server.BeginGame();
-                        if (book.Pages.Any(page => page.Data.PageId == 5))
-                            throw new InvalidOperationException("Preview requires Page ID 5 to start unowned.");
+                        if (!book.Pages.Select(page => page.Data.PageId).SequenceEqual(new byte[] { 2, 5 }))
+                            throw new InvalidOperationException("Expected initial Page IDs 2 and 5.");
                         s_drops.ReportEnemyDefeated("MiniGhost_A", s_drops.transform.position + new Vector3(-1.4f, 0.45f, 0f));
                         s_drops.ReportEnemyDefeated("MiniGhost_B", s_drops.transform.position + new Vector3(-0.45f, 0.52f, 0f));
-                        s_caption.text = "Two enemies dropped Page 5";
+                        s_caption.text = $"Two enemies dropped Page {PreviewPageId}";
                         s_next = now + 1.5;
                         s_step++;
                         break;
@@ -168,11 +174,11 @@ namespace YasudaHaruto.BookValidation.Editor
                         s_caption.text = "Collecting both bubbles...";
                         s_step++;
                         break;
-                    case 3 when book != null && book.BookView.IsReady && book.CurrentPage?.Data.PageId == 5:
-                        if (book.Pages.Count(page => page.Data.PageId == 5) != 1)
-                            throw new InvalidOperationException("Page 5 was added more than once.");
-                        s_caption.text = "PASS: Page 5 acquired once";
-                        Debug.Log("PageDropPreview PASS: two bubbles, real loopback, one Page 5 added and opened.");
+                    case 3 when book != null && book.BookView.IsReady && book.CurrentPage?.Data.PageId == PreviewPageId:
+                        if (!book.Pages.Select(page => page.Data.PageId).SequenceEqual(new byte[] { 2, PreviewPageId, 5 }))
+                            throw new InvalidOperationException("Expected Page 3 to be inserted once between Pages 2 and 5.");
+                        s_caption.text = $"PASS: Page {PreviewPageId} acquired once";
+                        Debug.Log($"PageDropPreview PASS: two bubbles, real loopback, one Page {PreviewPageId} inserted and opened.");
                         EditorApplication.update -= Tick;
                         break;
                 }
@@ -192,6 +198,8 @@ namespace YasudaHaruto.BookValidation.Editor
             EditorApplication.update -= Tick;
             SceneManager.sceneLoaded -= SetupStage;
             SessionState.EraseBool(Running);
+            if (s_previewCamera != null)
+                s_previewCamera.targetTexture = null;
             if (s_preview != null)
                 UnityEngine.Object.DestroyImmediate(s_preview);
         }
