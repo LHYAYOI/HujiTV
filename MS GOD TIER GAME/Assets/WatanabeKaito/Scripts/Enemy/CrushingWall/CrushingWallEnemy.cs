@@ -19,8 +19,17 @@ public class CrushingWallEnemy : SplineMoveEnemy
             new Keyframe(1f, 3f)
         );
 
-    [Header("加速時間")]
+    [Header("通常加速時間")]
     [SerializeField] private float m_speedRampDuration = 10f;
+
+    [Header("再スタート時の加速時間")]
+    [SerializeField] private float m_restartSpeedRampDuration = 10f;
+
+    [Header("最後の移動の加速時間")]
+    [SerializeField] private float m_lastSpeedRampDuration = 1f;
+
+    [Header("移動再開時の加速時間")]
+    [SerializeField] private float m_resumeSpeedRampDuration = 3f;
 
     [Header("被弾時の減速")]
     [SerializeField] private float m_damageSpeedRate = 0.7f;
@@ -41,6 +50,12 @@ public class CrushingWallEnemy : SplineMoveEnemy
     [Header("LookTarget")]
     [SerializeField] private GameObject m_lookTarget;
 
+    [Header("一回目の停止地点の割合")]
+    [SerializeField] private float m_firstStopPointT = 0.5f;
+
+    [Header("二回目の停止地点の割合")]
+    [SerializeField] private float m_secondStopPointT = 0.8f;
+
     private float m_speedElapsedTime = 0f; // 移動速度グラフの経過時間
 
     
@@ -51,6 +66,8 @@ public class CrushingWallEnemy : SplineMoveEnemy
 
     private bool m_battleStartFlag = false; // 戦闘開始フラグ
     private bool m_battleEndFlag = false; // 戦闘終了フラグ
+
+    private int m_startCount = 0; // 初期化回数のカウント
 
 
     public override void Initialize()
@@ -84,6 +101,7 @@ public class CrushingWallEnemy : SplineMoveEnemy
         m_speedElapsedTime = 0f;
         m_damageSpeedMultiplier = 1f;
         m_isAttackingFlag = false;
+        m_battleEndFlag = false;
 
         m_animator.SetFloat("fSpeed", 1f);
 
@@ -94,6 +112,17 @@ public class CrushingWallEnemy : SplineMoveEnemy
         ResetMoveSpeed();
 
         m_battleStartFlag = true;
+
+        if(m_startCount == 1)
+        {
+            m_speedRampDuration = m_restartSpeedRampDuration;
+        }
+        else if(m_startCount > 1)
+        {
+            m_speedRampDuration = m_lastSpeedRampDuration;
+        }
+
+        m_startCount++;
     }
 
     public override void BattleEnd()
@@ -108,8 +137,8 @@ public class CrushingWallEnemy : SplineMoveEnemy
     // 移動処理
     protected override void UpdateMovement()
     {
-        // 攻撃中とバトル開始前は移動しない
-        if (m_isAttackingFlag || !m_battleStartFlag)
+        // 攻撃中、バトル開始前、バトル終了後は移動しない
+        if (m_isAttackingFlag || !m_battleStartFlag || m_battleEndFlag)
         {
             return;
         }
@@ -224,9 +253,18 @@ public class CrushingWallEnemy : SplineMoveEnemy
         // 自身の移動を再開
         m_isAttackingFlag = false;
 
+        m_speedRampDuration = m_resumeSpeedRampDuration;
+
         // TargetableObject全てをアクティブにする
         ActivateAllTargetableObjects();
     }
+
+    // スプラインの指定した割合に応じた位置に移動する
+    public void MoveToPosition(float t)
+    {
+        transform.position = m_targetSpline.EvaluatePosition(t);
+    }
+
 
     // TargetableObject全てをアクティブにする
     public void ActivateAllTargetableObjects()

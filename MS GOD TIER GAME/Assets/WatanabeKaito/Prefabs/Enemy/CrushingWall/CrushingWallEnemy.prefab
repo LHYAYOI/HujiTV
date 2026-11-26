@@ -420,7 +420,10 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  m_speedRampDuration: 3
+  m_speedRampDuration: 5
+  m_restartSpeedRampDuration: 10
+  m_lastSpeedRampDuration: 1
+  m_resumeSpeedRampDuration: 3
   m_damageSpeedRate: 0.9
   m_minSpeedRate: 0.5
   m_attackToPlayerMoveDelay: 5

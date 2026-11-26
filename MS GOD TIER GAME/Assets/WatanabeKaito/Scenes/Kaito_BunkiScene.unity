@@ -10850,12 +10850,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6811702407854686011, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_startOffset
-      value: 0
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 6811702407854686011, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_startSplineController
       value: 
-      objectReference: {fileID: 1846558912}
+      objectReference: {fileID: 2019704239}
     - target: {fileID: 8778732444337950149, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_Name
       value: Sp_BedRoom
