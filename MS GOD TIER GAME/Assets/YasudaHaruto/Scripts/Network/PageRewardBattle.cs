@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 namespace YasudaHaruto
 {
-    // Uses the Alpha scene's original spawn and battle hit markers.
+    // Uses the scene's spawn and battle hit markers.
     public sealed class PageRewardBattle : GimmickSpline
     {
         [SerializeField] private PageRewardBattle m_battle;
@@ -14,6 +14,7 @@ namespace YasudaHaruto
         [SerializeField] private ActiveEnemyManager m_activeEnemyManager;
         [SerializeField] private RoutePageRewards m_rewards;
         [SerializeField] private PageData m_rewardPage;
+        [SerializeField] private bool m_unregisterTimedOutEnemies;
         [SerializeField] private UnityEvent m_onFinishBattle;
 
         private readonly List<EnemyBase> m_enemies = new();
@@ -95,6 +96,9 @@ namespace YasudaHaruto
                     {
                         if (enemy != null)
                             enemy.BattleEnd();
+                        // Later battles using the shared manager must not restart these enemies.
+                        if (m_unregisterTimedOutEnemies)
+                            m_activeEnemyManager.RemoveActiveEnemy(enemy);
                     }
                     break;
                 }

@@ -21,6 +21,11 @@ namespace YasudaHaruto
         [SerializeField] private bool m_faceCamera;
         [SerializeField] private Transform m_proximityTarget;
         [SerializeField] private float m_enemyFallDuration;
+        [SerializeField, Min(0.01f)] private float m_openPlaybackSpeed = 1f;
+        [SerializeField, Min(0f)] private float m_minimumFlightDuration;
+        [SerializeField, Min(0f)] private float m_cameraArrivalDistance;
+        [SerializeField] private bool m_faceCameraAfterOpening;
+        [SerializeField, Min(0f)] private float m_waveHeight = 0.28f;
 
         public event Action<byte> PageArrived;
 
@@ -126,7 +131,6 @@ namespace YasudaHaruto
             }
 
             const float waveDuration = 0.5f;
-            const float waveHeight = 0.28f;
             Animator animator = visual.GetComponentInChildren<Animator>();
             if (animator == null)
                 animator = visual.transform.GetChild(0).gameObject.AddComponent<Animator>();
@@ -142,28 +146,45 @@ namespace YasudaHaruto
             graph.Play();
 
             Vector3 origin = visual.transform.position;
-            var camera = m_faceCamera ? Camera.main : null;
-            float openingDuration = Mathf.Max(0.1f, m_openClip.length);
-            float duration = openingDuration + waveDuration;
+            float playbackSpeed = Mathf.Max(0.01f, m_openPlaybackSpeed);
+            float openingDuration = Mathf.Max(0.1f, m_openClip.length / playbackSpeed);
+            float duration = Mathf.Max(m_minimumFlightDuration, openingDuration + waveDuration);
+            float waveStart = m_faceCameraAfterOpening ? openingDuration : duration - waveDuration;
             try
             {
                 for (float time = 0f; time < duration; time += Time.deltaTime)
                 {
-                    clip.SetTime(Mathf.Min(time, Mathf.Max(0f, m_openClip.length - 0.0001f)));
+                    clip.SetTime(Mathf.Min(time * playbackSpeed, Mathf.Max(0f, m_openClip.length - 0.0001f)));
                     graph.Evaluate(0f);
 
-                    Vector3 target = m_cartTarget.position;
-                    float wave = Mathf.Clamp01((time - openingDuration) / waveDuration);
+                    Camera camera = m_faceCamera || m_faceCameraAfterOpening || m_cameraArrivalDistance > 0f
+                        ? Camera.main : null;
+                    Vector3 target = GetArrivalPosition(camera);
+                    float wave = Mathf.Clamp01((time - waveStart) / (duration - waveStart));
                     Vector3 position = Vector3.Lerp(origin, target, time / duration)
-                        + Vector3.up * (Mathf.Sin(wave * 2f * Mathf.PI) * waveHeight);
-                    Vector3 lookAt = camera != null ? camera.transform.position : target;
+                        + Vector3.up * (Mathf.Sin(wave * 2f * Mathf.PI) * m_waveHeight);
+                    Vector3 lookAt = m_faceCamera && !m_faceCameraAfterOpening && camera != null
+                        ? camera.transform.position : target;
                     Vector3 heading = Vector3.ProjectOnPlane(lookAt - position, Vector3.up);
+                    Quaternion rotation = visual.transform.rotation;
                     if (heading.sqrMagnitude > 0.001f)
-                        visual.transform.rotation = Quaternion.LookRotation(heading) * Quaternion.Euler(65f, 0f, 0f);
+                        rotation = Quaternion.LookRotation(heading) * Quaternion.Euler(65f, 0f, 0f);
+                    if (m_faceCameraAfterOpening && camera != null && time >= openingDuration)
+                    {
+                        Vector3 towardCamera = camera.transform.position - position;
+                        if (towardCamera.sqrMagnitude > 0.001f)
+                        {
+                            Quaternion faceCamera = Quaternion.LookRotation(towardCamera, camera.transform.up)
+                                * Quaternion.Euler(90f, 0f, 0f);
+                            float turn = Mathf.SmoothStep(0f, 1f, (time - openingDuration) / 0.2f);
+                            rotation = Quaternion.Slerp(rotation, faceCamera, turn);
+                        }
+                    }
+                    visual.transform.rotation = rotation;
                     visual.transform.position = position;
                     yield return null;
                 }
-                visual.transform.position = m_cartTarget.position;
+                visual.transform.position = GetArrivalPosition(m_cameraArrivalDistance > 0f ? Camera.main : null);
                 if (!m_localPreviewOnly)
                     m_arrived.Enqueue(pageId);
                 PageArrived?.Invoke(pageId);
@@ -175,6 +196,15 @@ namespace YasudaHaruto
                     graph.Destroy();
                 Destroy(visual);
             }
+        }
+
+        private Vector3 GetArrivalPosition(Camera camera)
+        {
+            if (m_cameraArrivalDistance <= 0f || camera == null)
+                return m_cartTarget.position;
+
+            float distance = Mathf.Max(m_cameraArrivalDistance, camera.nearClipPlane + 0.1f);
+            return camera.ViewportToWorldPoint(new Vector3(0.5f, 0.43f, distance));
         }
 
         private void OnDestroy()

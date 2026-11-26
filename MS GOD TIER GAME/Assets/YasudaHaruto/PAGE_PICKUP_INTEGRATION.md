@@ -1,5 +1,13 @@
 # ページ取得デモと本編への組み込み
 
+## 分岐シーンで報酬を調整する
+
+`Assets/YasudaHaruto/Scenes/Yasuda_GameScene.unity` を開きます。戦闘報酬は戦闘開始側の **Page Reward Battle → Reward Page** で設定します。ミニお化け1戦目は ID 3、2戦目は3体全滅で ID 6、マエストロ撃破は ID 4 です。鍵お化けと群れお化けは従来どおりです。
+
+`BattleManager` の **Route Page Rewards → Route Page Data** に道中の ID 1 が割り当てられています。置き場所は **Route Page** が参照する `Bedroom Exit - Close Page` を移動して調整します。初期配置は寝室出口から廊下へ約5mです。**Pickup Distance** は4mで、トロッコが範囲内に入ると飛行が始まります。
+
+同じコンポーネントの **Open Playback Speed** はページを開く速さ（0.6倍）、**Minimum Flight Duration** は飛行時間の下限（3.2秒）、**Camera Arrival Distance** はカメラから到着点までの距離（1.65m）です。
+
 `Scenes/PagePickupDemo.unity` は `Main_Game_Scene_Alpha_PageRewards` の複製です。Alphaの寝室と廊下、トロッコ、一人称カメラ、敵、魔法弾を使って、2種類のページ取得を1台のUnityエディターで確認できます。
 
 ## ノートPCで作業を再開する
