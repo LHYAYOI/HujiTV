@@ -95,7 +95,12 @@ Shader "Hidden/hatake/BlackLight/FluorescentDecal"
                 float4 maskSample = SAMPLE_TEXTURE2D_GRAD(_DecalMask, sampler_DecalMask, maskUV, ddxUV, ddyUV);
                 if (_DecalShape.y < 0.5) { shapeMask = maskSample.a; tint = maskSample.rgb; }
                 else if (_DecalShape.y < 1.5) shapeMask = maskSample.r;
-                else shapeMask = dot(maskSample.rgb, float3(0.2126, 0.7152, 0.0722));
+                else if (_DecalShape.y < 2.5) shapeMask = dot(maskSample.rgb, float3(0.2126, 0.7152, 0.0722));
+                else
+                {
+                    // RGB: 形は箱全体、色をそのまま乗算する（白は下地のまま、黒は真っ黒）。
+                    tint = maskSample.rgb;
+                }
             }
             else
             {
@@ -113,7 +118,7 @@ Shader "Hidden/hatake/BlackLight/FluorescentDecal"
         }
         ENDHLSL
 
-        // 0: 通常光での塗料の色（下地に乗算）。
+        // 0: 通常光での塗料の色（下地に乗算）。くりぬき（m_cutout）のデカールは、蛍光をすべて描いたあとにこのパスで乗算し、黒い所を光ごと真っ黒にする。
         Pass
         {
             Name "FluorescentDecalTint"

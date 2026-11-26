@@ -23,6 +23,7 @@ namespace LightShaftLab
             [InspectorName("A（RGBは色として乗算）")] ALPHA = 0,
             [InspectorName("R")] RED = 1,
             [InspectorName("輝度")] LUMINANCE = 2,
+            [InspectorName("RGB（形は箱全体、色をそのまま乗算）")] RGB = 3,
         }
 
         static readonly List<FluorescentDecal> g_active = new List<FluorescentDecal>();
@@ -37,6 +38,7 @@ namespace LightShaftLab
         public SHAPE m_shape = SHAPE.TEXTURE;
         [Tooltip("模様のテクスチャ。マスクのチャンネルで形を決め、Aを使う場合はRGBを蛍光色に乗算します。")]
         public Texture2D m_mask;
+        [Tooltip("模様の形をテクスチャのどこから取るか。「RGB」はアルファの無い画像用で、箱全体に画像の色をそのまま乗算します（白は下地のまま、黒は真っ黒）。")]
         public MASK_CHANNEL m_maskChannel = MASK_CHANNEL.ALPHA;
         public Vector2 m_tiling = Vector2.one;
         public Vector2 m_offset = Vector2.zero;
@@ -54,6 +56,10 @@ namespace LightShaftLab
         public float m_wrap = 0;
         [Range(0, 1), Tooltip("塗料の濃さ（模様全体の不透明度）。")]
         public float m_opacity = 1;
+
+        [Header("くりぬき")]
+        [Tooltip("ONにすると、蛍光をすべて描き終えたあとに、模様の色を画面に乗算します。黒（0,0,0）の所は、蛍光の光も下地も真っ黒にくりぬかれます（白は変えない）。\nこのデカール自身は光らず、「通常光で塗料が見える量」は使いません（いつも全部の強さで乗算します）。")]
+        public bool m_cutout;
 
         [Header("通常光での見た目")]
         [Tooltip("塗料そのものの色（下地に乗算）。白なら通常光では見えない透明インクになります。")]
@@ -83,8 +89,11 @@ namespace LightShaftLab
         /// <summary>単位立方体（±0.5）を投影の箱へ変換する行列。</summary>
         public Matrix4x4 BoxMatrix => transform.localToWorldMatrix * Matrix4x4.Scale(m_size);
 
-        public bool HasFluorescence => m_efficiency > 0 && m_opacity > 0 && m_fluorescentColor.maxColorComponent > 0;
-        public bool HasDaylightTint => m_daylightOpacity > 0 && m_opacity > 0 && m_daylightTint != Color.white;
+        public bool HasFluorescence => !m_cutout && m_efficiency > 0 && m_opacity > 0 && m_fluorescentColor.maxColorComponent > 0;
+        /// <summary>RGB チャンネルでテクスチャを使っている（テクスチャの色をそのまま乗算する）。</summary>
+        bool UsesTextureColor => m_shape == SHAPE.TEXTURE && m_mask && m_maskChannel == MASK_CHANNEL.RGB;
+        /// <summary>乗算のパスを描くか。くりぬきは常に描く。</summary>
+        public bool HasDaylightTint => m_opacity > 0 && (m_cutout || (m_daylightOpacity > 0 && (m_daylightTint != Color.white || UsesTextureColor)));
 
         /// <summary>ワールド空間の外接ボックス。</summary>
         public Bounds WorldBounds
