@@ -317,7 +317,13 @@ namespace LightShaftLab
                     m_positions[count] = new Vector4(position.x, position.y, position.z, light.range);
                     m_directions[count] = new Vector4(direction.x, direction.y, direction.z, Mathf.Cos(light.spotAngle * Mathf.Deg2Rad * 0.5f));
                     m_colors[count] = new Vector4(color.r, color.g, color.b, Mathf.Cos(light.innerSpotAngle * Mathf.Deg2Rad * 0.5f));
-                    m_shadowData[count] = new Vector4(hasShadowFlag ? shadowIndex : -1, emitter.m_castShadowsFlag && light.shadows != LightShadows.None && light.shadowStrength > 0 ? 1 : 0, 1f / Mathf.Max(light.range * light.range, 0.0001f), 1f / Mathf.Max(0.001f, m_colors[count].w - m_directions[count].w));
+                    // 壁で遮るのは選んだライトだけ。オフなら影は引かない（光は壁を抜ける）
+                    if (Application.isPlaying)
+                    {
+                        emitter.EnsureWallShadow(light);
+                    }
+                    bool blockFlag = emitter.m_blockByWallsFlag && hasShadowFlag && light.shadows != LightShadows.None && light.shadowStrength > 0;
+                    m_shadowData[count] = new Vector4(hasShadowFlag ? shadowIndex : -1, blockFlag ? 1 : 0, 1f / Mathf.Max(light.range * light.range, 0.0001f), 1f / Mathf.Max(0.001f, m_colors[count].w - m_directions[count].w));
                     // ブラックライト：空気中の埃が紫外線で光る分（等方）を可視の散乱とは別に渡す。
                     m_spotFluorescence[count] = Vector4.zero;
                     if (blackLight != null && blackLight.m_fogFluorescence.value > 0 && emitter.TryGetComponent<BlackLightEmitter>(out var ultraviolet) && ultraviolet.UltravioletIntensity > 0)
