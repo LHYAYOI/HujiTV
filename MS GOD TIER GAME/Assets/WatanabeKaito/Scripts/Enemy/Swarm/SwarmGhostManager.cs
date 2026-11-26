@@ -2,11 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SwarmGhostManager : TargetableObject
+public class SwarmGhostManager : EnemyBase
 {
-    [Header("群れお化けのデータ")]
-    [SerializeField] private EnemyData m_swarmGhostData;
-
     [Header("群れお化けの一個体リスト")]
     [SerializeField] private List<SwarmGhost> m_swarmGhostPrefabs;
 
@@ -19,6 +16,12 @@ public class SwarmGhostManager : TargetableObject
     [Header("群れお化けの突撃間隔（秒）")]
     [SerializeField] private float m_attackInterval = 5.0f;
 
+    [Header("Targetable")]
+    [SerializeField] private TargetableObject m_targetableObject;
+
+    [Header("群れお化けの最大体力")]
+    [SerializeField] private int m_maxHealth = 2;
+
 
     private List<SwarmGhost> m_activeSwarmGhostList = new List<SwarmGhost>(); // 現在出現している群れお化け
 
@@ -28,20 +31,31 @@ public class SwarmGhostManager : TargetableObject
 
     private bool m_isSpawningFlag = false;  // 出現処理が重複して実行されるのを防ぐ
 
-    private int m_currentHealth = 0; // 現在の群れお化けの体力
-
     private float m_attackTimer = 0.0f; // 群れお化けを突撃させるタイマー
 
     private bool m_isActiveFlag = false; // 群れお化けがアクティブかどうか
 
     private bool m_isAttackingFlag = false; // 群れお化けが突撃中かどうか
 
+    private bool m_hasFirstGhostReachedTargetFlag = false; // 最初の群れお化けがターゲットに到達したか
 
     private void Start()
     {
-        m_currentHealth = m_swarmGhostData.m_maxHealth;
+        m_currentHealth = m_maxHealth;
 
-        m_IsTargetableFlag = false;
+        m_targetableObject.SetTargetable(false);
+    }
+
+    public override void Initialize()
+    {
+    }
+
+    public override void BattleStart()
+    {
+    }
+
+    public override void BattleEnd()
+    {
     }
 
     private void Update()
@@ -62,9 +76,14 @@ public class SwarmGhostManager : TargetableObject
         {
             if (!m_isAttackingFlag)
             {
-                AttackAllSwarmGhosts();
+                // 到達フラグをリセット
+                m_hasFirstGhostReachedTargetFlag = false;
+
                 m_isAttackingFlag = true;
-                m_IsTargetableFlag = false;
+
+                m_targetableObject.SetTargetable(false);
+
+                AttackAllSwarmGhosts();
             }
         }
 
@@ -83,7 +102,7 @@ public class SwarmGhostManager : TargetableObject
             }
             if (allFinished)
             {
-                m_IsTargetableFlag = true;
+                m_targetableObject.SetTargetable(true);
                 m_isAttackingFlag = false;
                 m_attackTimer = 0.0f; // タイマーをリセット
             }
@@ -106,10 +125,10 @@ public class SwarmGhostManager : TargetableObject
     // 群れお化けを時間差で出現させる
     public IEnumerator SpawnAllSwarmGhostCoroutine()
     {
-        m_IsTargetableFlag = true;
+        m_targetableObject.SetTargetable(true);
 
         // 体力を最大値に設定
-        SetCurrentHealth(m_swarmGhostData.m_maxHealth);
+        SetCurrentHealth(m_maxHealth);
 
         if (m_isSpawningFlag)
         {
@@ -197,6 +216,9 @@ public class SwarmGhostManager : TargetableObject
                 transform
             );
 
+            // Managerを設定
+            swarmGhost.SetSwarmGhostManager(this);
+
             // お化けと出現位置を同じインデックスで登録
             m_activeSwarmGhostList.Add(swarmGhost);
             m_activeSpawnPositions.Add(spawnPosition);
@@ -214,6 +236,28 @@ public class SwarmGhostManager : TargetableObject
         m_isSpawningFlag = false;
 
         m_isActiveFlag = true;
+    }
+
+    // 群れお化けがターゲットに到達したとき
+    public void OnSwarmGhostReachedTarget()
+    {
+        // すでに別のお化けが到達していたら何もしない
+        if (!m_isAttackingFlag || m_hasFirstGhostReachedTargetFlag)
+        {
+            return;
+        }
+
+        // 最初の1体だけ実行する
+        m_hasFirstGhostReachedTargetFlag = true;
+
+        // 攻撃
+        ExecuteAttack();
+    }
+
+    // 攻撃処理
+    private void ExecuteAttack()
+    {
+        PlayerController.Instance.TakeDamage(GetEnemyData().m_attack);
     }
 
     // ランダムに半分の群れお化けを削除する
@@ -283,13 +327,13 @@ public class SwarmGhostManager : TargetableObject
 
         m_isActiveFlag = false;
 
-        m_IsTargetableFlag = false;
+        m_targetableObject.SetTargetable(false);
     }
 
     // 全ての群れお化けを非アクティブにする
     public void DeactivateAllSwarmGhosts()
     {
-        m_IsTargetableFlag = false;
+        m_targetableObject.SetTargetable(false);
         m_isActiveFlag = false;
     }
 
@@ -305,31 +349,63 @@ public class SwarmGhostManager : TargetableObject
 
     public int GetMaxHealth()
     {
-        return m_swarmGhostData.m_maxHealth;
+        return m_maxHealth;
     }
 
-    private void OnTriggerEnter(Collider collision)
+    public void OnSwarmGhostHit(HitData hitData)
     {
-        if (collision.gameObject.CompareTag("MagicBullet"))
+        if (m_isAttackingFlag)
         {
-            if(m_isAttackingFlag) 
-            {
-                // 突撃中は無敵
-                return;
-            }
+            // 突撃中は無敵
+            return;
+        }
 
-            m_currentHealth--;
+        if (hitData != null)
+        {
+            MagicData magicData = hitData.GetMagicData;
+            if (magicData != null)
+            {
+                if (magicData.MagicType == MAGIC_TYPE.ATTACK)
+                {
+                    m_currentHealth--;
 
-            if (m_currentHealth == 1)
-            {
-                // 体力が1になったらランダムに半分の群れお化けを削除
-                RemoveRandomHalfSwarmGhosts();
-            }
-            else if (m_currentHealth <= 0)
-            {
-                // 体力が0になったらすべての群れお化けを削除
-                RemoveAllSwarmGhosts();
+                    if (m_currentHealth == 1)
+                    {
+                        // 体力が1になったらランダムに半分の群れお化けを削除
+                        RemoveRandomHalfSwarmGhosts();
+                    }
+                    else if (m_currentHealth <= 0)
+                    {
+                        // 体力が0になったらすべての群れお化けを削除
+                        RemoveAllSwarmGhosts();
+                    }
+                }
             }
         }
     }
+
+    //private void OnTriggerEnter(Collider collision)
+    //{
+    //    if (collision.gameObject.CompareTag("MagicBullet"))
+    //    {
+    //        if(m_isAttackingFlag) 
+    //        {
+    //            // 突撃中は無敵
+    //            return;
+    //        }
+
+    //        m_currentHealth--;
+
+    //        if (m_currentHealth == 1)
+    //        {
+    //            // 体力が1になったらランダムに半分の群れお化けを削除
+    //            RemoveRandomHalfSwarmGhosts();
+    //        }
+    //        else if (m_currentHealth <= 0)
+    //        {
+    //            // 体力が0になったらすべての群れお化けを削除
+    //            RemoveAllSwarmGhosts();
+    //        }
+    //    }
+    //}
 }

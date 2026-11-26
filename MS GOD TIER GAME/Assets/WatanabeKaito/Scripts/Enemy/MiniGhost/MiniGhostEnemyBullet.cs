@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class MiniGhostEnemyBullet : MonoBehaviour
 {
-
     private Vector3 m_moveDirection;
 
     // 計算された水平速度と垂直速度、および専用の重力
@@ -21,6 +20,7 @@ public class MiniGhostEnemyBullet : MonoBehaviour
     private Vector3 m_randomRotationAxis; // ランダムな回転軸
     private float m_randomRotationSpeed; // ランダムな回転速度
 
+    private byte m_attackValue;
 
     // 引数に「発射角度（angle）」を追加
     public void SetTarget(Vector3 targetPosition, float bulletSpeed, float angle)
@@ -72,6 +72,10 @@ public class MiniGhostEnemyBullet : MonoBehaviour
         m_randomRotationSpeed = Random.Range(m_minRotationSpeed, m_maxRotationSpeed); // ランダムな回転速度を決定
     }
 
+    public void SetAttackValue(byte value)
+    {
+        m_attackValue = value;
+    }
 
     void Update()
     {
@@ -89,8 +93,14 @@ public class MiniGhostEnemyBullet : MonoBehaviour
         transform.Rotate(m_randomRotationAxis, m_randomRotationSpeed * Time.deltaTime, Space.Self);
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void HitProcess(HitData data) 
     {
-        Destroy(gameObject);
+        if (data.GetHitObject.CompareTag("Player")) 
+        {
+            // PlayerController.Instance.TakeDamage();
+
+            Destroy(gameObject);
+
+        }
     }
 }

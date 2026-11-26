@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   m_id: SwarmGhost
   m_name: 
+  m_deathText: {fileID: 0}
   m_maxHealth: 2
-  m_attack: 1
+  m_attack: 2
