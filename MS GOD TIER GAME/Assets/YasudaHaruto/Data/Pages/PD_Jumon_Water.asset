@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0348284d6c830c745b43a7bc4bbddec7, type: 3}
+  m_Name: PD_Jumon_Water
+  m_EditorClassIdentifier: Assembly-CSharp::PageData
+  m_pageId: 10
+  m_insertType: 0
+  m_displayName: Water
+  m_pageType: 0
+  m_interaction:
+    m_type: 1
+    m_runeData: {fileID: 11400000, guid: e17bbb79ae9f2c5409e9ab3263994020, type: 2}
+    m_runeImageIndex: -1
+  m_action:
+    m_type: 1
+    m_magicData: {fileID: 11400000, guid: 5ff605f81a8f6af449fc06d505dc1d87, type: 2}
+  m_leftVisualData: {fileID: 11400000, guid: 0f7bc487b474df047a4c782df98c33bb, type: 2}
+  m_rightVisualData: {fileID: 11400000, guid: 0699f35ecb9de724a9f71fee2e87a68e, type: 2}

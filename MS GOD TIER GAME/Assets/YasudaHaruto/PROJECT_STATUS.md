@@ -1,5 +1,11 @@
 # Project Status
 
+## ルーン成功後の魔法プレビュー設定場所を調査（2026-11-26）
+
+- Resources/RuneSpell/BulletPreviews.assetのBulletsへMagicBulletController付きPrefabを登録する構成。各PrefabのMagicData参照がページの魔法と一致したものを選び、直下のVisualだけを複製・撮影して本に表示する。現在の登録はMagicBulletClose／Fire／Ice。INSTANTや未登録・Visualなしは弾プレビューを表示しない。コード・アセット参照の静的調査のみ。実装変更なし。
+- Git状態確認・fetch・追跡先比較は親リポジトリパス解決エラーで未確認。
+
+
 ## 寝室出口の置きページを手前から回収（2026-11-26）
 
 - `Yasuda_GameScene` の置きページ（ID 1）の回収開始距離を1.4mから4mへ変更。既存のトロッコの近接判定を使い、4m以内に入ると飛行を開始。取得の確定は到着時。Inspector設定を静的に確認し、Play Modeでの開始位置は未確認。

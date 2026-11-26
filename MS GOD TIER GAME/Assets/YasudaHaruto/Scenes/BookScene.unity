@@ -166,6 +166,7 @@ MonoBehaviour:
   m_gameController: {fileID: 1832026887}
   m_runeTraceView: {fileID: 1457169296}
   m_runeCooldownSeconds: 5
+  m_cooldownBookDim: 0.6
   m_gameDragInput: {fileID: 8271864336177666055}
   m_obstacleSettings: {fileID: 0}
   m_rightObstacleArea:
@@ -1009,6 +1010,11 @@ MonoBehaviour:
   m_initialPages:
   - {fileID: 11400000, guid: 3babb39473d1e2443b4baa760cc7c483, type: 2}
   - {fileID: 11400000, guid: bc1d710beea17de4b8f658d3e4d39fa1, type: 2}
+  - {fileID: 11400000, guid: 027087e6411f8ce4d8264ba15e946d3d, type: 2}
+  - {fileID: 11400000, guid: 35d39baef0d973c4f87f93a1bdb5f491, type: 2}
+  - {fileID: 11400000, guid: b1bdac4875949d5448624f212b154e54, type: 2}
+  - {fileID: 11400000, guid: 992c0a84a267b6145ac444db66fc687e, type: 2}
+  - {fileID: 11400000, guid: b26585c5026a53b4ca6d99881ede2a2d, type: 2}
   m_inventorySettings: {fileID: 11400000, guid: 3734ec477f6e93a428f87450c7a2f0f8, type: 2}
 --- !u!1 &1948617070
 GameObject:
@@ -1507,6 +1513,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BookPageView
   m_pageContent: {fileID: 709096540}
+  m_lightweightCaptureCamera: 1
+  m_lightweightCaptureTextureMobile: 1
+  m_captureHeightMobile: 0
+  m_captureMipsMobile: 1
+  m_matchCaptureToDisplayMobile: 1
+  m_captureScaleMobile: 1
+  m_overlayShader: {fileID: 0}
+  m_fullScaleCapture: 1
+  m_alternateCapturesMobile: 1
+  m_pauseCapturesWhileTurningMobile: 1
+  m_filterPageImages: 1
 --- !u!114 &4417502217794631035
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1726,12 +1743,21 @@ MonoBehaviour:
   m_ambientRefreshRateMobile: 30
   m_maxOutputHeight: 0
   m_maxOutputHeightMobile: 720
+  m_limitOutputHeightMobile: 0
   m_bloomIterationsMobile: 3
+  m_bloomHalfRateMobile: 1
+  m_bloomLightPrefilterMobile: 1
+  m_bloomSkipLevelMobile: 1
+  m_staggerPagesMobile: 1
   m_forceMobileSettings: 0
   m_splitPassesMobile: 1
   m_turnCacheMobile: 1
+  m_stillVariantMobile: 1
+  m_contentDelta: 1
   m_postShader: {fileID: 4800000, guid: 5578288a7a21cc74e94534d3c228798e, type: 3}
   m_bloomIntensity: 0.9
+  m_bloomKeepDark: 0.9
+  m_pageSharpen: 0.6
   m_bloomThreshold: 0.95
   m_bloomKnee: 0.5
   m_bloomScatter: 0.7
@@ -1777,19 +1803,21 @@ MonoBehaviour:
   m_frontCover: {fileID: 0}
   m_backCover: {fileID: 0}
   m_rigidCovers: 1
-  m_burnDuration: 1.9
-  m_reviveDuration: 1.7
   m_turnGlow: 0.8
   m_stackThickness: 0.035
   m_minStackThickness: 0.006
   m_leafThickness: 0.0025
   m_stackLayers: 14
   m_stackDrop: 0.6
+  m_bundleThicknessScale: 2
+  m_bundleShadowGrow: 1.5
+  m_bundleCurlGrow: 10
   m_bookPose: {x: 0, y: 0, z: 0}
   m_paperFinish: 0
   m_screenFade: 0
   m_animationScaleMobile: 0.8
   m_progressiveStepsMobile: 6
+  m_stripSplitMobile: 2
   m_coverDestStepsMobile: 10
   m_prerenderCoverMobile: 1
   m_turnDestStepsMobile: 10
@@ -1831,10 +1859,17 @@ MonoBehaviour:
   m_useBurn: 1
   m_useRevive: 1
   m_useOpenClose: 1
+  m_usePageState: 1
   m_spotKey: 29
   m_burnKey: 26
   m_reviveKey: 23
   m_openCloseKey: 17
+  m_pageDimKey: 18
+  m_spreadDimKey: 20
+  m_blankKey: 16
+  m_acquireKey: 21
+  m_bundleForwardKey: 66
+  m_bundleBackKey: 67
   m_dimAmount: 0.85
   m_spotRadius: 0.22
   m_spotFeather: 0.07
@@ -1842,6 +1877,13 @@ MonoBehaviour:
   m_spotFollow: 18
   m_fadeDuration: 0.3
   m_spotSlot: 0
+  m_pageDimAmount: 0.75
+  m_pageDimFade: 0.3
+  m_acquireColor: {r: 0.95, g: 0.78, b: 0.35, a: 1}
+  m_acquireSpreadDuration: 1.2
+  m_acquireHoldDuration: 0.25
+  m_acquireRevealDuration: 0.8
+  m_bundleCount: 5
   m_editUnit: 0
   m_reviveSpread: {fileID: 11400000, guid: fd2ea4d585320f746908b5f45b9c8650, type: 2}
   m_revivePage: {fileID: 11400000, guid: ec9ee33f1dd87b741af4c870eac5ed96, type: 2}
@@ -2004,6 +2046,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BookPageView
   m_pageContent: {fileID: 1077514522}
+  m_lightweightCaptureCamera: 1
+  m_lightweightCaptureTextureMobile: 1
+  m_captureHeightMobile: 0
+  m_captureMipsMobile: 1
+  m_matchCaptureToDisplayMobile: 1
+  m_captureScaleMobile: 1
+  m_overlayShader: {fileID: 0}
+  m_fullScaleCapture: 1
+  m_alternateCapturesMobile: 1
+  m_pauseCapturesWhileTurningMobile: 1
+  m_filterPageImages: 1
 --- !u!4 &8055060439013167597
 Transform:
   m_ObjectHideFlags: 0

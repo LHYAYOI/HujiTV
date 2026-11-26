@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0348284d6c830c745b43a7bc4bbddec7, type: 3}
+  m_Name: PD_Jumon_Light
+  m_EditorClassIdentifier: Assembly-CSharp::PageData
+  m_pageId: 7
+  m_insertType: 0
+  m_displayName: Light
+  m_pageType: 0
+  m_interaction:
+    m_type: 1
+    m_runeData: {fileID: 11400000, guid: 38d13c14c6f41374da82e3c36c9cc10d, type: 2}
+    m_runeImageIndex: -1
+  m_action:
+    m_type: 1
+    m_magicData: {fileID: 11400000, guid: 38cb0a8d56613874a99e28dc7e7bb5e4, type: 2}
+  m_leftVisualData: {fileID: 11400000, guid: cdfd9696b7b147f47bf29dd31f8acf4d, type: 2}
+  m_rightVisualData: {fileID: 11400000, guid: 0caa90755b017d148b476efff825c2bb, type: 2}

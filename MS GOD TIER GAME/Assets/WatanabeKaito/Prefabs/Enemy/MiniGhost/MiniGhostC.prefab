@@ -179,6 +179,7 @@ MonoBehaviour:
   m_toonMaterialBlend: {fileID: 5691142609022336537}
   m_toonMaterialBlendDuration: 1
   m_targetableObject: {fileID: 4359766249631539556}
+  m_effectiveMagicType: 8
 --- !u!114 &1651294565247797093
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -260,7 +261,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostDyingState
   m_shrinkDuration: 1.5
+  m_particleDelay: 1
+  m_particleDuration: 1
   m_deathParticle: {fileID: 4058022614410997813, guid: 89b865f6e4ec0064984bc5885d17bc32, type: 3}
+  m_particleOffsetTransform: {fileID: 0}
 --- !u!114 &2673270581748922673
 MonoBehaviour:
   m_ObjectHideFlags: 0
