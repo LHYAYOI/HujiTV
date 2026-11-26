@@ -9108,6 +9108,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: TrokkoController
       objectReference: {fileID: 0}
+    - target: {fileID: 1236926793030025659, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
+      propertyPath: m_amplitudeGain
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1236926793030025659, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
+      propertyPath: m_frequencyGain
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 1336868705942693455, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
