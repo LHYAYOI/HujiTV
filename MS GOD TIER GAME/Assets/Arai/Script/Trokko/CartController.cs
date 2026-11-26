@@ -24,7 +24,9 @@ public class CartController : MonoBehaviour
     [SerializeField] private float m_speed;
     private float m_baseSpeed;
     [SerializeField] private float m_switchSpeed;
+    [SerializeField] private float m_rotationSpeed;
     [SerializeField] private float m_distance; // 全体の進んだ距離
+    
 
 
     [SerializeField]private SplineContainer m_spline;
@@ -140,7 +142,7 @@ public class CartController : MonoBehaviour
         transform.rotation = 
             Quaternion.Lerp(transform.rotation,
             Quaternion.LookRotation(tangent, up),
-            Time.deltaTime);
+            Time.deltaTime * m_rotationSpeed);
         transform.position = position;
 
     }
