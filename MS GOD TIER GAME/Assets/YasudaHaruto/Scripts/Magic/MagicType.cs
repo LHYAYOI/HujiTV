@@ -7,10 +7,7 @@
 
 public enum MAGIC_TYPE
 {
-    FIRE,
-    ICE,
-    THUNDER,
-    HEAL,
+    ATTACK,
     EVENT
 }
 
@@ -19,4 +16,5 @@ public enum EVENT_MAGIC_TYPE
     NONE,
     OPEN,
     CLOSE,
+    SET_BARRIER,
 }
