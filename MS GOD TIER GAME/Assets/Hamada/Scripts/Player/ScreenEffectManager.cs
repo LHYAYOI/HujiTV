@@ -8,6 +8,11 @@ public class ScreenEffectManager : MonoBehaviour
 
     Coroutine m_Coroutine;
 
+    private void Awake() 
+    {
+        m_edgeFx.Grunge.weight = 0;
+    }
+
     public void DoDamageScreen() 
     {
         if (m_Coroutine != null) 

@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4813d1ecc71b16843b3eafbef485a0c5, type: 3}
-  m_Name: PV_Obake_Ghost_R
+  m_Name: PV_Obake_MiniGhost_R
   m_EditorClassIdentifier: Assembly-CSharp::BookPageData
   m_category: 1
   m_backgroundMaterial: {fileID: 0}
   m_manuscriptHeading: 0
-  m_pageName: PV_Obake_Ghost_R
+  m_pageName: PV_Obake_MiniGhost_R
   m_backgroundColor: {r: 1, g: 1, b: 1, a: 1}
   m_images:
-  - m_sprite: {fileID: 21300000, guid: 546ed016bea9d8c4481df5b90fe823f0, type: 3}
+  - m_sprite: {fileID: 21300000, guid: 871d6a22376d71e48afa04136907ace1, type: 3}
     m_material: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
     m_position: {x: 0, y: 0}
     m_size: {x: 310, y: 360}

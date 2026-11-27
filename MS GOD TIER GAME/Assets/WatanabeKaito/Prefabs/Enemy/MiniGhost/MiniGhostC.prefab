@@ -107,7 +107,6 @@ GameObject:
   - component: {fileID: 4122682875455443804}
   - component: {fileID: 1547004853171550175}
   - component: {fileID: 2673270581748922673}
-  - component: {fileID: 9170967074312127478}
   m_Layer: 0
   m_Name: MiniGhostC
   m_TagString: Target
@@ -276,29 +275,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00c512fd8e70c5e4ca1cb396d258c2c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniGhostHitSender
---- !u!136 &9170967074312127478
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1309553552582454145}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.3
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!1 &5213084385458866402
 GameObject:
   m_ObjectHideFlags: 0
@@ -311,6 +287,9 @@ GameObject:
   - component: {fileID: 4359766249631539556}
   - component: {fileID: 6636270158319155016}
   - component: {fileID: 6346849451612561109}
+  - component: {fileID: 4408278795974278600}
+  - component: {fileID: 6114589231878279411}
+  - component: {fileID: 5394547226362459231}
   m_Layer: 0
   m_Name: Target
   m_TagString: Untagged
@@ -326,12 +305,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5213084385458866402}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.1800994, y: -0.68378663, z: 0.1800994, w: 0.68378663}
-  m_LocalPosition: {x: 0.2253274, y: 0.04388001, z: 0}
-  m_LocalScale: {x: 0.29999998, y: 0.29999998, z: 0.29999995}
+  m_LocalRotation: {x: -0, y: -1, z: -0, w: 0}
+  m_LocalPosition: {x: 0, y: 0.708, z: 0.19099998}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 6892106026488537020}
+  m_Father: {fileID: 8018822348592657025}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4359766249631539556
 MonoBehaviour:
@@ -403,6 +382,72 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5213084385458866402}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!135 &4408278795974278600
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5213084385458866402}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.05
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6114589231878279411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5213084385458866402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ced5332850543c24ca276d1983454a1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitReceiverController
+  m_onHit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3282884335062489158}
+        m_TargetAssemblyTypeName: MiniGhostEnemy, Assembly-CSharp
+        m_MethodName: OnMiniGhostHit
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_onStay:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onExit:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &5394547226362459231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5213084385458866402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00c512fd8e70c5e4ca1cb396d258c2c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniGhostHitSender
 --- !u!1 &5747816450418076520
 GameObject:
   m_ObjectHideFlags: 0
@@ -542,6 +587,18 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -2922892357548988066, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      propertyPath: m_AABB.m_Extent.x
+      value: 1.0481377
+      objectReference: {fileID: 0}
+    - target: {fileID: -2922892357548988066, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      propertyPath: m_AABB.m_Extent.y
+      value: 1.050363
+      objectReference: {fileID: 0}
+    - target: {fileID: -2922892357548988066, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      propertyPath: m_AABB.m_Extent.z
+      value: 1.457991
+      objectReference: {fileID: 0}
+    - target: {fileID: -2922892357548988066, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 9f17ab9e8654b28488552376e9bb9570, type: 2}
@@ -554,9 +611,33 @@ PrefabInstance:
       value: ghost_mini_mdl
       objectReference: {fileID: 0}
     - target: {fileID: 2788675242186676951, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      propertyPath: m_AABB.m_Extent.x
+      value: 1.5661029
+      objectReference: {fileID: 0}
+    - target: {fileID: 2788675242186676951, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      propertyPath: m_AABB.m_Extent.y
+      value: 1.5396979
+      objectReference: {fileID: 0}
+    - target: {fileID: 2788675242186676951, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      propertyPath: m_AABB.m_Extent.z
+      value: 1.342469
+      objectReference: {fileID: 0}
+    - target: {fileID: 2788675242186676951, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 9f17ab9e8654b28488552376e9bb9570, type: 2}
+    - target: {fileID: 6851099186128873815, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      propertyPath: m_AABB.m_Extent.x
+      value: 1.0294125
+      objectReference: {fileID: 0}
+    - target: {fileID: 6851099186128873815, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      propertyPath: m_AABB.m_Extent.y
+      value: 1.029932
+      objectReference: {fileID: 0}
+    - target: {fileID: 6851099186128873815, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      propertyPath: m_AABB.m_Extent.z
+      value: 1.0985413
+      objectReference: {fileID: 0}
     - target: {fileID: 6851099186128873815, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -568,8 +649,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: -5231070708292597034, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
-      insertIndex: -1
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
+      insertIndex: 0
       addedObject: {fileID: 8959542264079582052}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
@@ -592,11 +673,6 @@ SkinnedMeshRenderer:
 --- !u!137 &5652422522770018237 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 2788675242186676951, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
-  m_PrefabInstance: {fileID: 7548645462411662698}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &6892106026488537020 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -5231070708292597034, guid: 08cca77502391a84abdbda9af029b1a2, type: 3}
   m_PrefabInstance: {fileID: 7548645462411662698}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &7206679541990058043 stripped

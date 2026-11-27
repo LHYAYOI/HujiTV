@@ -381,6 +381,7 @@ public class ConductorGhost : MonoBehaviour
         n_rightChestShaker.StartLowerChestAnimation();
 
         m_lowerDrawerLockedFlag = true;
+
     }
 
     // 上の引き出しを閉めて、ロックする
@@ -399,6 +400,7 @@ public class ConductorGhost : MonoBehaviour
         n_leftChestShaker.StartUpperChestAnimation();
 
         m_upperDrawerLockedFlag = true;
+
     }
 
     // プレイヤーの方向へ即座に向く
