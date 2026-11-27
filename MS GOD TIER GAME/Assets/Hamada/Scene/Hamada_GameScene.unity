@@ -9108,30 +9108,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TrokkoController
       objectReference: {fileID: 0}
-    - target: {fileID: 1236926793030025659, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
-      propertyPath: m_amplitudeGain
-      value: 0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1236926793030025659, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
-      propertyPath: m_frequencyGain
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1336868705942693455, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1336868705942693455, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0.1
-      objectReference: {fileID: 0}
     - target: {fileID: 1431370856330892349, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
       propertyPath: m_spline
       value: 
       objectReference: {fileID: 1076259994}
-    - target: {fileID: 1431370856330892349, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
-      propertyPath: m_rotationSpeed
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2418083448201531036, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5.3399997
@@ -9171,18 +9151,6 @@ PrefabInstance:
     - target: {fileID: 2418083448201531036, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4223936359044100414, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4223936359044100414, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.175
-      objectReference: {fileID: 0}
-    - target: {fileID: 4223936359044100414, guid: 76ec98d9b93ba5d4db85d55faea535e8, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0.1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11047,12 +11015,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6811702407854686011, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_startOffset
-      value: 50
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6811702407854686011, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_startSplineController
       value: 
-      objectReference: {fileID: 2019704239}
+      objectReference: {fileID: 2111565414}
     - target: {fileID: 8778732444337950149, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_Name
       value: Sp_BedRoom
@@ -14742,26 +14710,6 @@ PrefabInstance:
     - target: {fileID: 3419224099547421611, guid: 4487dfc90121ce04c8da989321422093, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5555980636204488410, guid: 4487dfc90121ce04c8da989321422093, type: 3}
-      propertyPath: m_RenderPostProcessing
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8101182528761447535, guid: 4487dfc90121ce04c8da989321422093, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8101182528761447535, guid: 4487dfc90121ce04c8da989321422093, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.3
-      objectReference: {fileID: 0}
-    - target: {fileID: 8158479922000696081, guid: 4487dfc90121ce04c8da989321422093, type: 3}
-      propertyPath: near clip plane
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 8158479922000696081, guid: 4487dfc90121ce04c8da989321422093, type: 3}
-      propertyPath: m_CullingMask.m_Bits
-      value: 5911
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -27637,17 +27585,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a53446f2fbadcb14c8f268a6932c4b4e, type: 3}
---- !u!114 &1928151266 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7455172719043956682, guid: a53446f2fbadcb14c8f268a6932c4b4e, type: 3}
-  m_PrefabInstance: {fileID: 1928151265}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c9c7d274f3e9ff48a27234781c33d32, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BookNetworkServer
 --- !u!4 &1929154276 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8363324472497017347, guid: fd1be8b25ab300c44a4dff87535198d3, type: 3}
@@ -29770,6 +29707,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d508e122a72acf46b4bd25b847f992b, type: 3}
+--- !u!114 &2111565414 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 111196645449119932, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+  m_PrefabInstance: {fileID: 1476320023}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9cb05fac2f1bb648accdb5d6724626e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SplineController2
 --- !u!1001 &2115881406
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30149,6 +30097,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3969759120178904956, guid: 1e08b6c9466ce9648a4513c1cd364bf3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7995051064386392725, guid: 1e08b6c9466ce9648a4513c1cd364bf3, type: 3}
+      propertyPath: m_grunge.weight
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -31114,10 +31066,10 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99d97aa4a52705048b71c30ca9bf8d9a, type: 2}
-  - {fileID: 2100000, guid: 99d97aa4a52705048b71c30ca9bf8d9a, type: 2}
-  - {fileID: -1850668293158540933, guid: dca505125bf20d341988f344e7b8c0fd, type: 3}
-  - {fileID: 2100000, guid: 99d97aa4a52705048b71c30ca9bf8d9a, type: 2}
+  - {fileID: 2100000, guid: 42f040b875d5d9543afbf6cacbc32986, type: 2}
+  - {fileID: 2100000, guid: 42f040b875d5d9543afbf6cacbc32986, type: 2}
+  - {fileID: 2100000, guid: 42f040b875d5d9543afbf6cacbc32986, type: 2}
+  - {fileID: 2100000, guid: 42f040b875d5d9543afbf6cacbc32986, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -31653,29 +31605,9 @@ PrefabInstance:
     m_TransformParent: {fileID: 1722128856}
     m_Modifications:
     - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
-      propertyPath: magicDataLeft
-      value: 
-      objectReference: {fileID: 11400000, guid: 1fc6fe6d07825934aa2aa07117f42783, type: 2}
-    - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
-      propertyPath: magicDataRight
-      value: 
-      objectReference: {fileID: 11400000, guid: 1fc6fe6d07825934aa2aa07117f42783, type: 2}
-    - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
       propertyPath: m_bulletManager
       value: 
       objectReference: {fileID: 231831548}
-    - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
-      propertyPath: magicDataCenter
-      value: 
-      objectReference: {fileID: 11400000, guid: fd84468c9ad10ad489611b6288bb8c24, type: 2}
-    - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
-      propertyPath: m_lockOnUIManager
-      value: 
-      objectReference: {fileID: 734182226}
-    - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
-      propertyPath: m_bookNetworkServer
-      value: 
-      objectReference: {fileID: 1928151266}
     - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
       propertyPath: m_screenEffectManager
       value: 

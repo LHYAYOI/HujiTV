@@ -164,10 +164,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: MagicBulletManager
       objectReference: {fileID: 0}
-    - target: {fileID: 7078241854969815186, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7317960904224467323, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.31284

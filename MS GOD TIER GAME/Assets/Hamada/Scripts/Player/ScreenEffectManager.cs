@@ -1,4 +1,4 @@
-using Hatake.ScreenFx;
+﻿using Hatake.ScreenFx;
 using System.Collections;
 using UnityEngine;
 
@@ -6,21 +6,16 @@ public class ScreenEffectManager : MonoBehaviour
 {
     [SerializeField] ScreenEdgeFx m_edgeFx;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    Coroutine m_Coroutine;
 
     public void DoDamageScreen() 
     {
-        StartCoroutine(ScreenDamageRoutine());
+        if (m_Coroutine != null) 
+        {
+            StopCoroutine(m_Coroutine);
+        }
+
+        m_Coroutine = StartCoroutine(ScreenDamageRoutine());
     }
 
     IEnumerator ScreenDamageRoutine() 
