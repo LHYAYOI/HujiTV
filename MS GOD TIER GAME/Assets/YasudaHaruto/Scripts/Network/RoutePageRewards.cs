@@ -26,6 +26,7 @@ namespace YasudaHaruto
         [SerializeField, Min(0f)] private float m_cameraArrivalDistance;
         [SerializeField] private bool m_faceCameraAfterOpening;
         [SerializeField, Min(0f)] private float m_waveHeight = 0.28f;
+        [SerializeField, Min(0f)] private float m_arrivalHoldDuration;
 
         public event Action<byte> PageArrived;
 
@@ -131,6 +132,7 @@ namespace YasudaHaruto
             }
 
             const float waveDuration = 0.5f;
+            const float uprightTurnDuration = 0.75f;
             Animator animator = visual.GetComponentInChildren<Animator>();
             if (animator == null)
                 animator = visual.transform.GetChild(0).gameObject.AddComponent<Animator>();
@@ -148,12 +150,15 @@ namespace YasudaHaruto
             Vector3 origin = visual.transform.position;
             float playbackSpeed = Mathf.Max(0.01f, m_openPlaybackSpeed);
             float openingDuration = Mathf.Max(0.1f, m_openClip.length / playbackSpeed);
-            float duration = Mathf.Max(m_minimumFlightDuration, openingDuration + waveDuration);
+            float finishDuration = m_faceCameraAfterOpening ? uprightTurnDuration + 0.15f : waveDuration;
+            float duration = Mathf.Max(m_minimumFlightDuration, openingDuration + finishDuration);
             float waveStart = m_faceCameraAfterOpening ? openingDuration : duration - waveDuration;
             try
             {
-                for (float time = 0f; time < duration; time += Time.deltaTime)
+                for (float elapsed = 0f; elapsed < duration + m_arrivalHoldDuration; elapsed += Time.deltaTime)
                 {
+                    // Hold the final pose at the camera-relative destination until acquisition.
+                    float time = Mathf.Min(elapsed, duration);
                     clip.SetTime(Mathf.Min(time * playbackSpeed, Mathf.Max(0f, m_openClip.length - 0.0001f)));
                     graph.Evaluate(0f);
 
@@ -169,14 +174,24 @@ namespace YasudaHaruto
                     Quaternion rotation = visual.transform.rotation;
                     if (heading.sqrMagnitude > 0.001f)
                         rotation = Quaternion.LookRotation(heading) * Quaternion.Euler(65f, 0f, 0f);
-                    if (m_faceCameraAfterOpening && camera != null && time >= openingDuration)
+                    if (m_faceCameraAfterOpening && camera != null)
                     {
                         Vector3 towardCamera = camera.transform.position - position;
+                        Vector3 flatHeading = Vector3.ProjectOnPlane(towardCamera, Vector3.up);
+                        if (flatHeading.sqrMagnitude <= 0.001f)
+                            flatHeading = Vector3.ProjectOnPlane(-camera.transform.forward, Vector3.up);
+                        if (flatHeading.sqrMagnitude > 0.001f)
+                        {
+                            float flutter = Mathf.Sin(wave * 2f * Mathf.PI) * 4f;
+                            rotation = Quaternion.LookRotation(flatHeading) * Quaternion.Euler(flutter, 0f, 0f);
+                        }
+
                         if (towardCamera.sqrMagnitude > 0.001f)
                         {
                             Quaternion faceCamera = Quaternion.LookRotation(towardCamera, camera.transform.up)
                                 * Quaternion.Euler(90f, 0f, 0f);
-                            float turn = Mathf.SmoothStep(0f, 1f, (time - openingDuration) / 0.2f);
+                            float turn = Mathf.SmoothStep(0f, 1f,
+                                Mathf.InverseLerp(duration - uprightTurnDuration, duration, time));
                             rotation = Quaternion.Slerp(rotation, faceCamera, turn);
                         }
                     }
