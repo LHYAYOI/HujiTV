@@ -8307,9 +8307,10 @@ MonoBehaviour:
   m_enemyFallDuration: 0.42
   m_openPlaybackSpeed: 0.6
   m_minimumFlightDuration: 3.2
-  m_cameraArrivalDistance: 1.65
+  m_cameraArrivalDistance: 0.5
   m_faceCameraAfterOpening: 1
   m_waveHeight: 0.05
+  m_arrivalHoldDuration: 0.45
 --- !u!1 &727763954 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6362957621724478253, guid: c3380b62e0d92924f8bbae1e4e95a7b9, type: 3}
@@ -31693,7 +31694,7 @@ PrefabInstance:
     - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
       propertyPath: magicDataCenter
       value: 
-      objectReference: {fileID: 11400000, guid: fd84468c9ad10ad489611b6288bb8c24, type: 2}
+      objectReference: {fileID: 11400000, guid: aaedada4a2713374eb8206497a01423b, type: 2}
     - target: {fileID: 4096183140209637247, guid: 8168079dd1c37b8428d1883e3691ce4e, type: 3}
       propertyPath: m_lockOnUIManager
       value: 
