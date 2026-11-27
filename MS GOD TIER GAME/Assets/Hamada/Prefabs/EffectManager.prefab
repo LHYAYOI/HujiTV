@@ -78,14 +78,14 @@ MonoBehaviour:
     starScale: 1.6
     starScroll: {x: 0.004, y: 0.01}
   m_grunge:
-    weight: 0
+    weight: 0.825
     boxSize: {x: 0.1, y: 0.05}
-    start: 0.64
-    end: 1.45
+    start: 0.948
+    end: 1.784
     noiseAmount: 0.3
-    color: {r: 0, g: 0, b: 0, a: 1}
-    blotchScale: 0.7
-    grainScale: 1.9
+    color: {r: 1, g: 0, b: 0.527462, a: 1}
+    blotchScale: 0.21
+    grainScale: 1.01
     grain: 0.7
     stepsPerSecond: 10
     jitter: 0.06

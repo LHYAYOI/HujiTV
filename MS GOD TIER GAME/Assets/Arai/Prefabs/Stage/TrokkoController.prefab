@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3382136514076796961}
   m_Layer: 9
   m_Name: TrokkoController
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -54,7 +54,7 @@ MonoBehaviour:
   m_movingFlag: 1
   m_speed: 1
   m_switchSpeed: 1
-  m_rotationSpeed: 0
+  m_rotationSpeed: 1
   m_distance: 9.2
   m_spline: {fileID: 0}
 --- !u!114 &3914770714501455439
@@ -148,7 +148,7 @@ Transform:
   m_GameObject: {fileID: 4892619252162404982}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.004999894, y: -0.052, z: 0.47800153}
+  m_LocalPosition: {x: 0, y: 0.175, z: -0.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -358,7 +358,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2615624303660194760, guid: ce184db34ac8da94ca85e34522eee837, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.1006203
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2615624303660194760, guid: ce184db34ac8da94ca85e34522eee837, type: 3}
       propertyPath: m_LocalPosition.y
@@ -366,7 +366,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2615624303660194760, guid: ce184db34ac8da94ca85e34522eee837, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.0942502
+      value: -0.1
       objectReference: {fileID: 0}
     - target: {fileID: 2615624303660194760, guid: ce184db34ac8da94ca85e34522eee837, type: 3}
       propertyPath: m_LocalRotation.w
@@ -395,6 +395,14 @@ PrefabInstance:
     - target: {fileID: 2615624303660194760, guid: ce184db34ac8da94ca85e34522eee837, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2876499638195616828, guid: ce184db34ac8da94ca85e34522eee837, type: 3}
+      propertyPath: m_amplitudeGain
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2876499638195616828, guid: ce184db34ac8da94ca85e34522eee837, type: 3}
+      propertyPath: m_frequencyGain
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 6427638907401506824, guid: ce184db34ac8da94ca85e34522eee837, type: 3}
       propertyPath: m_resetLookPoint

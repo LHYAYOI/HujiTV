@@ -1,28 +1,28 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class MiniGhostEnemyBullet : MonoBehaviour
 {
     private Vector3 m_moveDirection;
 
-    // ŒvZ‚³‚ê‚½…•½‘¬“x‚Æ‚’¼‘¬“xA‚¨‚æ‚Ñê—p‚Ìd—Í
+    // è¨ˆç®—ã•ã‚ŒãŸæ°´å¹³é€Ÿåº¦ã¨å‚ç›´é€Ÿåº¦ã€ãŠã‚ˆã³å°‚ç”¨ã®é‡åŠ›
     private float m_horizontalSpeed;
     private float m_verticalVelocity;
     private float m_gravity;
 
     private bool m_isInitializedFlag = false;
 
-    [Header("Å¬‰ñ“]‘¬“x (“x/•b)")]
+    [Header("æœ€å°å›è»¢é€Ÿåº¦ (åº¦/ç§’)")]
     [SerializeField] private float m_minRotationSpeed = 300f;
 
-    [Header("Å‘å‰ñ“]‘¬“x (“x/•b)")]
+    [Header("æœ€å¤§å›è»¢é€Ÿåº¦ (åº¦/ç§’)")]
     [SerializeField] private float m_maxRotationSpeed = 1000f;
 
-    private Vector3 m_randomRotationAxis; // ƒ‰ƒ“ƒ_ƒ€‚È‰ñ“]²
-    private float m_randomRotationSpeed; // ƒ‰ƒ“ƒ_ƒ€‚È‰ñ“]‘¬“x
+    private Vector3 m_randomRotationAxis; // ãƒ©ãƒ³ãƒ€ãƒ ãªå›è»¢è»¸
+    private float m_randomRotationSpeed; // ãƒ©ãƒ³ãƒ€ãƒ ãªå›è»¢é€Ÿåº¦
 
     private byte m_attackValue;
 
-    // ˆø”‚Éu”­ËŠp“xianglejv‚ğ’Ç‰Á
+    // å¼•æ•°ã«ã€Œç™ºå°„è§’åº¦ï¼ˆangleï¼‰ã€ã‚’è¿½åŠ 
     public void SetTarget(Vector3 targetPosition, float bulletSpeed, float angle)
     {
         Vector3 currentPos = transform.position;
@@ -32,44 +32,44 @@ public class MiniGhostEnemyBullet : MonoBehaviour
         float distance = diffXZ.magnitude;
         m_moveDirection = diffXZ.normalized;
 
-        // Šp“xi“x”–@j‚ğƒ‰ƒWƒAƒ“‚É•ÏŠ·
+        // è§’åº¦ï¼ˆåº¦æ•°æ³•ï¼‰ã‚’ãƒ©ã‚¸ã‚¢ãƒ³ã«å¤‰æ›
         float rad = angle * Mathf.Deg2Rad;
 
-        // ƒXƒs[ƒh‚ÆŠp“x‚©‚çAÅ‰‚Ìu…•½•ûŒü‚Ì‘¬‚³v‚Æuã•ûŒü‚Ì‘¬‚³v‚ğŒvZ
+        // ã‚¹ãƒ”ãƒ¼ãƒ‰ã¨è§’åº¦ã‹ã‚‰ã€æœ€åˆã®ã€Œæ°´å¹³æ–¹å‘ã®é€Ÿã•ã€ã¨ã€Œä¸Šæ–¹å‘ã®é€Ÿã•ã€ã‚’è¨ˆç®—
         m_horizontalSpeed = bulletSpeed * Mathf.Cos(rad);
         m_verticalVelocity = bulletSpeed * Mathf.Sin(rad);
 
-        // Šp“x‚ª90“xi^ãj‚È‚ÇA…•½‚Éi‚Ü‚È‚¢İ’è‚É‚³‚ê‚½ê‡‚ÌƒGƒ‰[‰ñ”ğ
+        // è§’åº¦ãŒ90åº¦ï¼ˆçœŸä¸Šï¼‰ãªã©ã€æ°´å¹³ã«é€²ã¾ãªã„è¨­å®šã«ã•ã‚ŒãŸå ´åˆã®ã‚¨ãƒ©ãƒ¼å›é¿
         if (m_horizontalSpeed <= 0.001f)
         {
             m_horizontalSpeed = bulletSpeed;
             m_verticalVelocity = 0f;
             m_gravity = 0f;
             m_isInitializedFlag = true;
-            // ‰ñ“]‚ğ‰Šú‰»
+            // å›è»¢ã‚’åˆæœŸåŒ–
             InitializeRotation();
             return;
         }
 
-        // ƒ^[ƒQƒbƒg‚Ì^ã‚É“’B‚·‚é‚Ü‚Å‚ÌŠÔ
+        // ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®çœŸä¸Šã«åˆ°é”ã™ã‚‹ã¾ã§ã®æ™‚é–“
         float timeToReach = distance / m_horizontalSpeed;
 
-        // w’è‚µ‚½ƒXƒs[ƒh‚ÆŠp“x‚ÅAƒ^[ƒQƒbƒg‚Ì‚‚³‚É“’B‚·‚é‚½‚ß‚Ìê—p‚Ìd—Í‚ğŒvZ
+        // æŒ‡å®šã—ãŸã‚¹ãƒ”ãƒ¼ãƒ‰ã¨è§’åº¦ã§ã€ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®é«˜ã•ã«åˆ°é”ã™ã‚‹ãŸã‚ã®å°‚ç”¨ã®é‡åŠ›ã‚’è¨ˆç®—
         float heightDiff = diff.y;
         m_gravity = 2f * (m_verticalVelocity * timeToReach - heightDiff) / (timeToReach * timeToReach);
 
         m_isInitializedFlag = true;
         Destroy(gameObject, 10.0f);
 
-        // ‰ñ“]‚ğ‰Šú‰»
+        // å›è»¢ã‚’åˆæœŸåŒ–
         InitializeRotation();
     }
 
-    // ‰ñ“]‚Ì‰Šú‰»
+    // å›è»¢ã®åˆæœŸåŒ–
     private void InitializeRotation()
     {
-        m_randomRotationAxis = Random.onUnitSphere; // ’PˆÊ‹…–Êã‚Ìƒ‰ƒ“ƒ_ƒ€‚È“_i²j‚ğ¶¬
-        m_randomRotationSpeed = Random.Range(m_minRotationSpeed, m_maxRotationSpeed); // ƒ‰ƒ“ƒ_ƒ€‚È‰ñ“]‘¬“x‚ğŒˆ’è
+        m_randomRotationAxis = Random.onUnitSphere; // å˜ä½çƒé¢ä¸Šã®ãƒ©ãƒ³ãƒ€ãƒ ãªç‚¹ï¼ˆè»¸ï¼‰ã‚’ç”Ÿæˆ
+        m_randomRotationSpeed = Random.Range(m_minRotationSpeed, m_maxRotationSpeed); // ãƒ©ãƒ³ãƒ€ãƒ ãªå›è»¢é€Ÿåº¦ã‚’æ±ºå®š
     }
 
     public void SetAttackValue(byte value)
@@ -81,15 +81,15 @@ public class MiniGhostEnemyBullet : MonoBehaviour
     {
         if (!m_isInitializedFlag) return;
 
-        // ‹tZ‚µ‚½ê—p‚Ìd—Í‚ğg‚Á‚Ä—‰º‚³‚¹‚é
+        // é€†ç®—ã—ãŸå°‚ç”¨ã®é‡åŠ›ã‚’ä½¿ã£ã¦è½ä¸‹ã•ã›ã‚‹
         m_verticalVelocity -= m_gravity * Time.deltaTime;
 
-        // …•½•ûŒü‚Æ‚’¼•ûŒü‚ÌˆÚ“®—Ê‚ğ‡¬
+        // æ°´å¹³æ–¹å‘ã¨å‚ç›´æ–¹å‘ã®ç§»å‹•é‡ã‚’åˆæˆ
         Vector3 moveDelta = (m_moveDirection * m_horizontalSpeed) + (Vector3.up * m_verticalVelocity);
 
         transform.position += moveDelta * Time.deltaTime;
 
-        // ƒ‰ƒ“ƒ_ƒ€‚É‰ñ“]‚³‚¹‚é
+        // ãƒ©ãƒ³ãƒ€ãƒ ã«å›è»¢ã•ã›ã‚‹
         transform.Rotate(m_randomRotationAxis, m_randomRotationSpeed * Time.deltaTime, Space.Self);
     }
 
@@ -97,7 +97,7 @@ public class MiniGhostEnemyBullet : MonoBehaviour
     {
         if (data.GetHitObject.CompareTag("Player")) 
         {
-            // PlayerController.Instance.TakeDamage();
+            PlayerController.Instance.TakeDamage(1);
 
             Destroy(gameObject);
 

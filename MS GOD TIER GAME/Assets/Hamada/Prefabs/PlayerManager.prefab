@@ -46,11 +46,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   m_bulletManager: {fileID: 0}
-  m_magicDatabase: {fileID: 11400000, guid: 79b1f032ed3a57542a6da4c73d1f4111, type: 2}
+  m_magicDatabase: {fileID: 11400000, guid: 8ab0e86e510f7be4ea46c0342f735645, type: 2}
   m_targetSelector: {fileID: 1715315696896216547}
-  m_bookNetworkServer: {fileID: 0}
-  m_lockOnUIManager: {fileID: 0}
-  magicData: {fileID: 11400000, guid: 1fc6fe6d07825934aa2aa07117f42783, type: 2}
+  m_screenEffectManager: {fileID: 0}
+  magicDataLeft: {fileID: 11400000, guid: 1fc6fe6d07825934aa2aa07117f42783, type: 2}
+  magicDataCenter: {fileID: 11400000, guid: fd84468c9ad10ad489611b6288bb8c24, type: 2}
+  magicDataRight: {fileID: 11400000, guid: 1fc6fe6d07825934aa2aa07117f42783, type: 2}
 --- !u!114 &1715315696896216547
 MonoBehaviour:
   m_ObjectHideFlags: 0
