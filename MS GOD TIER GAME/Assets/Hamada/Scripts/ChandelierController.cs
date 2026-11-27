@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ChandelierController : MonoBehaviour
 {
+    [SerializeField] MAGIC_TYPE m_effectiveMagicType;
     [SerializeField] TargetableObject m_targetable;
     [SerializeField] ChandelierImpactEffect m_effect;
     [SerializeField] ChandelierBreakable m_chandelierBreakable;
@@ -22,13 +23,11 @@ public class ChandelierController : MonoBehaviour
     {
         if (data.GetHitObject.CompareTag("MagicBullet")) 
         {
-            StartCoroutine(FallRoutine());
+            if (data.GetMagicData.MagicType == m_effectiveMagicType) 
+            {
+                StartCoroutine(FallRoutine());
+            }
         }
-
-        //if (data.GetHitObject.CompareTag("Floor")) 
-        //{
-        //    m_groupLeader.DeadAnimationAllOyoguSwarmGhosts();
-        //}
     }
 
     private IEnumerator FallRoutine() 
