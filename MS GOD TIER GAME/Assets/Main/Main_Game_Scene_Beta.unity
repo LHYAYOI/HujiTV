@@ -1427,6 +1427,10 @@ PrefabInstance:
       propertyPath: 'm_magicBulletPrefabList.Array.data[8]'
       value: 
       objectReference: {fileID: 7678089287139935553, guid: f4f64cbd514a1b348b20f9c5a60ca37c, type: 3}
+    - target: {fileID: 2723047527836766935, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
+      propertyPath: 'm_magicBulletPrefabList.Array.data[9]'
+      value: 
+      objectReference: {fileID: 7678089287139935553, guid: f4f64cbd514a1b348b20f9c5a60ca37c, type: 3}
     - target: {fileID: 7078241854969815186, guid: df565cc6cd2b9bd418c243d7e6109229, type: 3}
       propertyPath: m_Name
       value: MagicBulletManager
@@ -6983,7 +6987,7 @@ Transform:
   m_GameObject: {fileID: 634923755}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5368738, y: -0.033570845, z: 0.021386988, w: 0.842723}
-  m_LocalPosition: {x: -0.35, y: 0.5, z: 5}
+  m_LocalPosition: {x: -0.35, y: 0.35, z: 5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8366,10 +8370,10 @@ MonoBehaviour:
   m_cartTarget: {fileID: 557432889}
   m_routePage: {fileID: 634923756}
   m_routePageData: {fileID: 11400000, guid: 03ed73127d4e75940b17b1584cd3e987, type: 2}
-  m_pickupDistance: 4
+  m_pickupDistance: 5
   m_pageModel: {fileID: 919132149155446097, guid: 5a52bd766365cac44ae7169cbf8c0a34, type: 3}
   m_openClip: {fileID: 1827226128182048838, guid: 5013e449fb6d43b4cbb53447ff3d2ffe, type: 3}
-  m_pageMaterial: {fileID: 2100000, guid: 234c405e2dc540e4b6827bf9dcc5b2d0, type: 2}
+  m_pageMaterial: {fileID: 2100000, guid: 747b5799646c4a67ab333339d9559018, type: 2}
   m_pageScale: 0.27
   m_localPreviewOnly: 0
   m_faceCamera: 1
@@ -8378,9 +8382,14 @@ MonoBehaviour:
   m_openPlaybackSpeed: 0.6
   m_minimumFlightDuration: 3.2
   m_cameraArrivalDistance: 0.5
-  m_faceCameraAfterOpening: 1
-  m_waveHeight: 0.05
-  m_arrivalHoldDuration: 0.45
+  m_faceCameraAfterOpening: 0
+  m_waveHeight: 0.035
+  m_arrivalHoldDuration: 0
+  m_useHorizontalSuction: 1
+  m_pickupCamera: {fileID: 900200101}
+  m_suctionViewportHeight: 0.27
+  m_extraDropDistance: 0.12
+  m_minimumPaperViewportHeight: 0.22
 --- !u!1 &727763954 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6362957621724478253, guid: c3380b62e0d92924f8bbae1e4e95a7b9, type: 3}
@@ -8828,7 +8837,7 @@ MonoBehaviour:
   priority: 0
   blendDistance: 0
   weight: 1
-  sharedProfile: {fileID: 11400000, guid: f9b33f88ae00e10469c455276273a68a, type: 2}
+  sharedProfile: {fileID: 0}
 --- !u!114 &750375029 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 111196645449119932, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
@@ -11237,7 +11246,7 @@ PrefabInstance:
     - target: {fileID: 6811702407854686011, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_startSplineController
       value: 
-      objectReference: {fileID: 1183142328}
+      objectReference: {fileID: 1476320024}
     - target: {fileID: 8778732444337950149, guid: fdfe749ae12c3ed4cb701b22a4c19eda, type: 3}
       propertyPath: m_Name
       value: Sp_BedRoom
@@ -11604,6 +11613,11 @@ PrefabInstance:
       addedObject: {fileID: 302399040}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fd1be8b25ab300c44a4dff87535198d3, type: 3}
+--- !u!20 &900200101 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 8158479922000696081, guid: 4487dfc90121ce04c8da989321422093, type: 3}
+  m_PrefabInstance: {fileID: 1135780681}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &901104238 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: bc7dadc2848889442b5ddaec1d1d1bdd, type: 3}
@@ -15555,17 +15569,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7782454354869500046, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
   m_PrefabInstance: {fileID: 1476320023}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1183142328 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 111196645449119932, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
-  m_PrefabInstance: {fileID: 1476320023}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9cb05fac2f1bb648accdb5d6724626e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SplineController2
 --- !u!1 &1188522581
 GameObject:
   m_ObjectHideFlags: 0
@@ -21332,6 +21335,17 @@ PrefabInstance:
       addedObject: {fileID: 544550886}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+--- !u!114 &1476320024 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 111196645449119932, guid: f33bf5714bafef94db35e0963735bfab, type: 3}
+  m_PrefabInstance: {fileID: 1476320023}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9cb05fac2f1bb648accdb5d6724626e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SplineController2
 --- !u!4 &1480379743 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6676759671222037871, guid: 4b73c1c4c135a1e498b352eef83107de, type: 3}

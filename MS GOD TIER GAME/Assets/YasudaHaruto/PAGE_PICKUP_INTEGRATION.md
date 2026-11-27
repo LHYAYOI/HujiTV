@@ -8,6 +8,8 @@
 
 同じコンポーネントの **Open Playback Speed** はページを開く速さ（0.6倍）、**Minimum Flight Duration** は飛行時間の下限（3.2秒）、**Camera Arrival Distance** はカメラから到着点までの距離（0.5m）です。
 
+**Use Horizontal Suction** をオンにすると、着地後その場で開き、**Wave Height** の振幅で紙面がしなりながら接近します。最後は縮みながら画面下寄りへ吸い込まれて取得されます。
+
 `Scenes/PagePickupDemo.unity` は `Main_Game_Scene_Alpha_PageRewards` の複製です。Alphaの寝室と廊下、トロッコ、一人称カメラ、敵、魔法弾を使って、2種類のページ取得を1台のUnityエディターで確認できます。
 
 ## ノートPCで作業を再開する

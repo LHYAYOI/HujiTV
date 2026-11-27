@@ -177,7 +177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0ee4760f6524ac58ab01478f5044e74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BookServerGameFlow
-  m_gameScenePath: Assets/YasudaHaruto/Scenes/Yasuda_GameScene.unity
+  m_gameScenePath: Assets/Main/Main_Game_Scene_Beta.unity
 --- !u!1 &2000
 GameObject:
   m_ObjectHideFlags: 0

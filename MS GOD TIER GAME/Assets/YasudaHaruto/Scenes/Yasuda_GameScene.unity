@@ -8299,7 +8299,7 @@ MonoBehaviour:
   m_pickupDistance: 4
   m_pageModel: {fileID: 919132149155446097, guid: 5a52bd766365cac44ae7169cbf8c0a34, type: 3}
   m_openClip: {fileID: 1827226128182048838, guid: 5013e449fb6d43b4cbb53447ff3d2ffe, type: 3}
-  m_pageMaterial: {fileID: 2100000, guid: 234c405e2dc540e4b6827bf9dcc5b2d0, type: 2}
+  m_pageMaterial: {fileID: 2100000, guid: 747b5799646c4a67ab333339d9559018, type: 2}
   m_pageScale: 0.27
   m_localPreviewOnly: 0
   m_faceCamera: 1
@@ -8308,9 +8308,8 @@ MonoBehaviour:
   m_openPlaybackSpeed: 0.6
   m_minimumFlightDuration: 3.2
   m_cameraArrivalDistance: 0.5
-  m_faceCameraAfterOpening: 1
-  m_waveHeight: 0.05
-  m_arrivalHoldDuration: 0.45
+  m_waveHeight: 0.035
+  m_useHorizontalSuction: 1
 --- !u!1 &727763954 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6362957621724478253, guid: c3380b62e0d92924f8bbae1e4e95a7b9, type: 3}
