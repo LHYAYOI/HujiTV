@@ -209,8 +209,58 @@ namespace LightShaftLab.Editor
             EditorGUILayout.HelpBox("Spotの光柱は、初期セットアップ後にこのスクリプトを追加するだけで使えます。色・角度・照射距離はLight側で調整します。Point Lightは非対応です。", MessageType.Info);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_scattering"), new GUIContent("光柱の強さ"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_priority"), new GUIContent("表示の優先度", "1=通常。見せ場は3など。0はSpot候補から除外。"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_castShadowsFlag"), new GUIContent("影を光柱に反映", "Light本体のShadowsも有効にしてください。"));
+            bool directionalFlag = targets.Any(t => ((LightShaftEmitter)t).TryGetComponent<Light>(out var l) && l.type == LightType.Directional);
+            if (directionalFlag)
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_castShadowsFlag"), new GUIContent("影を光柱に反映（Directional）", "Light本体のShadowsも有効にしてください。"));
+            }
+            var block = serializedObject.FindProperty("m_blockByWallsFlag");
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(block, new GUIContent("壁で遮る", "オン：壁や物で光柱が遮られる（ライトの影を使うので重い）。オフ：光は壁を突き抜ける（軽い）。"));
+            bool turnedOnFlag = EditorGUI.EndChangeCheck() && block.boolValue;
             serializedObject.ApplyModifiedProperties();
+
+            // 遮るにはこのライトのシャドウマップが要る。オンにしたら Light の影も付ける
+            bool missingShadowFlag = false;
+            foreach (UnityEngine.Object item in targets)
+            {
+                var emitter = (LightShaftEmitter)item;
+                if (!emitter.m_blockByWallsFlag || !emitter.TryGetComponent<Light>(out var light) || light.type != LightType.Spot)
+                {
+                    continue;
+                }
+                if (light.shadows == LightShadows.None && turnedOnFlag)
+                {
+                    Undo.RecordObject(light, "壁で遮る：ライトの影をオン");
+                    light.shadows = LightShadows.Hard;
+                    EditorUtility.SetDirty(light);
+                }
+                missingShadowFlag |= light.shadows == LightShadows.None || light.shadowStrength <= 0;
+            }
+            if (block.boolValue || block.hasMultipleDifferentValues)
+            {
+                if (missingShadowFlag)
+                {
+                    EditorGUILayout.HelpBox("Light の Shadows が None（または強さ 0）なので遮れません。下のボタンか Light 側で影をオンにしてください（Play 中は自動で Hard になります）。", MessageType.Warning);
+                    if (GUILayout.Button("ライトの影をオンにする（Hard）"))
+                    {
+                        foreach (UnityEngine.Object item in targets)
+                        {
+                            if (((LightShaftEmitter)item).TryGetComponent<Light>(out var light) && light.shadows == LightShadows.None)
+                            {
+                                Undo.RecordObject(light, "ライトの影をオン");
+                                light.shadows = LightShadows.Hard;
+                                EditorUtility.SetDirty(light);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox("このライトの影を毎フレーム描くので、オンのライトが増えるほど重くなります。" +
+                        "URP の影の距離（PC_RPAsset の Max Distance）より遠い所では遮られません。影は床や壁にも落ちます。", MessageType.None);
+                }
+            }
         }
     }
 }
