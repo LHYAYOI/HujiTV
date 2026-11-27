@@ -10003,6 +10003,7 @@ MonoBehaviour:
   m_priority: 1
   m_scattering: 1
   m_castShadowsFlag: 1
+  m_blockByWallsFlag: 0
   m_beamSpread: 0
   m_edgeSoftness: 0
   m_streakVariation: 0
@@ -14828,10 +14829,6 @@ PrefabInstance:
     - target: {fileID: 2833334610759478036, guid: a63cac2fd8edca14d947b464a2abaaa6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8242140068870044940, guid: a63cac2fd8edca14d947b464a2abaaa6, type: 3}
-      propertyPath: m_Interpolate
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
