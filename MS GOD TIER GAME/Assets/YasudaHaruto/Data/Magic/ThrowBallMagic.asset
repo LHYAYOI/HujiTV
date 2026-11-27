@@ -14,8 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MagicData
   m_magicId: 6
   m_displayName: ThrowBall
-  m_magicType: 0
-  m_eventMagicType: 0
+  m_magicType: 8
   m_aimType: 0
   m_castType: 0
   m_instantMagicPrefab: {fileID: 0}

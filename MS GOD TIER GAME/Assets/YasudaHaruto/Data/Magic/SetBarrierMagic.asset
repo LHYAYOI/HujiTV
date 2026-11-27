@@ -14,8 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MagicData
   m_magicId: 5
   m_displayName: SetBarrier
-  m_magicType: 1
-  m_eventMagicType: 3
+  m_magicType: 6
   m_aimType: 1
   m_castType: 1
   m_instantMagicPrefab: {fileID: 0}

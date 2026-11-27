@@ -39,6 +39,9 @@ public class MiniGhostEnemy : SplineMoveEnemy
     [Header("ミニお化けのTargetable")]
     [SerializeField] private TargetableObject m_targetableObject;
 
+    [Header("効く魔法の種類")]
+    [SerializeField] private MAGIC_TYPE m_effectiveMagicType = MAGIC_TYPE.NONE;
+
     private MiniGhostIdleState m_idleState;     // 待機ステート
     private MiniGhostSpawnState m_spawnState;   // 出現ステート
     private MiniGhostMoveState m_moveState;     // 移動ステート
@@ -374,7 +377,7 @@ public class MiniGhostEnemy : SplineMoveEnemy
             MagicData magicData = hitData.GetMagicData;
             if (magicData != null)
             {
-                if (magicData.MagicType == MAGIC_TYPE.ATTACK)
+                if (magicData.MagicType == m_effectiveMagicType)
                 {
                     BeginDying();
                 }

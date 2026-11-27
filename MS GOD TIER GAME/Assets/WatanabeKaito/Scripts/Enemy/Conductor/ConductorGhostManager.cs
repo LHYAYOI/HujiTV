@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
+public class ConductorGhostManager : EnemyBase, IMagicReceiver
 {
     [Header("è„ÇÃà¯Ç´èoÇµÇÃTargetable")]
     [SerializeField] private TargetableObject m_upperDrawerTargetable;
@@ -101,16 +101,16 @@ public class ConductorGhostManager : EnemyBase, IEventMagicReceiver
 
             if (magicData != null)
             {
-                TryReceiveEventMagic(magicData.EventMagicType);
+                TryReceiveEventMagic(magicData.MagicType);
             }
         }
 
         
     }
 
-    public bool TryReceiveEventMagic(EVENT_MAGIC_TYPE eventMagicType)
+    public bool TryReceiveEventMagic(MAGIC_TYPE eventMagicType)
     {
-        if (eventMagicType == EVENT_MAGIC_TYPE.CLOSE)
+        if (eventMagicType == MAGIC_TYPE.CLOSE)
         {
             if (m_isUpperFlag)
             {

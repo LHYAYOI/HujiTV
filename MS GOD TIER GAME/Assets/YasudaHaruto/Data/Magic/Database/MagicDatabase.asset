@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46b2f5749e5e5234a91d2153994d8843, type: 3}
+  m_Name: MagicDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::MagicDatabase
+  m_magicList:
+  - {fileID: 11400000, guid: 1fc6fe6d07825934aa2aa07117f42783, type: 2}
+  - {fileID: 11400000, guid: 6f8586ad32cdde2488f626aed063f6c3, type: 2}
+  - {fileID: 11400000, guid: fd84468c9ad10ad489611b6288bb8c24, type: 2}
+  - {fileID: 11400000, guid: 38cb0a8d56613874a99e28dc7e7bb5e4, type: 2}
+  - {fileID: 11400000, guid: 001ec494179ea8d4ebe80c10d1463ca9, type: 2}
+  - {fileID: 11400000, guid: 95a763a256907964f976644bb8ef7618, type: 2}
+  - {fileID: 11400000, guid: aaedada4a2713374eb8206497a01423b, type: 2}
+  - {fileID: 11400000, guid: e9f947540bce86a42a60a945b73f798a, type: 2}
+  - {fileID: 11400000, guid: b1c769eebb8d66841a9d32836c557d74, type: 2}
+  - {fileID: 11400000, guid: 5ff605f81a8f6af449fc06d505dc1d87, type: 2}

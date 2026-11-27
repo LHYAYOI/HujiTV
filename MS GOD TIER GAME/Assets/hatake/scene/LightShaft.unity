@@ -155,6 +155,17 @@ MonoBehaviour:
   m_tint: {r: 1, g: 0.6509804, b: 0.29803923, a: 1}
   m_edgeFade: 0.3
   m_subtractFlag: 0
+  m_groundFill: 0.45
+  m_groundSoftness: 0.25
+  m_groundNoiseScale: 1.4
+  m_groundNoiseAmount: 0.75
+  m_groundFlow: {x: 0, y: 0, z: 0.25}
+  m_spreadOrigin: {fileID: 0}
+  m_spreadRadius: 100
+  m_spreadEdge: 1.2
+  m_reactiveFlag: 0
+  m_motionDomain: {fileID: 0}
+  m_motionStrength: 1
 --- !u!4 &28350143
 Transform:
   m_ObjectHideFlags: 0
@@ -258,6 +269,13 @@ MonoBehaviour:
   m_priority: 1
   m_scattering: 3
   m_castShadowsFlag: 1
+  m_blockByWallsFlag: 0
+  m_beamSpread: 0
+  m_edgeSoftness: 0
+  m_streakVariation: 0
+  m_streakFrequency: 2
+  m_streakSeed: 0
+  m_streakFlow: 0
 --- !u!114 &392352497
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -530,6 +548,17 @@ MonoBehaviour:
   m_tint: {r: 0.7, g: 0.85, b: 1, a: 1}
   m_edgeFade: 0.3
   m_subtractFlag: 0
+  m_groundFill: 0.45
+  m_groundSoftness: 0.25
+  m_groundNoiseScale: 1.4
+  m_groundNoiseAmount: 0.75
+  m_groundFlow: {x: 0, y: 0, z: 0.25}
+  m_spreadOrigin: {fileID: 0}
+  m_spreadRadius: 100
+  m_spreadEdge: 1.2
+  m_reactiveFlag: 0
+  m_motionDomain: {fileID: 0}
+  m_motionStrength: 1
 --- !u!4 &885344831
 Transform:
   m_ObjectHideFlags: 0
@@ -886,6 +915,13 @@ MonoBehaviour:
   m_priority: 1
   m_scattering: 10
   m_castShadowsFlag: 1
+  m_blockByWallsFlag: 1
+  m_beamSpread: 0
+  m_edgeSoftness: 0
+  m_streakVariation: 0
+  m_streakFrequency: 2
+  m_streakSeed: 0
+  m_streakFlow: 0
 --- !u!114 &2030389133
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -932,7 +968,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 0.5, y: 0.5}
   m_Shadows:
-    m_Type: 0
+    m_Type: 1
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -988,13 +1024,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2030389131}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.42453408, y: 0.13442498, z: -0.040796313, w: 0.8944475}
-  m_LocalPosition: {x: -4, y: 5, z: 0}
+  m_LocalRotation: {x: -0.0039260015, y: 0.98085254, z: -0.15960231, w: -0.11153497}
+  m_LocalPosition: {x: 3.08, y: 1.74, z: 10.63}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 50.391, y: 18.836, z: 3.701}
+  m_LocalEulerAnglesHint: {x: 18.299, y: 193.246, z: 1.684}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

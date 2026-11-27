@@ -21,6 +21,10 @@ namespace LightShaftLab.Editor
                 bool useTextureFlag = shape.hasMultipleDifferentValues || shape.enumValueIndex == (int)FluorescentDecal.SHAPE.TEXTURE;
                 if (!useTextureFlag && (iterator.name == "m_mask" || iterator.name == "m_maskChannel" || iterator.name == "m_tiling" || iterator.name == "m_offset")) continue;
                 if (useTextureFlag && iterator.name == "m_edgeSoftness") continue;
+                // くりぬきでは、蛍光の設定と「見える量」は使わないので隠す。
+                var cutout = serializedObject.FindProperty("m_cutout");
+                bool cutoutFlag = !cutout.hasMultipleDifferentValues && cutout.boolValue;
+                if (cutoutFlag && (iterator.name == "m_fluorescentColor" || iterator.name == "m_efficiency" || iterator.name == "m_maxLuminance" || iterator.name == "m_wrap" || iterator.name == "m_daylightOpacity")) continue;
                 EditorGUILayout.PropertyField(iterator, true);
             }
             serializedObject.ApplyModifiedProperties();
@@ -28,6 +32,30 @@ namespace LightShaftLab.Editor
             var decal = (FluorescentDecal)target;
             if (decal.m_shape == FluorescentDecal.SHAPE.TEXTURE && !decal.m_mask)
                 EditorGUILayout.HelpBox("テクスチャが未設定のため、箱全体（長方形）に付きます。", MessageType.Info);
+            if (decal.m_cutout)
+            {
+                EditorGUILayout.HelpBox("くりぬき: 蛍光をすべて描いたあとに、模様の色を画面に乗算します。黒（0,0,0）の所は蛍光の光も下地も真っ黒、白の所は変わりません。色は「塗料そのものの色」×テクスチャの色（RGB / A チャンネル）です。楕円・長方形なら「塗料そのものの色」を黒にすると、その形に真っ黒の穴があきます。", MessageType.Info);
+            }
+            else if (GUILayout.Button("くりぬきデカールにする（黒で光ごと消す）"))
+            {
+                Undo.RecordObjects(targets, "くりぬきデカールにする");
+                foreach (var each in targets)
+                {
+                    var cutoutDecal = (FluorescentDecal)each;
+                    cutoutDecal.m_cutout = true;
+                    // テクスチャがあればその色をそのまま、無ければ真っ黒で乗算する。
+                    if (cutoutDecal.m_shape == FluorescentDecal.SHAPE.TEXTURE && cutoutDecal.m_mask)
+                    {
+                        if (cutoutDecal.m_maskChannel != FluorescentDecal.MASK_CHANNEL.ALPHA) cutoutDecal.m_maskChannel = FluorescentDecal.MASK_CHANNEL.RGB;
+                        cutoutDecal.m_daylightTint = Color.white;
+                    }
+                    else
+                    {
+                        cutoutDecal.m_daylightTint = Color.black;
+                    }
+                    EditorUtility.SetDirty(cutoutDecal);
+                }
+            }
             EditorGUILayout.HelpBox("不透明な面（深度に書き込む面）にだけ付きます。ブラックライト（BlackLightEmitter）の紫外線を受けたときに光り、通常の光では「通常光での見た目」だけが見えます。", MessageType.None);
         }
 

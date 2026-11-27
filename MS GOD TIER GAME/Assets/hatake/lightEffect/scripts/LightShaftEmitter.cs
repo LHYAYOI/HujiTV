@@ -12,9 +12,29 @@ namespace LightShaftLab
         [Min(0)]
         [UnityEngine.Serialization.FormerlySerializedAs("scattering")]
         public float m_scattering = 1;
-        [Tooltip("URPの影を霧の散乱に反映する。")]
+        [Tooltip("Directional 用：URPの影を霧の散乱に反映する。Spot は「壁で遮る」で切り替える。")]
         [UnityEngine.Serialization.FormerlySerializedAs("shadows")]
         public bool m_castShadowsFlag = true;
+        [Tooltip("Spot：壁や物で光柱を遮る（光が壁を突き抜けない）。オンにするとこのライトの影（シャドウマップ）を毎フレーム描き、" +
+            "光柱の各サンプルで影を引くので重くなる。必要なライトだけオンにする。")]
+        public bool m_blockByWallsFlag;
+
+        /// <summary>壁で遮るとき、Light の影が切れていれば Hard の影を付ける（シャドウマップが無いと遮れないため）。</summary>
+        public void EnsureWallShadow(Light light)
+        {
+            if (m_blockByWallsFlag && light && light.type == LightType.Spot && light.shadows == LightShadows.None)
+            {
+                light.shadows = LightShadows.Hard;
+            }
+        }
+
+        void OnEnable()
+        {
+            if (Application.isPlaying)
+            {
+                EnsureWallShadow(GetComponent<Light>());
+            }
+        }
 
         [Range(0, 1), Tooltip("Lightの円錐内で光を外側へ分布。照射角自体はLightのSpot Angleで調整します。")]
         public float m_beamSpread;

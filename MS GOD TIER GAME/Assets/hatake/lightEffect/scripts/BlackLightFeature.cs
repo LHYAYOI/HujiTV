@@ -165,7 +165,7 @@ namespace LightShaftLab
                 public Texture m_texture;
                 public Vector4 m_maskScale, m_shape, m_color, m_lighting, m_tint;
                 public float m_maxLuminance;
-                public bool m_tintFlag, m_emissionFlag;
+                public bool m_tintFlag, m_emissionFlag, m_cutoutFlag;
             }
 
             sealed class PassData
@@ -218,9 +218,10 @@ namespace LightShaftLab
                         m_shape = new Vector4((int)decal.m_shape, (int)decal.m_maskChannel, decal.m_edgeSoftness, decal.m_opacity),
                         m_color = new Vector4(fluorescent.r, fluorescent.g, fluorescent.b, decal.m_efficiency),
                         m_lighting = new Vector4(decal.m_wrap, Mathf.Cos(decal.m_angleFadeStart * Mathf.Deg2Rad), Mathf.Cos(decal.m_angleFadeEnd * Mathf.Deg2Rad), decal.m_depthFade),
-                        m_tint = new Vector4(daylight.r, daylight.g, daylight.b, decal.m_daylightOpacity),
+                        // くりぬきは「見える量」を使わず、いつも全部の強さで乗算する。
+                        m_tint = new Vector4(daylight.r, daylight.g, daylight.b, decal.m_cutout ? 1 : decal.m_daylightOpacity),
                         m_maxLuminance = decal.m_maxLuminance,
-                        m_tintFlag = tintFlag, m_emissionFlag = emissionFlag,
+                        m_tintFlag = tintFlag, m_emissionFlag = emissionFlag, m_cutoutFlag = decal.m_cutout,
                     });
                 }
                 return m_draws.Count > 0;
@@ -262,12 +263,14 @@ namespace LightShaftLab
                     builder.AllowPassCulling(false);
                     builder.SetRenderFunc(static (PassData passData, RasterGraphContext context) =>
                     {
-                        // 乗算（塗料の色）を先に、加算（蛍光）を後に描く。
-                        for (int pass = 0; pass < 2; pass++)
+                        // 乗算（塗料の色）→ 加算（蛍光）→ くりぬきの乗算 の順に描く。くりぬきは蛍光の光ごと黒くするため最後。
+                        for (int step = 0; step < 3; step++)
                         {
+                            int pass = step == 1 ? 1 : 0;
                             foreach (var draw in passData.m_draws)
                             {
-                                if (pass == 0 ? !draw.m_tintFlag : !draw.m_emissionFlag) continue;
+                                bool drawFlag = step == 0 ? draw.m_tintFlag && !draw.m_cutoutFlag : step == 1 ? draw.m_emissionFlag : draw.m_tintFlag && draw.m_cutoutFlag;
+                                if (!drawFlag) continue;
                                 var properties = passData.m_properties;
                                 properties.Clear();
                                 properties.SetTexture(g_maskId, draw.m_texture);
