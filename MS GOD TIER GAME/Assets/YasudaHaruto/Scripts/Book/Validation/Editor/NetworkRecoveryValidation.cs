@@ -266,20 +266,12 @@ namespace YasudaHaruto.BookValidation.Editor
             s_rune.BeginStroke(new Vector2(0.1f, 0.5f));
             Require(s_rune.State == RUNE_TRACE_STATE.WAITING_STROKE, "Turning to another page cannot re-enable offline drawing");
             s_input.SetRuneInputAvailable(true);
-            s_rune.ResumeCooldown(0.8f);
-            s_input.SetRuneInputAvailable(false);
-            s_rune.Tick(0.2f);
-            Require(Mathf.Abs(s_rune.CooldownRemaining - 0.6f) < 0.001f, "Disconnect retains and advances an already started cooldown");
-            s_rune.Tick(1f);
-            Require(!s_rune.CanBeginStroke && !s_rune.TryBeginCast(), "Cooldown expiry cannot unlock offline casting");
-            s_input.SetRuneInputAvailable(true);
+            Require(s_rune.CanBeginStroke, "Reconnect immediately allows a new trace");
             var interaction = new RuneTraceInteraction(s_data, s_rune, input, null, MAGIC_AIM_TYPE.THREE_DIRECTIONS);
             interaction.Begin();
-            s_rune.ResumeCooldown(0.7f);
             interaction.End();
             interaction.Begin();
-            Require(s_rune.State == RUNE_TRACE_STATE.COOLDOWN && s_rune.CooldownRemaining > 0.6f,
-                "Page interaction retains cooldown across leaving and returning");
+            Require(s_rune.CanBeginStroke, "Returning to a rune page allows a fresh trace");
             interaction.End();
             s_rune.BeginTrace(s_data);
         }

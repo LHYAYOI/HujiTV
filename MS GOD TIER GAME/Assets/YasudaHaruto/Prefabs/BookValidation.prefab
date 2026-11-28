@@ -2589,7 +2589,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::YasudaHaruto.BookValidation.BookGameBootstrap
   m_gameController: {fileID: 4064040582968914142}
   m_runeTraceView: {fileID: 4288898712623733700}
-  m_runeCooldownSeconds: 1
   m_gameDragInput: {fileID: 7365979044767123694}
   m_pageDatabase: {fileID: 11400000, guid: 262c5c96532bc7b4aaf8fbc2bbe1eda6, type: 2}
 --- !u!1 &5381132005429065483

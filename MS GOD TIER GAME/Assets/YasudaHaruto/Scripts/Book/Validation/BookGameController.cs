@@ -6,6 +6,7 @@
 //-----------------------------------------------
 using UnityEngine;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace YasudaHaruto.BookValidation
@@ -36,6 +37,8 @@ namespace YasudaHaruto.BookValidation
             return pages != null && spread > 0 && spread <= pages.Count ? pages[spread - 1] : null;
         }
         private bool m_editing;
+        private Coroutine m_tabNavigation;
+        private bool m_turningToTab;
         private Func<bool> m_canEdit;
         private int m_maxPageCount;
 
@@ -45,11 +48,49 @@ namespace YasudaHaruto.BookValidation
 
         public bool IsInitialized => m_initialized;
 
-        public bool CanRemoveObstacles => m_initialized && isActiveAndEnabled && !IsInputBlocked &&
+        public bool CanRemoveObstacles => m_initialized && isActiveAndEnabled && !IsInputBlocked && !m_turningToTab &&
             m_bookController != null && m_bookController.IsReady && !m_bookController.IsClosed;
 
-        public bool CanNavigate => m_initialized && isActiveAndEnabled && !IsInputBlocked &&
+        public bool CanNavigate => CanContinueTabNavigation && !m_turningToTab;
+
+        private bool CanContinueTabNavigation => m_initialized && isActiveAndEnabled && !IsInputBlocked &&
             m_bookController != null && m_bookController.IsReady && !(m_currentPage?.Obstacles.BlocksActions ?? false);
+
+        internal bool CanSelectTab => CanNavigate && !m_bookController.FlipView.TurnLocked &&
+            (m_canEdit == null || m_canEdit());
+
+        internal void NavigateToTab(int targetSpread)
+        {
+            if (!CanSelectTab || targetSpread < 1 || targetSpread > Pages.Count ||
+                (!m_bookController.IsClosed && targetSpread == m_bookController.CurrentSpread))
+                return;
+
+            m_turningToTab = true;
+            m_tabNavigation = StartCoroutine(TurnToTab(targetSpread));
+        }
+
+        private IEnumerator TurnToTab(int targetSpread)
+        {
+            // Start on the next frame so the initiating pointer release can finish.
+            yield return null;
+            if (CanContinueTabNavigation && !m_bookController.FlipView.TurnLocked &&
+                m_bookController.IsClosed && m_bookController.OpenBook())
+                while (m_bookController.IsBusy)
+                    yield return null;
+
+            while (CanContinueTabNavigation && !m_bookController.FlipView.TurnLocked && !m_bookController.IsClosed &&
+                m_bookController.CurrentSpread != targetSpread)
+            {
+                int next = m_bookController.CurrentSpread + (targetSpread > m_bookController.CurrentSpread ? 1 : -1);
+                m_bookController.ShowTabStep(next);
+                while (m_bookController.IsBusy)
+                    yield return null;
+                if (m_bookController.CurrentSpread != next)
+                    break;
+            }
+            m_turningToTab = false;
+            m_tabNavigation = null;
+        }
 
         public bool IsEditing => m_editing;
 
@@ -190,7 +231,7 @@ namespace YasudaHaruto.BookValidation
                 return PAGE_ADD_RESULT.BUSY;
             if (m_inventory.Contains(data.PageId))
                 return PAGE_ADD_RESULT.INVALID;
-            if (m_editing || !m_bookController.IsReady || (m_canEdit != null && !m_canEdit()))
+            if (m_editing || m_turningToTab || !m_bookController.IsReady || (m_canEdit != null && !m_canEdit()))
                 return PAGE_ADD_RESULT.BUSY;
             if (present && m_bookController.IsClosed)
             {
@@ -242,7 +283,14 @@ namespace YasudaHaruto.BookValidation
         }
 
 
-        private void OnDisable() => EndCurrentInteraction();
+        private void OnDisable()
+        {
+            if (m_tabNavigation != null)
+                StopCoroutine(m_tabNavigation);
+            m_tabNavigation = null;
+            m_turningToTab = false;
+            EndCurrentInteraction();
+        }
 
         private void OnEnable()
         {

@@ -21,6 +21,8 @@ public class BookNetworkServer : MonoBehaviour
     private BookNetworkServer Owner => s_instance != null ? s_instance : this;
     private bool m_isListening;
     private bool m_isGameStarted;
+    private bool m_isRestartingGame;
+    private ulong m_gameSessionId;
 
     public bool IsListening => Owner.m_isListening;
 
@@ -116,10 +118,61 @@ public class BookNetworkServer : MonoBehaviour
             Owner.BeginGame();
             return;
         }
-        if (!m_isListening || m_isGameStarted)
+        if (!m_isListening || m_isGameStarted || m_isRestartingGame)
             return;
+        m_gameSessionId = System.BitConverter.ToUInt64(System.Guid.NewGuid().ToByteArray(), 0);
         m_isGameStarted = true;
     }
+
+#if UNITY_EDITOR
+    public bool CanRestartActiveGameScene => Owner == this && m_isListening && !m_isRestartingGame &&
+        (m_isGameStarted || GetComponent<BookServerGameFlow>() == null);
+
+
+    public bool RestartActiveGameScene()
+    {
+        if (!CanRestartActiveGameScene)
+            return false;
+
+        var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        if (!scene.isLoaded || string.IsNullOrEmpty(scene.path))
+            return false;
+
+        AsyncOperation operation;
+        try
+        {
+            operation = UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(scene.path,
+                new UnityEngine.SceneManagement.LoadSceneParameters(UnityEngine.SceneManagement.LoadSceneMode.Single));
+        }
+        catch (System.Exception exception)
+        {
+            Debug.LogException(exception, this);
+            return false;
+        }
+        if (operation == null)
+            return false;
+
+        m_isRestartingGame = true;
+        m_isGameStarted = false;
+        m_startNotified.Clear();
+        m_acquiredPages.Clear();
+        m_pageDelivery.Clear();
+        m_cursorPosition = Vector2.zero;
+        SetCastSelection(PLAYER_SLOT.PLAYER1, false);
+        SetCastSelection(PLAYER_SLOT.PLAYER2, false);
+        StartCoroutine(FinishGameRestart(operation));
+        return true;
+    }
+
+
+    private System.Collections.IEnumerator FinishGameRestart(AsyncOperation operation)
+    {
+        yield return operation;
+        yield return null;
+        m_isRestartingGame = false;
+        BeginGame();
+    }
+#endif
 
     private const ushort Port = ServerDiscoveryProtocol.GamePort;
     private ServerDiscoveryResponder m_discovery;
@@ -283,7 +336,7 @@ public class BookNetworkServer : MonoBehaviour
     {
         if (Owner != this)
             return Owner.SendDirt(playerSlot, slotCount);
-        if (slotCount < 1 || slotCount > 4 || !m_driver.IsCreated)
+        if (m_isRestartingGame || slotCount < 1 || slotCount > 4 || !m_driver.IsCreated)
             return false;
         foreach (var pair in m_playerSlots)
         {
@@ -563,6 +616,8 @@ public class BookNetworkServer : MonoBehaviour
             m_driver.BeginSend(m_reliablePipeline, connection, out DataStreamWriter writer) != 0)
             return false;
         writer.WriteByte((byte)type);
+        if (type == BOOK_MESSAGE_TYPE.GAME_SESSION)
+            writer.WriteULong(m_gameSessionId);
         return m_driver.EndSend(writer) >= 0;
     }
 
@@ -582,7 +637,8 @@ public class BookNetworkServer : MonoBehaviour
         {
             if (m_registrationReplies.ContainsKey(pair.Key) || m_startNotified.Contains(pair.Key))
                 continue;
-            if (SendSessionMessage(pair.Key, BOOK_MESSAGE_TYPE.GAME_STARTED))
+            if (SendSessionMessage(pair.Key, BOOK_MESSAGE_TYPE.GAME_SESSION) &&
+                SendSessionMessage(pair.Key, BOOK_MESSAGE_TYPE.GAME_STARTED))
             {
                 m_startNotified.Add(pair.Key);
                 m_pageDelivery[pair.Key] = (0, m_acquiredPages.Count);
@@ -625,6 +681,11 @@ public class BookNetworkServer : MonoBehaviour
             m_discovery.StopResponding();
         if (m_driver.IsCreated)
         {
+            // Let tablets reconnect immediately when Play Mode is stopped cleanly.
+            foreach (var connection in m_playerSlots.Keys)
+                if (IsConnectionAlive(connection))
+                    m_driver.Disconnect(connection);
+            m_driver.ScheduleUpdate().Complete();
             m_driver.Dispose();
         }
 

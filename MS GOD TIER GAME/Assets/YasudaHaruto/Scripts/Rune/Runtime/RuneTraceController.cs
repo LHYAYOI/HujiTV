@@ -18,8 +18,6 @@ public enum RUNE_TRACE_STATE
     WAITING_RELEASE,
     FAILED_WAITING_RELEASE,
     CHARGING,
-    WAITING_RELEASE_AFTER_CAST,
-    COOLDOWN,
     WAITING_CAST_RELEASE,
     WAITING_CAST_START
 }
@@ -36,9 +34,6 @@ public class RuneTraceController
     private RUNE_TRACE_STATE m_state = RUNE_TRACE_STATE.INACTIVE;
     private int m_strokeIndex;
     private MAGIC_AIM_TYPE m_aimType = MAGIC_AIM_TYPE.THREE_DIRECTIONS;
-    private float m_cooldownSeconds = 1.0f;
-    private float m_cooldownRemaining;
-    private bool m_pointerReleased;
     private bool m_failureNotified;
     private bool m_inputAvailable = true;
 
@@ -68,11 +63,6 @@ public class RuneTraceController
 
     public bool CanBeginStroke => m_inputAvailable && m_state == RUNE_TRACE_STATE.WAITING_STROKE;
 
-    public float CooldownRemaining => m_cooldownRemaining;
-
-    public float CooldownProgress => m_cooldownSeconds > 0f
-        ? 1f - Mathf.Clamp01(m_cooldownRemaining / m_cooldownSeconds) : 1f;
-
     private bool m_castSelectionActive;
     public event Action<bool> CastSelectionChanged;
 
@@ -88,31 +78,7 @@ public class RuneTraceController
         m_inputAvailable = available;
         if (available || m_state == RUNE_TRACE_STATE.INACTIVE)
             return;
-        if (m_state == RUNE_TRACE_STATE.COOLDOWN)
-        {
-            // A lost pointer must not freeze an already started cooldown.
-            m_pointerReleased = true;
-            return;
-        }
         ResetAttempt();
-    }
-
-
-    public void ResumeCooldown(float remaining)
-    {
-        if (remaining <= 0f || m_runeData == null)
-            return;
-        m_state = RUNE_TRACE_STATE.COOLDOWN;
-        m_cooldownRemaining = remaining;
-        m_pointerReleased = true;
-        if (m_view is IRuneCooldownView cooldown)
-            cooldown.ShowCooldown(1f - CooldownProgress);
-    }
-
-
-    public void SetCooldown(float seconds)
-    {
-        m_cooldownSeconds = Mathf.Max(0f, seconds);
     }
 
 
@@ -220,13 +186,6 @@ public class RuneTraceController
                 ResetAttempt();
                 break;
 
-            case RUNE_TRACE_STATE.WAITING_RELEASE_AFTER_CAST:
-                ResetAttempt();
-                break;
-
-            case RUNE_TRACE_STATE.COOLDOWN:
-                m_pointerReleased = true;
-                break;
         }
     }
 
@@ -288,45 +247,8 @@ public class RuneTraceController
         if (m_view is IRuneCastPresentation presentation)
             presentation.LaunchCast(direction);
         m_castSelectionActive = false; // CAST_MAGIC closes the selection on the PC.
-        StartCooldown(true);
-        CastConfirmed?.Invoke(UsesThreeDirections ? direction : MAGIC_CAST_DIRECTION.NONE);
-    }
-
-
-
-    private void StartCooldown(bool pointerReleased)
-    {
-        m_state = RUNE_TRACE_STATE.COOLDOWN;
-        m_cooldownRemaining = m_cooldownSeconds;
-        m_pointerReleased = pointerReleased;
-        if (m_view is IRuneCooldownReleaseView release)
-            release.PlayCooldownRelease(m_cooldownSeconds);
-        if (m_view is IRuneCooldownView cooldown)
-            cooldown.ShowCooldown(1f);
-        Debug.Log($"Rune : Cooldown Started / {m_cooldownSeconds:F1}s");
-    }
-
-
-    public void Tick(float deltaTime)
-    {
-        if (m_state != RUNE_TRACE_STATE.COOLDOWN || !m_pointerReleased)
-        {// ポインタが離されていない場合はクールダウンを進めない
-            return;
-        }
-
-        // クールダウンを進める
-        m_cooldownRemaining = Mathf.Max(0f, m_cooldownRemaining - deltaTime);
-        if (m_view is IRuneCooldownView cooldown)
-            cooldown.ShowCooldown(1f - CooldownProgress);
-
-        if (m_cooldownRemaining > 0f)
-        {// クールダウン中
-            return;
-        }
-
-        // クールダウンが終了した場合、ルーンのなぞりをリセットする
-        Debug.Log("Rune : Cooldown Finished");
         ResetAttempt();
+        CastConfirmed?.Invoke(UsesThreeDirections ? direction : MAGIC_CAST_DIRECTION.NONE);
     }
 
 
@@ -341,8 +263,6 @@ public class RuneTraceController
         m_session?.Clear();
         m_session = null;
         m_view.Clear();
-        m_cooldownRemaining = 0f;
-        m_pointerReleased = true;
     }
 
 
@@ -384,7 +304,5 @@ public class RuneTraceController
         m_evaluator = null;
         m_state = RUNE_TRACE_STATE.WAITING_STROKE;
         m_view.BeginTrace(m_runeData);
-        m_cooldownRemaining = 0f;
-        m_pointerReleased = true;
     }
 }

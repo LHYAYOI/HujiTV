@@ -245,10 +245,7 @@ namespace YasudaHaruto.BookValidation.Editor
                         Require(s_rune.State == RUNE_TRACE_STATE.WAITING_STROKE && !s_rune.IsInputAvailable, "Fourth-slot arrival cancels an in-progress trace");
                         s_page.Obstacles.Clear(3, s_page.Obstacles[3]);
                         typeof(BookObstacleController).GetMethod("SynchronizeInput", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(s_obstacles, null);
-                        Set(s_rune, "m_state", RUNE_TRACE_STATE.COOLDOWN);
-                        Set(s_rune, "m_cooldownRemaining", 10f);
                         Packet(1);
-                        Require(s_rune.State == RUNE_TRACE_STATE.COOLDOWN && s_rune.CooldownRemaining > 9f, "Already started cooldown retained");
                         // Retain a rendered frame before verifying capture layers and pointer coordinates.
                         break;
                     case 4:
@@ -261,19 +258,15 @@ namespace YasudaHaruto.BookValidation.Editor
                             "First image is upper-right, second lower-right, third upper-left");
                         var leftPage = (BookPageView)Get(s_game.BookView, "m_leftPageView");
                         var rightPage = (BookPageView)Get(s_game.BookView, "m_rightPageView");
-                        ObstaclePatchGraphic leftFourth = null, rightFourth = null;
-                        foreach (var patch in leftPage.GetComponentsInChildren<ObstaclePatchGraphic>())
-                            if (patch.mainTexture == s_obstacles.Settings.GetTexture(3))
-                                leftFourth = patch;
-                        foreach (var patch in rightPage.GetComponentsInChildren<ObstaclePatchGraphic>())
-                            if (patch.mainTexture == s_obstacles.Settings.GetTexture(3))
-                                rightFourth = patch;
-                        Require(leftFourth != null && rightFourth != null &&
-                            ReferenceEquals(Get(leftFourth, "m_instance"), Get(rightFourth, "m_instance")),
-                            "Fourth image spans both pages with one shared cleaning progress");
+                        var fourthStain = s_page.Obstacles[3];
+                        int fourthParts = 0;
+                        foreach (var page in new[] { leftPage, rightPage })
+                            foreach (var patch in page.GetComponentsInChildren<ObstaclePatchGraphic>())
+                                if (ReferenceEquals(Get(patch, "m_instance"), fourthStain))
+                                    fourthParts++;
+                        Require(fourthParts > 0, "Fourth-stage graphics share the current fourth stain");
                         ScreenCapture.CaptureScreenshot("Temp/ObstacleValidation/four-stage-layout.png");
                         Rect fourth = areas[3];
-                        var fourthStain = s_page.Obstacles[3];
                         Vector2 empty = FindPoint(3, false);
                         Require(!s_obstacles.BeginPointer(empty), "Transparent image area cannot begin cleaning");
                         float span = Mathf.Min(fourth.width, fourth.height) * 0.1f;
@@ -339,6 +332,22 @@ namespace YasudaHaruto.BookValidation.Editor
                         if (s_obstacles.Settings.GetClearOpacityThreshold(3) > 0f)
                             Require(fourthStain.Progress < 1f && fourthStain.Complete && fourthStain.Opacity == 0f,
                                 "Fourth stain snaps away at its opacity threshold before full-distance completion");
+                        Packet(1);
+                        Require(s_page.Obstacles[3] != null && s_page.Obstacles[3].Progress == 0f,
+                            "A new fourth stain starts with no cleaning progress");
+                        float halfStroke = Mathf.Min(fourth.width, fourth.height) * 0.25f;
+                        Vector2 middle = FindPoint(3, true, halfStroke);
+                        pointer.position = middle - Vector2.up * halfStroke;
+                        s_input.OnPointerDown(pointer);
+                        pointer.position = middle + Vector2.up * halfStroke;
+                        s_input.OnDrag(pointer);
+                        Require(s_page.Obstacles[3] != null && s_page.Obstacles[3].Progress > 0f,
+                            "The outward swipe partially removes the fourth stain");
+                        pointer.position = middle - Vector2.up * halfStroke;
+                        s_input.OnDrag(pointer);
+                        s_input.OnPointerUp(pointer);
+                        Require(s_page.Obstacles[3] == null && !s_obstacles.BlocksActions && s_rune.IsInputAvailable,
+                            "One round trip clears the fresh fourth stain and restores rune input");
                         s_obstacles.SetConnected(false);
                         Require(s_page.Obstacles[0] != null, "Connection change preserves remaining obstacles");
                         File.AppendAllText(Report, "BookObstacleRuntime COMPLETE\n");

@@ -18,4 +18,5 @@ public enum BOOK_MESSAGE_TYPE : byte
     GAME_STARTED = 9,
     APPLY_DIRT = 10,
     CAST_SELECTION = 11,
+    GAME_SESSION = 12,
 }

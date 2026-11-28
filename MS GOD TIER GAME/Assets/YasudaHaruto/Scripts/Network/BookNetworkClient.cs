@@ -45,6 +45,8 @@ public class BookNetworkClient : MonoBehaviour
         get; private set;
     }
     public event Action GameStarted;
+    public event Action GameSessionChanged;
+    private ulong? m_gameSessionId;
 
 
     public bool IsReconnecting => m_shouldReconnect && ConnectionState != BOOK_CONNECTION_STATE.CONNECTED;
@@ -429,6 +431,10 @@ public class BookNetworkClient : MonoBehaviour
                 LastConnectionError = "Player slot is already in use. Select another Player.";
                 Disconnect();
                 break;
+            case BOOK_MESSAGE_TYPE.GAME_SESSION:
+                if (reader.Length == 1 + sizeof(ulong) && CanSend())
+                    ReceiveGameSession(reader.ReadULong());
+                break;
             case BOOK_MESSAGE_TYPE.GAME_STARTED:
                 if (reader.Length != 1 || !CanSend() || HasGameStarted)
                     break;
@@ -471,6 +477,22 @@ public class BookNetworkClient : MonoBehaviour
                     $"–¢‘Î‰žMessage : {messageType}");
                 break;
         }
+    }
+
+
+    private void ReceiveGameSession(ulong sessionId)
+    {
+        if (m_gameSessionId == sessionId)
+            return;
+
+        bool hadSession = m_gameSessionId.HasValue;
+        m_gameSessionId = sessionId;
+        HasGameStarted = false;
+        if (!hadSession)
+            return;
+
+        m_acquiredPageIds.Clear();
+        GameSessionChanged?.Invoke();
     }
 
 

@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackView, IRuneCooldownView, IRuneCooldownReleaseView, IRuneCastPresentation
+public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackView, IRuneCastPresentation
 {
     [SerializeField] private RuneLineGraphic m_referenceGraphic;
     [SerializeField] private RuneLineGraphic m_playerGraphic;
@@ -33,14 +33,6 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
     [SerializeField, Min(1f)] private float m_completionEndScale = 1.4f;
     private RuneCompletionOverlay m_completionOverlay;
 
-    [Header("Cooldown Feedback")]
-    [SerializeField, Range(0.05f, 0.8f)] private float m_cooldownBrightness = 0.28f;
-    [SerializeField, Min(0.05f)] private float m_cooldownReleaseDuration = 0.4f;
-    [SerializeField, Range(0f, 0.5f)] private float m_cooldownReleaseRise = 0.12f;
-    private RuneCooldownImageFeedback m_cooldownFeedback;
-    private Func<UnityEngine.UI.Image> m_cooldownImage;
-    private bool m_releaseCooldown;
-    private float m_releaseCooldownSeconds;
 
     private Func<Rect?> m_spellBookRect;
     private Func<Vector2> m_spellOrigin;
@@ -77,14 +69,6 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
             m_spellEffect.Hide();
     }
 
-
-    public void ConfigureCooldownImage(Func<UnityEngine.UI.Image> image) => m_cooldownImage = image;
-
-    public void PlayCooldownRelease(float cooldownSeconds = 1f)
-    {
-        m_releaseCooldown = true;
-        m_releaseCooldownSeconds = Mathf.Max(0f, cooldownSeconds);
-    }
 
 
     private readonly List<RuneStrokeData> m_completedStrokes = new();
@@ -169,7 +153,6 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
         // Retry resets the drawing without erasing the failure animation just started.
         if (m_runeData != runeData)
             HideFailure();
-        HideCooldown();
         m_runeData = runeData;
         HideCompletion();
         HideSpell(true);
@@ -305,33 +288,6 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
     }
 
 
-    public void ShowCooldown(float remainingFraction)
-    {
-        HideCompletion();
-        ClearGraphics();
-        if (!isActiveAndEnabled || remainingFraction <= 0f || m_cooldownImage == null)
-        {
-            HideCooldown();
-            return;
-        }
-        if (m_cooldownFeedback == null)
-            m_cooldownFeedback = gameObject.AddComponent<RuneCooldownImageFeedback>();
-        if (!m_cooldownFeedback.IsVisible)
-            m_cooldownFeedback.Show(m_cooldownImage?.Invoke(), m_releaseCooldown,
-                Mathf.Min(m_cooldownReleaseDuration, m_releaseCooldownSeconds * 0.1f), m_cooldownBrightness, m_cooldownReleaseRise);
-        m_releaseCooldown = false;
-        m_cooldownFeedback.SetRemaining(remainingFraction);
-    }
-
-
-    private void HideCooldown()
-    {
-        m_releaseCooldown = false;
-        if (m_cooldownFeedback != null)
-            m_cooldownFeedback.Hide();
-    }
-
-
     private void ClearGraphics()
     {
         ClearPlayerStrokes();
@@ -352,7 +308,6 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
     public void Clear()
     {
         HideSpell();
-        HideCooldown();
         m_runeData = null;
         HideCompletion();
         ClearGraphics();
@@ -371,7 +326,6 @@ public class RunePageView : MonoBehaviour, IRuneTraceView, IRuneTraceFeedbackVie
     {
         ClearPlayerStrokes();
         HideSpell();
-        HideCooldown();
         HideFailure();
         HideCompletion();
     }

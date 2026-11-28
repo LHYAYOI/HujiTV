@@ -318,16 +318,14 @@ namespace YasudaHaruto.BookValidation.Editor
                         break;
                     case 8:
                         s_overlay.OnPointerUp(Pointer(s_home + new Vector2(-0.35f, 0.35f) * Screen.height));
-                        Require(s_effect.IsFlying && s_controller.State == RUNE_TRACE_STATE.COOLDOWN && s_castCount == 1 &&
+                        Require(s_effect.IsFlying && s_controller.CanBeginStroke && s_castCount == 1 &&
                             s_lastDirection == MAGIC_CAST_DIRECTION.CENTER, "Release keeps the locked direction and launches once");
                         Require(s_overlay.IsFadingOut && s_overlay.gameObject.activeSelf &&
                             !s_overlay.GetComponentInChildren<RuneCastGuideGraphic>().raycastTarget,
                             "Release keeps the dimmer visible briefly without blocking input");
-                        float remaining = s_controller.CooldownRemaining;
                         Vector2 launch = s_effect.Center;
                         s_effect.Advance(s_settings.FlightDuration * 0.18f);
-                        Require(s_effect.Center.y > launch.y &&
-                            Mathf.Approximately(s_controller.CooldownRemaining, remaining), "Preview flies without ticking cooldown");
+                        Require(s_effect.Center.y > launch.y && s_controller.CanBeginStroke, "Flight continues while a new trace can start");
                         Capture("05-flight");
                         break;
                     case 9:
@@ -388,7 +386,7 @@ namespace YasudaHaruto.BookValidation.Editor
                         s_overlay.OnDrag(Pointer(upEnd));
                         s_overlay.OnPointerUp(Pointer(upEnd));
                         s_overlay.OnPointerUp(Pointer(upEnd));
-                        Require(s_controller.State == RUNE_TRACE_STATE.COOLDOWN && s_effect.IsFlying &&
+                        Require(s_controller.CanBeginStroke && s_effect.IsFlying &&
                             s_castCount == beforeUpCast + 1 && s_lastDirection == MAGIC_CAST_DIRECTION.NONE,
                             "Up swipe launches once and preserves NONE for the spell command");
                         CheckInstantCast();
@@ -426,7 +424,7 @@ namespace YasudaHaruto.BookValidation.Editor
                     "Instant cast keeps the rune in place without a bullet preview");
                 s_effect.Launch(MAGIC_CAST_DIRECTION.CENTER);
                 s_view.BeginTrace(s_rune);
-                Require(s_effect.IsActivating && !s_effect.IsFlying, "Instant activation survives cooldown reset without flying");
+                Require(s_effect.IsActivating && !s_effect.IsFlying, "Instant activation survives the trace reset without flying");
                 s_effect.Advance(0.1f);
                 Require((s_effect.Center - home).sqrMagnitude < 0.01f, "Instant activation stays at its origin");
                 s_effect.Advance(0.2f);

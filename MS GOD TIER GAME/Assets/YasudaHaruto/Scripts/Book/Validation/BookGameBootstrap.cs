@@ -5,6 +5,7 @@
 // 概要： 本の初期化と管理
 //-----------------------------------------------
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace YasudaHaruto.BookValidation
 {
@@ -17,14 +18,11 @@ namespace YasudaHaruto.BookValidation
 
         [Header("Rune")]
         [SerializeField] private RunePageView m_runeTraceView;
-        [SerializeField, Min(0f)] private float m_runeCooldownSeconds = 1f;
-        [SerializeField, Range(0f, 1f)] private float m_cooldownBookDim = 0.6f;
-        private bool m_bookDimmedForCooldown;
-        private float m_bookDimBeforeCooldown;
 
 
         [Header("Input")]
         [SerializeField] private BookGameDragInput m_gameDragInput;
+        [SerializeField] private bool m_showPageTabs;
 
 
         [Header("Obstacles")]
@@ -36,6 +34,7 @@ namespace YasudaHaruto.BookValidation
         private BookNetworkClient m_networkClient;
         private bool? m_pendingCastSelection;
         private BookPageRequestQueue m_pageRequests;
+        private bool m_isReloadingSession;
 
         public BookGameController GameController => m_gameController;
 
@@ -52,11 +51,9 @@ namespace YasudaHaruto.BookValidation
             BookInputController inputController = new BookInputController();
 
             m_runeTraceController = new RuneTraceController(m_runeTraceView);
-            m_runeTraceController.SetCooldown(m_runeCooldownSeconds);
             m_runeTraceController.CastSelectionChanged += OnCastSelectionChanged;
             m_runeTraceController.CastConfirmed += OnCastConfirmed;
 
-            // Cooldown dimming is handled for the whole book by UpdateBookCooldownDim.
             m_runeTraceView.ConfigureScreenProjection(m_gameDragInput.GetRuneScreenRect, m_gameDragInput.GetGraphicScreenRect);
             m_runeTraceView.ConfigureTraceOverlay(() => m_gameController.BookView != null &&
                 m_gameController.BookView.IsReady && !m_gameController.BookView.IsClosed);
@@ -80,6 +77,8 @@ namespace YasudaHaruto.BookValidation
             }
 
             m_gameDragInput.Initialize(m_runeTraceController, inputController);
+            if (m_showPageTabs)
+                gameObject.AddComponent<BookPageTabs>().Initialize(m_gameController, m_gameDragInput);
             m_pageRequests = new BookPageRequestQueue(m_pageDatabase, m_gameController);
             Debug.Log("BookGameBootstrap : 初期化完了");
             m_obstacleController = gameObject.AddComponent<BookObstacleController>();
@@ -92,6 +91,7 @@ namespace YasudaHaruto.BookValidation
                 foreach (byte pageId in m_networkClient.AcquiredPageIds)
                     m_pageRequests.ReceiveAcquired(pageId, false);
                 m_networkClient.ObstacleReceived += m_obstacleController.Receive;
+                m_networkClient.GameSessionChanged += ReloadBookForNewSession;
                 m_networkClient.OnConnectionStateChanged += OnConnectionStateChanged;
                 OnConnectionStateChanged(m_networkClient.ConnectionState);
                 gameObject.AddComponent<BookConnectionStatusView>().Initialize(m_networkClient);
@@ -101,45 +101,12 @@ namespace YasudaHaruto.BookValidation
 
         private void Update()
         {
-            m_runeTraceController?.Tick(Time.deltaTime);
-            UpdateBookCooldownDim();
+            if (m_isReloadingSession)
+                return;
             m_pageRequests?.Tick();
             if (m_pendingCastSelection.HasValue && m_networkClient != null &&
                 m_networkClient.SendCastSelection(m_pendingCastSelection.Value))
                 m_pendingCastSelection = null;
-        }
-
-
-        private void UpdateBookCooldownDim()
-        {
-            var book = m_gameController != null ? m_gameController.BookView : null;
-            var flipView = book != null ? book.FlipView : null;
-            if (flipView == null || !flipView.isActiveAndEnabled)
-                return;
-
-            bool coolingDown = m_cooldownBookDim > 0f &&
-                m_runeTraceController?.State == RUNE_TRACE_STATE.COOLDOWN &&
-                book.isActiveAndEnabled && !book.IsClosed;
-            if (coolingDown == m_bookDimmedForCooldown)
-                return;
-
-            m_bookDimmedForCooldown = coolingDown;
-            if (coolingDown)
-                m_bookDimBeforeCooldown = flipView.Dim;
-            flipView.FadeDim(coolingDown ? Mathf.Max(m_bookDimBeforeCooldown, m_cooldownBookDim) :
-                m_bookDimBeforeCooldown, 0.15f);
-        }
-
-
-        private void OnDisable()
-        {
-            if (!m_bookDimmedForCooldown)
-                return;
-
-            m_bookDimmedForCooldown = false;
-            var book = m_gameController != null ? m_gameController.BookView : null;
-            if (book != null && book.FlipView != null)
-                book.FlipView.SetDim(m_bookDimBeforeCooldown);
         }
 
 
@@ -160,7 +127,39 @@ namespace YasudaHaruto.BookValidation
 
         private void OnConnectionStateChanged(BOOK_CONNECTION_STATE state)
         {
-            m_obstacleController.SetConnected(state == BOOK_CONNECTION_STATE.CONNECTED);
+            m_obstacleController.SetConnected(!m_isReloadingSession && state == BOOK_CONNECTION_STATE.CONNECTED);
+        }
+
+
+        private void ReloadBookForNewSession()
+        {
+            if (m_isReloadingSession)
+                return;
+
+            var scene = gameObject.scene;
+            try
+            {
+                var parameters = new LoadSceneParameters(LoadSceneMode.Single);
+#if UNITY_EDITOR
+                if (scene.buildIndex < 0 && !string.IsNullOrEmpty(scene.path))
+                    m_isReloadingSession = UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(
+                        scene.path, parameters) != null;
+                else
+#endif
+                    m_isReloadingSession = scene.buildIndex >= 0 && SceneManager.LoadSceneAsync(scene.buildIndex, parameters) != null;
+            }
+            catch (System.Exception exception)
+            {
+                Debug.LogException(exception, this);
+            }
+            if (!m_isReloadingSession)
+            {
+                Debug.LogError("The current book scene could not be reloaded. Include it in the tablet Build Profile.", this);
+                return;
+            }
+            m_pageRequests.Clear();
+            OnConnectionStateChanged(m_networkClient.ConnectionState);
+            m_pendingCastSelection = null;
         }
 
 
@@ -175,6 +174,7 @@ namespace YasudaHaruto.BookValidation
                 }
                 if (m_obstacleController != null)
                     m_networkClient.ObstacleReceived -= m_obstacleController.Receive;
+                m_networkClient.GameSessionChanged -= ReloadBookForNewSession;
                 m_networkClient.OnConnectionStateChanged -= OnConnectionStateChanged;
             }
             m_pageRequests?.Clear();

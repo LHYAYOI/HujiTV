@@ -165,9 +165,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::YasudaHaruto.BookValidation.BookGameBootstrap
   m_gameController: {fileID: 1832026887}
   m_runeTraceView: {fileID: 1457169296}
-  m_runeCooldownSeconds: 5
-  m_cooldownBookDim: 0.6
   m_gameDragInput: {fileID: 8271864336177666055}
+  m_showPageTabs: 1
   m_obstacleSettings: {fileID: 0}
   m_rightObstacleArea:
     serializedVersion: 2
@@ -722,9 +721,6 @@ MonoBehaviour:
   m_failureCrossSprite: {fileID: 0}
   m_completionDuration: 0.65
   m_completionEndScale: 1.4
-  m_cooldownBrightness: 0.07
-  m_cooldownReleaseDuration: 0.6
-  m_cooldownReleaseRise: 0.12
 --- !u!224 &1457169297
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1774,7 +1770,7 @@ MonoBehaviour:
   m_leftCrop: {x: 0.1125, y: 0.1, z: 0.3875, w: 0.8}
   m_rightCrop: {x: 0.5, y: 0.1, z: 0.3875, w: 0.8}
   m_pageAspectOverride: 0
-  m_turnDuration: 0.75
+  m_turnDuration: 0.375
   m_turnCurve:
     serializedVersion: 2
     m_Curve:
@@ -1801,7 +1797,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   m_autoCorner: 0
   m_autoLift: 0.12
-  m_releaseSpeed: 4
+  m_releaseSpeed: 8
   m_flickSpeed: 2.5
   m_frontCover: {fileID: 0}
   m_backCover: {fileID: 0}

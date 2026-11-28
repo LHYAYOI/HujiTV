@@ -434,7 +434,14 @@ namespace YasudaHaruto.BookValidation
         }
 
 
-        private void ShowSpreadInternal(int spreadIndex, bool instant)
+        internal void ShowTabStep(int spreadIndex)
+        {
+            if (IsReady && !IsClosed && Mathf.Abs(spreadIndex - m_spreadIndex) == 1)
+                ShowSpreadInternal(spreadIndex, false, true);
+        }
+
+
+        private void ShowSpreadInternal(int spreadIndex, bool instant, bool quickTurn = false)
         {
             if (!isActiveAndEnabled || !m_inventoryInitialized)
                 return;
@@ -479,7 +486,7 @@ namespace YasudaHaruto.BookValidation
             }
             else if (m_modelView != null && !m_modelView.Initialize())
                 return;
-            StartCoroutine(CaptureSpread(spreadIndex, leftPage, rightPage, instant));
+            StartCoroutine(CaptureSpread(spreadIndex, leftPage, rightPage, instant, quickTurn));
         }
 
 
@@ -774,7 +781,7 @@ namespace YasudaHaruto.BookValidation
 
 
         private IEnumerator CaptureSpread(
-            int spreadIndex, BookPageData leftPage, BookPageData rightPage, bool instant)
+            int spreadIndex, BookPageData leftPage, BookPageData rightPage, bool instant, bool quickTurn)
         {
             m_captureFlag = true;
             bool advanceFlag = spreadIndex > m_spreadIndex;
@@ -804,7 +811,10 @@ namespace YasudaHaruto.BookValidation
                 m_flipView.SetReadingProgress(m_spreadIndex, SpreadCount);
                 if (turnFlag)
                 {
-                    yield return m_flipView.PlayTurn(m_currentTexture, targetTexture, advanceFlag);
+                    if (quickTurn)
+                        yield return PlayQuickTurn(targetTexture, advanceFlag);
+                    else
+                        yield return m_flipView.PlayTurn(m_currentTexture, targetTexture, advanceFlag);
                     EndLiveCurrent();
                     if (!m_flipView.LastTurnCommitted)
                     {
@@ -860,6 +870,20 @@ namespace YasudaHaruto.BookValidation
             m_captureFlag = false;
             SpreadShown?.Invoke(spreadIndex);
             ResumePendingSpread();
+        }
+
+
+        private IEnumerator PlayQuickTurn(Texture target, bool forward)
+        {
+            var turn = m_flipView.PlayTurn(m_currentTexture, target, forward, 1);
+            while (turn.MoveNext())
+            {
+                // Sample the existing automatic turn twice per rendered frame.
+                // Keep explicit waits and the last frame before the texture swap.
+                if (turn.Current == null && m_flipView.IsTurning && m_flipView.TurnAmount < 1f && !turn.MoveNext())
+                    yield break;
+                yield return turn.Current;
+            }
         }
 
 

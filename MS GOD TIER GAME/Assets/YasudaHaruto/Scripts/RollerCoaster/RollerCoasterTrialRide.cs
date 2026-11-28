@@ -21,6 +21,7 @@ namespace YasudaHaruto.RollerCoaster
         private float m_speed = 12f;
         [SerializeField, Range(0f, 0.99f)] private float m_startProgress;
         [SerializeField, Range(0f, 30f)] private float m_fallPitch = 15f;
+        [SerializeField] private bool m_showDebugControls = true;
         private readonly List<Camera> m_disabledCameras = new List<Camera>();
         private readonly List<AudioListener> m_disabledListeners = new List<AudioListener>();
         private readonly List<CinemachineBrain> m_disabledBrains = new List<CinemachineBrain>();
@@ -111,7 +112,7 @@ namespace YasudaHaruto.RollerCoaster
 
         private void Update()
         {
-            if (!m_started)
+            if (!m_started || !m_showDebugControls)
                 return;
             if (Input.GetKeyDown(KeyCode.Space))
                 TogglePause();
@@ -267,7 +268,7 @@ namespace YasudaHaruto.RollerCoaster
 
         private void OnGUI()
         {
-            if (!m_started)
+            if (!m_started || !m_showDebugControls)
                 return;
             GUI.Box(new Rect(12f, 12f, 340f, 76f), "Trial Ride  " + Mathf.RoundToInt(Progress * 100f) + "%   Speed " + m_cart.Speed.ToString("F1"));
             if (GUI.Button(new Rect(24f, 43f, 148f, 30f), m_finished ? "Restart (Space)" : m_paused ? "Resume (Space)" : "Pause (Space)"))
